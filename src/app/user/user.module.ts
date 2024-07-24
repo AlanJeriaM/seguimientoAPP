@@ -8,6 +8,7 @@ import { MainComponent } from './pages/main/main.component';
 import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
 import { DashboardUserComponent } from './pages/dashboard-user/dashboard-user.component';
 import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
+import { UserRoutingModule } from './user-routing.module';
 
 
 
@@ -23,7 +24,8 @@ import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.co
     ViewEncuestasComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    UserRoutingModule,
   ]
 })
 export class UserModule { }
