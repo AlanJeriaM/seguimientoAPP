@@ -9,6 +9,7 @@ import { CreateEncuestaComponent } from './pages/create-encuesta/create-encuesta
 import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
 import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin.component';
+import { AdminRoutingModule } from './admin-routing.module';
 
 
 
@@ -22,10 +23,11 @@ import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin
     CreateEncuestaComponent,
     ViewDeletedUsersComponent,
     ViewUsersComponent,
-    DashboardAdminComponent
+    DashboardAdminComponent,
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    AdminRoutingModule,
   ]
 })
 export class AdminModule { }
