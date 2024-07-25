@@ -40,6 +40,8 @@ const components: any[] = [
     PrimeNgModule,
     NgbModule,
     NgbPaginationModule,
-  ]
+  ],
+
+
 })
 export class VisitorModule { }

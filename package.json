@@ -20,6 +20,7 @@
     "@angular/router": "^18.1.0",
     "@ng-bootstrap/ng-bootstrap": "^17.0.0",
     "@popperjs/core": "^2.11.8",
+    "@sweetalert2/ngx-sweetalert2": "^12.4.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "jquery": "^3.7.1",
@@ -27,6 +28,7 @@
     "primeicons": "^7.0.0",
     "primeng": "^17.18.5",
     "rxjs": "~7.8.0",
+    "sweetalert2": "^11.12.3",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
   },
