@@ -1,1 +1,28 @@
-<p>navbar-visitor works!</p>
+
+<header class="p-3 border-bottom">
+  <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+
+          <a routerLink="/visitor" class="navbar-brand d-flex align-items-center text-dark text-decoration-none">
+              <img src="assets/icons/uv.png" alt="uv.png">
+              <strong class="smaller-text">Seguimiento egresados</strong>
+          </a>
+
+          <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse mt-2" id="navbarNav">
+              <div class="text-end">
+                  <a routerLink="/visitor/login" class="mx-2">
+                      <button pButton type="button" label=" Iniciar sesión con LinkedIn" icon="pi pi-linkedin" class="btn btn-primary "></button>
+                  </a>
+              </div>
+          </div>
+      </div>
+  </nav>
+</header>
+
+
+

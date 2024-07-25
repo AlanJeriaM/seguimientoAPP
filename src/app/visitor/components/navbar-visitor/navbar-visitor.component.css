@@ -1,0 +1,33 @@
+/* Media query para pantallas grandes (por ejemplo, 992px o más) */
+
+
+@media (min-width: 992px) {
+  .collapse.navbar-collapse {
+      display: flex;
+      justify-content: flex-end;
+  }
+
+  .collapse.navbar-collapse .text-end {
+      display: flex;
+  }
+
+  .collapse.navbar-collapse .text-end .btn {
+      margin-left: 10px;
+      /* Puedes ajustar el espaciado entre los botones si es necesario */
+  }
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand img {
+  height: 50px; /* Ajusta la altura del logo según tus necesidades */
+  margin-right: 10px; /* Ajusta el margen entre el logo y el texto */
+}
+
+.navbar-brand strong {
+  font-size: 1rem; /* Ajusta el tamaño del texto del nombre */
+}
+
