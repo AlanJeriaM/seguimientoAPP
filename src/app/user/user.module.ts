@@ -9,6 +9,8 @@ import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
 import { DashboardUserComponent } from './pages/dashboard-user/dashboard-user.component';
 import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
 import { UserRoutingModule } from './user-routing.module';
+import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -26,6 +28,8 @@ import { UserRoutingModule } from './user-routing.module';
   imports: [
     CommonModule,
     UserRoutingModule,
+    PrimeNgModule,
+    NgbModule,
   ]
 })
 export class UserModule { }

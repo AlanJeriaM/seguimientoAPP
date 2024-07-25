@@ -10,6 +10,9 @@ import { LoginComponent } from './pages/login/login.component';
 import { MainComponent } from './pages/main/main.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { VisitorRoutingModule } from './visitor-routing.module';
+import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
+import { NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 const components: any[] = [
@@ -33,6 +36,10 @@ const components: any[] = [
   imports: [
     CommonModule,
     VisitorRoutingModule,
+    ReactiveFormsModule,
+    PrimeNgModule,
+    NgbModule,
+    NgbPaginationModule,
   ]
 })
 export class VisitorModule { }

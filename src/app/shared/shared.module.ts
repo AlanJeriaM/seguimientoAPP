@@ -8,7 +8,7 @@ import { PrimeNgModule } from './modules/prime-ng/prime-ng.module';
   declarations: [],
   imports: [
     CommonModule,
-    PrimeNgModule
+    PrimeNgModule,
   ]
 })
 export class SharedModule { }
