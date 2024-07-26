@@ -1,0 +1,6 @@
+@media (max-width: 768px) {
+  .hide-on-small-screen {
+      /* Oculta la etiqueta <a> en pantallas pequeñas */
+      display: none;
+  }
+}

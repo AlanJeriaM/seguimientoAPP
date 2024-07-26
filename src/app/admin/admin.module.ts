@@ -10,6 +10,10 @@ import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-delet
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
 import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin.component';
 import { AdminRoutingModule } from './admin-routing.module';
+import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
 
 
 
@@ -24,10 +28,15 @@ import { AdminRoutingModule } from './admin-routing.module';
     ViewDeletedUsersComponent,
     ViewUsersComponent,
     DashboardAdminComponent,
+    ViewEncuestasComponent,
   ],
   imports: [
     CommonModule,
     AdminRoutingModule,
+    PrimeNgModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbModule,
   ]
 })
 export class AdminModule { }
