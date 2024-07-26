@@ -1,0 +1,3 @@
+::ng-deep .p-panelmenu .p-panelmenu-content .p-menuitem-link {
+  text-decoration: none !important;
+}

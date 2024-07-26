@@ -16,6 +16,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { ToastModule } from 'primeng/toast';
 import { RippleModule } from 'primeng/ripple';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { BadgeModule } from 'primeng/badge';
 // import { PaginatorModule } from 'primeng/paginator';
 
 
@@ -36,7 +37,10 @@ const primeNgModules = [
   InputSwitchModule,
   ToastModule,
   RippleModule,
-  ToggleButtonModule
+  ToggleButtonModule,
+  BadgeModule,
+  RippleModule,
+
   // PaginatorModule
 ]
 
