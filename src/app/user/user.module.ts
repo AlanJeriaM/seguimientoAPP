@@ -11,6 +11,9 @@ import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.co
 import { UserRoutingModule } from './user-routing.module';
 import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
+import { EncuestaCompletadaComponent } from './pages/encuesta-completada/encuesta-completada.component';
 
 
 
@@ -23,13 +26,18 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     MainComponent,
     MiProfileComponent,
     DashboardUserComponent,
-    ViewEncuestasComponent
+    ViewEncuestasComponent,
+    EncuestaCompletadaComponent
   ],
   imports: [
     CommonModule,
     UserRoutingModule,
     PrimeNgModule,
+    ReactiveFormsModule,
     NgbModule,
+  ],
+  providers: [
+    MessageService,
   ]
 })
 export class UserModule { }
