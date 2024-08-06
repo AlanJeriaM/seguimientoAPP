@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 
-import { FooterComponent } from './components/footer/footer.component';
 import { NavbarVisitorComponent } from './components/navbar-visitor/navbar-visitor.component';
 import { TermsAndConditionsComponent } from './components/terms-and-conditions/terms-and-conditions.component';
 import { HomeComponent } from './pages/home/home.component';
@@ -13,13 +12,13 @@ import { VisitorRoutingModule } from './visitor-routing.module';
 import { PrimeNgModule } from '../shared/modules/prime-ng/prime-ng.module';
 import { NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SharedModule } from '../shared/shared.module';
 
 
 const components: any[] = [
 
   HomeComponent,
   LoginComponent,
-  FooterComponent,
   NavbarVisitorComponent,
   MainComponent,
   RegisterComponent,
@@ -35,6 +34,7 @@ const components: any[] = [
   ],
   imports: [
     CommonModule,
+    SharedModule,
     VisitorRoutingModule,
     ReactiveFormsModule,
     PrimeNgModule,

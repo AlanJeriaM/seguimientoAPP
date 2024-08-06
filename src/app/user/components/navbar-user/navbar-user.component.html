@@ -2,7 +2,7 @@
   <div class="container">
       <div class="row">
           <div class="col-12 d-flex align-items-center justify-content-between">
-              <!-- Contenido a la izquierda -->
+
               <div class="d-flex align-items-center">
                   <div class="mx-3">
                       <app-sidebar-user nameUser="{{userName}}"></app-sidebar-user>
@@ -14,20 +14,16 @@
               </a>
               </div>
 
-              <!-- Contenido a la derecha -->
+
               <div class="dropdown">
                   <a class="d-inline link-dark text-decoration-none dropdown-toggle" id="dropdownUser1"
                       data-bs-toggle="dropdown" aria-expanded="false">
-                      <img src="assets/icons/fotoperfil.png" alt="fotoperfil.png" width="32" height="32"
-                          class="rounded-circle">
+                      <div class="user-image-container">
+                         <img src="assets/icons/fotoperfil.png" alt="fotoperfil.png"
+                          class="rounded-0">
+                        </div>
                   </a>
                   <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                      <!-- <li><a class="dropdown-item">Términos y condiciones</a></li>
-                      <li><a class="dropdown-item">¿Quiénes somos?</a></li>
-                      <li><a class="dropdown-item">Contáctanos</a></li>
-                       <li>
-                          <hr class="dropdown-divider">
-                      </li> -->
                       <li><a routerLink="/user/my-profile" class="dropdown-item">Mi Perfil</a></li>
                       <li><a class="dropdown-item" (click)="logOut()">Cerrar sesión</a></li>
                   </ul>
@@ -36,3 +32,15 @@
       </div>
   </div>
 </header>
+<!-- <div class="layout-topbar">
+  <p-button type="button" class="mr-2" (onClick)="openSidebar()" icon="pi pi-bars"  />
+</div> -->
+
+
+<!-- <div class="layout-topbar">
+  <a class="layout-topbar-logo" routerLink="">
+      <img class="mx-2" width="100" src="assets/icons/uv.png" alt="uv.png">
+      <span>SAKAI</span>
+  </a>
+
+</div> -->
