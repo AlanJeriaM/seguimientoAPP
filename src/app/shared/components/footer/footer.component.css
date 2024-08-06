@@ -1,0 +1,28 @@
+.subrayado{
+  text-decoration: none;
+
+  }
+  .footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2.2rem 0;
+    border-top: 1px solid #dee2e6;
+    background-color: white; /* Para asegurar que el contenido debajo no se vea */
+  }
+
+  .footer-center {
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .icon-link {
+    margin: 0 10px;
+  }
+
+
+
+

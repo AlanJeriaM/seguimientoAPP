@@ -3,6 +3,7 @@ import { MenuItem } from 'primeng/api';
 
 
 
+
 @Component({
   selector: 'app-sidebar-admin',
   templateUrl: './sidebar-admin.component.html',
@@ -21,6 +22,8 @@ export class SidebarAdminComponent implements OnInit {
   ngOnInit(): void {
 
     this.itemsPanelMenu = [
+
+
       {
         label: 'Reporte Egresado LinkedIn',
         icon: 'pi pi-linkedin',

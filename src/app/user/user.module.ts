@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FooterComponent } from './components/footer/footer.component';
 import { NavbarUserComponent } from './components/navbar-user/navbar-user.component';
 import { SidebarUserComponent } from './components/sidebar-user/sidebar-user.component';
 import { HomeComponent } from './pages/home/home.component';
@@ -14,12 +13,12 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { EncuestaCompletadaComponent } from './pages/encuesta-completada/encuesta-completada.component';
+import { SharedModule } from '../shared/shared.module';
 
 
 
 @NgModule({
   declarations: [
-    FooterComponent,
     NavbarUserComponent,
     SidebarUserComponent,
     HomeComponent,
@@ -31,6 +30,7 @@ import { EncuestaCompletadaComponent } from './pages/encuesta-completada/encuest
   ],
   imports: [
     CommonModule,
+    SharedModule,
     UserRoutingModule,
     PrimeNgModule,
     ReactiveFormsModule,
