@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { PrimeNGConfig } from 'primeng/api';
 import { PanelMenu } from 'primeng/panelmenu';
@@ -11,6 +11,7 @@ import { PanelMenu } from 'primeng/panelmenu';
 export class SidebarUserComponent implements OnInit {
 
     display!: boolean;
+    visibleSidebar: boolean = true;
     itemsPanelMenu: MenuItem[] = [];
 
     @Input() nameUser!: string
@@ -49,14 +50,10 @@ export class SidebarUserComponent implements OnInit {
         ]
       }
 
+      toggleSidebar() {
+        this.visibleSidebar = !this.visibleSidebar;
+      }
+
     }
 
-
-    // closeSidebar() {
-    //     const offcanvas: HTMLElement | null = document.querySelector('#offcanvasExample');
-    //     if (offcanvas) {
-    //         offcanvas.classList.remove('show'); // cierra el sidebar
-    //         // this.panelMenu.hide(); // oculta el menú desplegable (si está abierto)
-    //     }
-    // }
 
