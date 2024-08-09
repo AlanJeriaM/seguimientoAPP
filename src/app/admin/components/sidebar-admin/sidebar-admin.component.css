@@ -1,84 +1,115 @@
-/* medidas del sidebar y fondo del sidebar sin el menubar */
-.custom-sidebar {
-  background-color: #f8f9fa;
-  color: #2271c0;
-  width: 375px; /* Adjust the width as needed */
-  border-right: 2px solid #dee2e6;
-}
-
-/* color del fondo del boton */
-.custom-sidebar .offcanvas-header {
-  background-color: #376b9f;
-  color: #ffffff;
-}
-
-/* color del boton */
-.custom-sidebar .offcanvas-header button {
-  background-color: #b4b4b46e;
-  border: none;
-}
-/* color cuando coloco el mouse por encima del boton del sidebar */
-.custom-sidebar .offcanvas-header button:hover {
-  background-color: #0b7bea;
-  border: none;
-}
-
-/* titulo Administrador color  */
-.custom-sidebar .sidebar-title {
-  color: #485057;
-}
-
-/* Forma de la imagen del administrador admin4 */
-.custom-sidebar .sidebar-image {
-  border-radius: 10%;
-  border: 2px solid #674b9a;
-}
-
-/* color letra nameUser */
-.custom-sidebar .sidebar-username button {
-  background-color: #376b9f;
-  color: #fff;
-  border: none;
-}
-
-/* color cuando coloco el mouse por encima del boton nameUser */
-.custom-sidebar .sidebar-username button:hover {
-  background-color: #0b7bea;
-}
-
+/* Botón de abrir el sidebar */
 .custom-btn {
-  background-color: #376b9f; /* Cambia este color según tu preferencia */
-  color: #ffffff; /* Color del texto */
+  background-color: #376b9f !important;
+  color: #ffffff !important;
   border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-size: 17px;
 }
 
 .custom-btn:hover {
-  background-color: #0b7bea;
-  border-color: none; /* Color al pasar el ratón por encima */
+  background-color: #0b7def;
 }
 
-
-::ng-deep .p-menubar .p-menuitem-link {
-  text-decoration: none !important; /* Elimina el subrayado */
-  color: inherit !important; /* Asegura que el color sea el mismo que el del texto del menú */
+/* Estilo para el encabezado del sidebar */
+.p-sidebar-header {
+  background-color: #376b9f; /* Fondo azul del encabezado del sidebar */
+  padding: 0.8rem; /* Espaciado interno del encabezado */
+  border-radius: 5px;
+  display: flex;
+  justify-content: flex-end; /* Alinea el botón de cierre a la derecha */
 }
 
-
-/* .custom-menubar {
-  background-color: #4a3f4d6e;
-  border: none;
+/* Botón de cierre personalizado del sidebar */
+.custom-close-btn {
+  background-color: #376b9f; /* Fondo azul */
+  color: #ffffff; /* Color del icono */
+  border: none; /* Sin borde */
+  border-radius: 50%; /* Forma circular */
+  padding: 0.5rem; /* Espaciado interno */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra sutil */
 }
 
-.custom-menubar .p-menubar .p-menuitem-link {
-  color: #f50000;
-  background-color: #495057;
-  border-radius: 4px;
-  margin: 4px 0;
-  padding: 10px;
+.custom-close-btn:hover {
+  background-color: #0b7bea; /* Fondo azul más oscuro al pasar el ratón */
+  color: #ffffff; /* Color del icono al pasar el ratón */
 }
 
-.p-menubar .p-menuitem-link:hover {
-  background-color: #de0e0e !important;
-} */
+/* Estilo para el contenido del sidebar */
+.p-sidebar-content {
+  padding: 0.5rem; /* Espaciado interno del contenido del sidebar */
+  overflow: auto; /* Permite el desplazamiento si el contenido es demasiado grande */
+}
 
+/* Estilo para el título del sidebar */
+.sidebar-title {
+  color: #0d0d0d; /* Color del texto del título */
+  margin-top: 8%;
+  text-align: center;
+}
 
+/* Estilo para la imagen del sidebar */
+.sidebar-image {
+  display: block;
+  margin: 0 auto; /* Centra la imagen horizontalmente */
+  border-radius: 30%; /* Forma circular */
+  border: 2px solid #2e2476; /* Borde alrededor de la imagen */
+  margin-top: 5%;
+  max-width: 100%; /* Ajusta la imagen al tamaño del contenedor */
+  height: auto; /* Mantiene la proporción de la imagen */
+}
+
+/* Estilo para el botón del nombre de usuario */
+.custom-username-btn {
+  background-color: #376b9f; /* Fondo azul */
+  color: #ffffff; /* Color del texto */
+  border: none; /* Sin borde */
+}
+
+.custom-username-btn:hover {
+  background-color: #0b7bea; /* Fondo azul más oscuro al pasar el ratón */
+}
+
+/* Estilo para el panelMenu */
+.custom-menubar {
+  background-color: #f8f9fa; /* Fondo del panelMenu */
+  border: none; /* Sin borde */
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .custom-btn {
+    padding: 8px 16px; /* Ajusta el padding en pantallas más pequeñas */
+    font-size: 15px; /* Reduce el tamaño del texto */
+  }
+
+  .p-sidebar-header {
+    padding: 0.5rem; /* Reduce el padding en pantallas más pequeñas */
+  }
+
+  .sidebar-title {
+    font-size: 1.2rem; /* Ajusta el tamaño del texto del título */
+  }
+
+  .sidebar-image {
+    width: 80px; /* Ajusta el tamaño de la imagen */
+    height: 80px; /* Ajusta el tamaño de la imagen */
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-btn {
+    padding: 6px 12px; /* Ajusta aún más el padding */
+    font-size: 13px; /* Reduce el tamaño del texto */
+  }
+
+  .sidebar-title {
+    font-size: 1rem; /* Ajusta el tamaño del texto del título */
+  }
+
+  .sidebar-image {
+    width: 60px; /* Ajusta el tamaño de la imagen */
+    height: 60px; /* Ajusta el tamaño de la imagen */
+  }
+}

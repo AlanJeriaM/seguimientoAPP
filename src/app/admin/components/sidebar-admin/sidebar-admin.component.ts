@@ -15,6 +15,7 @@ export class SidebarAdminComponent implements OnInit {
   visibleSidebar: boolean = true;
   itemsPanelMenu: MenuItem[] = [];
 
+
   @Input() nameUser!: string
 
   constructor() { }
@@ -66,5 +67,12 @@ export class SidebarAdminComponent implements OnInit {
       }
     ]
   }
+
+  toggleSidebar() {
+    this.visibleSidebar = !this.visibleSidebar;
+  }
+
+
+
 
 }
