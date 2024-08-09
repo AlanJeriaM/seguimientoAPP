@@ -38,27 +38,28 @@
 <button type="button" pButton icon="pi pi-bars" class="custom-btn" (click)="toggleSidebar()"></button>
 
 <p-sidebar [(visible)]="visibleSidebar" [position]="'left'" [modal]="true" [showCloseIcon]="false">
-  <!-- Botón personalizado de cierre del sidebar -->
-  <div class="p-sidebar-header">
-    <button type="button" pButton icon="pi pi-times" class="custom-close-btn" (click)="toggleSidebar()"></button>
-  </div>
-
-  <div class="p-sidebar-content">
-    <div class="sidebar-title-container">
-      <h3 class="sidebar-title"><strong>Administrador</strong></h3>
+    <!-- Botón personalizado de cierre del sidebar -->
+    <div class="p-sidebar-header">
+        <button type="button" pButton icon="pi pi-times" class="custom-close-btn" (click)="toggleSidebar()"></button>
     </div>
 
-    <hr class="sidebar-divider" />
+    <div class="p-sidebar-content">
+        <div class="sidebar-title-container">
+            <h3 class="sidebar-title"><strong>Administrador</strong></h3>
+        </div>
 
-    <img class="sidebar-image" src="assets/icons/admin4.png" alt="admin4.png" width="96" height="96" />
-    <h4 class="sidebar-username">
-      <!-- <p-button label="{{nameUser}}" class="custom-username-btn"> </p-button> -->
-    </h4>
+        <hr class="sidebar-divider" />
 
-    <hr class="sidebar-divider" />
-    <p-panelMenu [model]="itemsPanelMenu" class="custom-menubar"></p-panelMenu>
-  </div>
+        <img class="sidebar-image" src="assets/icons/admin4.png" alt="admin4.png" width="96" height="96" />
+        <h4 class="sidebar-username">
+            <!-- <p-button label="{{nameUser}}" class="custom-username-btn"> </p-button> -->
+        </h4>
+
+        <hr class="sidebar-divider" />
+        <p-panelMenu [model]="itemsPanelMenu" class="custom-menubar"></p-panelMenu>
+    </div>
 </p-sidebar>
+
 
 
 

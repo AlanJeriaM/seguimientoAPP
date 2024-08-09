@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, PrimeNGConfig } from 'primeng/api';
 
 
 
@@ -18,10 +18,10 @@ export class SidebarAdminComponent implements OnInit {
 
   @Input() nameUser!: string
 
-  constructor() { }
+  constructor(private primengConfig: PrimeNGConfig) { }
 
   ngOnInit(): void {
-
+    this.primengConfig.ripple = true;
     this.itemsPanelMenu = [
 
 
