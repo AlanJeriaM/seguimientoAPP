@@ -1,7 +1,7 @@
 <div class="container-fluid">
 
   <div *ngIf="!esAdmin">
-      <!-- Inicio de sesión para clientes -->
+
       <div class="container card mt-5 cardCustom">
           <div>
               <button (click)="esAdmin = !esAdmin; resetForm()" class="btn btn-dark btn-sm float-end mt-3">
@@ -22,7 +22,7 @@
 
   <div *ngIf="esAdmin">
 
-      <!-- Inicio de sesión para administradores -->
+
       <div class="container card mt-5 cardCustom">
           <div>
               <button (click)="esAdmin = !esAdmin; resetForm()" class="btn btn-dark btn-sm float-end mt-3">

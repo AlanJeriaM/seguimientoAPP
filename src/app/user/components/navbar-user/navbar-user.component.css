@@ -21,8 +21,7 @@
   width: 100%;
 }
 
-.left-content,
-.right-content {
+.left-content {
   display: flex;
   align-items: center;
 }
