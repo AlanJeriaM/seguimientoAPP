@@ -23,6 +23,7 @@
     "@sweetalert2/ngx-sweetalert2": "^12.4.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "chart.js": "^4.4.3",
     "jquery": "^3.7.1",
     "ngx-bootstrap-icons": "^1.9.3",
     "primeflex": "^3.3.1",

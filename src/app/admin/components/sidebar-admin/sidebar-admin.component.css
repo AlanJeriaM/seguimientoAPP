@@ -1,4 +1,84 @@
-::ng-deep .p-panelmenu .p-menuitem .p-menuitem-link,
-::ng-deep .p-panelmenu .p-panelmenu-header .p-menuitem-link {
-  text-decoration: none !important;
+/* medidas del sidebar y fondo del sidebar sin el menubar */
+.custom-sidebar {
+  background-color: #f8f9fa;
+  color: #2271c0;
+  width: 375px; /* Adjust the width as needed */
+  border-right: 2px solid #dee2e6;
 }
+
+/* color del fondo del boton */
+.custom-sidebar .offcanvas-header {
+  background-color: #376b9f;
+  color: #ffffff;
+}
+
+/* color del boton */
+.custom-sidebar .offcanvas-header button {
+  background-color: #b4b4b46e;
+  border: none;
+}
+/* color cuando coloco el mouse por encima del boton del sidebar */
+.custom-sidebar .offcanvas-header button:hover {
+  background-color: #0b7bea;
+  border: none;
+}
+
+/* titulo Administrador color  */
+.custom-sidebar .sidebar-title {
+  color: #485057;
+}
+
+/* Forma de la imagen del administrador admin4 */
+.custom-sidebar .sidebar-image {
+  border-radius: 10%;
+  border: 2px solid #674b9a;
+}
+
+/* color letra nameUser */
+.custom-sidebar .sidebar-username button {
+  background-color: #376b9f;
+  color: #fff;
+  border: none;
+}
+
+/* color cuando coloco el mouse por encima del boton nameUser */
+.custom-sidebar .sidebar-username button:hover {
+  background-color: #0b7bea;
+}
+
+.custom-btn {
+  background-color: #376b9f; /* Cambia este color según tu preferencia */
+  color: #ffffff; /* Color del texto */
+  border: none;
+}
+
+.custom-btn:hover {
+  background-color: #0b7bea;
+  border-color: none; /* Color al pasar el ratón por encima */
+}
+
+
+::ng-deep .p-menubar .p-menuitem-link {
+  text-decoration: none !important; /* Elimina el subrayado */
+  color: inherit !important; /* Asegura que el color sea el mismo que el del texto del menú */
+}
+
+
+/* .custom-menubar {
+  background-color: #4a3f4d6e;
+  border: none;
+}
+
+.custom-menubar .p-menubar .p-menuitem-link {
+  color: #f50000;
+  background-color: #495057;
+  border-radius: 4px;
+  margin: 4px 0;
+  padding: 10px;
+}
+
+.p-menubar .p-menuitem-link:hover {
+  background-color: #de0e0e !important;
+} */
+
+

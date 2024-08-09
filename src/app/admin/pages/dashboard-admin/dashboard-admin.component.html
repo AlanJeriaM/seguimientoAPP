@@ -1,1 +1,47 @@
-<p>dashboard-admin works!</p>
+<div class="p-grid">
+  <div class="p-col-12 p-md-6 p-lg-3">
+    <p-card header="Connections" styleClass="card">
+      <div class="p-d-flex p-jc-between">
+        <div class="p-d-flex p-ai-center">
+          <i class="pi pi-users p-mr-2" style="font-size: 2rem"></i>
+          <h3 class="p-m-0">1500</h3>
+        </div>
+      </div>
+    </p-card>
+  </div>
+  <div class="p-col-12 p-md-6 p-lg-3">
+    <p-card header="Messages" styleClass="card">
+      <div class="p-d-flex p-jc-between">
+        <div class="p-d-flex p-ai-center">
+          <i class="pi pi-comments p-mr-2" style="font-size: 2rem"></i>
+          <h3 class="p-m-0">75</h3>
+        </div>
+      </div>
+    </p-card>
+  </div>
+  <div class="p-col-12 p-md-6 p-lg-3">
+    <p-card header="Profile Views" styleClass="card">
+      <div class="p-d-flex p-jc-between">
+        <div class="p-d-flex p-ai-center">
+          <i class="pi pi-eye p-mr-2" style="font-size: 2rem"></i>
+          <h3 class="p-m-0">300</h3>
+        </div>
+      </div>
+    </p-card>
+  </div>
+  <div class="p-col-12 p-md-6 p-lg-3">
+    <p-card header="Endorsements" styleClass="card">
+      <div class="p-d-flex p-jc-between">
+        <div class="p-d-flex p-ai-center">
+          <i class="pi pi-thumbs-up p-mr-2" style="font-size: 2rem"></i>
+          <h3 class="p-m-0">120</h3>
+        </div>
+      </div>
+    </p-card>
+  </div>
+  <div class="p-col-12">
+    <p-card>
+      <p-chart type="line" [data]="chartData" [options]="chartOptions"></p-chart>
+    </p-card>
+  </div>
+</div>

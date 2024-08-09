@@ -1,4 +1,4 @@
-<header class="p-3 border-bottom">
+<!-- <header class="p-3 border-bottom">
   <div class="container">
       <div class="row">
           <div class="col-12 d-flex align-items-center justify-content-between">
@@ -18,10 +18,10 @@
               <div class="dropdown">
                   <a class="d-inline link-dark text-decoration-none dropdown-toggle" id="dropdownUser1"
                       data-bs-toggle="dropdown" aria-expanded="false">
-                      <div class="user-image-container">
-                         <img src="assets/icons/fotoperfil.png" alt="fotoperfil.png"
+
+                         <img src="assets/icons/fotoperfil.png" alt="fotoperfil.png" width="45" height="45"
                           class="rounded-0">
-                        </div>
+
                   </a>
                   <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
                       <li><a routerLink="/user/my-profile" class="dropdown-item">Mi Perfil</a></li>
@@ -32,15 +32,37 @@
       </div>
   </div>
 </header>
-<!-- <div class="layout-topbar">
-  <p-button type="button" class="mr-2" (onClick)="openSidebar()" icon="pi pi-bars"  />
-</div> -->
+ -->
 
 
-<!-- <div class="layout-topbar">
-  <a class="layout-topbar-logo" routerLink="">
-      <img class="mx-2" width="100" src="assets/icons/uv.png" alt="uv.png">
-      <span>SAKAI</span>
-  </a>
+<header class="header">
+  <div class="container-prime">
+    <div class="row-prime">
+      <div class="col-prime">
+        <!-- Contenido a la izquierda -->
+        <div class="left-content">
+          <div class="sidebar-container">
+            <app-sidebar-user nameUser="{{userName}}"></app-sidebar-user>
+          </div>
+          <a routerLink="/user/dashboard" class="dashboard-link">
+            <img class="uv-logo" src="assets/icons/uv.png" alt="uv.png" />
+            <strong class="dashboard-text">Seguimiento egresados</strong>
+          </a>
+        </div>
 
-</div> -->
+        <!-- Contenido a la derecha -->
+        <div class="right-content">
+          <p-avatar
+            image="assets/icons/fotoperfil.png"
+            size="large"
+            shape="circle"
+            class="avatar"
+            (click)="menu.toggle($event)"
+          ></p-avatar>
+
+          <p-tieredMenu #menu [model]="menuItems" popup appendTo="body"></p-tieredMenu>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

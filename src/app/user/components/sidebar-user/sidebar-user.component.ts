@@ -35,13 +35,13 @@ export class SidebarUserComponent implements OnInit {
             icon: 'pi pi-users',
             items: [
               {
-                label: 'Encuestas nuevas',
-                icon: 'pi pi-fw pi-users',
+                label: 'Encuesta nueva',
+                icon: 'pi pi-file-edit',
                 routerLink: '/user/view-encuestas',
               },
               {
                 label: 'Encuestas completadas',
-                icon: 'pi pi-fw pi-trash',
+                icon: 'pi pi-check',
                 routerLink: '/user/encuesta-completada',
               },
             ]
