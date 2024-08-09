@@ -18,6 +18,10 @@ import { RippleModule } from 'primeng/ripple';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { BadgeModule } from 'primeng/badge';
 import { MenuModule } from 'primeng/menu';
+import { AvatarModule } from 'primeng/avatar';
+import { TieredMenuModule } from 'primeng/tieredmenu';
+import { ChartModule } from 'primeng/chart';
+
 // import { PaginatorModule } from 'primeng/paginator';
 
 
@@ -42,6 +46,11 @@ const primeNgModules = [
   BadgeModule,
   RippleModule,
   MenuModule,
+  AvatarModule,
+  TieredMenuModule,
+  ChartModule,
+
+
 
   // PaginatorModule
 ]
