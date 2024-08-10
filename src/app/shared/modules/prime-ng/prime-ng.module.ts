@@ -21,6 +21,9 @@ import { MenuModule } from 'primeng/menu';
 import { AvatarModule } from 'primeng/avatar';
 import { TieredMenuModule } from 'primeng/tieredmenu';
 import { ChartModule } from 'primeng/chart';
+import { CheckboxModule } from 'primeng/checkbox';
+import { PasswordModule } from 'primeng/password';
+
 
 // import { PaginatorModule } from 'primeng/paginator';
 
@@ -49,6 +52,8 @@ const primeNgModules = [
   AvatarModule,
   TieredMenuModule,
   ChartModule,
+  CheckboxModule,
+  PasswordModule,
 
 
 

@@ -85,4 +85,9 @@ export class LoginComponent implements OnInit {
     this.formularioLogin.reset();
     this.formularioLogin.markAsUntouched(); // Establece todos los campos como no tocados.
   }
+
+  loginWithLinkedIn() {
+    // Aquí va la lógica para iniciar sesión con LinkedIn
+    // Puede redirigir a una página de autenticación o hacer una llamada a un servicio
+  }
 }
