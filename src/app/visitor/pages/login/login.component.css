@@ -1,4 +1,167 @@
-.cardCustom {
-  max-width: 500px;
-  max-height: 600px;
+/* Contenedor principal */
+.surface-ground {
+  display: flex;
+  align-items: baseline !important;
+  justify-content: center !important;
+  min-height: 100vh;
+  min-width: 100vw;
+  overflow: hidden;
+  padding: 1rem;
+  background-color: hsl(0, 0%, 100%) !important; /* Fondo de la página */
+}
+
+/* Contenedor del formulario */
+.surface-card {
+  position: relative !important;
+  width: 100%;
+  max-width: 400px; /* Tamaño máximo para pantallas grandes */
+  height: 635px; /* Ajusta la altura fija */
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 1rem; /* Ajusta el padding para un diseño más compacto */
+  box-shadow: 0 15px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centra el contenido verticalmente */
+  overflow: hidden; /* Evita el scroll */
+}
+
+/* Tamaño específico para login de administrador */
+.small-card {
+  max-width: 900px !important; /* Tamaño máximo para login de administrador */
+  height: 500px !important; /* Ajusta la altura fija para administrador */
+}
+
+/* Tamaño específico para login de egresado */
+.large-card {
+  max-width: 500px !important; /* Tamaño máximo para login de egresado */
+  height: 500px !important;/* Ajusta la altura fija para egresado */
+}
+
+/* Ajuste de la posición del checkbox */
+.rememberme-checkbox {
+  margin-block: 25px; /* Ajusta este valor según lo que necesites */
+}
+
+/* Botón de alternancia */
+.surface-card .toggle-button {
+  position: absolute;
+  top: 10px; /* Ajusta el espacio superior para evitar la superposición */
+  right: 10px; /* Ajusta el espacio derecho para evitar la superposición */
+  width: auto;
+  padding: 0.3rem 0.5rem; /* Ajusta el padding para un tamaño compacto */
+  font-size: 0.8rem;
+  border-radius: 5px;
+  background-color: #515355 !important;
+  color: #ffffff !important;
+  border: none;
+}
+
+/* Imagen del logo */
+.surface-card img {
+  max-width: 100px; /* Ajusta el tamaño del logo */
+  height: auto;
+  margin: 0 auto; /* Centra la imagen horizontalmente */
+  margin-bottom: 1.5rem; /* Asegura suficiente espacio debajo del logo */
+}
+
+/* Títulos y textos */
+.surface-card .text-900 {
+  color: #333;
+  font-size: 1.2rem !important;
+  font-weight: 300;
+  text-align: center; /* Centra el texto horizontalmente */
+}
+
+.surface-card .text-600 {
+  color: #777;
+  font-size: 1rem;
+  font-weight: 300;
+  text-align: center; /* Centra el texto horizontalmente */
+}
+
+.text-left{
+  text-align: left !important;
+
+}
+
+/* Estilos para los inputs */
+.surface-card input,
+.surface-card .p-password input {
+  width: 100%;
+  padding: 0.5rem !important; /* Ajusta el padding para el tamaño compacto */
+  font-size: 0.9rem; /* Ajusta el tamaño de la fuente */
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+/* Estilo para el checkbox */
+.surface-card .p-checkbox {
+  margin-right: 0.5rem;
+}
+
+.text-red-500 {
+  margin-top: -2rem; /* Ajusta este valor según sea necesario */
+  margin-bottom: 0; /* Elimina cualquier margen inferior adicional */
+  font-size: 0.875rem; /* Asegura que el texto no sea demasiado grande */
+  display: block; /* Asegura que el span ocupe todo el ancho disponible */
+}
+
+/* Botones */
+.surface-card button {
+  width: 100%;
+  padding: 0.75rem; /* Ajusta el padding para el tamaño compacto */
+  font-size: 0.9rem; /* Ajusta el tamaño de la fuente */
+  border-radius: 10px;
+  margin-top: 1rem; /* Asegura que el botón tenga un margen superior */
+}
+
+.surface-card button.p-button {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+}
+
+/* Enlace "¿Olvidaste tu contraseña?" */
+.surface-card a {
+  color: var(--primary-color);
+  font-size: 0.8rem;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 576px) {
+  .surface-card {
+    padding: 5rem;
+    height: auto; /* Ajusta la altura para pantallas pequeñas */
+  }
+
+  .surface-card .toggle-button {
+    top: 5px; /* Menos espacio superior en pantallas pequeñas */
+    right: 15px; /* Menos espacio derecho en pantallas pequeñas */
+    font-size: 0.7rem; /* Ajusta el tamaño de fuente en pantallas pequeñas */
+    padding: 0.2rem 0.5rem; /* Ajusta el padding en pantallas pequeñas */
+  }
+
+  .surface-card img {
+    max-width: 80px; /* Ajusta el tamaño máximo del logo en pantallas pequeñas */
+  }
+}
+
+/* Ajustes para pantallas medianas */
+@media (min-width: 577px) and (max-width: 768px) {
+  .surface-card {
+    max-width: 350px;
+  }
+
+  .surface-card .toggle-button {
+    top: 10px; /* Mantiene el espacio superior en pantallas medianas */
+    right: 10px; /* Mantiene el espacio derecho en pantallas medianas */
+    font-size: 0.8rem; /* Mantiene el tamaño de fuente en pantallas medianas */
+    padding: 0.3rem 0.5rem; /* Mantiene el padding en pantallas medianas */
+  }
+
+  .surface-card img {
+    max-width: 90px; /* Ajusta el tamaño máximo del logo en pantallas medianas */
+  }
 }

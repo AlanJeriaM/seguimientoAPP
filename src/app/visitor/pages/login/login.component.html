@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<!-- <div class="container-fluid">
 
   <div *ngIf="!esAdmin">
 
@@ -58,4 +58,49 @@
 
   </div>
 
+</div> -->
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
+  <div class="flex flex-column align-items-center justify-content-center">
+      <div [ngClass]="{ 'small-card': esAdmin, 'large-card': !esAdmin }" style="border-radius:50px; padding:0.5rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+          <div class="surface-card py-9 px-5 sm:px-8 position-relative" style="border-radius:53px">
+              <!-- Botón en la esquina superior derecha -->
+              <button pButton (click)="esAdmin = !esAdmin; resetForm()" label="{{ esAdmin ? 'Iniciar sesión Egresados' : 'Iniciar sesión Administrador' }}" class="toggle-button"></button>
+
+              <div class="text-center mb-5">
+                  <!-- Cambiar el logo según el tipo de usuario -->
+                  <img [src]="esAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'" alt="Image" height="50" class="mb-3">
+                  <div class="text-900 text-3xl font-medium mb-3">{{ esAdmin ? 'Administrador' : 'Egresados' }}</div>
+                  <span class="text-600 font-medium">{{ esAdmin ? 'Iniciar sesión Administrador' : 'Iniciar sesión Egresados' }}</span>
+              </div>
+
+              <form [formGroup]="formularioLogin" (ngSubmit)="login()">
+                  <!-- si es admin muestra login administrador -->
+                  <div *ngIf="esAdmin">
+                      <label for="emailUsuario" class="block text-900 text-left text-xl font-medium mb-2">Correo electrónico</label>
+                      <input id="emailUsuario" type="email" pInputText formControlName="emailUsuario" placeholder="Correo electrónico" class="w-full mb-5 email-input">
+                      <span *ngIf="campoInvalido('emailUsuario')" class="text-red-500 text-sm">El correo es inválido.</span>
+
+                      <label for="contrasenia" class="block text-900 text-left text-xl font-medium mb-2">Contraseña</label>
+                      <p-password id="contrasenia" formControlName="contrasenia" placeholder="Contraseña" [toggleMask]="true" class="mb-4 contrasenia-input"></p-password>
+                      <span *ngIf="campoInvalido('contrasenia')" class="text-red-500 text-sm">La contraseña es obligatoria.</span>
+                  </div>
+
+                  <!-- si NO es admin muestra login egresado -->
+                  <div *ngIf="!esAdmin" class="text-center">
+                      <button pButton type="button" class="p-button-primary" (click)="loginWithLinkedIn()">Iniciar sesión con LinkedIn</button>
+                  </div>
+
+                  <div *ngIf="esAdmin" class="flex align-items-center justify-content-between mb-5 gap-4">
+                      <div class="flex align-items-center">
+                          <p-checkbox id="rememberme1" [binary]="true" class="rememberme-checkbox mr-2"></p-checkbox>
+                          <label for="rememberme1">Recuérdame</label>
+                      </div>
+                      <a class="font-medium ml-2 text-center cursor-pointer" style="color: var(--primary-color)">¿Olvidaste tu contraseña?</a>
+                  </div>
+
+                  <button *ngIf="esAdmin" pButton pRipple label="Acceder" class="w-full p-2 text-xl" type="submit"></button>
+              </form>
+          </div>
+      </div>
+  </div>
 </div>
