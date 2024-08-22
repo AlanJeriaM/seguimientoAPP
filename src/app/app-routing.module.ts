@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { Error404PageComponent } from './shared/pages/error404-page/error404-page.component';
 
 const routes: Routes = [
 
@@ -20,11 +21,20 @@ const routes: Routes = [
     //canLoad : [AdminGuard]
   },
   {
+    path: 'notfound-404',
+    component: Error404PageComponent,
+  },
+  //cuando los usuarios entran al path vacio '' exactamente vacio con el patMatch
+  {
+    path: '',
+    redirectTo: 'visitor',
+    pathMatch:'full'
+  },
+  //cualquier otra ruta que sea diferente a las mencionadas mostrara el componente notfound-404.
+  {
     path: '**',
-    redirectTo: 'visitor'
+    redirectTo: 'notfound-404'
   }
-
-
 ];
 
 @NgModule({
