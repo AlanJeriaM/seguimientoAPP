@@ -1,4 +1,6 @@
 /* Contenedor principal */
+
+
 .surface-ground {
   display: flex;
   align-items: baseline !important;
@@ -15,7 +17,7 @@
   position: relative !important;
   width: 100%;
   max-width: 400px; /* Tamaño máximo para pantallas grandes */
-  height: 635px; /* Ajusta la altura fija */
+  height: 590px; /* Ajusta la altura fija */
   background-color: #fff;
   border-radius: 10px;
   padding: 1rem; /* Ajusta el padding para un diseño más compacto */
@@ -26,6 +28,8 @@
   overflow: hidden; /* Evita el scroll */
 }
 
+
+
 /* Tamaño específico para login de administrador */
 .small-card {
   max-width: 900px !important; /* Tamaño máximo para login de administrador */
@@ -35,13 +39,15 @@
 /* Tamaño específico para login de egresado */
 .large-card {
   max-width: 500px !important; /* Tamaño máximo para login de egresado */
-  height: 500px !important;/* Ajusta la altura fija para egresado */
+  height: 400px !important;/* Ajusta la altura fija para egresado */
 }
 
 /* Ajuste de la posición del checkbox */
 .rememberme-checkbox {
   margin-block: 25px; /* Ajusta este valor según lo que necesites */
 }
+
+
 
 /* Botón de alternancia */
 .surface-card .toggle-button {
@@ -55,6 +61,9 @@
   background-color: #515355 !important;
   color: #ffffff !important;
   border: none;
+}
+.surface-card .toggle-button:hover {
+  background-color: #1378e4 !important;
 }
 
 /* Imagen del logo */
@@ -101,6 +110,7 @@
   margin-right: 0.5rem;
 }
 
+
 .text-red-500 {
   margin-top: -2rem; /* Ajusta este valor según sea necesario */
   margin-bottom: 0; /* Elimina cualquier margen inferior adicional */
@@ -117,10 +127,22 @@
   margin-top: 1rem; /* Asegura que el botón tenga un margen superior */
 }
 
+
+button.w-full.p-2.text-xl {
+  margin-top: -10px; /* Aumenta o disminuye según sea necesario */
+}
+
+
+
 .surface-card button.p-button {
   background-color: var(--primary-color);
   color: #fff;
   border: none;
+}
+
+/* boton iniciar sesion con linkedin y acceder */
+.surface-card button.p-button:hover {
+background-color: #0A66C2;
 }
 
 /* Enlace "¿Olvidaste tu contraseña?" */
