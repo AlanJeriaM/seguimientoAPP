@@ -23,6 +23,24 @@
     margin: 0 10px;
   }
 
+  .icon-link {
+    background-color: #0077b5; /* Cambia el color de fondo del círculo */
+    margin-left: 10px;
+    color: #f0f0f0;
+    transition: background-color 0.3s ease;
+    border-radius: 50%;
+    border: none;
+    padding: 8px;
+    align-items: center !important;
+    justify-content: center !important;
+}
 
+.icon-link:hover {
+    background-color: #005582; /* Cambia el color de fondo al hacer hover */
+}
+
+.icon-link:hover {
+    background-color: #005582; /* Cambia el color de fondo al hacer hover */
+}
 
 
