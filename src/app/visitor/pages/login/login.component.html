@@ -74,14 +74,15 @@
               </div>
 
               <form [formGroup]="formularioLogin" (ngSubmit)="login()">
+
                   <!-- si es admin muestra login administrador -->
                   <div *ngIf="esAdmin">
-                      <label for="emailUsuario" class="block text-900 text-left text-xl font-medium mb-2">Correo electrónico</label>
-                      <input id="emailUsuario" type="email" pInputText formControlName="emailUsuario" placeholder="Correo electrónico" class="w-full mb-5 email-input">
-                      <span *ngIf="campoInvalido('emailUsuario')" class="text-red-500 text-sm">El correo es inválido.</span>
+                      <label for="emailUsuario" class="block text-900 text-left text-xl font-medium mb-1">Correo electrónico</label>
+                      <input id="emailUsuario" type="email" pInputText formControlName="emailUsuario" placeholder="admin@correo.com" class="w-full mb-5 email-input">
+                      <span *ngIf="campoInvalido('emailUsuario')" class="text-red-500 email-invalid text-sm">El correo es inválido.</span>
 
-                      <label for="contrasenia" class="block text-900 text-left text-xl font-medium mb-2 ">Contraseña</label>
-                      <p-password id="contrasenia" formControlName="contrasenia" placeholder="Contraseña" [toggleMask]="true" class="w-full mb-5 contrasenia-input"></p-password>
+                      <label for="contrasenia" class="block text-900 text-left text-xl font-medium mb-1 ">Contraseña</label>
+                      <p-password id="contrasenia" formControlName="contrasenia" placeholder="*******" [toggleMask]="true" class="w-full mb-5 contrasenia-input"></p-password>
                       <span *ngIf="campoInvalido('contrasenia')" class="text-red-500 text-sm">La contraseña es obligatoria.</span>
                   </div>
 
