@@ -10,6 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { registerLocaleData } from '@angular/common';
 import localeEsCL from '@angular/common/locales/es-CL';
+import { PrimeNgModule } from './modules/prime-ng.module';
 
 
 
@@ -27,6 +28,7 @@ registerLocaleData(localeEsCL);
     HttpClientModule,
     AppRoutingModule,
     NgbModule,
+    PrimeNgModule,
 
   ],
   providers: [

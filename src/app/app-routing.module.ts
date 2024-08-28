@@ -5,9 +5,10 @@ import { Error404PageComponent } from './shared/pages/error404-page/error404-pag
 const routes: Routes = [
 
   {
-    path: 'visitor',
-    loadChildren: () => import('./visitor/visitor.module').then(m => m.VisitorModule)
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
   },
+
   {
     path: 'user',
     loadChildren: () => import('./user/user.module').then(m => m.UserModule),
@@ -27,7 +28,7 @@ const routes: Routes = [
   //cuando los usuarios entran al path vacio '' exactamente vacio con el patMatch
   {
     path: '',
-    redirectTo: 'visitor',
+    redirectTo: 'auth',
     pathMatch:'full'
   },
   //cualquier otra ruta que sea diferente a las mencionadas mostrara el componente notfound-404.

@@ -26,10 +26,6 @@ import { PasswordModule } from 'primeng/password';
 
 
 // import { PaginatorModule } from 'primeng/paginator';
-
-
-
-
 const primeNgModules = [
   CommonModule,
   ButtonModule,
@@ -54,8 +50,6 @@ const primeNgModules = [
   ChartModule,
   CheckboxModule,
   PasswordModule,
-
-
 
   // PaginatorModule
 ]

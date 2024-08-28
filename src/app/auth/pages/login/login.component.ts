@@ -13,19 +13,20 @@ import Swal from 'sweetalert2';
 })
 export class LoginComponent implements OnInit {
 
-  private emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
-  esAdmin: boolean = false;
-  formularioLogin: FormGroup;
+  private emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";  //expresion regular que valida que el correo ingresado tenga un formato correcto.
+  esAdmin: boolean = false;  // un booleano que indica si el usuario es administrador
+  formularioLogin: FormGroup; // un objeto de 'FormGroup' que representa el formulario de inicio de sesion
 
   constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private primengConfig: PrimeNGConfig
+    private fb: FormBuilder,  // utilizado para construir el formulario
+    private authService: AuthService, // servicio para manejar la autenticacion
+    private router: Router, // para navegar dentro de la aplicacion
+    private primengConfig: PrimeNGConfig // para configurar opciones de primeNG
   ) {
+
     // Inicializar el formulario en el constructor
     this.formularioLogin = this.fb.group({
-      emailUsuario: [
+      emailUsuario: [ //emailUsuario es un campo de correo electronico que es obligatorio y debe coincidir con el patron definido en emailPattern
         '',
         [
           Validators.required,
@@ -36,9 +37,11 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  //Este método se ejecuta cuando el componente se inicializa. En este caso, habilita el efecto "ripple" de PrimeNG.
   ngOnInit(): void {
     this.primengConfig.ripple = true;
   }
+
 
   login() {
     if (this.formularioLogin.invalid) {
