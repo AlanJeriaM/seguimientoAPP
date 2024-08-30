@@ -6,7 +6,7 @@ import { MenuItem } from 'primeng/api';
 @Component({
   selector: 'app-navbar-user',
   templateUrl: './navbar-user.component.html',
-  styleUrls: ['./navbar-user.component.css'] // <-- Corregir 'styleUrl' a 'styleUrls'
+  styleUrls: ['./navbar-user.component.css']
 })
 export class NavbarUserComponent implements OnInit {
 
@@ -33,6 +33,6 @@ export class NavbarUserComponent implements OnInit {
 
   public logOut() {
     this.authService.logOut();
-    this.router.navigate(['visitor']);
+    this.router.navigate(['auth']);
   }
 }
