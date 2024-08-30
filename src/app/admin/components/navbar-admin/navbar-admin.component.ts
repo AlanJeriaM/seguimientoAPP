@@ -34,6 +34,6 @@ export class NavbarAdminComponent implements OnInit {
 
   logOut() {
     this.authService.logOut();
-    this.router.navigate(['visitor']);
+    this.router.navigate(['auth']);
   }
 }
