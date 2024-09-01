@@ -4,11 +4,11 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { MenuItem } from 'primeng/api';
 
 @Component({
-  selector: 'app-navbar-user',
-  templateUrl: './navbar-user.component.html',
-  styleUrls: ['./navbar-user.component.css']
+  selector: 'app-navbar-shared',
+  templateUrl: './navbar-shared.component.html',
+  styleUrls: ['./navbar-shared.component.css']
 })
-export class NavbarUserComponent implements OnInit {
+export class NavbarSharedComponent implements OnInit {
 
   userName: string = '';
   menuItems: MenuItem[] = [];
@@ -23,7 +23,7 @@ export class NavbarUserComponent implements OnInit {
     this.menuItems = [
       { label: 'Mi Perfil',
         icon: 'pi pi-user',
-        routerLink: '/user/my-profile' },
+        routerLink: this.isAdmin() ? '/admin/my-profile' : '/user/my-profile' },
       { separator: true },
       { label: 'Cerrar sesión',
         icon: 'pi pi-sign-out',
@@ -31,7 +31,21 @@ export class NavbarUserComponent implements OnInit {
     ];
   }
 
-  public logOut() {
+
+  //métodos para verificar si la URL actual comienza con /admin o /auth o /user.
+  isAdmin(): boolean {
+    return this.router.url.startsWith('/admin');
+  }
+
+  isUser(): boolean {
+    return this.router.url.startsWith('/user');
+  }
+
+  isAuth(): boolean {
+    return this.router.url.startsWith('/auth');
+  }
+
+  logOut() {
     this.authService.logOut();
     this.router.navigate(['auth']);
   }

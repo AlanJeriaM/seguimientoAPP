@@ -1,0 +1,25 @@
+<button type="button" pButton icon="pi pi-bars" class="custom-btn" (click)="toggleSidebar()"></button>
+
+<p-sidebar [(visible)]="visibleSidebar" [position]="'left'" [modal]="true" [showCloseIcon]="false">
+    <div class="p-sidebar-header">
+        <button type="button" pButton icon="pi pi-times" class="custom-close-btn" (click)="toggleSidebar()"></button>
+    </div>
+
+    <div class="p-sidebar-content">
+        <div class="sidebar-title-container">
+            <h3 class="sidebar-title">
+                <strong>{{ isAdmin ? 'Administrador' : 'Menú Egresado' }}</strong>
+            </h3>
+        </div>
+
+        <hr class="sidebar-divider" />
+
+        <img class="sidebar-image" [src]="isAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'" alt="sidebar image" width="96" height="96" />
+        <h4 class="sidebar-username">
+            {{ nameUser }}
+        </h4>
+
+        <hr class="sidebar-divider" />
+        <p-panelMenu [model]="itemsPanelMenu" class="custom-menubar"></p-panelMenu>
+    </div>
+</p-sidebar>
