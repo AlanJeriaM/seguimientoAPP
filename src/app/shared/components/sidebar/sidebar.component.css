@@ -1,0 +1,94 @@
+/* Incluye el CSS que ya tienes en los sidebars de user y admin */
+
+.custom-btn {
+  background-color: #376b9f !important;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 17px;
+}
+
+.custom-btn:hover {
+  background-color: #0b7bea !important;
+  color: #ffffff;
+}
+
+.p-sidebar-header {
+  background-color: #376b9f;
+  padding: 0.8rem;
+  border-radius: 5px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.custom-close-btn {
+  background-color: #376b9f;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-close-btn:hover {
+  background-color: #0b7bea;
+  color: #ffffff;
+}
+
+.p-sidebar-content {
+  padding: 0.2rem;
+  overflow: auto;
+}
+
+.sidebar-title {
+  color: #111112f1;
+  margin-top: 10%;
+  text-align: center;
+}
+
+.sidebar-image {
+  display: block;
+  margin: 0 auto;
+  border-radius: 30%;
+  border: 2px solid #2e2476;
+  margin-top: 8%;
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .custom-btn {
+    padding: 8px 16px;
+    font-size: 15px;
+  }
+
+  .p-sidebar-header {
+    padding: 0.5rem;
+  }
+
+  .sidebar-title {
+    font-size: 1.2rem;
+  }
+
+  .sidebar-image {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .sidebar-title {
+    font-size: 1rem;
+  }
+
+  .sidebar-image {
+    width: 60px;
+    height: 60px;
+  }
+}

@@ -8,7 +8,7 @@ import { PrimeNgModule } from '../modules/prime-ng.module';
 import { SharedModule } from '../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MainComponent } from './pages/main/main.component';
-import { NavbarAuthComponent } from './components/navbar-auth/navbar-auth.component';
+
 
 
 @NgModule({
@@ -16,7 +16,6 @@ import { NavbarAuthComponent } from './components/navbar-auth/navbar-auth.compon
     LoginComponent,
     RegisterComponent,
     MainComponent,
-    NavbarAuthComponent
   ],
   imports: [
     CommonModule,
@@ -24,8 +23,6 @@ import { NavbarAuthComponent } from './components/navbar-auth/navbar-auth.compon
     PrimeNgModule,
     SharedModule,
     ReactiveFormsModule,
-
-
   ]
 })
 export class AuthModule { }
