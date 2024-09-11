@@ -10,7 +10,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 export class AuthService {
 
   private url: string = environment.baseUrl;
-  private _usuario!: any;
+  private _usuario!: any; //aqui se puede crear una interface para que el usuario no sea de tipo any.
 
   get usuario() {
     return { ...this._usuario };

@@ -25,10 +25,12 @@ export class NavbarSharedComponent implements OnInit {
         icon: 'pi pi-user',
         routerLink: this.isAdmin() ? '/admin/my-profile' : '/user/my-profile' },
       { separator: true },
+
       { label: 'Cerrar sesión',
         icon: 'pi pi-sign-out',
         command: () => this.logOut() }
     ];
+
   }
 
 

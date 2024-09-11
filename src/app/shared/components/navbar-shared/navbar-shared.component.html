@@ -6,7 +6,9 @@
         <div class="left-content" *ngIf="!isAuth()">
           <div class="sidebar-container">
 
-            <app-sidebar [nameUser]="userName" [isAdmin]="isAdmin()"></app-sidebar>
+            <app-sidebar  nameUser="{{userName}}" [isAdmin]="isAdmin()"></app-sidebar>
+
+
           </div>
           <a routerLink="/{{ isAdmin() ? 'admin' : 'user' }}/dashboard" class="dashboard-link">
             <img class="uv-logo" src="assets/icons/uv.png" alt="uv.png" />
