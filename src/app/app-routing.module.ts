@@ -1,25 +1,30 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { Error404PageComponent } from './shared/pages/error404-page/error404-page.component';
+import { AdminGuard } from './core/guards/admin.guard';
+import { ClientGuard } from './core/guards/client.guard';
 
 const routes: Routes = [
 
   {
     path: 'auth',
-    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
+    //TODO: crear PublicGuard para que el usuario cuando este registrado no pueda volver al login.
+    //canActivate: [],
+    //canMatch: []
   },
 
   {
     path: 'user',
     loadChildren: () => import('./user/user.module').then(m => m.UserModule),
-    //canActivate: [ClientGuard], AQUI TENGO QUE APRENDER A APLICAR LOS GUARDS PARA PROTEGER LAS RUTAS DEL LOGIN.
-    //canLoad: [ClientGuard]
+    //canActivate: [ClientGuard],
+    //canMatch: [ClientGuard]
   },
   {
     path: 'admin',
     loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
     //canActivate : [AdminGuard],
-    //canLoad : [AdminGuard]
+    //canMatch : [AdminGuard]
   },
   {
     path: 'notfound-404',
