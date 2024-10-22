@@ -1,1 +1,110 @@
-<p>view-encuestas works!</p>
+<div class="grid">
+  <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+    <p-card  class="text-center" header="Listado de encuestas">
+
+
+
+              <p-table
+                #tb4
+                [value]="registros"
+                [rowHover]="true"
+                styleClass="p-datatable-sm"
+                [globalFilterFields]="['dataA', 'dataB', 'randomA', 'randomB']"
+                [paginator]="true"
+                [rows]="10"
+                currentPageReportTemplate="{first} hasta {last} de {totalRecords} registros"
+                [showCurrentPageReport]="true"
+
+              >
+                <ng-template pTemplate="caption">
+                  <div class="flex justify-content-between align-content-center">
+                    <div>
+                      <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input
+                          pInputText
+                          type="text"
+                          (input)="
+                            tb4.filterGlobal(
+                              $any($event.target).value,
+                              'contains'
+                            )
+                          "
+                          placeholder="Filtro..."
+                        />
+                      </span>
+                      <p-button
+                        styleClass="p-button-text p-button-sm ml-2"
+                        icon="pi pi-filter-slash"
+                        (click)="tb4.clear()"
+                        pTooltip="Limpiar filtros"
+                      ></p-button>
+                    </div>
+                    <div>
+                      <p-button
+                        pRipple
+                        label="Actualizar"
+                        icon="pi pi-refresh"
+                        styleClass="p-button-sm p-button-info"
+                      ></p-button>
+                    </div>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Fecha de publicación</th>
+                    <th>Estado</th>
+                    <th style="width: 150px"></th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-data>
+                  <tr>
+                    <td>
+                      <span class="p-column-title">Random A</span>
+                      {{ data.randomA }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Random B</span>
+                      {{ data.randomB }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Columna A</span>
+                      {{ data.dataA }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Columna B</span>
+                      {{ data.dataB }}
+                    </td>
+                    <td class="text-right" style="width: 150px">
+                      <p-button
+                        pRipple
+                        icon="pi pi-trash"
+                        styleClass="p-button-sm p-button-danger mr-2"
+                        pTooltip="Eliminar encuesta"
+                      ></p-button>
+                      <p-button
+                        pRipple
+                        icon="pi pi-pencil"
+                        styleClass="p-button-sm p-button-warning mr-2"
+                        pTooltip="Editar encuesta"
+                      ></p-button>
+                      <p-button
+                        pRipple
+                        icon="pi pi-eye"
+                        styleClass="p-button-sm p-button-info"
+                        pTooltip="Ver encuesta"
+                      ></p-button>
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                  <tr>
+                    <td [attr.colspan]="5">Sin registros</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+    </p-card>
+  </div>
+</div>
