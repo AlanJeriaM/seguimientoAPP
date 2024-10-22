@@ -25,6 +25,16 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { PasswordModule } from 'primeng/password';
 
 
+//de pruebas
+import { DropdownModule } from 'primeng/dropdown';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TableModule } from 'primeng/table';
+import { PaginatorModule } from 'primeng/paginator';
+
+import { AccordionModule } from 'primeng/accordion';
+import { MultiSelectModule } from 'primeng/multiselect';
+
+
 // import { PaginatorModule } from 'primeng/paginator';
 const primeNgModules = [
   CommonModule,
@@ -50,6 +60,14 @@ const primeNgModules = [
   ChartModule,
   CheckboxModule,
   PasswordModule,
+  AccordionModule,
+  MultiSelectModule,
+
+  // de pruebas
+  DropdownModule,
+  ProgressSpinnerModule,
+  TableModule,
+  PaginatorModule,
 
   // PaginatorModule
 ]
