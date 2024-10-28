@@ -12,7 +12,7 @@ const routes: Routes = [
     path: '',
     component: MainComponent,
     children: [
-      { path: 'my-profile', component: MiProfileComponent },
+      { path: 'mi-perfil', component: MiProfileComponent },
       { path: 'dashboard', component: DashboardUserComponent },
       { path: 'view-encuestas', component: ViewEncuestasComponent },
       {path:  'encuesta-completada', component: EncuestaCompletadaComponent},

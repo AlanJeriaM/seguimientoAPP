@@ -12,6 +12,7 @@ import { PrimeNgModule } from '../modules/prime-ng.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
 import { SharedModule } from '../shared/shared.module';
+import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
 
 
 
@@ -24,6 +25,7 @@ import { SharedModule } from '../shared/shared.module';
     ViewUsersComponent,
     DashboardAdminComponent,
     ViewEncuestasComponent,
+    MiProfileComponent,
   ],
   imports: [
     CommonModule,

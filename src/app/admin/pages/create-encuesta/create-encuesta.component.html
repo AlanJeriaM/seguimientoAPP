@@ -1,1 +1,55 @@
-<p>create-encuesta works!</p>
+<div class="p-grid p-justify-center">
+  <div class="p-col-12 p-md-8 p-lg-6">
+    <p-card>
+      <ng-template pTemplate="header">
+        <h1 class="text-center p-mb-4">Crear encuesta</h1>
+      </ng-template>
+
+      <div class="p-fluid">
+        <div class="p-field">
+          <label for="surveyTitle">Título de la Encuesta</label>
+          <input id="surveyTitle" type="text" pInputText [(ngModel)]="surveyTitle" placeholder="Ingrese el título" class="mt-2" />
+        </div>
+
+        <div class="p-field mt-4">
+          <p-button label="Agregar Pregunta" icon="pi pi-plus" (onClick)="addQuestion()" styleClass="p-button-outlined"></p-button>
+        </div>
+
+        <div *ngFor="let question of questions; let i = index" class="mt-4">
+          <p-fieldset [legend]="'Pregunta ' + (i + 1)" [toggleable]="true">
+            <div class="p-field mt-2">
+              <span class="p-float-label">
+                <input id="question-{{i}}" type="text" pInputText [(ngModel)]="question.text" />
+                <label for="question-{{i}}">Texto de la pregunta</label>
+              </span>
+            </div>
+
+            <div class="p-field mt-3">
+              <p-dropdown [options]="questionTypes" [(ngModel)]="question.type"
+                          placeholder="Seleccione el tipo de pregunta" [style]="{'width':'100%'}">
+              </p-dropdown>
+            </div>
+
+            <div *ngIf="question.type === 'multiple'" class="p-mt-3">
+              <div *ngFor="let option of question.options; let j = index" class="p-field p-mb-2">
+                <div class="p-inputgroup">
+                  <input type="text" pInputText [(ngModel)]="question.options[j]" placeholder="Opción {{j + 1}}" />
+                  <button type="button" pButton icon="pi pi-trash" (click)="removeOption(i, j)" class="p-button-danger ml-1"></button>
+                </div>
+              </div>
+              <p-button label="Agregar Opción" icon="pi pi-plus" (onClick)="addOption(i)" styleClass="p-button-outlined p-button-secondary p-mt-2"></p-button>
+            </div>
+
+            <div class="p-text-right p-mt-3">
+              <p-button icon="pi pi-trash" (onClick)="removeQuestion(i)" styleClass="p-button-danger p-button-text"></p-button>
+            </div>
+          </p-fieldset>
+        </div>
+      </div>
+
+      <div class="p-d-flex p-jc-center mt-2">
+        <p-button label="Guardar Encuesta" icon="pi pi-save" (onClick)="saveSurvey()" styleClass="p-button-Mm"></p-button>
+      </div>
+    </p-card>
+  </div>
+</div>

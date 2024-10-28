@@ -23,7 +23,7 @@ export class NavbarSharedComponent implements OnInit {
     this.menuItems = [
       { label: 'Mi Perfil',
         icon: 'pi pi-user',
-        routerLink: this.isAdmin() ? '/admin/my-profile' : '/user/my-profile' },
+        routerLink: this.isAdmin() ? '/admin/mi-perfil' : '/user/mi-perfil' },
       { separator: true },
 
       { label: 'Cerrar sesión',

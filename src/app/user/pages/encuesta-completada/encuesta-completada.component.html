@@ -10,14 +10,14 @@
                 styleClass="p-datatable-sm"
                 [globalFilterFields]="['dataA', 'dataB', 'randomA', 'randomB']"
                 [paginator]="true"
-                [rows]="10"
+                [rows]="15"
                 currentPageReportTemplate="{first} hasta {last} de {totalRecords} registros"
                 [showCurrentPageReport]="true"
 
               >
                 <ng-template pTemplate="caption">
-                  <div class="flex justify-content-between align-content-center">
-                    <div>
+                  <div class="flex flex-wrap justify-content-between align-content-center">
+                    <div class="mb-2 sm:mb-0">
                       <span class="p-input-icon-left">
                         <i class="pi pi-search"></i>
                         <input
@@ -77,18 +77,20 @@
                       {{ data.dataB }}
                     </td>
                     <td class="text-right" style="width: 150px">
+                      <div class="flex flex-column sm:flex-row align-items-end">
                       <p-button
                         pRipple
                         icon="pi pi-pencil"
-                        styleClass="p-button-sm p-button-warning mr-2"
+                        styleClass="p-button-sm p-button-warning mb-1 sm:mb-0 sm:mr-1 "
                         pTooltip="Editar encuesta"
                       ></p-button>
                       <p-button
                         pRipple
                         icon="pi pi-eye"
-                        styleClass="p-button-sm p-button-info"
+                        styleClass="p-button-sm p-button-info mb-1 sm:mb-0"
                         pTooltip="Ver encuesta"
                       ></p-button>
+                    </div>
                     </td>
                   </tr>
                 </ng-template>
