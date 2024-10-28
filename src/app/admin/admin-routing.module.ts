@@ -6,6 +6,7 @@ import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-delet
 import { CreateEncuestaComponent } from './pages/create-encuesta/create-encuesta.component';
 import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin.component';
 import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
+import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
 
 const routes: Routes = [
   {
@@ -13,6 +14,7 @@ const routes: Routes = [
       component: MainComponent,
       children: [
         { path: 'view-users', component: ViewUsersComponent },
+        { path: 'mi-perfil', component: MiProfileComponent},
         { path: 'view-deleted-users', component: ViewDeletedUsersComponent },
         { path: 'create-encuesta', component: CreateEncuestaComponent},
         { path: 'view-encuesta', component: ViewEncuestasComponent},

@@ -5,14 +5,18 @@
   .footer {
     position: fixed;
     bottom: 0;
+    left: 0;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2.2rem 0;
+    padding: 2rem; /* Deja el padding en 2rem */
     border-top: 1px solid #dee2e6;
-    background-color: white; /* Para asegurar que el contenido debajo no se vea */
+    background-color: white;
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
   }
+
+
 
   .footer-center {
     flex-grow: 1;
