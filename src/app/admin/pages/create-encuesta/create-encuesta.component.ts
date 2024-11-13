@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 
 interface Question {
@@ -15,9 +14,11 @@ interface Question {
 export class CreateEncuestaComponent {
   surveyTitle: string = '';
   questions: Question[] = [];
-  questionTypes = [
-    { label: 'Selección Múltiple', value: 'multiple' }
-  ];
+  questionTypes = [{ label: 'Selección Múltiple', value: 'multiple' }];
+
+  // Propiedades de mensaje de error
+  errorMessages: string[] = [];
+  formIsValid: boolean = false;  // Nuevo estado para controlar si el formulario es válido
 
   addQuestion() {
     this.questions.push({
@@ -25,25 +26,26 @@ export class CreateEncuestaComponent {
       type: 'multiple',
       options: ['', '']  // Por defecto, crea 2 opciones vacías para validación.
     });
+    this.validateSurvey();
   }
 
   removeQuestion(index: number) {
     this.questions.splice(index, 1);
+    this.validateSurvey();  // Validar nuevamente después de eliminar la pregunta
   }
 
   addOption(questionIndex: number) {
     this.questions[questionIndex].options.push('');
+    this.validateSurvey();  // Validar nuevamente después de agregar una opción
   }
 
   removeOption(questionIndex: number, optionIndex: number) {
     this.questions[questionIndex].options.splice(optionIndex, 1);
+    this.validateSurvey();  // Validar nuevamente después de eliminar una opción
   }
 
   saveSurvey() {
-    if (!this.validateSurvey()) {
-      alert('Por favor, asegúrese de que el título, al menos una pregunta, y mínimo 2 opciones estén completas, sin campos vacíos.');
-      return;
-    }
+    if (!this.validateSurvey()) return;
 
     const survey = {
       title: this.surveyTitle,
@@ -57,17 +59,37 @@ export class CreateEncuestaComponent {
   resetForm() {
     this.surveyTitle = '';
     this.questions = [];
+    this.errorMessages = [];  // Limpia los mensajes de error al restablecer el formulario
+    this.formIsValid = false; // Resetea el estado de validación
   }
 
   validateSurvey(): boolean {
-    if (!this.surveyTitle.trim()) return false;
-    if (this.questions.length === 0) return false;
+    this.errorMessages = [];  // Reinicia los mensajes de error
 
-    return this.questions.every(question => {
-      if (!question.text.trim()) return false;
-      if (question.type === 'multiple' && question.options.length < 2) return false;
-      return question.options.every(option => option.trim() !== '');
+    if (!this.surveyTitle.trim()) {
+      this.errorMessages.push('El título de la encuesta no puede estar vacío.');
+    }
+
+    if (this.questions.length === 0) {
+      this.errorMessages.push('Debe agregar al menos una pregunta.');
+    }
+
+    this.questions.forEach((question, index) => {
+      if (!question.text.trim()) {
+        this.errorMessages.push(`La pregunta ${index + 1} no tiene título.`);
+      }
+      if (question.type === 'multiple') {
+        if (question.options.length < 2) {
+          this.errorMessages.push(`La pregunta ${index + 1} debe tener al menos 2 opciones.`);
+        } else if (!question.options.every(option => option.trim() !== '')) {
+          this.errorMessages.push(`Todas las opciones de la pregunta ${index + 1} deben estar completas.`);
+        }
+      }
     });
+
+    this.formIsValid = this.errorMessages.length === 0;  // Actualiza el estado de validez
+
+    return this.formIsValid;  // Retorna si el formulario es válido
   }
 
   // trackBy para optimizar el rendimiento del ngFor

@@ -31,6 +31,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { FieldsetModule } from 'primeng/fieldset';
+import { MessageModule } from 'primeng/message';
 
 import { AccordionModule } from 'primeng/accordion';
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -70,6 +71,8 @@ const primeNgModules = [
   TableModule,
   PaginatorModule,
   FieldsetModule,
+  MessageModule,
+
 
 
   // PaginatorModule
