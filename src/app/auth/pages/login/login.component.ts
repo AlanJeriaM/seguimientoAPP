@@ -26,14 +26,8 @@ export class LoginComponent implements OnInit {
 
     // Inicializar el formulario en el constructor
     this.formularioLogin = this.fb.group({
-      emailUsuario: [ //emailUsuario es un campo de correo electronico que es obligatorio y debe coincidir con el patron definido en emailPattern
-        '',
-        [
-          Validators.required,
-          Validators.pattern(this.emailPattern)
-        ],
-      ],
-      contrasenia: ['', Validators.required]
+      emailUsuario: [ '',[ Validators.required, Validators.pattern(this.emailPattern)],],
+      contrasenia: ['', Validators.required],
     });
   }
 

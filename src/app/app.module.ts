@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';
 import localeEsCL from '@angular/common/locales/es-CL';
 import { PrimeNgModule } from './modules/prime-ng.module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 
@@ -29,6 +30,7 @@ registerLocaleData(localeEsCL);
     AppRoutingModule,
     NgbModule,
     PrimeNgModule,
+    ReactiveFormsModule,
 
   ],
   providers: [

@@ -111,7 +111,7 @@
 
 
 .text-red-500 {
-  margin-top: 0.1rem; /* Ajusta este valor según sea necesario */
+  margin-top: -0.4rem;
   margin-bottom: 0; /* Elimina cualquier margen inferior adicional */
   font-size: 0.875rem; /* Asegura que el texto no sea demasiado grande */
   display: block; /* Asegura que el span ocupe todo el ancho disponible */
@@ -119,9 +119,7 @@
 
 .email-invalid {
   margin-top: -1.8rem; /* Ajusta el valor según sea necesario */
-  margin-bottom: 0;
   font-size: 0.875rem;
-  display: block;
 }
 
 /* Botones */
@@ -155,10 +153,11 @@ background-color: #0A66C2;
   font-size: 0.8rem;
 }
 
+
 /* Ajustes para pantallas pequeñas */
 @media (max-width: 576px) {
   .surface-card {
-    padding: 5rem;
+    padding: 2.5rem;
     height: auto; /* Ajusta la altura para pantallas pequeñas */
   }
 

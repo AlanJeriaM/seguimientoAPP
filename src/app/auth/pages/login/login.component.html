@@ -1,105 +1,79 @@
-<!-- <div class="container-fluid">
-
-  <div *ngIf="!esAdmin">
-
-      <div class="container card mt-5 cardCustom">
-          <div>
-              <button (click)="esAdmin = !esAdmin; resetForm()" class="btn btn-dark btn-sm float-end mt-3">
-                  {{ esAdmin ? 'Iniciar sesión Egresados' : 'Iniciar sesión Administrador' }}
-              </button>
-          </div>
-          <form [formGroup]="formularioLogin" (ngSubmit)="login()" class="px-4 py-3">
-              <div class="container text-center">
-                  <img class="mt-4" src="assets/icons/egresado.png" alt="egresado.jpg" width="106" height="85">
-              </div>
-              <h1 class="h3 mb-3 pt-2 fw-normal text-center"><strong>Egresados</strong></h1>
-              <div class="h3 mb-3 pt-2 fw-normal text-center">
-                <button pButton type="button" class="btn btn-primary bi bi-linkedin "> Iniciar sesión con LinkedIn</button>
-              </div>
-          </form>
-      </div>
-  </div>
-
-  <div *ngIf="esAdmin">
-
-
-      <div class="container card mt-5 cardCustom">
-          <div>
-              <button (click)="esAdmin = !esAdmin; resetForm()" class="btn btn-dark btn-sm float-end mt-3">
-                  {{ esAdmin ? 'Iniciar sesión Egresados' : 'Iniciar sesión Administrador' }}
-              </button>
-          </div>
-
-          <form [formGroup]="formularioLogin" (ngSubmit)="login()" class="px-4 py-3">
-              <div class="container text-center">
-                  <img class="mt-4" src="assets/icons/admin4.png" alt="admin.png" width="110" height="95">
-              </div>
-              <h1 class="h3 mb-3 pt-2 fw-normal text-center"><strong>Administrador</strong></h1>
-
-              <div class="mb-3">
-                  <label for="exampleDropdownFormEmail1" class="form-label">Correo electrónico</label>
-                  <input type="email" class="form-control" formControlName="emailUsuario"
-                      id="exampleDropdownFormEmail1" placeholder="admin@correo.com">
-                  <span *ngIf="campoInvalido('emailUsuario')" class="form-text text-danger">
-                      El correo es inválido.
-                  </span>
-              </div>
-              <div class="mb-3">
-                  <label for="exampleDropdownFormPassword1" class="form-label">Contraseña</label>
-                  <input type="password" class="form-control" name="password" autocomplete="on"
-                      formControlName="contrasenia" id="exampleDropdownFormPassword1" placeholder="******">
-                  <span *ngIf="campoInvalido('contrasenia')" class="form-text text-danger">
-                      La contraseña es obligatoria.
-                  </span>
-              </div>
-              <button role="link" class="btn btn-primary">Acceder</button>
-          </form>
-      </div>
-
-  </div>
-
-</div> -->
 <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
   <div class="flex flex-column align-items-center justify-content-center">
-      <div [ngClass]="{ 'small-card': esAdmin, 'large-card': !esAdmin }" style="border-radius:50px; padding:0.5rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+      <div [ngClass]="{ 'small-card': esAdmin, 'large-card': !esAdmin }"
+           style="border-radius:50px; padding:0.5rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
           <div class="surface-card py-9 px-5 sm:px-8 position-relative" style="border-radius:53px">
+
               <!-- Botón en la esquina superior derecha -->
-              <button pButton (click)="esAdmin = !esAdmin; resetForm()" label="{{ esAdmin ? 'Egresados' : 'Administrador' }}" class="toggle-button"></button>
+              <button pButton (click)="esAdmin = !esAdmin; resetForm()"
+                      label="{{ esAdmin ? 'Egresados' : 'Administrador' }}"
+                      class="toggle-button"></button>
 
               <div class="text-center mb-5">
-                  <!-- Cambiar el logo según el tipo de usuario -->
-                  <img [src]="esAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'" alt="Image" height="50" class="mb-3">
+                  <img [src]="esAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'"
+                       alt="Image"
+                       height="50"
+                       class="mb-3">
                   <div class="text-900 text-3xl font-medium mb-3">{{ esAdmin ? 'Administrador' : 'Egresados' }}</div>
                   <span class="text-600 font-medium">{{ esAdmin ? 'Iniciar sesión Administrador' : 'Iniciar sesión Egresados' }}</span>
               </div>
 
               <form [formGroup]="formularioLogin" (ngSubmit)="login()">
-
                   <!-- si es admin muestra login administrador -->
                   <div *ngIf="esAdmin">
                       <label for="emailUsuario" class="block text-900 text-left text-xl font-medium mb-1">Correo electrónico</label>
-                      <input id="emailUsuario" type="email" pInputText formControlName="emailUsuario" placeholder="admin@correo.com" class="w-full mb-5 email-input">
-                      <span *ngIf="campoInvalido('emailUsuario')" class="text-red-500 email-invalid text-sm">El correo es inválido.</span>
 
-                      <label for="contrasenia" class="block text-900 text-left text-xl font-medium mb-1 ">Contraseña</label>
-                      <p-password id="contrasenia" formControlName="contrasenia" placeholder="*******" [toggleMask]="true" class="w-full mb-5 contrasenia-input"></p-password>
-                      <span *ngIf="campoInvalido('contrasenia')" class="text-red-500 text-sm">La contraseña es obligatoria.</span>
-                  </div>
+                          <input id="emailUsuario"
+                                 type="email"
+                                 pInputText
+                                 formControlName="emailUsuario"
+                                 placeholder="admin@correo.com"
+                                 class="w-full mb-2 email-input">
+                                 <span *ngIf="campoInvalido('emailUsuario')" class="text-red-500">
+                                  El correo es inválido
+                                </span>
 
-                  <!-- si NO es admin muestra login egresado -->
-                  <div *ngIf="!esAdmin" class="text-center">
-                      <button  pButton type="button" class="p-button-primary" icon="pi pi-linkedin" iconPos="right" label=" " (click)="loginWithLinkedIn()">Iniciar sesión con LinkedIn</button>
-                  </div>
 
-                  <div *ngIf="esAdmin" class="flex align-items-center justify-content-between mb-5 gap-4">
+                      <label for="contrasenia" class="block text-900 text-left text-xl font-medium mb-1">Contraseña</label>
+                          <p-password
+                                      id="contrasenia"
+                                      formControlName="contrasenia"
+                                      placeholder="*******"
+                                      [toggleMask]="true"
+                                      class="w-full mb-2 contrasenia-input">
+                          </p-password>
+                          <span *ngIf="campoInvalido('contrasenia')" class=" mt-1 text-red-500">
+                            La contraseña es obligatoria
+                          </span>
+                   </div>
+
+
+                  <div *ngIf="esAdmin" class="flex align-items-center justify-content-between mb-4 gap-4">
                       <div class="flex align-items-center">
-                          <p-checkbox id="rememberme1" [binary]="true" class="rememberme-checkbox mr-2"></p-checkbox>
+                          <p-checkbox id="rememberme1"
+                                      [binary]="true"
+                                      class="rememberme-checkbox mr-2"></p-checkbox>
                           <label for="rememberme1">Recuérdame</label>
                       </div>
-                      <a class="font-medium ml-2 text-center cursor-pointer" style="color: var(--primary-color)">¿Olvidaste tu contraseña?</a>
+                      <a class="font-medium ml-2 text-center cursor-pointer"
+                         style="color: var(--primary-color)">¿Olvidaste tu contraseña?</a>
                   </div>
 
-                  <button *ngIf="esAdmin" pButton pRipple label="Acceder" class="w-full p-2 text-xl" type="submit"></button>
+                  <button *ngIf="esAdmin" pButton pRipple
+                          label="Acceder"
+                          class="w-full p-2 text-xl"
+                          type="submit">
+                  </button>
+
+                  <div *ngIf="!esAdmin" class="text-center">
+                        <button pButton type="button"
+                                class="p-button-primary"
+                                icon="pi pi-linkedin"
+                                iconPos="right"
+                                label="Iniciar sesión con LinkedIn"
+                                (click)="loginWithLinkedIn()">
+                        </button>
+                  </div>
               </form>
           </div>
       </div>
