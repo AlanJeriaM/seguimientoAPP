@@ -1,3 +1,4 @@
+
 import { Component } from '@angular/core';
 
 interface Question {
@@ -6,49 +7,41 @@ interface Question {
   options: string[];
 }
 
-
 @Component({
   selector: 'app-create-encuesta',
   templateUrl: './create-encuesta.component.html',
-  styleUrl: './create-encuesta.component.css'
+  styleUrls: ['./create-encuesta.component.css']
 })
 export class CreateEncuestaComponent {
-
   surveyTitle: string = '';
   questions: Question[] = [];
   questionTypes = [
-    { label: 'Selección Múltiple', value: 'multiple' },
-    { label: 'Texto Libre', value: 'text' }
+    { label: 'Selección Múltiple', value: 'multiple' }
   ];
 
-  // Método para agregar una nueva pregunta
   addQuestion() {
     this.questions.push({
       text: '',
-      type: '',
-      options: []
+      type: 'multiple',
+      options: ['', '']  // Por defecto, crea 2 opciones vacías para validación.
     });
   }
 
-  // Método para eliminar una pregunta específica
   removeQuestion(index: number) {
     this.questions.splice(index, 1);
   }
 
-  // Método para agregar una opción a una pregunta de selección múltiple
   addOption(questionIndex: number) {
     this.questions[questionIndex].options.push('');
   }
 
-  // Método para eliminar una opción específica de una pregunta
   removeOption(questionIndex: number, optionIndex: number) {
     this.questions[questionIndex].options.splice(optionIndex, 1);
   }
 
-  // Método para guardar la encuesta
   saveSurvey() {
-    if (!this.surveyTitle || this.questions.length === 0) {
-      alert('El título de la encuesta y al menos una pregunta son requeridos.');
+    if (!this.validateSurvey()) {
+      alert('Por favor, asegúrese de que el título, al menos una pregunta, y mínimo 2 opciones estén completas, sin campos vacíos.');
       return;
     }
 
@@ -58,19 +51,27 @@ export class CreateEncuestaComponent {
     };
 
     console.log('Encuesta guardada:', survey);
-    // Aquí puedes llamar al servicio para enviar la encuesta al backend
-    // Por ejemplo: this.surveyService.createSurvey(survey).subscribe(...)
-
-    // Limpieza del formulario
     this.resetForm();
   }
 
-  // Método para limpiar el formulario después de guardar la encuesta
   resetForm() {
     this.surveyTitle = '';
     this.questions = [];
   }
 
+  validateSurvey(): boolean {
+    if (!this.surveyTitle.trim()) return false;
+    if (this.questions.length === 0) return false;
 
+    return this.questions.every(question => {
+      if (!question.text.trim()) return false;
+      if (question.type === 'multiple' && question.options.length < 2) return false;
+      return question.options.every(option => option.trim() !== '');
+    });
+  }
 
+  // trackBy para optimizar el rendimiento del ngFor
+  trackByIndex(index: number, obj: any): any {
+    return index;
+  }
 }
