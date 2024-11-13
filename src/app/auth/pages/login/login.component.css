@@ -118,7 +118,8 @@
 }
 
 .email-invalid {
-  margin-top: -1.8rem; /* Ajusta el valor según sea necesario */
+  position: relative;
+  margin-top: 1rem; /* Ajusta el valor según sea necesario */
   font-size: 0.875rem;
 }
 
