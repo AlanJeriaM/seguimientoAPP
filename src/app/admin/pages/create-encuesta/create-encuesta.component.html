@@ -5,21 +5,21 @@
         <h1 class="text-center p-mb-4">Crear encuesta</h1>
       </ng-template>
 
-      <!-- Contenedor de mensajes de error y éxito -->
-      <div *ngIf="errorMessages.length > 0" class="error-box p-mb-4 p-p-3">
-        <span>Ayuda para crear una encuesta</span>
-        <ul>
-          <li *ngFor="let errorMessage of errorMessages">{{ errorMessage }}</li>
-        </ul>
-      </div>
-
 
       <div *ngIf="!formIsValid && questions.length > 0" class="text-right error-box mb-4 p-p-3">
-        <p-message severity="error" text="Estado: Encuesta inválida "></p-message>
+        <p-message severity="error" text="Encuesta inválida "></p-message>
       </div>
 
       <div *ngIf="formIsValid" class="text-right success-box mb-4 p-p-3">
         <p-message severity="success" text="Estado: Encuesta válida "></p-message>
+      </div>
+
+      <!-- Contenedor de mensajes de error y éxito -->
+      <div *ngIf="errorMessages.length > 0" class="error-box p-mb-4 p-p-3">
+        <span><strong>Ayuda para crear una encuesta:</strong></span>
+        <ul>
+          <li *ngFor="let errorMessage of errorMessages">{{ errorMessage }}</li>
+        </ul>
       </div>
 
       <div class="p-fluid">
@@ -29,7 +29,7 @@
             id="surveyTitle"
             type="text"
             pInputText
-            [(ngModel)]="surveyTitle"
+            [(ngModel)]="tituloEncuesta"
             placeholder="Ingrese el título"
             class="mt-2"
             (ngModelChange)="validateSurvey()"
@@ -44,7 +44,7 @@
                   id="question-{{ i }}"
                   type="text"
                   pInputText
-                  [(ngModel)]="question.text"
+                  [(ngModel)]="question.tituloPregunta"
                   placeholder="Título de la pregunta"
                   (ngModelChange)="validateSurvey()"
                 />
@@ -63,18 +63,14 @@
             </div>
 
             <div *ngIf="question.type === 'multiple'" class="mt-2">
-              <div
-                *ngFor="let option of question.options; let j = index; trackBy: trackByIndex"
-                class="p-field mb-2"
-              >
+              <div *ngFor="let option of question.options; let j = index; trackBy: trackByIndex" class="p-field mb-2">
                 <div class="p-inputgroup mt-2">
                   <input
                     type="text"
                     pInputText
                     [(ngModel)]="question.options[j]"
                     placeholder="Opción {{ j + 1 }}"
-                    (ngModelChange)="validateSurvey()"
-                  />
+                    (ngModelChange)="validateSurvey()"/>
                   <button
                     type="button"
                     pButton
@@ -84,22 +80,22 @@
                   ></button>
                 </div>
               </div>
-              <p-button
-                [disabled]="question.options.length > 4"
-                label="Agregar Opción"
-                icon="pi pi-plus"
-                (onClick)="addOption(i)"
-                styleClass="p-button-outlined p-button-secondary mt-2"
-              ></p-button>
-            </div>
-
-            <div>
-              <p-button
-                label="Eliminar pregunta"
-                icon="pi pi-trash"
-                (onClick)="removeQuestion(i)"
-                styleClass="p-button-danger p-button-Mm mt-3"
-              ></p-button>
+              <!-- Contenedor con flexbox para alinear el botón "Eliminar" a la derecha -->
+              <div class="flex">
+                <p-button
+                  [disabled]="question.options.length > 4"
+                  label="Opción"
+                  icon="pi pi-plus"
+                  (onClick)="addOption(i)"
+                  styleClass=" p-button-outlined p-button-secondary mt-2">
+              </p-button>
+                <p-button
+                  label="Eliminar"
+                  icon="pi pi-trash"
+                  (onClick)="removeQuestion(i)"
+                  styleClass=" p-button-danger mt-2 ml-4">
+              </p-button>
+              </div>
             </div>
           </p-fieldset>
         </div>
@@ -110,19 +106,19 @@
           label="Agregar pregunta"
           (onClick)="addQuestion()"
           icon="pi pi-plus"
-          styleClass="p-button-outlined p-button-Mm mt-3 mr-2"
+          styleClass="p-button-outlined mt-3 mr-2"
         ></p-button>
       </div>
     </p-card>
 
-    <div>
+    <div class="text-right mr-2">
       <p-button
         [disabled]="!formIsValid"
         pRipple
         label="Guardar encuesta"
         (onClick)="saveSurvey()"
         icon="pi pi-save"
-        styleClass="p-button-success p-button-Mm mt-3 mr-2"
+        styleClass="p-button-success mt-3 mr-2"
       ></p-button>
     </div>
   </div>

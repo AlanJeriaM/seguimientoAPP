@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 interface Question {
-  text: string;
+  tituloPregunta: string;
   type: string;
   options: string[];
 }
@@ -12,7 +12,7 @@ interface Question {
   styleUrls: ['./create-encuesta.component.css']
 })
 export class CreateEncuestaComponent {
-  surveyTitle: string = '';
+  tituloEncuesta: string = '';
   questions: Question[] = [];
   questionTypes = [{ label: 'Selección Múltiple', value: 'multiple' }];
 
@@ -22,7 +22,7 @@ export class CreateEncuestaComponent {
 
   addQuestion() {
     this.questions.push({
-      text: '',
+      tituloPregunta: '',
       type: 'multiple',
       options: ['', '']  // Por defecto, crea 2 opciones vacías para validación.
     });
@@ -48,7 +48,7 @@ export class CreateEncuestaComponent {
     if (!this.validateSurvey()) return;
 
     const survey = {
-      title: this.surveyTitle,
+      title: this.tituloEncuesta,
       questions: this.questions
     };
 
@@ -57,7 +57,7 @@ export class CreateEncuestaComponent {
   }
 
   resetForm() {
-    this.surveyTitle = '';
+    this.tituloEncuesta = '';
     this.questions = [];
     this.errorMessages = [];  // Limpia los mensajes de error al restablecer el formulario
     this.formIsValid = false; // Resetea el estado de validación
@@ -66,16 +66,16 @@ export class CreateEncuestaComponent {
   validateSurvey(): boolean {
     this.errorMessages = [];  // Reinicia los mensajes de error
 
-    if (!this.surveyTitle.trim()) {
+    if (!this.tituloEncuesta.trim()) {
       this.errorMessages.push('El título de la encuesta no puede estar vacío.');
     }
 
     if (this.questions.length === 0) {
-      this.errorMessages.push('Debe agregar al menos una pregunta.');
+      this.errorMessages.push('Ahora debes agregar al menos una pregunta.');
     }
 
     this.questions.forEach((question, index) => {
-      if (!question.text.trim()) {
+      if (!question.tituloPregunta.trim()) {
         this.errorMessages.push(`La pregunta ${index + 1} no tiene título.`);
       }
       if (question.type === 'multiple') {
