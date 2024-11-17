@@ -77,7 +77,7 @@
 /* Títulos y textos */
 .surface-card .text-900 {
   color: #333;
-  font-size: 1.2rem !important;
+  font-size: 1rem !important;
   font-weight: 300;
   text-align: center; /* Centra el texto horizontalmente */
 }

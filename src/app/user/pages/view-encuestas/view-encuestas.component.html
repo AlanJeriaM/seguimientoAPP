@@ -1,1 +1,40 @@
-<p>view-encuestas works!</p>
+<!-- <div class="p-grid p-justify-center">
+  <div class="p-col-12 p-md-8 p-lg-6">
+    <p-card>
+      <ng-template pTemplate="header">
+        <h1 class="text-center p-mb-4">{{ surveyTitle }}</h1>
+      </ng-template>
+
+      <div class="p-fluid">
+        <div *ngFor="let question of questions; let i = index" class="mt-4">
+          <p-fieldset [legend]="'Pregunta ' + (i + 1)">
+            <p>{{ question.text }}</p>
+
+
+            <div *ngIf="question.type === 'multiple'">
+              <div *ngFor="let option of question.options; let j = index" class="p-field mt-2">
+                <p-radioButton
+                  name="option-{{ i }}"
+                  [(ngModel)]="userResponses[i]"
+                  [value]="option"
+                  inputId="option-{{ i }}-{{ j }}"
+                ></p-radioButton>
+                <label for="option-{{ i }}-{{ j }}">{{ option }}</label>
+              </div>
+            </div>
+          </p-fieldset>
+        </div>
+      </div>
+
+      <div class="text-right mr-2 mt-4">
+        <p-button
+          pRipple
+          label="Enviar respuestas"
+          (onClick)="submitResponses()"
+          icon="pi pi-check"
+          styleClass="p-button-success"
+        ></p-button>
+      </div>
+    </p-card>
+  </div>
+</div> -->

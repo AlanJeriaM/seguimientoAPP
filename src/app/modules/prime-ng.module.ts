@@ -32,6 +32,7 @@ import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { FieldsetModule } from 'primeng/fieldset';
 import { MessageModule } from 'primeng/message';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 import { AccordionModule } from 'primeng/accordion';
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -72,6 +73,7 @@ const primeNgModules = [
   PaginatorModule,
   FieldsetModule,
   MessageModule,
+  RadioButtonModule,
 
 
 

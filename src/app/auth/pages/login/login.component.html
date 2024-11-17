@@ -59,11 +59,17 @@
                          style="color: var(--primary-color)">¿Olvidaste tu contraseña?</a>
                   </div>
 
-                  <button *ngIf="esAdmin" pButton pRipple
-                          label="Acceder"
-                          class="w-full p-2 text-xl"
-                          type="submit">
-                  </button>
+                  <div class="flex flex-column align-items-center">
+                    <button *ngIf="esAdmin"
+                      pButton
+                      pRipple
+                      label="Acceder"
+                      class="w-8 p-2 text-l "
+                      type="submit">
+                    </button>
+                  </div>
+
+
 
                   <div *ngIf="!esAdmin" class="text-center">
                         <button pButton type="button"
