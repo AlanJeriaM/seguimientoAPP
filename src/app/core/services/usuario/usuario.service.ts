@@ -86,9 +86,4 @@ export class UsuarioService {
         }),
       );
   }
-
-
-
-
-
 }

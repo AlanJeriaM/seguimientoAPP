@@ -1,99 +1,103 @@
-import { Component } from '@angular/core';
-
-interface Question {
-  tituloPregunta: string;
-  type: string;
-  options: string[];
-}
+import { Component, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-encuesta',
   templateUrl: './create-encuesta.component.html',
   styleUrls: ['./create-encuesta.component.css']
 })
-export class CreateEncuestaComponent {
-  tituloEncuesta: string = '';
-  questions: Question[] = [];
+export class CreateEncuestaComponent implements OnInit {
+  encuestaForm!: FormGroup;
+
   questionTypes = [{ label: 'Selección Múltiple', value: 'multiple' }];
 
-  // Propiedades de mensaje de error
-  errorMessages: string[] = [];
-  formIsValid: boolean = false;  // Nuevo estado para controlar si el formulario es válido
+  constructor(private fb: FormBuilder) {}
 
-  addQuestion() {
-    this.questions.push({
-      tituloPregunta: '',
-      type: 'multiple',
-      options: ['', '']  // Por defecto, crea 2 opciones vacías para validación.
+  ngOnInit(): void {
+    this.encuestaForm = this.fb.group({
+      tituloEncuesta: ['', [Validators.required, Validators.minLength(3)]],
+      questions: this.fb.array([])
     });
-    this.validateSurvey();
   }
 
-  removeQuestion(index: number) {
-    this.questions.splice(index, 1);
-    this.validateSurvey();  // Validar nuevamente después de eliminar la pregunta
+  get questions(): FormArray {
+    return this.encuestaForm.get('questions') as FormArray;
   }
 
-  addOption(questionIndex: number) {
-    this.questions[questionIndex].options.push('');
-    this.validateSurvey();  // Validar nuevamente después de agregar una opción
-  }
-
-  removeOption(questionIndex: number, optionIndex: number) {
-    this.questions[questionIndex].options.splice(optionIndex, 1);
-    this.validateSurvey();  // Validar nuevamente después de eliminar una opción
-  }
-
-  saveSurvey() {
-    if (!this.validateSurvey()) return;
-
-    const survey = {
-      title: this.tituloEncuesta,
-      questions: this.questions
-    };
-
-    console.log('Encuesta guardada:', survey);
-    this.resetForm();
-  }
-
-  resetForm() {
-    this.tituloEncuesta = '';
-    this.questions = [];
-    this.errorMessages = [];  // Limpia los mensajes de error al restablecer el formulario
-    this.formIsValid = false; // Resetea el estado de validación
-  }
-
-  validateSurvey(): boolean {
-    this.errorMessages = [];  // Reinicia los mensajes de error
-
-    if (!this.tituloEncuesta.trim()) {
-      this.errorMessages.push('El título de la encuesta no puede estar vacío.');
-    }
-
-    if (this.questions.length === 0) {
-      this.errorMessages.push('Ahora debes agregar al menos una pregunta.');
-    }
-
-    this.questions.forEach((question, index) => {
-      if (!question.tituloPregunta.trim()) {
-        this.errorMessages.push(`La pregunta ${index + 1} no tiene título.`);
-      }
-      if (question.type === 'multiple') {
-        if (question.options.length < 2) {
-          this.errorMessages.push(`La pregunta ${index + 1} debe tener al menos 2 opciones.`);
-        } else if (!question.options.every(option => option.trim() !== '')) {
-          this.errorMessages.push(`Todas las opciones de la pregunta ${index + 1} deben estar completas.`);
-        }
-      }
+  addQuestion(): void {
+    const questionGroup = this.fb.group({
+      tituloPregunta: ['', [Validators.required, Validators.minLength(3)]],
+      type: ['multiple', Validators.required],
+      options: this.fb.array([this.createOption(), this.createOption()] ,)
     });
-
-    this.formIsValid = this.errorMessages.length === 0;  // Actualiza el estado de validez
-
-    return this.formIsValid;  // Retorna si el formulario es válido
+    this.questions.push(questionGroup);
   }
 
-  // trackBy para optimizar el rendimiento del ngFor
-  trackByIndex(index: number, obj: any): any {
-    return index;
+  removeQuestion(index: number): void {
+    this.questions.removeAt(index);
+  }
+
+  createOption(): FormGroup {
+    return this.fb.group({
+      value: ['', Validators.required],
+
+    });
+  }
+
+  addOption(questionIndex: number): void {
+    const options = this.questions.at(questionIndex).get('options') as FormArray;
+    if (options.length < 5) {
+      options.push(this.createOption());
+    }
+  }
+
+  removeOption(questionIndex: number, optionIndex: number): void {
+    const options = this.questions.at(questionIndex).get('options') as FormArray;
+    options.removeAt(optionIndex);
+  }
+
+
+  // Validador para asegurarse de que haya al menos 2 opciones
+  // minOptionsValidator(control: FormArray): { [key: string]: boolean } | null {
+  //   return control.length >= 2 ? null : { 'minOptions': true };
+  // }
+
+  saveSurvey(): void {
+    if (this.encuestaForm.valid) {
+      console.log('Encuesta guardada:', this.encuestaForm.value);
+      this.resetForm();
+    } else {
+      this.encuestaForm.markAllAsTouched();
+    }
+  }
+
+  resetForm(): void {
+    this.encuestaForm.reset();
+    this.questions.clear();
+  }
+
+  // Ayuda para acceder a las opciones de cada pregunta
+  getOptions(questionIndex: number): FormArray {
+    return this.questions.at(questionIndex).get('options') as FormArray;
+  }
+
+  public isValidField( form: FormGroup ,field : string): boolean | null{
+    return form.controls[field].errors && form.controls[field].touched;
+  }
+
+  getFieldError( field: string ): string | null{
+    if ( !this.encuestaForm.controls[field] ) return null;
+    const errors = this.encuestaForm.controls[field].errors || {};
+    for (const key of Object.keys(errors)){
+      switch(key){
+        case 'required':
+          return 'Este campo es requerido';
+
+        case 'minlength':
+          return `Mínimo ${ errors ['minlength'].requiredLength } caracteres.`
+      }
+    }
+    return null;
+
   }
 }
