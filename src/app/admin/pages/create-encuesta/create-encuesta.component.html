@@ -2,7 +2,7 @@
   <div class="p-col-12 p-md-8 p-lg-6">
     <p-card>
       <ng-template pTemplate="header">
-        <h1 class="text-center p-mb-4">Crear Encuesta</h1>
+        <h1 class="text-center p-mb-4 mt-6">Crear Encuesta</h1>
       </ng-template>
 
       <div *ngIf="questions.length > 0" class="text-right mb-4 p-p-3">
@@ -12,7 +12,7 @@
         </p-message>
       </div>
 
-      <form [formGroup]="encuestaForm">
+      <form [formGroup]="encuestaForm"  (ngSubmit)="saveSurvey()">
         <!-- Título de la encuesta -->
         <div class="p-field">
           <label for="tituloEncuesta">Título de la Encuesta</label>
@@ -26,12 +26,8 @@
               class="w-full mt-2"
             />
             <small class="p-error" *ngIf="isValidField(encuestaForm, 'tituloEncuesta')">
-              {{ getFieldError('tituloEncuesta') }}
+              {{ getFieldError(encuestaForm,'tituloEncuesta') }}
             </small>
-
-            <!-- <small *ngIf="encuestaForm.get('tituloEncuesta')?.touched && encuestaForm.get('tituloEncuesta')?.invalid" class="p-error">
-              El título es obligatorio.
-            </small> -->
           </div>
         </div>
 
@@ -51,9 +47,13 @@
                     placeholder="Título de la pregunta"
                     class="w-full mt-2"
                   />
-                   <small *ngIf="question.get('tituloPregunta')?.touched && question.get('tituloPregunta')?.invalid" class="p-error">
+                   <!-- <small *ngIf="question.get('tituloPregunta')?.touched && question.get('tituloPregunta')?.invalid" class="p-error">
                     El título de la pregunta es obligatorio, mínimo 3 caracteres.
+                  </small> -->
+                  <small class="p-error" *ngIf="isValidField(question, 'tituloPregunta')">
+                    {{ getFieldError(question, 'tituloPregunta') }}
                   </small>
+
                 </div>
               </div>
 
@@ -84,11 +84,14 @@
                         pButton
                         icon="pi pi-trash"
                         (click)="removeOption(i, j)"
-                        class="p-button-danger ml-1 p-button-text"
-                      ></button>
+                        class="p-button-danger ml-1 p-button-text">
+                    </button>
                     </div>
-                    <small *ngIf="option.get('value')?.touched && option.get('value')?.invalid" class="p-error">
-                      La opción {{ j+1 }} no puede estar vacía.
+                    <small class="p-error" *ngIf="isValidField(option, 'value')">
+                      {{ getFieldError(option, 'value') }}, la opción {{ j+1 }} no puede estar vacía.
+                    </small>
+                    <small *ngIf="isDuplicateOption(option, i, j)" class="p-error">
+                      Esta opción ya existe.
                     </small>
                   </div>
                 </div>
@@ -99,21 +102,16 @@
                     label="Opción"
                     icon="pi pi-plus"
                     (onClick)="addOption(i)"
-                    class="mt-2"
-                  ></p-button>
-
-                                <!-- Mensaje de error si hay menos de 2 opciones -->
-              <!-- <div *ngIf="getOptions(i).length < 2 && question.get('type')?.value === 'multiple'" class="p-error mt-2">
-                Debe haber al menos dos opciones para cada pregunta de selección múltiple.
-              </div> -->
+                    class="mt-2">
+                </p-button>
 
                   <!-- Botón para eliminar la pregunta -->
                   <p-button
                     label="Eliminar"
                     icon="pi pi-trash"
                     (onClick)="removeQuestion(i)"
-                    styleClass="p-button-danger mt-2"
-                  ></p-button>
+                    styleClass="p-button-danger mt-2">
+                </p-button>
                 </div>
               </div>
             </p-fieldset>
@@ -135,7 +133,7 @@
     <!-- Botón para guardar encuesta -->
     <div class="text-right mt-3">
       <p-button
-        [disabled]="encuestaForm.invalid"
+        [disabled]="encuestaForm.invalid || questions.length === 0"
         pRipple
         label="Guardar encuesta"
         (onClick)="saveSurvey()"
@@ -144,4 +142,13 @@
       ></p-button>
     </div>
   </div>
+
+<!-- Debug Mode -->
+<!-- <div>
+  <pre><b>encuestaForm.value: </b> {{encuestaForm.value | json }}</pre>
+  <pre><b>encuestaForm.errors: </b> {{encuestaForm.errors | json }}</pre>
+  <pre><b>encuestaForm.errors: </b> {{encuestaForm.valid | json }}</pre>
+
+</div> -->
+
 </div>
