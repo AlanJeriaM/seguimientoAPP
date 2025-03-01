@@ -1,87 +1,60 @@
-<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
-  <div class="flex flex-column align-items-center justify-content-center">
-      <div [ngClass]="{ 'small-card': esAdmin, 'large-card': !esAdmin }"
-           style="border-radius:50px; padding:0.5rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
-          <div class="surface-card py-9 px-5 sm:px-8 position-relative" style="border-radius:53px">
+<div class="login-container">
+  <div class="login-card" [ngClass]="{ 'small-card': esAdmin, 'large-card': !esAdmin }">
+    <button pButton (click)="esAdmin = !esAdmin; resetForm()"
+            label="{{ esAdmin ? 'Egresados' : 'Administrador' }}"
+            class="p-button-sm toggle-button"></button>
 
-              <!-- Botón en la esquina superior derecha -->
-              <button pButton (click)="esAdmin = !esAdmin; resetForm()"
-                      label="{{ esAdmin ? 'Egresados' : 'Administrador' }}"
-                      class="toggle-button"></button>
+    <div class="login-header">
+      <img [src]="esAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'"
+           alt="Logo"
+           class="logo">
+      <h1>{{ esAdmin ? 'Administrador' : 'Egresados' }}</h1>
+      <p>{{ esAdmin ? 'Iniciar sesión Administrador' : 'Iniciar sesión Egresados' }}</p>
+    </div>
 
-              <div class="text-center mb-5">
-                  <img [src]="esAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'"
-                       alt="Image"
-                       height="50"
-                       class="mb-3">
-                  <div class="text-900 text-3xl font-medium mb-3">{{ esAdmin ? 'Administrador' : 'Egresados' }}</div>
-                  <span class="text-600 font-medium">{{ esAdmin ? 'Iniciar sesión Administrador' : 'Iniciar sesión Egresados' }}</span>
-              </div>
+    <form [formGroup]="formularioLogin" (ngSubmit)="login()">
+      <!-- Campos y botón para administrador -->
+      <div *ngIf="esAdmin">
+        <div class="form-group">
+          <label for="emailUsuario">Correo electrónico</label>
+          <input id="emailUsuario"
+                 type="email"
+                 pInputText
+                 formControlName="emailUsuario"
+                 placeholder="admin@correo.com">
+          <span *ngIf="campoInvalido('emailUsuario')" class="error-message">El correo es inválido</span>
+        </div>
 
-              <form [formGroup]="formularioLogin" (ngSubmit)="login()">
-                  <!-- si es admin muestra login administrador -->
-                  <div *ngIf="esAdmin">
-                      <label for="emailUsuario" class="block text-900 text-left text-xl font-medium mb-1">Correo electrónico</label>
+        <div class="form-group">
+          <label for="contrasenia">Contraseña</label>
+          <input id="contrasenia"
+                      type="password"
+                      formControlName="contrasenia"
+                      placeholder="*******">
+          <span *ngIf="campoInvalido('contrasenia')" class="error-message">La contraseña es obligatoria</span>
+        </div>
 
-                          <input id="emailUsuario"
-                                 type="email"
-                                 pInputText
-                                 formControlName="emailUsuario"
-                                 placeholder="admin@correo.com"
-                                 class="w-full mb-2 email-input">
-                                 <span *ngIf="campoInvalido('emailUsuario')" class="text-red-500">
-                                  El correo es inválido
-                                </span>
+        <div class="remember-forgot">
+          <a class="forgot-password">¿Olvidaste tu contraseña?</a>
+        </div>
 
-
-                      <label for="contrasenia" class="block text-900 text-left text-xl font-medium mb-1">Contraseña</label>
-                          <p-password
-                                      id="contrasenia"
-                                      formControlName="contrasenia"
-                                      placeholder="*******"
-                                      [toggleMask]="true"
-                                      class="w-full mb-2 contrasenia-input">
-                          </p-password>
-                          <span *ngIf="campoInvalido('contrasenia')" class=" mt-1 text-red-500">
-                            La contraseña es obligatoria
-                          </span>
-                   </div>
-
-
-                  <div *ngIf="esAdmin" class="flex align-items-center justify-content-between mb-4 gap-4">
-                      <div class="flex align-items-center">
-                          <p-checkbox id="rememberme1"
-                                      [binary]="true"
-                                      class="rememberme-checkbox mr-2"></p-checkbox>
-                          <label for="rememberme1">Recuérdame</label>
-                      </div>
-                      <a class="font-medium ml-2 text-center cursor-pointer"
-                         style="color: var(--primary-color)">¿Olvidaste tu contraseña?</a>
-                  </div>
-
-                  <div class="flex flex-column align-items-center">
-                    <button *ngIf="esAdmin"
-                      pButton
-                      pRipple
-                      label="Acceder"
-                      class="w-8 p-2 text-l mt-1"
-                      type="submit">
-                    </button>
-                  </div>
-
-
-
-                  <div *ngIf="!esAdmin" class="text-center">
-                        <button pButton type="button"
-                                class="p-button-primary"
-                                icon="pi pi-linkedin"
-                                iconPos="right"
-                                label="Iniciar sesión con LinkedIn"
-                                (click)="loginWithLinkedIn()">
-                        </button>
-                  </div>
-              </form>
-          </div>
+        <div class="form-group p-d-flex p-jc-start">
+          <p-button type="submit"
+                    label="Iniciar sesión"
+                    [disabled]="formularioLogin.invalid"
+                    class="submit-button">
+          </p-button>
+        </div>
       </div>
+
+      <!-- Botón para egresados -->
+      <div *ngIf="!esAdmin" class="form-group button-container">
+        <p-button label="Iniciar sesión con LinkedIn"
+                  icon="pi pi-linkedin"
+                  (click)="loginWithLinkedIn()"
+                  class="linkedin-button">
+        </p-button>
+      </div>
+    </form>
   </div>
 </div>

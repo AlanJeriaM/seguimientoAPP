@@ -34,6 +34,8 @@ export class CreateEncuestaComponent implements OnInit {
       )
     });
     this.questions.push(questionGroup);
+
+
   }
 
   removeQuestion(index: number): void {
@@ -68,6 +70,8 @@ export class CreateEncuestaComponent implements OnInit {
       this.encuestaForm.markAllAsTouched();
     }
   }
+
+
 
   resetForm(): void {
     this.encuestaForm.reset();

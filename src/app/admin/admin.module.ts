@@ -6,7 +6,6 @@ import { MainComponent } from './pages/main/main.component';
 import { CreateEncuestaComponent } from './pages/create-encuesta/create-encuesta.component';
 import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
-import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin.component';
 import { AdminRoutingModule } from './admin-routing.module';
 import { PrimeNgModule } from '../modules/prime-ng.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,12 +17,10 @@ import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
 
 @NgModule({
   declarations: [
-
     MainComponent,
     CreateEncuestaComponent,
     ViewDeletedUsersComponent,
     ViewUsersComponent,
-    DashboardAdminComponent,
     ViewEncuestasComponent,
     MiProfileComponent,
   ],

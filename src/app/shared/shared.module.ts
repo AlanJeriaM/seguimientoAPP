@@ -6,6 +6,7 @@ import { Error404PageComponent } from './pages/error404-page/error404-page.compo
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NavbarSharedComponent } from './components/navbar-shared/navbar-shared.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { SharedDashboardComponent } from './pages/shared-dashboard/shared-dashboard.component';
 
 
 
@@ -18,6 +19,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
     Error404PageComponent,
     NavbarSharedComponent,
     SidebarComponent,
+    SharedDashboardComponent,
   ],
   imports: [
     CommonModule,
@@ -29,6 +31,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
     FooterComponent,
     Error404PageComponent,
     NavbarSharedComponent,
+    SharedDashboardComponent,
   ],
 })
 export class SharedModule { }
