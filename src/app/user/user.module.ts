@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 
 import { MainComponent } from './pages/main/main.component';
 import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
-import { DashboardUserComponent } from './pages/dashboard-user/dashboard-user.component';
 import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
 import { UserRoutingModule } from './user-routing.module';
 import { PrimeNgModule } from '../modules/prime-ng.module';
@@ -20,7 +19,6 @@ import { SharedModule } from '../shared/shared.module';
   declarations: [
     MainComponent,
     MiProfileComponent,
-    DashboardUserComponent,
     ViewEncuestasComponent,
     EncuestaCompletadaComponent
   ],

@@ -1,206 +1,166 @@
-/* Contenedor principal */
-.surface-ground {
+.login-container {
   display: flex;
-  align-items: baseline !important;
-  justify-content: center !important;
-  min-height: 100vh;
-  min-width: 100vw;
-  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); /* Restamos la altura del footer */
+  background-color: #f5f5f5;
   padding: 1rem;
-  background-color: hsl(0, 0%, 100%) !important; /* Fondo de la página */
+  margin-bottom: 80px; /* Altura del footer */
 }
 
-
-/* Contenedor del formulario */
-.surface-card {
-  position: relative !important;
-  width: 100%;
-  max-width: 400px; /* Tamaño máximo para pantallas grandes */
-  height: 550px; /* Ajusta la altura fija */
-  background-color: #fff;
+.login-card {
+  background: #fff;
   border-radius: 10px;
-  padding: 1rem; /* Ajusta el padding para un diseño más compacto */
-  box-shadow: 0 15px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Centra el contenido verticalmente */
-  overflow: hidden; /* Evita el scroll */
-}
-
-/* Tamaño específico para login de administrador */
-.small-card {
-  max-width: 900px !important; /* Tamaño máximo para login de administrador */
-  height: 500px !important; /* Ajusta la altura fija para administrador */
-}
-
-/* Tamaño específico para login de egresado */
-.large-card {
-  max-width: 500px !important; /* Tamaño máximo para login de egresado */
-  height: 400px ;/* Ajusta la altura fija para egresado */
-}
-
-/* Ajuste de la posición del checkbox */
-.rememberme-checkbox {
-  margin-block: 10px; /* Ajusta este valor según lo que necesites */
-}
-
-/* Botón de alternancia */
-.surface-card .toggle-button {
-  position: absolute;
-  top: 10px; /* Ajusta el espacio superior para evitar la superposición */
-  right: 10px; /* Ajusta el espacio derecho para evitar la superposición */
-  width: auto;
-  padding: 0.3rem 0.5rem; /* Ajusta el padding para un tamaño compacto */
-  font-size: 0.8rem;
-  border-radius: 5px;
-  background-color: #515355 !important;
-  color: #ffffff !important;
-  border: none;
-}
-.surface-card .toggle-button:hover {
-  background-color: #1378e4 !important;
-}
-/* Ajusta el estilo del borde del input de correo electrónico */
-.email-input {
-  border-radius: 4px !important; /* Redondeo de los bordes */
-  width: 95% !important;
-}
-
-/* Imagen del logo */
-.surface-card img {
-  max-width: 100px; /* Ajusta el tamaño del logo */
-  height: auto;
-  margin: 0 auto; /* Centra la imagen horizontalmente */
-  margin-bottom: 1.5rem; /* Asegura suficiente espacio debajo del logo */
-}
-
-/* Títulos y textos */
-.surface-card .text-900 {
-  color: #333;
-  font-size: 1rem !important;
-  font-weight: 300;
-  text-align: center; /* Centra el texto horizontalmente */
-}
-
-.surface-card .text-600 {
-  color: #777;
-  font-size: 1rem;
-  font-weight: 300;
-  text-align: center; /* Centra el texto horizontalmente */
-}
-
-.text-left{
-  text-align: left !important;
-
-}
-
-/* Estilos para los inputs */
-.surface-card input,
-.surface-card .p-password input {
-    width: 100%;
-    padding: 0.5rem !important;
-    font-size: 0.9rem; /* tamaño fuente admin@correo.com */
-    border: 1px solid #ddd;
-    box-sizing: border-box; /* Asegura que el padding y el borde no alteren el tamaño total del input */
-}
-
-/* Estilo para el checkbox */
-.surface-card .p-checkbox {
-  margin-right: 0.5rem;
-}
-
-
-.text-red-500 {
-  margin-top: -0.4rem;
-  margin-bottom: 0; /* Elimina cualquier margen inferior adicional */
-  font-size: 0.875rem; /* Asegura que el texto no sea demasiado grande */
-  display: block; /* Asegura que el span ocupe todo el ancho disponible */
-}
-
-.email-invalid {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
   position: relative;
-  margin-top: 1rem; /* Ajusta el valor según sea necesario */
-  font-size: 0.875rem;
 }
 
-/* Botones */
-.surface-card button {
-  width: 100%;
-  padding: 0.75rem; /* Ajusta el padding para el tamaño compacto */
-  font-size: 0.9rem; /* Ajusta el tamaño de la fuente */
-  border-radius: 10px;
-  margin-top: 1rem; /* Asegura que el botón tenga un margen superior */
+.small-card {
+  max-width: 500px;
 }
 
-/* boton acceder */
-button.w-full.p-2.text-xl {
-  margin-top: 0px; /* Aumenta o disminuye según sea necesario */
+.large-card {
+  max-width: 500px;
 }
 
-.surface-card button.p-button {
-  background-color: var(--primary-color);
+.toggle-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #515355;
   color: #fff;
   border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-/* boton iniciar sesion con linkedin y acceder */
-.surface-card button.p-button:hover {
-background-color: #0A66C2;
+.toggle-button:hover {
+  background-color: #1378e4;
 }
 
-/* Enlace "¿Olvidaste tu contraseña?" */
-.surface-card a {
-  color: var(--primary-color);
-  font-size: 0.8rem;
+.login-header {
+  margin-bottom: 2rem;
 }
 
-
-/* Ajustes para pantallas pequeñas */
-@media (max-width: 576px) {
-  .surface-card {
-    padding: 2.5rem;
-    height: auto; /* Ajusta la altura para pantallas pequeñas */
-  }
-
-  .surface-card .toggle-button {
-    top: 5px; /* Menos espacio superior en pantallas pequeñas */
-    right: 15px; /* Menos espacio derecho en pantallas pequeñas */
-    font-size: 0.7rem; /* Ajusta el tamaño de fuente en pantallas pequeñas */
-    padding: 0.2rem 0.5rem; /* Ajusta el padding en pantallas pequeñas */
-  }
-
-  .surface-card img {
-    max-width: 80px; /* Ajusta el tamaño máximo del logo en pantallas pequeñas */
-  }
-
-  .email-input {
-    border-radius: 4px !important; /* Redondeo de los bordes */
-    width: 90% !important;
-  }
-
-
+.logo {
+  max-width: 100px;
+  margin-bottom: 1rem;
 }
 
-/* Ajustes para pantallas medianas */
-@media (min-width: 577px) and (max-width: 768px) {
-  .surface-card {
-    max-width: 350px;
+h1 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  color: #777;
+  font-size: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+input, .p-password {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.error-message {
+  color: #ff0000;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.forgot-password {
+  color: #1378e4;
+  cursor: pointer;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center; /* Centra el botón horizontalmente */
+  margin-top: 1rem;
+}
+
+.submit-button, .linkedin-button {
+  width: 100%;
+  max-width: 300px; /* Limita el ancho máximo del botón */
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 5px;
+}
+
+.submit-button {
+  border: none;
+}
+
+.linkedin-button {
+  border: none;
+  border-radius: 5px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* Espacio entre el icono y el texto */
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover, .linkedin-button:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    min-height: calc(100vh - 60px); /* Ajustamos para pantallas pequeñas */
+    margin-bottom: 60px; /* Reducimos el margen inferior */
   }
 
-  .surface-card .toggle-button {
-    top: 10px; /* Mantiene el espacio superior en pantallas medianas */
-    right: 10px; /* Mantiene el espacio derecho en pantallas medianas */
-    font-size: 0.8rem; /* Mantiene el tamaño de fuente en pantallas medianas */
-    padding: 0.3rem 0.5rem; /* Mantiene el padding en pantallas medianas */
+  .login-card {
+    padding: 1.5rem;
   }
 
-  .surface-card img {
-    max-width: 90px; /* Ajusta el tamaño máximo del logo en pantallas medianas */
+  .toggle-button {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
   }
 
-  .email-input {
-    width: 120% !important;
-    border-radius: 4px !important;
+  .logo {
+    max-width: 80px;
+  }
 
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  p {
+    font-size: 0.875rem;
   }
 }

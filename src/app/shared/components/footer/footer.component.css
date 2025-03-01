@@ -1,7 +1,4 @@
-.subrayado{
-  text-decoration: none;
 
-  }
   .footer {
     position: fixed;
     bottom: 0;
@@ -10,13 +7,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem; /* Deja el padding en 2rem */
+    padding: 2rem; /* Altura del footer ajustada */
     border-top: 1px solid #dee2e6;
     background-color: white;
-    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    z-index: 1000; /* Mantener por encima del contenido */
   }
-
-
 
   .footer-center {
     flex-grow: 1;
@@ -43,8 +38,5 @@
     background-color: #005582; /* Cambia el color de fondo al hacer hover */
 }
 
-.icon-link:hover {
-    background-color: #005582; /* Cambia el color de fondo al hacer hover */
-}
 
 

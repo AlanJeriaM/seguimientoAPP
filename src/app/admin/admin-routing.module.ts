@@ -4,9 +4,9 @@ import { MainComponent } from './pages/main/main.component';
 import { ViewUsersComponent } from './pages/view-users/view-users.component';
 import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
 import { CreateEncuestaComponent } from './pages/create-encuesta/create-encuesta.component';
-import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin.component';
 import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
 import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
+import { SharedDashboardComponent } from '../shared/pages/shared-dashboard/shared-dashboard.component';
 
 const routes: Routes = [
   {
@@ -18,7 +18,7 @@ const routes: Routes = [
         { path: 'view-deleted-users', component: ViewDeletedUsersComponent },
         { path: 'create-encuesta', component: CreateEncuestaComponent},
         { path: 'view-encuesta', component: ViewEncuestasComponent},
-        { path: 'dashboard', component: DashboardAdminComponent},
+        { path: 'dashboard', component: SharedDashboardComponent},
         { path: '**', redirectTo: 'dashboard' }
       ],
     }
