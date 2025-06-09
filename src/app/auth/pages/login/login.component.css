@@ -5,7 +5,6 @@
   min-height: calc(100vh - 80px); /* Restamos la altura del footer */
   background-color: #f5f5f5;
   padding: 1rem;
-  margin-bottom: 80px; /* Altura del footer */
 }
 
 .login-card {
@@ -138,7 +137,6 @@ input, .p-password {
 @media (max-width: 768px) {
   .login-container {
     min-height: calc(100vh - 60px); /* Ajustamos para pantallas pequeñas */
-    margin-bottom: 60px; /* Reducimos el margen inferior */
   }
 
   .login-card {
