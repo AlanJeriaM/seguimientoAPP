@@ -1,0 +1,226 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+
+// Interfaces para el Dashboard
+export interface EstadisticasMercado {
+  totalProfesionales: number;
+  nuevosProfesionalesEsteMes: number;
+  empresasUnicas: number;
+  industriasUnicas: number;
+  porcentajeCrecimiento: number;
+}
+
+export interface TecnologiaDemandada {
+  nombre: string;
+  demanda: number;
+}
+
+export interface DistribucionSalarial {
+  industria: string;
+  cantidad: number;
+  salarioMinimo: number;
+  salarioMaximo: number;
+  salarioPromedio: number;
+  variacionMensual: number;
+}
+
+export interface EmpresaContratante {
+  empresa: string;
+  totalEmpleados: number;
+  vacantesAbiertas: number;
+  promedioSalario: number;
+  satisfaccionLaboral: number;
+  tipoEmpresa: string;
+}
+
+export interface TendenciaMensual {
+  mes: string;
+  nuevosRegistros: number;
+  demandaLaboral: number;
+  satisfaccionPromedio: number;
+}
+
+export interface TendenciasMercado {
+  ultimosSeisMeses: TendenciaMensual[];
+  resumen: {
+    crecimientoMensual: number;
+    promedioSatisfaccion: number;
+    promedioDemanda: number;
+  };
+}
+
+export interface PerfilUsuario {
+  id: number;
+  nombre: string;
+  correo: string;
+  perfil_imagen_url: string | null;
+  posicion_actual: string;
+  empresa_actual: string;
+  ubicacion: string;
+  resumen: string;
+  industria: string;
+  rol: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DashboardService {
+  private url: string = environment.baseUrl;
+
+  constructor(private http: HttpClient) { }
+
+  private getHeaders(): HttpHeaders {
+    return new HttpHeaders()
+      .set('token', sessionStorage.getItem('token') || '');
+  }
+
+  // Obtener estadísticas generales del mercado laboral
+  obtenerEstadisticasMercado(): Observable<{ ok: boolean; estadisticas?: EstadisticasMercado; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/estadisticas-mercado`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener estadísticas del mercado' 
+        }))
+      );
+  }
+
+  // Obtener tecnologías más demandadas
+  obtenerTecnologiasMasDemandadas(): Observable<{ ok: boolean; tecnologias?: TecnologiaDemandada[]; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/tecnologias-demandadas`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener tecnologías demandadas' 
+        }))
+      );
+  }
+
+  // Obtener distribución salarial por industria
+  obtenerDistribucionSalarial(): Observable<{ ok: boolean; distribucionSalarial?: DistribucionSalarial[]; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/distribucion-salarial`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener distribución salarial' 
+        }))
+      );
+  }
+
+  // Obtener empresas que más contratan
+  obtenerEmpresasQueContratanMas(): Observable<{ ok: boolean; empresas?: EmpresaContratante[]; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/empresas-contratan`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener empresas que contratan' 
+        }))
+      );
+  }
+
+  // Obtener tendencias del mercado laboral
+  obtenerTendenciasMercado(): Observable<{ ok: boolean; tendencias?: TendenciasMercado; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/tendencias-mercado`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener tendencias del mercado' 
+        }))
+      );
+  }
+
+  // Obtener perfil del usuario actual (para la sección personal)
+  obtenerPerfilUsuario(): Observable<{ ok: boolean; usuario?: PerfilUsuario; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/users/mi-perfil`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener perfil del usuario' 
+        }))
+      );
+  }
+
+  // Método auxiliar para obtener todos los datos del dashboard de una vez
+  obtenerDatosDashboard(): Observable<{
+    estadisticasMercado?: EstadisticasMercado;
+    tecnologias?: TecnologiaDemandada[];
+    distribucionSalarial?: DistribucionSalarial[];
+    empresas?: EmpresaContratante[];
+    tendencias?: TendenciasMercado;
+    perfilUsuario?: PerfilUsuario;
+    errores: string[];
+  }> {
+    return new Observable(observer => {
+      const errores: string[] = [];
+      const resultados: any = {};
+
+      // Ejecutar todas las llamadas en paralelo
+      Promise.all([
+        this.obtenerEstadisticasMercado().toPromise(),
+        this.obtenerTecnologiasMasDemandadas().toPromise(),
+        this.obtenerDistribucionSalarial().toPromise(),
+        this.obtenerEmpresasQueContratanMas().toPromise(),
+        this.obtenerTendenciasMercado().toPromise(),
+        this.obtenerPerfilUsuario().toPromise()
+      ]).then(([
+        estadisticasResp,
+        tecnologiasResp,
+        distribucionResp,
+        empresasResp,
+        tendenciasResp,
+        perfilResp
+      ]) => {
+        
+        if (estadisticasResp?.ok) {
+          resultados.estadisticasMercado = estadisticasResp.estadisticas;
+        } else {
+          errores.push(estadisticasResp?.msj || 'Error en estadísticas');
+        }
+
+        if (tecnologiasResp?.ok) {
+          resultados.tecnologias = tecnologiasResp.tecnologias;
+        } else {
+          errores.push(tecnologiasResp?.msj || 'Error en tecnologías');
+        }
+
+        if (distribucionResp?.ok) {
+          resultados.distribucionSalarial = distribucionResp.distribucionSalarial;
+        } else {
+          errores.push(distribucionResp?.msj || 'Error en distribución salarial');
+        }
+
+        if (empresasResp?.ok) {
+          resultados.empresas = empresasResp.empresas;
+        } else {
+          errores.push(empresasResp?.msj || 'Error en empresas');
+        }
+
+        if (tendenciasResp?.ok) {
+          resultados.tendencias = tendenciasResp.tendencias;
+        } else {
+          errores.push(tendenciasResp?.msj || 'Error en tendencias');
+        }
+
+        if (perfilResp?.ok) {
+          resultados.perfilUsuario = perfilResp.usuario;
+        } else {
+          errores.push(perfilResp?.msj || 'Error en perfil de usuario');
+        }
+
+        observer.next({ ...resultados, errores });
+        observer.complete();
+
+      }).catch(error => {
+        console.error('Error general en obtenerDatosDashboard:', error);
+        observer.next({ 
+          errores: ['Error general al cargar datos del dashboard'] 
+        });
+        observer.complete();
+      });
+    });
+  }
+}

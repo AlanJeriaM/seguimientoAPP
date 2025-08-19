@@ -1,82 +1,430 @@
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-container">
+  <div class="loading-content">
+    <p-progressSpinner
+      strokeWidth="4"
+      fill="transparent"
+      animationDuration="1s">
+    </p-progressSpinner>
+    <h3 class="loading-text">Cargando datos del mercado laboral...</h3>
+  </div>
+</div>
 
-<div class="grid mt-4">
+<!-- Error State -->
+<div *ngIf="error && !loading" class="error-container">
+  <p-message
+    severity="error"
+    [text]="error"
+    >
+  </p-message>
+  <p-button
+    label="Reintentar"
+    icon="pi pi-refresh"
+    (onClick)="loadDashboardData()"
+    class="mt-3">
+  </p-button>
+</div>
 
-  <div class="col-12 lg:col-6 xl:col-3">
-    <p-card>
-        <div class="flex justify-content-between mb-3">
-            <div>
-                <span class="block text-500 font-medium mb-3">Usuarios registrados</span>
-                <div class="text-900 font-medium text-xl">100</div>
-            </div>
-            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                <i class="pi pi-user text-blue-500 text-xl"></i>
-            </div>
+<!-- Main Dashboard -->
+<div *ngIf="!loading && !error" class="dashboard-container">
+
+  <!-- Header Section -->
+  <div class="header-section mb-6">
+    <div class="flex align-items-center justify-content-between flex-wrap gap-4">
+      <!-- Perfil Personal del Usuario -->
+      <div class="profile-header" *ngIf="perfilUsuario">
+        <div class="profile-avatar">
+          <p-avatar
+            [label]="getUserInitials()"
+            size="xlarge"
+            shape="circle"
+            [style]="{'background-color': '#0077b5', 'color': '#ffffff'}">
+          </p-avatar>
         </div>
-        <span class="text-green-500 font-medium">24 new </span>
-        <span class="text-500">since last visit</span>
+        <div class="profile-info ml-4">
+          <h1 class="profile-name">{{ getFullName() }}</h1>
+          <p class="profile-headline">{{ getCurrentPosition() }}</p>
+          <div class="profile-meta">
+            <span class="location">
+              <i class="pi pi-map-marker"></i>
+              {{ getLocation() }}
+            </span>
+            <span class="company ml-3">
+              <i class="pi pi-building"></i>
+              {{ getCurrentCompany() }}
+            </span>
+            <span class="industry ml-3">
+              <i class="pi pi-briefcase"></i>
+              {{ getIndustry() }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder si no hay perfil -->
+      <div class="profile-header" *ngIf="!perfilUsuario">
+        <div class="profile-info">
+          <h1 class="profile-name">Dashboard del Mercado Laboral</h1>
+          <p class="profile-headline">Información y estadísticas del mercado tecnológico</p>
+        </div>
+      </div>
+
+      <!-- Market Growth Badge -->
+      <div class="market-growth">
+        <div class="growth-card">
+          <span class="growth-label">Crecimiento del mercado</span>
+          <div class="growth-value">
+            <span class="growth-percentage">+{{ (estadisticasMercado?.porcentajeCrecimiento || 0) }}%</span>
+            <span class="growth-text">este mes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Market Stats Cards -->
+  <div class="stats-grid mb-6">
+    <div class="grid">
+      <div class="col-12 md:col-6 xl:col-3">
+        <div class="stat-card stat-card-blue">
+          <div class="stat-icon">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value">{{ getTotalProfesionales() | number }}</h3>
+            <p class="stat-label">Profesionales activos</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 md:col-6 xl:col-3">
+        <div class="stat-card stat-card-green">
+          <div class="stat-icon">
+            <i class="pi pi-chart-line"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value">{{ getNuevosProfesionales() | number }}</h3>
+            <p class="stat-label">Nuevos este mes</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 md:col-6 xl:col-3">
+        <div class="stat-card stat-card-orange">
+          <div class="stat-icon">
+            <i class="pi pi-building"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value">{{ getEmpresasUnicas() | number }}</h3>
+            <p class="stat-label">Empresas únicas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 md:col-6 xl:col-3">
+        <div class="stat-card stat-card-purple">
+          <div class="stat-icon">
+            <i class="pi pi-sitemap"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value">{{ getIndustriasUnicas() | number }}</h3>
+            <p class="stat-label">Industrias diferentes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <div class="grid">
+
+      <!-- Tecnologías más Demandadas -->
+      <div class="col-12 lg:col-6">
+        <p-card styleClass="chart-card h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Tecnologías Más Demandadas</h3>
+              <p-tag
+                value="Mercado laboral"
+                severity="info"
+                styleClass="info-tag">
+              </p-tag>
+            </div>
+          </ng-template>
+
+          <div class="chart-container">
+            <canvas id="tecnologiasDemandadasChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Distribución Salarial por Industria -->
+      <div class="col-12 lg:col-6">
+        <p-card styleClass="chart-card h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Distribución Salarial por Industria</h3>
+              <p-tag
+                value="Promedios del mercado"
+                severity="success"
+                styleClass="info-tag">
+              </p-tag>
+            </div>
+          </ng-template>
+
+          <div class="chart-container">
+            <canvas id="distribucionSalarialChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Empresas que Más Contratan -->
+      <div class="col-12 lg:col-8">
+        <p-card styleClass="chart-card h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Empresas que Más Contratan</h3>
+              <p-tag
+                value="Top empleadores"
+                severity="warning"
+                styleClass="info-tag">
+              </p-tag>
+            </div>
+          </ng-template>
+
+          <div class="chart-container">
+            <canvas id="empresasContratantesChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Estadísticas Generales -->
+      <div class="col-12 lg:col-4">
+        <p-card styleClass="chart-card h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Distribución del Mercado</h3>
+            </div>
+          </ng-template>
+
+          <div class="chart-container">
+            <canvas id="estadisticasGeneralesChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Tendencias del Mercado -->
+      <div class="col-12">
+        <p-card styleClass="chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Tendencias del Mercado Laboral</h3>
+              <p-tag
+                value="Últimos 6 meses"
+                severity="success"
+                styleClass="info-tag">
+              </p-tag>
+            </div>
+          </ng-template>
+
+          <div class="chart-container large-chart">
+            <canvas id="tendenciasMercadoChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Detailed Info Section -->
+  <div class="details-section mt-6">
+    <div class="grid">
+
+      <!-- Top Tecnologías -->
+      <div class="col-12 lg:col-6">
+        <p-card styleClass="info-card">
+          <ng-template pTemplate="header">
+            <h3>Tecnologías Más Demandadas</h3>
+          </ng-template>
+
+          <div class="technology-list">
+            <div
+              *ngFor="let tech of tecnologiasDemandadas | slice:0:8"
+              class="technology-item">
+              <div class="technology-header">
+                <h4 class="technology-name">{{ tech.nombre }}</h4>
+                <span class="technology-demand">{{ tech.demanda }} puestos</span>
+              </div>
+              <div class="technology-progress">
+                <p-progressBar
+                  [value]="getTechDemandPercentage(tech.demanda)"
+                  [showValue]="false"
+                  styleClass="tech-progress-bar">
+                </p-progressBar>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Top Empresas -->
+      <div class="col-12 lg:col-6">
+        <p-card styleClass="info-card">
+          <ng-template pTemplate="header">
+            <h3>Empresas que Más Contratan</h3>
+          </ng-template>
+
+          <div class="companies-list">
+            <div
+              *ngFor="let empresa of empresasContratantes | slice:0:6"
+              class="company-item">
+              <div class="company-header">
+                <span class="company-name">{{ empresa.empresa }}</span>
+                <span class="company-employees">{{ empresa.totalEmpleados }} empleados</span>
+              </div>
+              <div class="company-details">
+                <div class="detail-item">
+                  <i class="pi pi-briefcase"></i>
+                  <span>{{ empresa.vacantesAbiertas }} vacantes abiertas</span>
+                </div>
+                <div class="detail-item">
+                  <i class="pi pi-dollar"></i>
+                  <span>{{ empresa.promedioSalario | currency:'CLP':'symbol':'1.0-0' }} promedio</span>
+                </div>
+                <div class="detail-item">
+                  <i class="pi pi-star"></i>
+                  <span>{{ empresa.satisfaccionLaboral | number:'1.1-1' }}/5.0 satisfacción</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Distribución Salarial Detallada -->
+      <div class="col-12">
+        <p-card styleClass="info-card">
+          <ng-template pTemplate="header">
+            <div class="flex justify-content-between align-items-center">
+              <h3>Distribución Salarial por Industria</h3>
+              <p-tag
+                value="Promedios del mercado"
+                severity="info"
+                styleClass="info-tag">
+              </p-tag>
+            </div>
+          </ng-template>
+
+          <div class="salary-distribution-grid">
+            <div class="grid">
+              <div
+                *ngFor="let dist of distribucionSalarial"
+                class="col-12 md:col-6 lg:col-3">
+                <div class="salary-card">
+                  <div class="salary-header">
+                    <h4 class="industry-name">{{ dist.industria }}</h4>
+                    <span class="professionals-count">{{ dist.cantidad }} profesionales</span>
+                  </div>
+                  <div class="salary-details">
+                    <div class="salary-range">
+                      <span class="range-label">Rango salarial:</span>
+                      <span class="range-value">
+                        {{ dist.salarioMinimo | currency:'CLP':'symbol':'1.0-0' }} - 
+                        {{ dist.salarioMaximo | currency:'CLP':'symbol':'1.0-0' }}
+                      </span>
+                    </div>
+                    <div class="salary-average">
+                      <span class="average-label">Promedio:</span>
+                      <span class="average-value">{{ dist.salarioPromedio | currency:'CLP':'symbol':'1.0-0' }}</span>
+                    </div>
+                    <div class="salary-variation" [ngClass]="{
+                      'positive': dist.variacionMensual > 0,
+                      'negative': dist.variacionMensual < 0,
+                      'neutral': dist.variacionMensual === 0
+                    }">
+                      <i class="pi" [ngClass]="{
+                        'pi-arrow-up': dist.variacionMensual > 0,
+                        'pi-arrow-down': dist.variacionMensual < 0,
+                        'pi-minus': dist.variacionMensual === 0
+                      }"></i>
+                      <span>{{ dist.variacionMensual }}% este mes</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Market Insights Section -->
+  <div class="insights-section mt-6" *ngIf="tendenciasMercado">
+    <p-card styleClass="insights-card">
+      <ng-template pTemplate="header">
+        <h3>Insights del Mercado Laboral</h3>
+      </ng-template>
+
+      <div class="insights-grid">
+        <div class="grid">
+          <div class="col-12 md:col-4">
+            <div class="insight-item">
+              <div class="insight-icon">
+                <i class="pi pi-chart-line"></i>
+              </div>
+              <div class="insight-content">
+                <h4>Crecimiento Mensual</h4>
+                <p class="insight-value">{{ tendenciasMercado.resumen.crecimientoMensual > 0 ? '+' : '' }}{{ tendenciasMercado.resumen.crecimientoMensual }}</p>
+                <p class="insight-description">nuevos profesionales este mes</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-12 md:col-4">
+            <div class="insight-item">
+              <div class="insight-icon">
+                <i class="pi pi-heart"></i>
+              </div>
+              <div class="insight-content">
+                <h4>Satisfacción Promedio</h4>
+                <p class="insight-value">{{ tendenciasMercado.resumen.promedioSatisfaccion }}/5.0</p>
+                <p class="insight-description">nivel de satisfacción laboral</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-12 md:col-4">
+            <div class="insight-item">
+              <div class="insight-icon">
+                <i class="pi pi-trending-up"></i>
+              </div>
+              <div class="insight-content">
+                <h4>Demanda Promedio</h4>
+                <p class="insight-value">{{ tendenciasMercado.resumen.promedioDemanda }}%</p>
+                <p class="insight-description">nivel de demanda laboral</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </p-card>
   </div>
 
-  <div class="col-12 lg:col-6 xl:col-3">
-    <p-card>
-        <div class="flex justify-content-between mb-3">
-            <div>
-                <span class="block text-500 font-medium mb-3">Usuarios registrados</span>
-                <div class="text-900 font-medium text-xl">100</div>
-            </div>
-            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                <i class="pi pi-user text-blue-500 text-xl"></i>
-            </div>
+  <!-- Error Messages -->
+  <div class="errors-section mt-4" *ngIf="errores.length > 0">
+    <p-messages>
+      <ng-template pTemplate>
+        <div class="ml-2">
+          <h5>Algunos datos no pudieron cargarse:</h5>
+          <ul>
+            <li *ngFor="let error of errores">{{ error }}</li>
+          </ul>
         </div>
-        <span class="text-green-500 font-medium">24 new </span>
-        <span class="text-500">since last visit</span>
-    </p-card>
+      </ng-template>
+    </p-messages>
   </div>
 
-  <div class="col-12 lg:col-6 xl:col-3">
-    <p-card>
-        <div class="flex justify-content-between mb-3">
-            <div>
-                <span class="block text-500 font-medium mb-3">Promedio de sueldos</span>
-                <div class="text-900 font-medium text-xl">$1.800.000</div>
-            </div>
-            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                <i class="pi pi-sort-up-fill text-blue-500 text-xl"></i>
-            </div>
-        </div>
-        <span class="text-green-500 font-medium">24 new </span>
-        <span class="text-500">since last visit</span>
-    </p-card>
-  </div>
-
-  <div class="col-12 lg:col-6 xl:col-3">
-    <p-card>
-        <div class="flex justify-content-between mb-3">
-            <div>
-                <span class="block text-500 font-medium mb-3">Numero de trabajos</span>
-                <div class="text-900 font-medium text-xl">5</div>
-            </div>
-            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                <i class="pi pi-briefcase text-blue-500 text-xl"></i>
-            </div>
-        </div>
-        <span class="text-green-500 font-medium">24 new </span>
-        <span class="text-500">since last visit</span>
-    </p-card>
-  </div>
-  <div class="col-12 lg:col-6 xl:col-3">
-    <p-card>
-        <div class="flex justify-content-between mb-3">
-            <div>
-                <span class="block text-500 font-medium mb-3">Numero de capacitaciones</span>
-                <div class="text-900 font-medium text-xl">10</div>
-            </div>
-            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                <i class="pi pi-book text-blue-500 text-xl"></i>
-            </div>
-        </div>
-        <span class="text-green-500 font-medium">24 new </span>
-        <span class="text-500">since last visit</span>
-    </p-card>
-  </div>
 </div>
