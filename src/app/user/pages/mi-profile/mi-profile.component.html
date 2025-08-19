@@ -1,1 +1,266 @@
-<p>mi-profile works!</p>
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-container">
+  <div class="loading-content">
+    <p-progressSpinner 
+      strokeWidth="4" 
+      fill="transparent" 
+      animationDuration="1s">
+    </p-progressSpinner>
+    <h3 class="loading-text">Cargando perfil...</h3>
+  </div>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error && !loading" class="error-container">
+  <p-message
+    severity="error"
+    [text]="error">
+  </p-message>
+  <p-button
+    label="Reintentar"
+    icon="pi pi-refresh"
+    (onClick)="cargarPerfil()"
+    class="mt-3">
+  </p-button>
+</div>
+
+<!-- Main Profile Content -->
+<div *ngIf="!loading && !error && perfil" class="profile-container">
+  
+  <!-- Header Section -->
+  <div class="profile-header mb-6">
+    <div class="header-card">
+      <div class="profile-avatar-section">
+        <div class="avatar-container">
+          <img
+            [src]="perfil.perfil_imagen_url"
+            alt="Perfil"
+            class="profile-image"
+            style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;"
+            (error)="handleImageError($event)"
+            *ngIf="perfil.perfil_imagen_url && !imageError"
+          >
+          <p-avatar
+            [label]="getUserInitials()"
+            size="xlarge"
+            shape="circle"
+            [style]="{'background-color': '#0077b5', 'color': '#ffffff', 'font-size': '2rem'}"
+            *ngIf="!perfil.perfil_imagen_url || imageError">
+          </p-avatar>
+        </div>
+        <div class="profile-info">
+          <h1 class="profile-name">{{ perfil.nombre }}</h1>
+          <p class="profile-email">{{ perfil.correo }}</p>
+          <div class="profile-meta">
+            <span class="meta-item">
+              <i class="pi pi-calendar"></i>
+              <span>Perfil creado el: {{ getProfileCreationDate() }}</span>
+            </span>
+            <span class="meta-item" *ngIf="perfil.ultimo_acceso">
+              <i class="pi pi-clock"></i>
+              <span>Último acceso: {{ getFormattedDateTime(perfil.ultimo_acceso) }}</span>
+            </span>
+            <span class="meta-item" *ngIf="!perfil.ultimo_acceso">
+              <i class="pi pi-clock"></i>
+              <span>Primer acceso</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="profile-actions">
+        <p-tag 
+          [value]="perfil.rol === 'CLIENT-USER' ? 'Usuario' : 'Administrador'"
+          [severity]="perfil.rol === 'CLIENT-USER' ? 'info' : 'success'"
+          icon="pi pi-user">
+        </p-tag>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Form -->
+  <div class="profile-form-section">
+    <p-card styleClass="profile-form-card">
+      <ng-template pTemplate="header">
+        <div class="form-header">
+          <h2>
+            <i class="pi pi-user-edit"></i>
+            Editar Perfil
+          </h2>
+          <p class="form-subtitle">Actualiza tu información profesional</p>
+        </div>
+      </ng-template>
+
+      <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()" class="profile-form">
+        
+        <!-- Información Personal -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-user"></i>
+            Información Personal
+          </h3>
+          
+          <div class="grid">
+            <!-- Nombre Completo -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="nombre" class="field-label">
+                  Nombre Completo <span class="required">*</span>
+                </label>
+                <input
+                  pInputText
+                  id="nombre"
+                  type="text"
+                  formControlName="nombre"
+                  placeholder="Ingrese su nombre completo"
+                  [class.ng-invalid]="isFieldInvalid('nombre')"
+                  class="w-full" />
+                <small *ngIf="isFieldInvalid('nombre')" class="field-error">
+                  {{ getFieldError('nombre') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Ubicación -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="ubicacion" class="field-label">Ubicación</label>
+                <input
+                  pInputText
+                  id="ubicacion"
+                  type="text"
+                  formControlName="ubicacion"
+                  placeholder="Ciudad, País"
+                  [class.ng-invalid]="isFieldInvalid('ubicacion')"
+                  class="w-full" />
+                <small *ngIf="isFieldInvalid('ubicacion')" class="field-error">
+                  {{ getFieldError('ubicacion') }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información Profesional -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-briefcase"></i>
+            Información Profesional
+          </h3>
+          
+          <div class="grid">
+            <!-- Posición Actual -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="posicion_actual" class="field-label">Posición Actual</label>
+                <input
+                  pInputText
+                  id="posicion_actual"
+                  type="text"
+                  formControlName="posicion_actual"
+                  placeholder="ej. Senior Developer, Product Manager"
+                  [class.ng-invalid]="isFieldInvalid('posicion_actual')"
+                  class="w-full" />
+                <small *ngIf="isFieldInvalid('posicion_actual')" class="field-error">
+                  {{ getFieldError('posicion_actual') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Empresa Actual -->
+            <div class="col-12 md:col-6">
+              <div class="field">
+                <label for="empresa_actual" class="field-label">Empresa Actual</label>
+                <input
+                  pInputText
+                  id="empresa_actual"
+                  type="text"
+                  formControlName="empresa_actual"
+                  placeholder="ej. Google, Microsoft, Startup XYZ"
+                  [class.ng-invalid]="isFieldInvalid('empresa_actual')"
+                  class="w-full" />
+                <small *ngIf="isFieldInvalid('empresa_actual')" class="field-error">
+                  {{ getFieldError('empresa_actual') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Industria -->
+            <div class="col-12">
+              <div class="field">
+                <label for="industria" class="field-label">Industria</label>
+                <p-dropdown
+                  id="industria"
+                  formControlName="industria"
+                  [options]="industriasOpciones"
+                  placeholder="Seleccione su industria"
+                  [class.ng-invalid]="isFieldInvalid('industria')"
+                  styleClass="w-full"
+                  [showClear]="true">
+                </p-dropdown>
+                <small *ngIf="isFieldInvalid('industria')" class="field-error">
+                  {{ getFieldError('industria') }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen Profesional -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-file-edit"></i>
+            Resumen Profesional
+          </h3>
+          
+          <div class="field">
+            <label for="resumen" class="field-label">
+              Resumen
+              <span class="optional-hint">(Opcional)</span>
+            </label>
+            <textarea
+              pInputTextarea
+              id="resumen"
+              formControlName="resumen"
+              placeholder="Describe tu experiencia, habilidades y objetivos profesionales..."
+              rows="4"
+              [autoResize]="true"
+              [class.ng-invalid]="isFieldInvalid('resumen')"
+              class="w-full">
+            </textarea>
+            <small class="char-counter">
+              {{ perfilForm.get('resumen')?.value?.length || 0 }}/500 caracteres
+            </small>
+            <small *ngIf="isFieldInvalid('resumen')" class="field-error">
+              {{ getFieldError('resumen') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <p-button
+            type="button"
+            label="Restablecer"
+            icon="pi pi-refresh"
+            styleClass="p-button-outlined p-button-secondary"
+            (onClick)="resetForm()"
+            [disabled]="saving">
+          </p-button>
+          
+          <p-button
+            type="submit"
+            label="Guardar Cambios"
+            icon="pi pi-save"
+            styleClass="p-button-primary"
+            [loading]="saving"
+            [disabled]="perfilForm.invalid || saving">
+          </p-button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>
+
+<!-- Toast Messages -->
+<p-toast position="top-right"></p-toast>
