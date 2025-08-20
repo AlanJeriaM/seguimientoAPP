@@ -6,6 +6,7 @@ const { connectDB } = require('./src/config/database');
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
 const dashboardRoutes = require('./src/routes/dashboard');
+const adminRoutes = require('./src/routes/admins');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/admins', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -70,8 +72,8 @@ app.use((error, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
-  console.log(`🌐 API URL: http://localhost:${PORT}/api`);
-  console.log(`🔍 Health Check: http://localhost:${PORT}/api/health`);
-  console.log(`📊 phpMyAdmin: http://localhost/phpmyadmin`);
+  console.log(`Servidor ejecutándose en puerto ${PORT}`);
+  console.log(`API URL: http://localhost:${PORT}/api`);
+  console.log(`Health Check: http://localhost:${PORT}/api/health`);
+  console.log(`phpMyAdmin: http://localhost/phpmyadmin`);
 });

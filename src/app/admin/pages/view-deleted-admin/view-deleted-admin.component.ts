@@ -1,56 +1,56 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../../core/services/auth/auth.service';
+import { AdminService } from '../../../core/services/admin/admin.service';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-view-deleted-users',
-  templateUrl: './view-deleted-users.component.html',
-  styleUrls: ['./view-deleted-users.component.css']
+  selector: 'app-view-deleted-admin',
+  templateUrl: './view-deleted-admin.component.html',
+  styleUrls: ['./view-deleted-admin.component.css']
 })
-export class ViewDeletedUsersComponent implements OnInit {
+export class ViewDeletedAdminComponent implements OnInit {
 
-  usuariosEliminados: any[] = [];
+  administradoresEliminados: any[] = [];
   loading: boolean = false;
   totalRecords: number = 0;
   currentPage: number = 1;
   pageSize: number = 10;
   searchText: string = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(private adminService: AdminService) {}
 
   ngOnInit() {
-    this.cargarUsuariosEliminados();
+    this.cargarAdministradoresEliminados();
   }
 
-  cargarUsuariosEliminados(page: number = 1, search: string = '') {
+  cargarAdministradoresEliminados(page: number = 1, search: string = '') {
     this.loading = true;
     this.currentPage = page;
     this.searchText = search;
 
-    this.authService.obtenerUsuariosEliminados(page, this.pageSize, search).subscribe({
+    this.adminService.obtenerAdministradoresEliminados(page, this.pageSize, search).subscribe({
       next: (resp) => {
         this.loading = false;
         if (resp.ok) {
-          this.usuariosEliminados = resp.usuarios || [];
+          this.administradoresEliminados = resp.administradores || [];
           this.totalRecords = resp.total || 0;
 
-          console.log('Usuarios eliminados cargados:', this.usuariosEliminados.length);
+          console.log('Administradores eliminados cargados:', this.administradoresEliminados.length);
           console.log('Total registros eliminados:', this.totalRecords);
         } else {
           console.error('Error:', resp.msj);
-          this.usuariosEliminados = [];
+          this.administradoresEliminados = [];
           this.totalRecords = 0;
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: resp.msj || 'Error al cargar usuarios eliminados'
+            text: resp.msj || 'Error al cargar administradores eliminados'
           });
         }
       },
       error: (error) => {
-        console.error('Error al cargar usuarios eliminados:', error);
+        console.error('Error al cargar administradores eliminados:', error);
         this.loading = false;
-        this.usuariosEliminados = [];
+        this.administradoresEliminados = [];
         this.totalRecords = 0;
         Swal.fire({
           icon: 'error',
@@ -61,9 +61,9 @@ export class ViewDeletedUsersComponent implements OnInit {
     });
   }
 
-  buscarUsuarios(event: any) {
+  buscarAdministradores(event: any) {
     const searchValue = event.target.value;
-    this.cargarUsuariosEliminados(1, searchValue);
+    this.cargarAdministradoresEliminados(1, searchValue);
   }
 
   limpiarFiltros() {
@@ -72,17 +72,17 @@ export class ViewDeletedUsersComponent implements OnInit {
     if (searchInput) {
       searchInput.value = '';
     }
-    this.cargarUsuariosEliminados(1, '');
+    this.cargarAdministradoresEliminados(1, '');
   }
 
   actualizarDatos() {
-    this.cargarUsuariosEliminados(this.currentPage, this.searchText);
+    this.cargarAdministradoresEliminados(this.currentPage, this.searchText);
   }
 
-  reactivarUsuario(usuario: any) {
+  reactivarAdministrador(admin: any) {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: `¿Deseas reactivar al usuario ${usuario.nombre}?`,
+      text: `¿Deseas reactivar al administrador ${admin.nombre_completo}?`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#28a745',
@@ -91,22 +91,22 @@ export class ViewDeletedUsersComponent implements OnInit {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.authService.reactivarUsuario(usuario.id).subscribe({
+        this.adminService.reactivarAdministrador(admin.id).subscribe({
           next: (resp) => {
             if (resp.ok) {
               Swal.fire({
                 icon: 'success',
-                title: 'Usuario reactivado',
-                text: 'El usuario ha sido reactivado correctamente',
+                title: 'Administrador reactivado',
+                text: 'El administrador ha sido reactivado correctamente',
                 timer: 2000,
                 showConfirmButton: false
               });
-              this.cargarUsuariosEliminados(this.currentPage, this.searchText);
+              this.cargarAdministradoresEliminados(this.currentPage, this.searchText);
             } else {
               Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: resp.msj || 'Error al reactivar usuario'
+                text: resp.msj || 'Error al reactivar administrador'
               });
             }
           },
@@ -123,20 +123,20 @@ export class ViewDeletedUsersComponent implements OnInit {
     });
   }
 
-  eliminarPermanentemente(usuario: any) {
+  eliminarPermanentemente(admin: any) {
     Swal.fire({
       title: '¡ELIMINACIÓN PERMANENTE!',
       html: `
         <div style="text-align: left; margin: 20px 0;">
-          <p><strong>¿Estás seguro que deseas ELIMINAR PERMANENTEMENTE al usuario?</strong></p>
+          <p><strong>¿Estás seguro que deseas ELIMINAR PERMANENTEMENTE al administrador?</strong></p>
           <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
-            <p><strong>Nombre:</strong> ${usuario.nombre}</p>
-            <p><strong>Correo:</strong> ${usuario.correo}</p>
-            <p><strong>Empresa:</strong> ${usuario.empresa_actual || 'Sin empresa'}</p>
+            <p><strong>Nombre:</strong> ${admin.nombre_completo}</p>
+            <p><strong>Correo:</strong> ${admin.email_usuario}</p>
+            <p><strong>Rol:</strong> ${admin.rol}</p>
           </div>
           <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px;">
             <p style="margin: 0; color: #856404;"><strong>ADVERTENCIA:</strong> Esta acción es IRREVERSIBLE.
-            El usuario será eliminado completamente de la base de datos y no podrá ser recuperado.</p>
+            El administrador será eliminado completamente de la base de datos y no podrá ser recuperado.</p>
           </div>
         </div>
       `,
@@ -147,25 +147,19 @@ export class ViewDeletedUsersComponent implements OnInit {
       confirmButtonText: 'Sí, eliminar permanentemente',
       cancelButtonText: 'Cancelar',
       focusCancel: true,
-      reverseButtons: true,
-      showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-      },
-      hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-      }
+      reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
         // Segundo diálogo de confirmación
         Swal.fire({
           title: 'Confirmación Final',
-          text: '¿Realmente deseas proceder? Escribe "ELIMINAR" para confirmar.',
+          text: '¿Realmente deseas eliminar? Escribe "ELIMINAR" para confirmar.',
           input: 'text',
           inputPlaceholder: 'Escribe ELIMINAR',
           showCancelButton: true,
           confirmButtonColor: '#dc3545',
           cancelButtonColor: '#6c757d',
-          confirmButtonText: 'Proceder',
+          confirmButtonText: 'Eliminar',
           cancelButtonText: 'Cancelar',
           inputValidator: (value) => {
             if (value !== 'ELIMINAR') {
@@ -175,17 +169,17 @@ export class ViewDeletedUsersComponent implements OnInit {
           }
         }).then((secondResult) => {
           if (secondResult.isConfirmed) {
-            this.realizarEliminacionPermanente(usuario);
+            this.realizarEliminacionPermanente(admin);
           }
         });
       }
     });
   }
 
-  private realizarEliminacionPermanente(usuario: any) {
+  private realizarEliminacionPermanente(admin: any) {
     // Mostrar loading
     Swal.fire({
-      title: 'Eliminando usuario...',
+      title: 'Eliminando administrador...',
       text: 'Por favor espera mientras se procesa la eliminación',
       allowOutsideClick: false,
       didOpen: () => {
@@ -193,15 +187,15 @@ export class ViewDeletedUsersComponent implements OnInit {
       }
     });
 
-    this.authService.eliminarUsuarioPermanentemente(usuario.id).subscribe({
+    this.adminService.eliminarAdministradorPermanentemente(admin.id).subscribe({
       next: (resp) => {
         if (resp.ok) {
           Swal.fire({
             icon: 'success',
-            title: 'Usuario eliminado permanentemente',
+            title: 'Administrador eliminado permanentemente',
             html: `
               <div style="text-align: left;">
-                <p><strong>${usuario.nombre}</strong> ha sido eliminado permanentemente del sistema.</p>
+                <p><strong>${admin.nombre_completo}</strong> ha sido eliminado permanentemente del sistema.</p>
                 <p><small>Esta acción no se puede deshacer.</small></p>
               </div>
             `,
@@ -209,13 +203,13 @@ export class ViewDeletedUsersComponent implements OnInit {
             showConfirmButton: true
           });
 
-          // Recargar la lista de usuarios eliminados
-          this.cargarUsuariosEliminados(this.currentPage, this.searchText);
+          // Recargar la lista de administradores eliminados
+          this.cargarAdministradoresEliminados(this.currentPage, this.searchText);
         } else {
           Swal.fire({
             icon: 'error',
             title: 'Error al eliminar',
-            text: resp.msj || 'Error al eliminar usuario permanentemente'
+            text: resp.msj || 'Error al eliminar administrador permanentemente'
           });
         }
       },
@@ -232,7 +226,7 @@ export class ViewDeletedUsersComponent implements OnInit {
 
   onPageChange(event: any) {
     const page = (event.first / event.rows) + 1;
-    this.cargarUsuariosEliminados(page, this.searchText);
+    this.cargarAdministradoresEliminados(page, this.searchText);
   }
 
   handleImageError(event: any) {

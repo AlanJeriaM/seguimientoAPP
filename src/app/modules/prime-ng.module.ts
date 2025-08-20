@@ -38,6 +38,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TagModule } from 'primeng/tag';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { DialogModule } from 'primeng/dialog';
 
 
 // import { PaginatorModule } from 'primeng/paginator';
@@ -78,6 +79,7 @@ const primeNgModules = [
   RadioButtonModule,
   TagModule,
   SelectButtonModule,
+  DialogModule,
 
 
   // PaginatorModule

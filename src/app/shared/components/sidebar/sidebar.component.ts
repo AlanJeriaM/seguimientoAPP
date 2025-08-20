@@ -33,6 +33,12 @@ export class SidebarComponent {
   private getAdminMenuItems(): MenuItem[] {
     return [
       { label: 'Reporte Egresado LinkedIn', icon: 'pi pi-linkedin', routerLink: '/admin/dashboard' },
+      { label: 'Administradores', icon: 'pi pi-user-edit', items: [
+        { label: 'Administradores activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-admin' },
+        { label: 'Administradores eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-admin' }
+      ]
+    },
+
       { label: 'Usuarios', icon: 'pi pi-users', items: [
           { label: 'Usuarios activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-users' },
           { label: 'Usuarios eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-users' }

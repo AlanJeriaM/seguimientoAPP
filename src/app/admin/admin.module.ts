@@ -12,6 +12,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
 import { SharedModule } from '../shared/shared.module';
 import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
+import { ViewAdminComponent } from './pages/view-admin/view-admin.component';
+import { ViewDeletedAdminComponent } from './pages/view-deleted-admin/view-deleted-admin.component';
 
 
 
@@ -23,6 +25,8 @@ import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
     ViewUsersComponent,
     ViewEncuestasComponent,
     MiProfileComponent,
+    ViewAdminComponent,
+    ViewDeletedAdminComponent,
   ],
   imports: [
     CommonModule,
