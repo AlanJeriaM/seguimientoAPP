@@ -28,6 +28,11 @@ const Admin = sequelize.define('Admin', {
     allowNull: false,
     defaultValue: 'Administrador'
   },
+  apellido: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Apellido del administrador'
+  },
   rol: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -36,6 +41,16 @@ const Admin = sequelize.define('Admin', {
   activo: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
+  },
+  ultimo_acceso: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Última vez que accedió al sistema'
+  },
+  fecha_eliminacion: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Fecha cuando el administrador fue desactivado/eliminado'
   }
 }, {
   tableName: 'admins',

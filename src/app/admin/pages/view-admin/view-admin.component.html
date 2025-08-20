@@ -1,0 +1,287 @@
+<div class="grid">
+  <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+    <p-card class="text-center" header="Administradores del Sistema">
+      <div class="flex justify-content-between align-content-center mb-2">
+      </div>
+      <p-table
+        #tb4
+        [value]="administradores"
+        [rowHover]="true"
+        styleClass="p-datatable-sm"
+        [globalFilterFields]="['nombre_usuario', 'apellido', 'email_usuario']"
+        [paginator]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalRecords"
+        [lazy]="true"
+        (onLazyLoad)="onPageChange($event)"
+        currentPageReportTemplate="{first} hasta {last} de {totalRecords} registros"
+        [showCurrentPageReport]="true"
+        [loading]="loading"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex flex-wrap justify-content-between align-content-center">
+            <div class="mb-2 sm:mb-0">
+              <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input
+                  pInputText
+                  type="text"
+                  [value]="searchText"
+                  (input)="buscarAdministradores($event)"
+                  placeholder="Buscar por nombre, apellido o correo..."
+                />
+              </span>
+              <p-button
+                styleClass="p-button-text p-button-sm ml-2"
+                icon="pi pi-filter-slash"
+                (click)="limpiarFiltros()"
+                pTooltip="Limpiar filtros"
+              ></p-button>
+            </div>
+            <div>
+              <p-button
+                pRipple
+                label="Nuevo Administrador"
+                icon="pi pi-plus"
+                styleClass="p-button-sm p-button-success mr-2"
+                (click)="nuevoAdministrador()"
+                pTooltip="Crear nuevo administrador"
+              ></p-button>
+              <p-button
+                pRipple
+                label="Actualizar"
+                icon="pi pi-refresh"
+                styleClass="p-button-sm p-button-info"
+                (click)="actualizarDatos()"
+              ></p-button>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th>ID</th>
+            <th>Nombre Completo</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Fecha Registro</th>
+            <th>Último Acceso</th>
+            <th style="width: 150px">Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-admin>
+          <tr>
+            <td>
+              <span class="p-column-title">ID</span>
+              {{ admin.id }}
+            </td>
+            <td>
+              <span class="p-column-title">Nombre Completo</span>
+              <div>
+                {{ admin.nombre_completo }}
+                <br>
+                <!-- <small class="text-muted">{{ admin.nombre_usuario }} {{ admin.apellido || '' }}</small> -->
+              </div>
+            </td>
+            <td>
+              <span class="p-column-title">Correo</span>
+              {{ admin.email_usuario }}
+            </td>
+            <td>
+              <span class="p-column-title">Rol</span>
+              <p-tag
+                [value]="admin.rol"
+                [severity]="admin.rol === 'ADMIN-USER' ? 'info' : 'warning'"
+                styleClass="p-tag-sm"
+              ></p-tag>
+            </td>
+            <td>
+              <span class="p-column-title">Fecha Registro</span>
+              {{ admin.fecha_registro ? (admin.fecha_registro | date:'dd/MM/yyyy') : 'N/A' }}
+            </td>
+            <td>
+              <span class="p-column-title">Último Acceso</span>
+              {{ admin.ultimo_acceso ? (admin.ultimo_acceso | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}
+            </td>
+            <td class="text-right" style="width: 150px">
+              <div class="flex">
+                <p-button
+                  pRipple
+                  icon="pi pi-eye"
+                  styleClass="p-button-sm p-button-info mr-2"
+                  pTooltip="Ver administrador"
+                  (click)="verAdministrador(admin)"
+                ></p-button>
+                <p-button
+                  pRipple
+                  icon="pi pi-pencil"
+                  styleClass="p-button-sm p-button-warning mr-2"
+                  pTooltip="Editar administrador"
+                  (click)="editarAdministrador(admin)"
+                ></p-button>
+                <p-button
+                  pRipple
+                  icon="pi pi-trash"
+                  styleClass="p-button-sm p-button-danger mr-2"
+                  pTooltip="Desactivar administrador"
+                  (click)="eliminarAdministrador(admin)"
+                ></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage" let-columns>
+          <tr>
+            <td [attr.colspan]="7" class="text-center">
+              <div class="p-4">
+                <i class="pi pi-user-edit" style="font-size: 3rem; color: #6c757d;"></i>
+                <h5 class="mt-3">No hay administradores registrados</h5>
+                <p class="text-muted">Los administradores del sistema aparecerán aquí</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody" let-columns>
+          <tr>
+            <td [attr.colspan]="7" class="text-center">
+              <div class="p-4">
+                <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
+                <p class="mt-2">Cargando administradores...</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+</div>
+
+<!-- Diálogo para crear/editar administrador -->
+<p-dialog
+  [(visible)]="displayDialog"
+  [header]="editMode ? 'Editar Administrador' : 'Nuevo Administrador'"
+  [modal]="true"
+  [style]="{width: '50vw', zIndex: 1000}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+>
+  <form [formGroup]="adminForm" (ngSubmit)="guardarAdministrador()">
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="nombre" class="block text-900 font-medium mb-2">
+          Nombre*
+        </label>
+        <input
+          id="nombre"
+          pInputText
+          type="text"
+          formControlName="nombre_usuario"
+          placeholder="Ingrese el nombre"
+          class="w-full"
+          [class.ng-invalid]="isFieldInvalid('nombre_usuario')"
+          [class.ng-dirty]="isFieldInvalid('nombre_usuario')"
+        />
+        <span
+          *ngIf="isFieldInvalid('nombre_usuario')" class="error-message text-red-500 text-sm mt-1 block">
+          {{ getFieldError('nombre_usuario') }}
+        </span>
+      </div>
+
+      <div class="col-12 md:col-6">
+        <label for="apellido" class="block text-900 font-medium mb-2">
+          Apellido*
+        </label>
+        <input
+          id="apellido"
+          pInputText
+          type="text"
+          formControlName="apellido"
+          placeholder="Ingrese el apellido"
+          class="w-full"
+          [class.ng-invalid]="isFieldInvalid('apellido')"
+          [class.ng-dirty]="isFieldInvalid('apellido')"
+        />
+        <span *ngIf="isFieldInvalid('apellido')" class="error-message text-red-500 text-sm mt-1 block">
+        {{ getFieldError('apellido') }}
+      </span>
+
+      </div>
+
+      <div class="col-12">
+        <label for="email" class="block text-900 font-medium mb-2">
+          Correo Electrónico*
+        </label>
+        <input
+          id="email"
+          pInputText
+          type="email"
+          formControlName="email_usuario"
+          placeholder="admin@ejemplo.com"
+          class="w-full"
+          [class.ng-invalid]="isFieldInvalid('email_usuario')"
+          [class.ng-dirty]="isFieldInvalid('email_usuario')"
+        />
+        <span *ngIf="isFieldInvalid('email_usuario')" class="error-message text-red-500 text-sm mt-1 block">
+          {{ getFieldError('email_usuario') }}
+        </span>
+      </div>
+
+      <div class="col-12">
+        <label for="contrasenia" class="block text-900 font-medium mb-2">
+          {{ editMode ? 'Nueva Contraseña (dejar en blanco para mantener la actual)' : 'Contraseña*' }}
+        </label>
+        <input
+          id="contrasenia"
+          pInputText
+          type="password"
+          formControlName="contrasenia"
+          [placeholder]="editMode ? 'Dejar en blanco para mantener' : 'Mínimo 6 caracteres'"
+          class="w-full"
+          [class.ng-invalid]="isFieldInvalid('contrasenia')"
+          [class.ng-dirty]="isFieldInvalid('contrasenia')"
+        />
+        <span *ngIf="isFieldInvalid('contrasenia')" class="error-message text-red-500 text-sm mt-1 block">
+          {{ getFieldError('contrasenia') }}
+        </span>
+      </div>
+
+      <div class="col-12" *ngIf="!editMode || adminForm.get('contrasenia')?.value">
+        <label for="confirmarContrasenia" class="block text-900 font-medium mb-2">
+          Confirmar Contraseña{{ editMode ? '' : '*' }}
+        </label>
+        <input
+          id="confirmarContrasenia"
+          pInputText
+          type="password"
+          formControlName="confirmarContrasenia"
+          placeholder="Repite la contraseña"
+          class="w-full"
+          [class.ng-invalid]="isFieldInvalid('confirmarContrasenia')"
+          [class.ng-dirty]="isFieldInvalid('confirmarContrasenia')"
+        />
+        <span *ngIf="isFieldInvalid('confirmarContrasenia')" class="error-message text-red-500 text-sm mt-1 block">
+          {{ getFieldError('confirmarContrasenia') }}
+        </span>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      icon="pi pi-times"
+      (click)="cancelarDialog()"
+      styleClass="p-button-text"
+    ></p-button>
+    <p-button
+      [label]="editMode ? 'Actualizar' : 'Crear'"
+      icon="pi pi-check"
+      [disabled]="adminForm.invalid"
+      (click)="guardarAdministrador()"
+      [styleClass]="editMode ? 'p-button-warning' : 'p-button-success'"
+    ></p-button>
+  </ng-template>
+</p-dialog>
