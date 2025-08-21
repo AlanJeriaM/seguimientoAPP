@@ -32,10 +32,10 @@ const obtenerAdministradores = async (req, res) => {
         'nombre_usuario',
         'apellido',
         'rol',
-        'ultimo_acceso',
         'created_at',
         'updated_at'
-      ]
+      ],
+      raw: true // Usar raw: true para obtener los datos directamente
     });
 
     // Formatear datos para mejor visualización
@@ -46,7 +46,6 @@ const obtenerAdministradores = async (req, res) => {
       apellido: admin.apellido || 'Sin apellido',
       nombre_completo: `${admin.nombre_usuario || ''} ${admin.apellido || ''}`.trim(),
       rol: admin.rol,
-      ultimo_acceso: admin.ultimo_acceso,
       fecha_registro: admin.created_at,
       fecha_actualizacion: admin.updated_at
     }));
@@ -312,7 +311,6 @@ const actualizarAdministrador = async (req, res) => {
       nombre_usuario: nombre_usuario.trim(),
       apellido: apellido?.trim() || null,
       email_usuario: email_usuario.toLowerCase().trim()
-      // ultimo_acceso solo se actualiza cuando realmente acceden al sistema
     };
 
     // Solo actualizar contraseña si se proporciona

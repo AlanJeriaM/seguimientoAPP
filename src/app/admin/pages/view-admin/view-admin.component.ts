@@ -73,6 +73,16 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
 
           console.log('Administradores cargados:', this.administradores.length);
           console.log('Total registros:', this.totalRecords);
+
+          // Debug: mostrar datos de cada administrador
+          this.administradores.forEach((admin, index) => {
+            console.log(`Admin ${index + 1}:`, {
+              id: admin.id,
+              nombre: admin.nombre_usuario,
+              fecha_registro: admin.fecha_registro,
+              // ultimo_acceso: admin.ultimo_acceso
+            });
+          });
         } else {
           console.error('Error:', resp.msj);
           this.administradores = [];
@@ -522,7 +532,6 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
           <p><strong>Correo:</strong> ${admin.email_usuario}</p>
           <p><strong>Rol:</strong> ${admin.rol}</p>
           <p><strong>Fecha de registro:</strong> ${new Date(admin.fecha_registro).toLocaleDateString('es-ES')}</p>
-          <p><strong>Último acceso:</strong> ${admin.ultimo_acceso ? new Date(admin.ultimo_acceso).toLocaleString('es-ES') : 'Nunca'}</p>
         </div>
       `,
       icon: 'info',
