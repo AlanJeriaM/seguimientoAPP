@@ -135,13 +135,45 @@ export class DashboardService {
 
   // Obtener perfil del usuario actual (para la sección personal)
   obtenerPerfilUsuario(): Observable<{ ok: boolean; usuario?: PerfilUsuario; msj?: string }> {
-    return this.http.get<any>(`${this.url}/api/users/mi-perfil`, { headers: this.getHeaders() })
-      .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener perfil del usuario' 
-        }))
-      );
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      return of({ ok: false, msj: 'No hay token de autenticación' });
+    }
+
+    // Decodificar el token para obtener el rol del usuario
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const rol = payload.rol;
+
+      // Usar la ruta correcta según el rol
+      if (rol === 'ADMIN-USER') {
+        return this.http.get<any>(`${this.url}/api/admins/mi-perfil`, { headers: this.getHeaders() })
+          .pipe(
+            catchError(err => of({ 
+              ok: false, 
+              msj: err.error?.msj || 'Error al obtener perfil del administrador' 
+            }))
+          );
+      } else {
+        return this.http.get<any>(`${this.url}/api/users/mi-perfil`, { headers: this.getHeaders() })
+          .pipe(
+            catchError(err => of({ 
+              ok: false, 
+              msj: err.error?.msj || 'Error al obtener perfil del usuario' 
+            }))
+          );
+      }
+    } catch (error) {
+      console.error('Error decodificando token:', error);
+      // Fallback a la ruta de usuarios si no se puede decodificar el token
+      return this.http.get<any>(`${this.url}/api/users/mi-perfil`, { headers: this.getHeaders() })
+        .pipe(
+          catchError(err => of({ 
+            ok: false, 
+            msj: err.error?.msj || 'Error al obtener perfil del usuario' 
+          }))
+        );
+    }
   }
 
   // Método auxiliar para obtener todos los datos del dashboard de una vez
