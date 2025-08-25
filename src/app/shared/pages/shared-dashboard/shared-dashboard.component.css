@@ -1,17 +1,25 @@
+/* CSS Mínimo para el Dashboard - Solo lo esencial */
 
+/* Variables CSS básicas */
+:root {
+  --linkedin-blue: #0077b5;
+  --linkedin-blue-light: #00a0b0;
+  --success-color: #00d084;
+  --warning-color: #ff6b35;
+  --purple-color: #7b68ee;
+  --border-radius: 8px;
+  --border-radius-sm: 4px;
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --transition: all 0.3s ease;
+}
 
-/* Global styles */
+/* Estilos básicos del contenedor */
 .dashboard-container {
   padding: 1.5rem;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 1rem;
-  }
 }
 
 /* Loading State */
@@ -20,7 +28,6 @@
   justify-content: center;
   align-items: center;
   min-height: 80vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
 .loading-content {
@@ -31,9 +38,9 @@
   margin-top: 2rem;
   color: var(--linkedin-blue);
   font-weight: 500;
-  animation: pulse 2s infinite;
 }
 
+/* Error State */
 .error-container {
   display: flex;
   flex-direction: column;
@@ -44,12 +51,9 @@
   padding: 2rem;
 }
 
-
-
-@media (max-width: 768px) {
-  .header-section {
-    padding: 1.5rem;
-  }
+/* Header Section */
+.header-section {
+  margin-bottom: 2rem;
 }
 
 .profile-header {
@@ -59,33 +63,11 @@
   gap: 1rem;
 }
 
-@media (max-width: 576px) {
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-.profile-avatar :host ::ng-deep .p-avatar {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  border: 3px solid rgba(255, 255, 255, 0.3);
-}
-
-.profile-info {
-  flex: 1;
-}
-
 .profile-name {
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 768px) {
-  .profile-name {
-    font-size: 2rem;
-  }
+  color: #2c3e50;
 }
 
 .profile-headline {
@@ -93,6 +75,7 @@
   opacity: 0.9;
   margin: 0 0 1rem 0;
   font-weight: 400;
+  color: #2c3e50;
 }
 
 .profile-meta {
@@ -101,63 +84,20 @@
   flex-wrap: wrap;
 }
 
-@media (max-width: 576px) {
-  .profile-meta {
-    justify-content: center;
-  }
-}
-
 .profile-meta span {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   opacity: 0.8;
   font-size: 0.9rem;
-}
-
-.profile-meta span i {
-  font-size: 1rem;
-}
-
-.completeness-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: var(--border-radius-sm);
-  padding: 1.5rem;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.completeness-label {
-  display: block;
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-bottom: 1rem;
-}
-
-.completeness-circle {
-  position: relative;
-}
-
-.completeness-circle :host ::ng-deep .custom-progress .p-progressbar {
-  height: 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.completeness-circle :host ::ng-deep .custom-progress .p-progressbar-value {
-  background: var(--success-color);
-  border-radius: 4px;
-}
-
-.completeness-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-top: 0.5rem;
-  display: block;
+  color: #2c3e50;
 }
 
 /* Stats Grid */
+.stats-grid {
+  margin-bottom: 2rem;
+}
+
 .stat-card {
   background: white;
   border-radius: var(--border-radius);
@@ -166,6 +106,7 @@
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  margin-bottom: 1rem;
 }
 
 .stat-card::before {
@@ -175,29 +116,12 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--gradient-primary);
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-medium);
-}
-
-.stat-card-blue::before {
-  background: linear-gradient(90deg, var(--linkedin-blue) 0%, var(--linkedin-blue-light) 100%);
-}
-
-.stat-card-green::before {
-  background: linear-gradient(90deg, var(--success-color) 0%, #4fc3f7 100%);
-}
-
-.stat-card-orange::before {
-  background: linear-gradient(90deg, var(--warning-color) 0%, #ffb74d 100%);
-}
-
-.stat-card-purple::before {
-  background: linear-gradient(90deg, var(--purple-color) 0%, #ba68c8 100%);
-}
+.stat-card-blue::before { background: var(--linkedin-blue); }
+.stat-card-green::before { background: var(--success-color); }
+.stat-card-orange::before { background: var(--warning-color); }
+.stat-card-purple::before { background: var(--purple-color); }
 
 .stat-icon {
   display: inline-flex;
@@ -207,28 +131,13 @@
   height: 60px;
   border-radius: 50%;
   margin-bottom: 1rem;
-}
-
-.stat-icon i {
-  font-size: 1.5rem;
   color: white;
 }
 
-.stat-card-blue .stat-icon {
-  background: var(--linkedin-blue);
-}
-
-.stat-card-green .stat-icon {
-  background: var(--success-color);
-}
-
-.stat-card-orange .stat-icon {
-  background: var(--warning-color);
-}
-
-.stat-card-purple .stat-icon {
-  background: var(--purple-color);
-}
+.stat-card-blue .stat-icon { background: var(--linkedin-blue); }
+.stat-card-green .stat-icon { background: var(--success-color); }
+.stat-card-orange .stat-icon { background: var(--warning-color); }
+.stat-card-purple .stat-icon { background: var(--purple-color); }
 
 .stat-value {
   font-size: 2.5rem;
@@ -246,54 +155,8 @@
 }
 
 /* Chart Cards */
-:host ::ng-deep .chart-card .p-card {
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-light);
-  border: none;
-  transition: var(--transition);
-  height: 100%;
-}
-
-:host ::ng-deep .chart-card .p-card:hover {
-  box-shadow: var(--shadow-medium);
-}
-
-:host ::ng-deep .chart-card .p-card .p-card-header {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-bottom: 1px solid #dee2e6;
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-  padding: 1.5rem;
-}
-
-.card-header-custom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.card-header-custom h3 {
-  margin: 0;
-  color: #2c3e50;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.card-header-custom .filter-dropdown :host ::ng-deep .p-dropdown,
-.card-header-custom .time-filter :host ::ng-deep .p-selectbutton .p-button {
-  border-radius: var(--border-radius-sm);
-  font-size: 0.85rem;
-}
-
-.card-header-custom .info-tag :host ::ng-deep .p-tag {
-  border-radius: var(--border-radius-sm);
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-}
-
-:host ::ng-deep .chart-card .p-card .p-card-body {
-  padding: 1.5rem;
+.chart-card {
+  margin-bottom: 2rem;
 }
 
 .chart-container {
@@ -305,237 +168,243 @@
   height: 400px;
 }
 
-.chart-container canvas {
-  border-radius: var(--border-radius-sm);
-}
-
-/* Info Cards */
-:host ::ng-deep .info-card .p-card {
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-light);
-  border: none;
-  height: 100%;
-}
-
-:host ::ng-deep .info-card .p-card .p-card-header {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-bottom: 1px solid #dee2e6;
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-  padding: 1.5rem;
-}
-
-:host ::ng-deep .info-card .p-card .p-card-header h3 {
+/* Estilos para títulos de gráficos y tarjetas */
+.card-header-custom h3,
+.insights-card .p-card-header h3,
+.info-card .p-card-header h3 {
   margin: 0;
+  padding: 0.5rem 0;
   color: #2c3e50;
   font-size: 1.2rem;
   font-weight: 600;
+  line-height: 1.4;
 }
 
-:host ::ng-deep .info-card .p-card .p-card-body {
+/* Estilos específicos para headers de tarjetas PrimeNG */
+:host ::ng-deep .p-card .p-card-header {
+  padding: 1.5rem 1.5rem 1rem 1.5rem !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border-bottom: 1px solid #dee2e6 !important;
+  border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+}
+
+:host ::ng-deep .chart-card .p-card .p-card-header,
+:host ::ng-deep .info-card .p-card .p-card-header,
+:host ::ng-deep .insights-card .p-card .p-card-header {
+  padding: 1.5rem 1.5rem 1rem 1.5rem !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border-bottom: 1px solid #dee2e6 !important;
+  border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+}
+
+/* Estilos específicos para títulos de tarjetas */
+.card-header-custom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0;
+  width: 100%;
+}
+
+.card-header-custom h3 {
+  margin: 0;
+  padding: 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* Espaciado para etiquetas de información */
+.card-header-custom .info-tag {
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+/* Estilos específicos para headers sin etiquetas */
+.card-header-custom h3:only-child {
+  margin: 0;
+  padding: 0;
+}
+
+/* Espaciado para el contenido de las tarjetas */
+:host ::ng-deep .chart-card .p-card .p-card-body,
+:host ::ng-deep .info-card .p-card .p-card-body,
+:host ::ng-deep .insights-card .p-card .p-card-body {
   padding: 1.5rem;
 }
 
-/* Experience List */
-.experience-item {
+/* Estilos para títulos de secciones principales */
+.dashboard-container h1,
+.dashboard-container h2,
+.dashboard-container h3 {
+  margin: 0 0 1rem 0;
+  padding: 0.5rem 0;
+  line-height: 1.3;
+}
+
+/* Espaciado para el header del dashboard */
+.header-section {
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+}
+
+/* Espaciado para las tarjetas de estadísticas */
+.stats-grid {
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-light);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+/* Espaciado para las secciones de gráficos */
+.charts-section {
+  margin: 2rem 0;
+}
+
+.charts-section .grid {
+  margin-bottom: 2rem;
+}
+
+/* Espaciado para las secciones de información detallada */
+.details-section {
+  margin: 2rem 0;
+}
+
+.details-section .grid {
+  margin-bottom: 1.5rem;
+}
+
+/* Espaciado para la sección de insights */
+.insights-section {
+  margin: 2rem 0;
+}
+
+/* Espaciado para mensajes de error */
+.errors-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: var(--border-radius);
+  border-left: 4px solid #dc3545;
+}
+
+/* Info Cards */
+.info-card {
+  margin-bottom: 2rem;
+}
+
+/* Estilos específicos para títulos de tarjetas */
+.card-header-custom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.card-header-custom h3 {
+  margin: 0;
+  padding: 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* Espaciado para etiquetas de información */
+.card-header-custom .info-tag {
+  margin-left: 1rem;
+}
+
+/* Estilos para el contenido de las tarjetas */
+.p-card-content {
+  padding: 1rem 0;
+}
+
+/* Espaciado para listas de tecnologías y empresas */
+.technology-list,
+.companies-list {
+  margin-top: 1rem;
+}
+
+.technology-item,
+.company-item {
   padding: 1.5rem 0;
   border-bottom: 1px solid #f1f3f4;
 }
 
-.experience-item:last-child {
+.technology-item:last-child,
+.company-item:last-child {
   border-bottom: none;
 }
 
-.experience-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.5rem;
-  gap: 1rem;
+/* Espaciado para headers de items */
+.technology-header,
+.company-header {
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
 }
 
-.experience-position {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin: 0;
-  flex: 1;
+/* Espaciado para detalles de empresas */
+.company-details {
+  margin-top: 1rem;
+  padding: 0.5rem 0;
 }
 
-.experience-header :host ::ng-deep .status-tag .p-tag {
-  border-radius: var(--border-radius-sm);
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
+/* Espaciado para distribución salarial */
+.salary-distribution-grid {
+  margin-top: 1.5rem;
 }
 
-.experience-company {
-  font-weight: 500;
-  color: var(--linkedin-blue);
-  margin: 0 0 0.25rem 0;
-}
-
-.experience-duration {
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-/* Skills List */
-.skill-item {
-  margin-bottom: 2rem;
-}
-
-.skill-item:last-child {
-  margin-bottom: 0;
-}
-
-.skill-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.skill-name {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.skill-level {
-  font-weight: 700;
-  color: var(--linkedin-blue);
-  font-size: 0.9rem;
-}
-
-.skill-progress {
-  margin-bottom: 0.5rem;
-}
-
-.skill-progress :host ::ng-deep .skill-progress-bar .p-progressbar {
-  height: 8px;
-  border-radius: 4px;
-  background: #f1f3f4;
-}
-
-.skill-progress :host ::ng-deep .skill-progress-bar .p-progressbar-value {
-  background: linear-gradient(90deg, var(--linkedin-blue) 0%, var(--linkedin-blue-light) 100%);
-  border-radius: 4px;
-}
-
-.endorsements {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.8rem;
-  color: #7f8c8d;
-}
-
-.endorsements i {
-  color: var(--linkedin-blue);
-}
-
-/* Certifications Grid */
-.certification-card {
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  border: 1px solid #e9ecef;
-  border-radius: var(--border-radius-sm);
+.salary-card {
   padding: 1.5rem;
-  transition: var(--transition);
-  height: 100%;
-}
-
-.certification-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-light);
-}
-
-.certification-icon {
-  text-align: center;
   margin-bottom: 1rem;
 }
 
-.certification-icon i {
-  font-size: 2rem;
+/* Espaciado para insights */
+.insights-grid {
+  margin-top: 1.5rem;
 }
 
-.certification-icon i.cert-cloud {
-  color: #ff9800;
-}
-
-.certification-icon i.cert-frontend {
-  color: #4caf50;
-}
-
-.certification-icon i.cert-backend {
-  color: var(--linkedin-blue);
-}
-
-.certification-icon i.cert-database {
-  color: var(--purple-color);
-}
-
-.certification-content {
-  text-align: center;
-}
-
-.certification-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin: 0 0 0.5rem 0;
-}
-
-.certification-issuer {
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  margin: 0 0 0.25rem 0;
-}
-
-.certification-date {
-  color: #95a5a6;
-  font-size: 0.8rem;
-  margin: 0 0 1rem 0;
-}
-
-.certification-content :host ::ng-deep .category-tag .p-tag {
-  border-radius: var(--border-radius-sm);
-  font-size: 0.7rem;
-  padding: 0.25rem 0.5rem;
-}
-
-/* Market Growth Badge */
-.market-growth {
-  display: flex;
-  align-items: center;
-}
-
-.growth-card {
-  background: rgba(0, 208, 132, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: var(--border-radius-sm);
+.insight-item {
   padding: 1.5rem;
-  text-align: center;
-  border: 1px solid rgba(0, 208, 132, 0.2);
+  margin-bottom: 1rem;
+  border-radius: var(--border-radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  transition: var(--transition);
 }
 
-.growth-label {
-  display: block;
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-bottom: 0.5rem;
-  color: var(--success-color);
+.insight-item:last-child {
+  margin-bottom: 0;
 }
 
-.growth-percentage {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--success-color);
-  display: block;
+.insight-content h4 {
+  margin: 0 0 0.75rem 0;
+  padding: 0.25rem 0;
 }
 
-.growth-text {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  color: var(--success-color);
+.insight-value {
+  margin: 0 0 0.5rem 0;
+  padding: 0.25rem 0;
+}
+
+.insight-description {
+  margin: 0;
+  padding: 0.25rem 0;
 }
 
 /* Technology List */
@@ -571,21 +440,6 @@
   font-weight: 700;
   color: var(--linkedin-blue);
   font-size: 0.9rem;
-}
-
-.technology-progress {
-  margin-top: 0.5rem;
-}
-
-.technology-progress :host ::ng-deep .tech-progress-bar .p-progressbar {
-  height: 6px;
-  border-radius: 3px;
-  background: #f1f3f4;
-}
-
-.technology-progress :host ::ng-deep .tech-progress-bar .p-progressbar-value {
-  background: linear-gradient(90deg, var(--linkedin-blue) 0%, var(--linkedin-blue-light) 100%);
-  border-radius: 3px;
 }
 
 /* Companies List */
@@ -636,12 +490,7 @@
   color: #7f8c8d;
 }
 
-.detail-item i {
-  color: var(--linkedin-blue);
-  font-size: 0.8rem;
-}
-
-/* Salary Distribution Grid */
+/* Salary Distribution */
 .salary-distribution-grid {
   margin-top: 1rem;
 }
@@ -653,11 +502,6 @@
   padding: 1.5rem;
   transition: var(--transition);
   height: 100%;
-}
-
-.salary-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-light);
 }
 
 .salary-header {
@@ -733,164 +577,101 @@
   color: #9e9e9e;
 }
 
-/* Insights Section */
-:host ::ng-deep .insights-card .p-card {
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-light);
-  border: none;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+/* Market Growth Badge */
+.market-growth {
+  display: flex;
+  align-items: center;
 }
 
-:host ::ng-deep .insights-card .p-card .p-card-header {
-  background: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+.growth-card {
+  background: rgba(0, 208, 132, 0.1);
+  border-radius: var(--border-radius-sm);
   padding: 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(0, 208, 132, 0.2);
 }
 
-:host ::ng-deep .insights-card .p-card .p-card-header h3 {
-  margin: 0;
-  color: white;
-  font-size: 1.2rem;
-  font-weight: 600;
+.growth-label {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+  color: var(--success-color);
 }
 
-:host ::ng-deep .insights-card .p-card .p-card-body {
-  padding: 1.5rem;
+.growth-percentage {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--success-color);
+  display: block;
 }
 
-.insights-grid {
+.growth-text {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  color: var(--success-color);
+}
+
+/* Debug Section */
+.debug-section {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
   margin-top: 1rem;
 }
 
-.insight-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--border-radius-sm);
-  padding: 1.5rem;
-  transition: var(--transition);
-}
-
-.insight-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.insight-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.insight-icon i {
-  font-size: 1.5rem;
-  color: white;
-}
-
-.insight-content h4 {
-  margin: 0 0 0.5rem 0;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.insight-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: white;
-  margin: 0 0 0.25rem 0;
-}
-
-.insight-description {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-}
-
-/* Error Messages */
-.errors-section :host ::ng-deep .p-messages {
-  margin: 0;
-}
-
-.errors-section :host ::ng-deep .p-messages .p-message {
-  border-radius: var(--border-radius-sm);
-}
-
-/* Animations */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Responsive Design */
-@media (max-width: 1200px) {
+@media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
   }
-
-  .header-section {
-    padding: 1.5rem;
-  }
-
-  .stat-card {
-    padding: 1.5rem !important;
-  }
-}
-
-@media (max-width: 768px) {
+  
   .profile-header {
     flex-direction: column;
     text-align: center;
   }
-
-  .stats-grid .stat-card {
-    padding: 1rem !important;
+  
+  .profile-name {
+    font-size: 2rem;
   }
-
-  .card-header-custom {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 0.5rem !important;
-  }
-
-  .actions-grid {
-    grid-template-columns: 1fr;
+  
+  .stat-card {
+    padding: 1.5rem;
   }
 }
 
-@media (max-width: 576px) {
-  .chart-container {
-    height: 250px !important;
-  }
+/* Estilos específicos para títulos dentro de tarjetas */
+:host ::ng-deep .p-card .p-card-header h3,
+:host ::ng-deep .chart-card .p-card .p-card-header h3,
+:host ::ng-deep .info-card .p-card .p-card-header h3,
+:host ::ng-deep .insights-card .p-card .p-card-header h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #2c3e50 !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  display: block !important;
+  width: 100% !important;
+}
 
-  .large-chart {
-    height: 300px !important;
-  }
+/* Estilos específicos para títulos de tarjetas */
+.card-header-custom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0;
+  width: 100%;
+}
 
-  .experience-header {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 0.5rem !important;
-  }
+.card-header-custom h3 {
+  margin: 0;
+  padding: 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  flex: 1;
 }

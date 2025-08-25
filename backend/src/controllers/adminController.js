@@ -525,6 +525,59 @@ const eliminarAdministradorPermanentemente = async (req, res) => {
   }
 };
 
+// Obtener perfil del administrador actual
+const obtenerMiPerfilAdmin = async (req, res) => {
+  try {
+    const { id } = req.usuario;
+
+    const admin = await Admin.findByPk(id, {
+      attributes: { exclude: ['contrasenia'] }
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        ok: false,
+        msj: 'Administrador no encontrado'
+      });
+    }
+
+    if (!admin.activo) {
+      return res.status(403).json({
+        ok: false,
+        msj: 'Administrador inactivo'
+      });
+    }
+
+    // Actualizar último acceso
+    await admin.update({ ultimo_acceso: new Date() });
+
+    const perfilAdmin = {
+      id: admin.id,
+      nombre: `${admin.nombre_usuario || ''} ${admin.apellido || ''}`.trim() || 'Administrador',
+      correo: admin.email_usuario,
+      perfil_imagen_url: null, // Los admins no tienen imagen de perfil por defecto
+      posicion_actual: 'Administrador del Sistema',
+      empresa_actual: 'Sistema de Seguimiento',
+      ubicacion: 'Sistema',
+      resumen: 'Administrador del sistema de seguimiento de egresados',
+      industria: 'Tecnología',
+      rol: admin.rol
+    };
+
+    res.json({
+      ok: true,
+      usuario: perfilAdmin
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerMiPerfilAdmin:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al obtener perfil del administrador'
+    });
+  }
+};
+
 module.exports = {
   obtenerAdministradores,
   obtenerAdministradoresEliminados,
@@ -533,5 +586,6 @@ module.exports = {
   actualizarAdministrador,
   desactivarAdministrador,
   reactivarAdministrador,
-  eliminarAdministradorPermanentemente
+  eliminarAdministradorPermanentemente,
+  obtenerMiPerfilAdmin
 };
