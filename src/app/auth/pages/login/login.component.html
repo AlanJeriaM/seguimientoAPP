@@ -30,7 +30,7 @@
           <input id="contrasenia"
                       type="password"
                       formControlName="contrasenia"
-                      placeholder="*******">
+                      placeholder="**********">
           <span *ngIf="campoInvalido('contrasenia')" class="error-message">La contraseña es obligatoria</span>
         </div>
 
@@ -40,9 +40,10 @@
 
         <div class="form-group p-d-flex p-jc-start">
           <p-button type="submit"
+                    icon="pi pi-user"
                     label="Iniciar sesión"
                     [disabled]="formularioLogin.invalid"
-                    class="submit-button">
+                    styleClass="w-full text-xs sm:text-sm md:text-base">
           </p-button>
         </div>
       </div>
@@ -52,7 +53,7 @@
         <p-button label="Iniciar sesión con LinkedIn"
                   icon="pi pi-linkedin"
                   (click)="loginWithLinkedIn()"
-                  class="linkedin-button">
+                  styleClass="w-full text-xs sm:text-sm md:text-base">
         </p-button>
       </div>
     </form>
