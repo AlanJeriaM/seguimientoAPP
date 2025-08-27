@@ -8,14 +8,16 @@ import { PrimeNgModule } from '../modules/prime-ng.module';
 import { SharedModule } from '../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MainComponent } from './pages/main/main.component';
-
-
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   declarations: [
     LoginComponent,
     RegisterComponent,
     MainComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     CommonModule,
@@ -23,6 +25,8 @@ import { MainComponent } from './pages/main/main.component';
     PrimeNgModule,
     SharedModule,
     ReactiveFormsModule,
-  ]
+    ToastModule,
+  ],
+  providers: [MessageService]
 })
 export class AuthModule { }

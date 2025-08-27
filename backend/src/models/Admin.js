@@ -51,6 +51,16 @@ const Admin = sequelize.define('Admin', {
     type: DataTypes.DATE,
     allowNull: true,
     comment: 'Fecha cuando el administrador fue desactivado/eliminado'
+  },
+  codigo_restablecimiento: {
+    type: DataTypes.STRING(6),
+    allowNull: true,
+    comment: 'Código de 6 dígitos para restablecer contraseña'
+  },
+  codigo_expiracion: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Fecha de expiración del código de restablecimiento'
   }
 }, {
   tableName: 'admins',
@@ -68,8 +78,12 @@ Admin.beforeCreate(async (admin) => {
 
 Admin.beforeUpdate(async (admin) => {
   if (admin.changed('contrasenia')) {
-    const salt = await bcrypt.genSalt(10);
-    admin.contrasenia = await bcrypt.hash(admin.contrasenia, salt);
+    // Solo hashear si la contraseña NO parece estar ya hasheada
+    // Los hashes de bcrypt siempre empiezan con $2a$ o $2b$ y tienen 60 caracteres
+    if (!admin.contrasenia.startsWith('$2a$') && !admin.contrasenia.startsWith('$2b$') && admin.contrasenia.length !== 60) {
+      const salt = await bcrypt.genSalt(10);
+      admin.contrasenia = await bcrypt.hash(admin.contrasenia, salt);
+    }
   }
 });
 

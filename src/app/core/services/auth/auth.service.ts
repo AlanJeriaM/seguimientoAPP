@@ -184,6 +184,30 @@ export class AuthService {
       );
   }
 
+  // Enviar código de restablecimiento de contraseña
+  sendResetCode(email: string): Observable<any> {
+    return this.http.post<any>(`${this.url}/api/auth/send-reset-code`, { email })
+      .pipe(
+        catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al enviar código de restablecimiento' }))
+      );
+  }
+
+  // Verificar código de restablecimiento
+  verifyResetCode(email: string, code: string): Observable<any> {
+    return this.http.post<any>(`${this.url}/api/auth/verify-reset-code`, { email, code })
+      .pipe(
+        catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al verificar código' }))
+      );
+  }
+
+  // Restablecer contraseña
+  resetPassword(email: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.url}/api/auth/reset-password`, { email, newPassword })
+      .pipe(
+        catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al restablecer contraseña' }))
+      );
+  }
+
   logOut() {
     sessionStorage.clear();
     this._usuario = null;
