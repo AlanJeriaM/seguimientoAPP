@@ -1,7 +1,10 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const User = require('../models/User');
 const { generarJWT } = require('../services/jwt');
 const linkedinService = require('../services/linkedinService');
+const emailService = require('../services/emailService');
 
 // Login de administrador
 const loginAdmin = async (req, res) => {
@@ -310,10 +313,258 @@ const loginLinkedIn = async (req, res) => {
   }
 };
 
+// Enviar código de restablecimiento de contraseña
+const enviarCodigoRestablecimiento = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'El correo es requerido'
+      });
+    }
+
+    // Buscar administrador por email
+    const admin = await Admin.findOne({
+      where: { email_usuario: email }
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        ok: false,
+        msj: 'No se encontró un administrador con ese correo'
+      });
+    }
+
+    // Verificar que el administrador esté activo
+    if (!admin.activo) {
+      return res.status(403).json({
+        ok: false,
+        msj: 'El administrador está inactivo'
+      });
+    }
+
+    // Generar código de 6 dígitos
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Guardar código en la base de datos (con expiración de 10 minutos)
+    const codigoExpiracion = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
+
+    await admin.update({
+      codigo_restablecimiento: codigo,
+      codigo_expiracion: codigoExpiracion
+    });
+
+    // Formatear tiempo de expiración para mostrar
+    const expiracionFormateada = codigoExpiracion.toLocaleString('es-ES', {
+      timeZone: 'America/Santiago',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Obtener nombre del administrador
+    const nombreAdmin = admin.nombre_usuario || 'Administrador';
+
+    // Enviar email con el código
+    const emailResult = await emailService.sendResetCode(
+      email,
+      nombreAdmin,
+      codigo,
+      expiracionFormateada
+    );
+
+    if (emailResult.success) {
+      console.log(`Código de restablecimiento enviado a ${email}: ${codigo}`);
+      console.log(`Expira en: ${expiracionFormateada}`);
+
+      res.json({
+        ok: true,
+        msj: 'Código de verificación enviado al correo',
+        // Solo en desarrollo - remover en producción
+        codigo: process.env.NODE_ENV === 'development' ? codigo : undefined
+      });
+    } else {
+      console.error('Error al enviar email:', emailResult.error);
+
+      // Si falla el email, aún enviamos respuesta exitosa pero con advertencia
+      res.json({
+        ok: true,
+        msj: 'Código generado pero hubo un problema al enviar el email. Contacta soporte.',
+        codigo: process.env.NODE_ENV === 'development' ? codigo : undefined
+      });
+    }
+
+  } catch (error) {
+    console.error('Error en enviarCodigoRestablecimiento:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al enviar código'
+    });
+  }
+};
+
+// Verificar código de restablecimiento
+const verificarCodigoRestablecimiento = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'Email y código son requeridos'
+      });
+    }
+
+    // Buscar administrador por email
+    const admin = await Admin.findOne({
+      where: { email_usuario: email }
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        ok: false,
+        msj: 'No se encontró un administrador con ese correo'
+      });
+    }
+
+    // Verificar que el administrador esté activo
+    if (!admin.activo) {
+      return res.status(403).json({
+        ok: false,
+        msj: 'El administrador está inactivo'
+      });
+    }
+
+    // Verificar código
+    if (admin.codigo_restablecimiento !== code) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'Código incorrecto'
+      });
+    }
+
+    // Verificar expiración
+    if (new Date() > admin.codigo_expiracion) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'El código ha expirado'
+      });
+    }
+
+    // Generar token temporal para cambio de contraseña
+    const tokenTemporal = jwt.sign(
+      {
+        id: admin.id,
+        email: admin.email_usuario,
+        tipo: 'reset_password'
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    res.json({
+      ok: true,
+      msj: 'Código verificado correctamente',
+      token: tokenTemporal
+    });
+
+  } catch (error) {
+    console.error('Error en verificarCodigoRestablecimiento:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al verificar código'
+    });
+  }
+};
+
+// Restablecer contraseña
+const restablecerContrasenia = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'Email y nueva contraseña son requeridos'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'La contraseña debe tener al menos 6 caracteres'
+      });
+    }
+
+    // Buscar administrador por email
+    const admin = await Admin.findOne({
+      where: { email_usuario: email }
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        ok: false,
+        msj: 'No se encontró un administrador con ese correo'
+      });
+    }
+
+    // Verificar que el administrador esté activo
+    if (!admin.activo) {
+      return res.status(403).json({
+        ok: false,
+        msj: 'El administrador está inactivo'
+      });
+    }
+
+    // Hashear nueva contraseña
+    const salt = bcrypt.genSaltSync();
+    const nuevaContraseniaHash = bcrypt.hashSync(newPassword, salt);
+
+    // Obtener nombre del administrador antes de actualizar
+    const nombreAdmin = admin.nombre_usuario || 'Administrador';
+
+    // Actualizar contraseña y limpiar código de restablecimiento
+    await admin.update({
+      contrasenia: nuevaContraseniaHash,
+      codigo_restablecimiento: null,
+      codigo_expiracion: null,
+      ultimo_acceso: new Date()
+    });
+
+    // Enviar email de confirmación
+    const emailResult = await emailService.sendPasswordChangedConfirmation(email, nombreAdmin);
+
+    if (emailResult.success) {
+      console.log('Email de confirmación enviado exitosamente');
+    } else {
+      console.error('Error al enviar email de confirmación:', emailResult.error);
+    }
+
+    res.json({
+      ok: true,
+      msj: 'Contraseña restablecida correctamente'
+    });
+
+  } catch (error) {
+    console.error('Error en restablecerContrasenia:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al restablecer contraseña'
+    });
+  }
+};
+
 module.exports = {
   loginAdmin,
   renovarToken,
   getLinkedInAuthUrl,
   linkedinCallback,
-  loginLinkedIn
+  loginLinkedIn,
+  enviarCodigoRestablecimiento,
+  verificarCodigoRestablecimiento,
+  restablecerContrasenia
 };
