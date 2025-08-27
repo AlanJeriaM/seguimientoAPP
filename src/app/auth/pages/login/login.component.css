@@ -89,7 +89,7 @@ input, .p-password {
 
 .remember-forgot {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 1.5rem;
 }
@@ -97,6 +97,7 @@ input, .p-password {
 .forgot-password {
   color: #1378e4;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .button-container {
