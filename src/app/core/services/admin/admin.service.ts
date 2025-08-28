@@ -104,4 +104,26 @@ export class AdminService {
         catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al eliminar administrador permanentemente' }))
       );
   }
+
+  // Obtener mi perfil de administrador
+  obtenerMiPerfil(): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('token', sessionStorage.getItem('token') || '');
+
+    return this.http.get<any>(`${this.url}/api/admins/mi-perfil`, { headers })
+      .pipe(
+        catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al obtener mi perfil' }))
+      );
+  }
+
+  // Actualizar mi perfil de administrador
+  actualizarMiPerfil(perfilData: any): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('token', sessionStorage.getItem('token') || '');
+
+    return this.http.put<any>(`${this.url}/api/admins/mi-perfil`, perfilData, { headers })
+      .pipe(
+        catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al actualizar mi perfil' }))
+      );
+  }
 }

@@ -127,8 +127,8 @@ export class ViewDeletedUsersComponent implements OnInit {
     Swal.fire({
       title: '¡ELIMINACIÓN PERMANENTE!',
       html: `
-        <div style="text-align: left; margin: 20px 0;">
-          <p><strong>¿Estás seguro que deseas ELIMINAR PERMANENTEMENTE al usuario?</strong></p>
+        <div style="text-align: center; margin: 20px 0;">
+          <p><strong>¿Estás seguro que deseas eliminar permanentemente al usuario?</strong></p>
           <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
             <p><strong>Nombre:</strong> ${usuario.nombre}</p>
             <p><strong>Correo:</strong> ${usuario.correo}</p>
@@ -136,7 +136,6 @@ export class ViewDeletedUsersComponent implements OnInit {
           </div>
           <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px;">
             <p style="margin: 0; color: #856404;"><strong>ADVERTENCIA:</strong> Esta acción es IRREVERSIBLE.
-            El usuario será eliminado completamente de la base de datos y no podrá ser recuperado.</p>
           </div>
         </div>
       `,
@@ -144,7 +143,7 @@ export class ViewDeletedUsersComponent implements OnInit {
       showCancelButton: true,
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Sí, eliminar permanentemente',
+      confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
       focusCancel: true,
       reverseButtons: true,
@@ -159,13 +158,13 @@ export class ViewDeletedUsersComponent implements OnInit {
         // Segundo diálogo de confirmación
         Swal.fire({
           title: 'Confirmación Final',
-          text: '¿Realmente deseas proceder? Escribe "ELIMINAR" para confirmar.',
+          text: '¿Realmente deseas eliminar? Escribe "ELIMINAR" para confirmar.',
           input: 'text',
           inputPlaceholder: 'Escribe ELIMINAR',
           showCancelButton: true,
           confirmButtonColor: '#dc3545',
           cancelButtonColor: '#6c757d',
-          confirmButtonText: 'Proceder',
+          confirmButtonText: 'Confirmar',
           cancelButtonText: 'Cancelar',
           inputValidator: (value) => {
             if (value !== 'ELIMINAR') {
@@ -200,9 +199,9 @@ export class ViewDeletedUsersComponent implements OnInit {
             icon: 'success',
             title: 'Usuario eliminado permanentemente',
             html: `
-              <div style="text-align: left;">
+              <div style="text-align: center;">
                 <p><strong>${usuario.nombre}</strong> ha sido eliminado permanentemente del sistema.</p>
-                <p><small>Esta acción no se puede deshacer.</small></p>
+                <p><small>Esta acción no se puede deshacer</small></p>
               </div>
             `,
             timer: 3000,

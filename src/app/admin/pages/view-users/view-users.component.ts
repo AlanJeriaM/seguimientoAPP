@@ -88,7 +88,7 @@ export class ViewUsersComponent implements OnInit {
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, desactivar',
+      confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -97,8 +97,8 @@ export class ViewUsersComponent implements OnInit {
             if (resp.ok) {
               Swal.fire({
                 icon: 'success',
-                title: 'Usuario desactivado',
-                text: 'El usuario ha sido desactivado correctamente',
+                title: 'Usuario eliminado',
+                text: 'El usuario ha sido eliminado correctamente',
                 timer: 2000,
                 showConfirmButton: false
               });
@@ -107,7 +107,7 @@ export class ViewUsersComponent implements OnInit {
               Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: resp.msj || 'Error al desactivar usuario'
+                text: resp.msj || 'Error al eliminar usuario'
               });
             }
           },

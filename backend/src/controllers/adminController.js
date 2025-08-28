@@ -553,20 +553,19 @@ const obtenerMiPerfilAdmin = async (req, res) => {
 
     const perfilAdmin = {
       id: admin.id,
-      nombre: `${admin.nombre_usuario || ''} ${admin.apellido || ''}`.trim() || 'Administrador',
-      correo: admin.email_usuario,
-      perfil_imagen_url: null, // Los admins no tienen imagen de perfil por defecto
-      posicion_actual: 'Administrador del Sistema',
-      empresa_actual: 'Sistema de Seguimiento',
-      ubicacion: 'Sistema',
-      resumen: 'Administrador del sistema de seguimiento de egresados',
-      industria: 'Tecnología',
-      rol: admin.rol
+      nombre_usuario: admin.nombre_usuario,
+      apellido: admin.apellido,
+      email_usuario: admin.email_usuario,
+      rol: admin.rol,
+      activo: admin.activo,
+      ultimo_acceso: admin.ultimo_acceso,
+      createdAt: admin.created_at,
+      updatedAt: admin.updated_at
     };
 
     res.json({
       ok: true,
-      usuario: perfilAdmin
+      data: perfilAdmin
     });
 
   } catch (error) {
@@ -574,6 +573,92 @@ const obtenerMiPerfilAdmin = async (req, res) => {
     res.status(500).json({
       ok: false,
       msj: 'Error del servidor al obtener perfil del administrador'
+    });
+  }
+};
+
+// Actualizar perfil del administrador actual
+const actualizarMiPerfilAdmin = async (req, res) => {
+  try {
+    const { id } = req.usuario;
+    const { nombre_usuario, apellido, email_usuario, contrasenia } = req.body;
+
+    // Validar campos requeridos
+    if (!nombre_usuario || !apellido || !email_usuario) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'Nombre, apellido y email son obligatorios'
+      });
+    }
+
+    // Buscar el administrador
+    const admin = await Admin.findByPk(id);
+
+    if (!admin) {
+      return res.status(404).json({
+        ok: false,
+        msj: 'Administrador no encontrado'
+      });
+    }
+
+    if (!admin.activo) {
+      return res.status(403).json({
+        ok: false,
+        msj: 'Administrador inactivo'
+      });
+    }
+
+    // Verificar si el email ya existe en otro administrador
+    if (email_usuario !== admin.email_usuario) {
+      const emailExiste = await Admin.findOne({
+        where: { 
+          email_usuario: email_usuario,
+          id: { [Op.ne]: id } // Excluir el administrador actual
+        }
+      });
+
+      if (emailExiste) {
+        return res.status(400).json({
+          ok: false,
+          msj: 'El email ya está registrado por otro administrador'
+        });
+      }
+    }
+
+    // Preparar datos para actualizar
+    const datosActualizar = {
+      nombre_usuario,
+      apellido,
+      email_usuario
+    };
+
+    // Solo actualizar contraseña si se proporciona
+    if (contrasenia && contrasenia.trim() !== '') {
+      if (contrasenia.length < 6) {
+        return res.status(400).json({
+          ok: false,
+          msj: 'La contraseña debe tener al menos 6 caracteres'
+        });
+      }
+      // La contraseña se hasheará automáticamente por el hook beforeUpdate
+      datosActualizar.contrasenia = contrasenia;
+    }
+
+    // Actualizar administrador
+    await admin.update(datosActualizar);
+
+    console.log(`Perfil del administrador actualizado: ${nombre_usuario} ${apellido} (ID: ${id})`);
+
+    res.json({
+      ok: true,
+      msj: 'Perfil actualizado correctamente'
+    });
+
+  } catch (error) {
+    console.error('Error en actualizarMiPerfilAdmin:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al actualizar perfil del administrador'
     });
   }
 };
@@ -587,5 +672,6 @@ module.exports = {
   desactivarAdministrador,
   reactivarAdministrador,
   eliminarAdministradorPermanentemente,
-  obtenerMiPerfilAdmin
+  obtenerMiPerfilAdmin,
+  actualizarMiPerfilAdmin
 };
