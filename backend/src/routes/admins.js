@@ -9,7 +9,8 @@ const {
   desactivarAdministrador,
   reactivarAdministrador,
   eliminarAdministradorPermanentemente,
-  obtenerMiPerfilAdmin
+  obtenerMiPerfilAdmin,
+  actualizarMiPerfilAdmin
 } = require('../controllers/adminController');
 const { verificarToken, verificarAdmin } = require('../middleware/auth');
 
@@ -19,6 +20,9 @@ router.use(verificarAdmin);
 
 // Ruta para obtener perfil del administrador actual
 router.get('/mi-perfil', obtenerMiPerfilAdmin);
+
+// Ruta para actualizar perfil del administrador actual
+router.put('/mi-perfil', actualizarMiPerfilAdmin);
 
 // CRUD de administradores
 router.get('/', obtenerAdministradores);

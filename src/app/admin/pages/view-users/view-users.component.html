@@ -28,7 +28,7 @@
                   type="text"
                   [value]="searchText"
                   (input)="buscarUsuarios($event)"
-                  placeholder="Buscar por nombre, correo o empresa..."
+                  placeholder="Buscar"
                 />
               </span>
               <p-button
@@ -111,7 +111,7 @@
                   pRipple
                   icon="pi pi-trash"
                   styleClass="p-button-sm p-button-danger mr-2"
-                  pTooltip="Desactivar usuario"
+                  pTooltip="Eliminar usuario"
                   (click)="eliminarUsuario(usuario)"
                 ></p-button>
                 <p-button

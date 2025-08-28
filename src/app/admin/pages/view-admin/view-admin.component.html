@@ -28,7 +28,7 @@
                   type="text"
                   [value]="searchText"
                   (input)="buscarAdministradores($event)"
-                  placeholder="Buscar por nombre, apellido o correo..."
+                  placeholder="Buscar"
                 />
               </span>
               <p-button
@@ -117,7 +117,7 @@
                   pRipple
                   icon="pi pi-trash"
                   styleClass="p-button-sm p-button-danger mr-2"
-                  pTooltip="Desactivar administrador"
+                  pTooltip="Eliminar administrador"
                   (click)="eliminarAdministrador(admin)"
                 ></p-button>
               </div>

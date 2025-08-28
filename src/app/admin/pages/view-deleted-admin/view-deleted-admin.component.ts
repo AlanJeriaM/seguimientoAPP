@@ -127,16 +127,15 @@ export class ViewDeletedAdminComponent implements OnInit {
     Swal.fire({
       title: '¡ELIMINACIÓN PERMANENTE!',
       html: `
-        <div style="text-align: left; margin: 20px 0;">
-          <p><strong>¿Estás seguro que deseas ELIMINAR PERMANENTEMENTE al administrador?</strong></p>
+        <div style="text-align: center; margin: 20px 0;">
+          <p><strong>¿Estás seguro que deseas eliminar permanentemente al administrador?</strong></p>
           <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
             <p><strong>Nombre:</strong> ${admin.nombre_completo}</p>
             <p><strong>Correo:</strong> ${admin.email_usuario}</p>
             <p><strong>Rol:</strong> ${admin.rol}</p>
           </div>
           <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px;">
-            <p style="margin: 0; color: #856404;"><strong>ADVERTENCIA:</strong> Esta acción es IRREVERSIBLE.
-            El administrador será eliminado completamente de la base de datos y no podrá ser recuperado.</p>
+            <p style="margin: 0; color: #856404;"><strong>ADVERTENCIA:</strong> Esta acción es IRREVERSIBLE.</p>
           </div>
         </div>
       `,
@@ -144,7 +143,7 @@ export class ViewDeletedAdminComponent implements OnInit {
       showCancelButton: true,
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Sí, eliminar permanentemente',
+      confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
       focusCancel: true,
       reverseButtons: true

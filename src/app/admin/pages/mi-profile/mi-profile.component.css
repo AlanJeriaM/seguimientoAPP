@@ -1,0 +1,13 @@
+/* CSS Mínimo para Admin Profile - Solo lo esencial */
+
+.profile-form-section {
+  margin-top: 2rem;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .profile-form-section {
+    margin-top: 1rem;
+  }
+}
+

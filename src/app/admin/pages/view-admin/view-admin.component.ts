@@ -482,12 +482,12 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
   eliminarAdministrador(admin: any) {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: `¿Deseas desactivar al administrador ${admin.nombre_completo}?`,
+      text: `¿Deseas eliminar al administrador ${admin.nombre_completo}?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, desactivar',
+      confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -496,8 +496,8 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
             if (resp.ok) {
               Swal.fire({
                 icon: 'success',
-                title: 'Administrador desactivado',
-                text: 'El administrador ha sido desactivado correctamente',
+                title: 'Administrador eliminado',
+                text: 'El administrador ha sido eliminado correctamente',
                 timer: 2000,
                 showConfirmButton: false
               });
@@ -506,7 +506,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
               Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: resp.msj || 'Error al desactivar administrador'
+                text: resp.msj || 'Error al eliminar administrador'
               });
             }
           },
