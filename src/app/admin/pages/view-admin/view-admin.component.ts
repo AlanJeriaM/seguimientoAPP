@@ -535,6 +535,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
         </div>
       `,
       icon: 'info',
+      confirmButtonColor: '#17a2b8',
       confirmButtonText: 'Cerrar'
     });
   }

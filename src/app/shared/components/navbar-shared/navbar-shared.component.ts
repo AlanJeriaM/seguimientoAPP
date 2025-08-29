@@ -21,20 +21,29 @@ export class NavbarSharedComponent implements OnInit {
   ngOnInit(): void {
     this.userName = this.authService.usuario.nombreUsuario;
     this.menuItems = [
-      { label: 'Mi Perfil',
+      {
+        label: 'Mi Perfil',
         icon: 'pi pi-user',
-        routerLink: this.isAdmin() ? '/admin/mi-perfil' : '/user/mi-perfil' },
+        routerLink: this.isAdmin() ? '/admin/mi-perfil' : '/user/mi-perfil'
+      },
       { separator: true },
-
-      { label: 'Cerrar sesión',
+      {
+        label: 'Cerrar sesión',
         icon: 'pi pi-sign-out',
-        command: () => this.logOut() }
+        command: () => this.logOut()
+      }
     ];
-
   }
 
+  // Método auxiliar para obtener la ruta de inicio
+  getHomeRoute(): string {
+    if (this.isAuth()) {
+      return '/auth/login';
+    }
+    return this.isAdmin() ? '/admin/dashboard' : '/user/dashboard';
+  }
 
-  //métodos para verificar si la URL actual comienza con /admin o /auth o /user.
+  // Métodos para verificar si la URL actual comienza con /admin o /auth o /user.
   isAdmin(): boolean {
     return this.router.url.startsWith('/admin');
   }

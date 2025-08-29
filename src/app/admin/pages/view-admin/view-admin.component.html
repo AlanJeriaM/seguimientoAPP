@@ -1,5 +1,5 @@
 <div class="grid">
-  <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+  <div class="col-12">
     <p-card class="text-center" header="Administradores del Sistema">
       <div class="flex justify-content-between align-content-center mb-2">
       </div>
@@ -19,41 +19,49 @@
         [loading]="loading"
       >
         <ng-template pTemplate="caption">
-          <div class="flex flex-wrap justify-content-between align-content-center">
-            <div class="mb-2 sm:mb-0">
-              <span class="p-input-icon-left">
-                <i class="pi pi-search"></i>
-                <input
-                  pInputText
-                  type="text"
-                  [value]="searchText"
-                  (input)="buscarAdministradores($event)"
-                  placeholder="Buscar"
-                />
-              </span>
-              <p-button
-                styleClass="p-button-text p-button-sm ml-2"
-                icon="pi pi-filter-slash"
-                (click)="limpiarFiltros()"
-                pTooltip="Limpiar filtros"
-              ></p-button>
+          <div class="grid">
+            <!-- Sección de búsqueda - ocupa toda la fila en móvil -->
+            <div class="col-12 lg:col-6 mb-2">
+              <div class="flex flex-wrap align-items-center gap-2">
+                <span class="p-input-icon-left flex-1 lg:flex-none" style="min-width: 200px;">
+                  <i class="pi pi-search"></i>
+                  <input
+                    pInputText
+                    type="text"
+                    [value]="searchText"
+                    (input)="buscarAdministradores($event)"
+                    placeholder="Buscar"
+                    class="w-full lg:w-auto"
+                  />
+                </span>
+                <p-button
+                  styleClass="p-button-text p-button-sm"
+                  icon="pi pi-filter-slash"
+                  (click)="limpiarFiltros()"
+                  pTooltip="Limpiar filtros"
+                ></p-button>
+              </div>
             </div>
-            <div>
-              <p-button
-                pRipple
-                label="Nuevo Administrador"
-                icon="pi pi-plus"
-                styleClass="p-button-sm p-button-success mr-2"
-                (click)="nuevoAdministrador()"
-                pTooltip="Crear nuevo administrador"
-              ></p-button>
-              <p-button
-                pRipple
-                label="Actualizar"
-                icon="pi pi-refresh"
-                styleClass="p-button-sm p-button-info"
-                (click)="actualizarDatos()"
-              ></p-button>
+
+            <!-- Sección de botones - ahora con w-full en móviles -->
+            <div class="col-12 lg:col-6 mb-2">
+              <div class="flex flex-column lg:flex-row justify-content-start lg:justify-content-end gap-2">
+                <p-button
+                  pRipple
+                  label="Nuevo administrador"
+                  icon="pi pi-plus"
+                  styleClass="p-button-sm p-button-success w-full lg:w-auto"
+                  (click)="nuevoAdministrador()"
+                  pTooltip="Crear nuevo administrador"
+                ></p-button>
+                <p-button
+                  pRipple
+                  label="Actualizar"
+                  icon="pi pi-refresh"
+                  styleClass="p-button-sm p-button-info w-full lg:w-auto"
+                  (click)="actualizarDatos()"
+                ></p-button>
+              </div>
             </div>
           </div>
         </ng-template>
@@ -98,25 +106,25 @@
               {{ admin.fecha_registro ? (admin.fecha_registro | date:'dd/MM/yyyy HH:mm') : 'N/A' }}
             </td>
             <td class="text-right" style="width: 150px">
-              <div class="flex">
+              <div class="flex flex-wrap gap-1 justify-content-end">
                 <p-button
                   pRipple
                   icon="pi pi-eye"
-                  styleClass="p-button-sm p-button-info mr-2"
+                  styleClass="p-button-sm p-button-info"
                   pTooltip="Ver administrador"
                   (click)="verAdministrador(admin)"
                 ></p-button>
                 <p-button
                   pRipple
                   icon="pi pi-pencil"
-                  styleClass="p-button-sm p-button-warning mr-2"
+                  styleClass="p-button-sm p-button-warning"
                   pTooltip="Editar administrador"
                   (click)="editarAdministrador(admin)"
                 ></p-button>
                 <p-button
                   pRipple
                   icon="pi pi-trash"
-                  styleClass="p-button-sm p-button-danger mr-2"
+                  styleClass="p-button-sm p-button-danger"
                   pTooltip="Eliminar administrador"
                   (click)="eliminarAdministrador(admin)"
                 ></p-button>
@@ -150,22 +158,26 @@
   </div>
 </div>
 
-<!-- Diálogo para crear/editar administrador -->
+<!-- Modal completamente responsivo -->
 <p-dialog
   [(visible)]="displayDialog"
   [header]="editMode ? 'Editar Administrador' : 'Nuevo Administrador'"
   [modal]="true"
-  [style]="{width: '50vw', zIndex: 1000}"
+  [style]="{width: '95vw', maxWidth: '600px'}"
+  [contentStyle]="{'padding': '1rem', 'overflow-y': 'auto', 'max-height': '80vh'}"
   [draggable]="false"
   [resizable]="false"
   [appendTo]="'body'"
   [baseZIndex]="1000"
   [closable]="true"
   [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '90vw', '640px': '95vw'}"
+  [dismissableMask]="true"
 >
   <form [formGroup]="adminForm" (ngSubmit)="guardarAdministrador()">
     <div class="grid">
-      <div class="col-12 md:col-6">
+      <div class="col-12 sm:col-6">
         <label for="nombre" class="block text-900 font-medium mb-2">
           Nombre*
         </label>
@@ -180,12 +192,13 @@
           [class.ng-dirty]="isFieldInvalid('nombre_usuario')"
         />
         <span
-          *ngIf="isFieldInvalid('nombre_usuario')" class="error-message text-red-500 text-sm mt-1 block">
+          *ngIf="isFieldInvalid('nombre_usuario')"
+          class="error-message text-red-500 text-sm mt-1 block">
           {{ getFieldError('nombre_usuario') }}
         </span>
       </div>
 
-      <div class="col-12 md:col-6">
+      <div class="col-12 sm:col-6">
         <label for="apellido" class="block text-900 font-medium mb-2">
           Apellido*
         </label>
@@ -199,10 +212,10 @@
           [class.ng-invalid]="isFieldInvalid('apellido')"
           [class.ng-dirty]="isFieldInvalid('apellido')"
         />
-        <span *ngIf="isFieldInvalid('apellido')" class="error-message text-red-500 text-sm mt-1 block">
-        {{ getFieldError('apellido') }}
-      </span>
-
+        <span *ngIf="isFieldInvalid('apellido')"
+          class="error-message text-red-500 text-sm mt-1 block">
+          {{ getFieldError('apellido') }}
+        </span>
       </div>
 
       <div class="col-12">
@@ -219,7 +232,8 @@
           [class.ng-invalid]="isFieldInvalid('email_usuario')"
           [class.ng-dirty]="isFieldInvalid('email_usuario')"
         />
-        <span *ngIf="isFieldInvalid('email_usuario')" class="error-message text-red-500 text-sm mt-1 block">
+        <span *ngIf="isFieldInvalid('email_usuario')"
+          class="error-message text-red-500 text-sm mt-1 block">
           {{ getFieldError('email_usuario') }}
         </span>
       </div>
@@ -238,7 +252,8 @@
           [class.ng-invalid]="isFieldInvalid('contrasenia')"
           [class.ng-dirty]="isFieldInvalid('contrasenia')"
         />
-        <span *ngIf="isFieldInvalid('contrasenia')" class="error-message text-red-500 text-sm mt-1 block">
+        <span *ngIf="isFieldInvalid('contrasenia')"
+          class="error-message text-red-500 text-sm mt-1 block">
           {{ getFieldError('contrasenia') }}
         </span>
       </div>
@@ -257,7 +272,8 @@
           [class.ng-invalid]="isFieldInvalid('confirmarContrasenia')"
           [class.ng-dirty]="isFieldInvalid('confirmarContrasenia')"
         />
-        <span *ngIf="isFieldInvalid('confirmarContrasenia')" class="error-message text-red-500 text-sm mt-1 block">
+        <span *ngIf="isFieldInvalid('confirmarContrasenia')"
+          class="error-message text-red-500 text-sm mt-1 block">
           {{ getFieldError('confirmarContrasenia') }}
         </span>
       </div>
@@ -265,18 +281,20 @@
   </form>
 
   <ng-template pTemplate="footer">
-    <p-button
-      label="Cancelar"
-      icon="pi pi-times"
-      (click)="cancelarDialog()"
-      styleClass="p-button-text"
-    ></p-button>
-    <p-button
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
       [label]="editMode ? 'Actualizar' : 'Crear'"
       icon="pi pi-check"
       [disabled]="adminForm.invalid"
       (click)="guardarAdministrador()"
-      [styleClass]="editMode ? 'p-button-warning' : 'p-button-success'"
+      [styleClass]="(editMode ? 'p-button-warning' : 'p-button-success') + ' w-full sm:w-auto order-1 sm:order-2'"
     ></p-button>
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cancelarDialog()"
+        styleClass="p-button-danger w-full sm:w-auto order-2 sm:order-1"
+      ></p-button>
+    </div>
   </ng-template>
 </p-dialog>

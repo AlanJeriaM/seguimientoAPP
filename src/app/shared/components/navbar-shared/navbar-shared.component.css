@@ -1,62 +1,95 @@
-.header {
-  padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
+/* Toolbar personalizada */
+::ng-deep .custom-toolbar {
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface-ground);
+  padding: 0.75rem 1rem;
 }
 
-.container-prime {
-  max-width: 1640px;
-  margin: 0 auto;
-}
-
-.row-prime {
+/* Contenido izquierdo */
+.navbar-start {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
-.col-prime {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.left-content {
+.sidebar-wrapper {
   display: flex;
   align-items: center;
 }
 
-.sidebar-container {
-  margin-right: 1rem;
-}
-
-.dashboard-link {
+/* Brand link */
+.brand-link {
   display: flex;
   align-items: center;
   text-decoration: none;
+  color: var(--text-color);
+  gap: 0.75rem;
+  padding: 0.25rem;
+  border-radius: var(--border-radius);
+  transition: background-color 0.2s ease;
 }
 
-.uv-logo {
-  margin-right: 1rem;
-  width: 100px;
+.brand-link:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-color);
 }
 
-.dashboard-text {
-  font-size: 1.15rem;
-  color: #333;
+.brand-logo {
+  height: 40px;
+  width: auto;
+  flex-shrink: 0;
 }
 
-.avatar {
-  cursor: pointer;
-  margin-right: 1rem;
+.brand-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  white-space: nowrap;
 }
 
-.hide-on-small-screen {
-  display: none;
+/* Contenido derecho */
+.navbar-end {
+  display: flex;
+  align-items: center;
 }
 
-@media (min-width: 768px) {
-  .hide-on-small-screen {
-    display: inline;
+/* Botón de usuario */
+::ng-deep .user-menu-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  ::ng-deep .custom-toolbar {
+    padding: 0.5rem;
   }
+
+  .navbar-start {
+    gap: 0.5rem;
+  }
+
+  .brand-logo {
+    height: 32px;
+  }
+
+  .brand-text {
+    font-size: 1rem;
+  }
+
+  /* En móviles muy pequeños, ocultar el texto si es necesario */
+  @media (max-width: 480px) {
+    .brand-text {
+      display: none;
+    }
+  }
+}
+
+/* Mejoras adicionales para el menú */
+::ng-deep .p-tieredmenu {
+  min-width: 200px;
+}
+
+::ng-deep .p-tieredmenu .p-menuitem-link {
+  padding: 0.75rem 1rem;
 }

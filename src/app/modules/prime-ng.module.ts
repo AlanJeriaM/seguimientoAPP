@@ -39,6 +39,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { TagModule } from 'primeng/tag';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DialogModule } from 'primeng/dialog';
+import { ToolbarModule } from 'primeng/toolbar';
+
 
 
 // import { PaginatorModule } from 'primeng/paginator';
@@ -80,6 +82,7 @@ const primeNgModules = [
   TagModule,
   SelectButtonModule,
   DialogModule,
+  ToolbarModule,
 
 
   // PaginatorModule

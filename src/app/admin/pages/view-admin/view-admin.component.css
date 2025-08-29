@@ -6,3 +6,70 @@
 ::ng-deep .swal2-popup {
   z-index: 10001 !important;
 }
+
+/* Botones de SweetAlert2 responsivos */
+::ng-deep .swal2-actions {
+  width: 100% !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+  padding: 0 0.5rem !important;
+}
+
+::ng-deep .swal2-confirm,
+::ng-deep .swal2-cancel,
+::ng-deep .swal2-deny {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+/* Para pantallas más grandes, mantener diseño horizontal */
+@media screen and (min-width: 640px) {
+  ::ng-deep .swal2-actions {
+    flex-direction: row !important;
+    width: auto !important;
+    padding: 0 !important;
+  }
+
+  ::ng-deep .swal2-confirm,
+  ::ng-deep .swal2-cancel,
+  ::ng-deep .swal2-deny {
+    width: auto !important;
+    margin: 0.3125em !important;
+    padding: 0.625em 1.5em !important;
+    font-size: 1em !important;
+  }
+}
+
+/* Asegurar responsividad completa del modal */
+::ng-deep .p-dialog {
+  margin: 0.5rem;
+}
+
+::ng-deep .p-dialog .p-dialog-content {
+  padding: 1rem !important;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+/* Mejorar espaciado en móviles */
+::ng-deep .p-dialog .p-dialog-footer {
+  padding: 1rem !important;
+}
+
+@media screen and (max-width: 640px) {
+  ::ng-deep .p-dialog {
+    margin: 0.25rem;
+  }
+
+  ::ng-deep .p-dialog .p-dialog-content {
+    padding: 0.75rem !important;
+  }
+
+  ::ng-deep .p-dialog .p-dialog-footer {
+    padding: 0.75rem !important;
+  }
+}
