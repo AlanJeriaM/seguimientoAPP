@@ -9,7 +9,7 @@ const initializeDatabase = async () => {
     console.log('✅ Conexión a MySQL establecida');
 
     console.log('🔄 Sincronizando modelos...');
-    await sequelize.sync({ alter: true }); // Cambiado de force a alter
+    await sequelize.sync({ alter: false }); // Cambiado a false para evitar índices duplicados
     console.log('✅ Tablas creadas/actualizadas');
 
     // Crear admin por defecto

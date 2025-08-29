@@ -1,37 +1,40 @@
-<header class="header">
-  <div class="container-prime">
-    <div class="row-prime">
-      <div class="col-prime">
-        <!-- Contenido a la izquierda -->
-        <div class="left-content" *ngIf="!isAuth()">
-          <div class="sidebar-container">
-            <app-sidebar  nameUser="{{userName}}" [isAdmin]="isAdmin()"></app-sidebar>
-          </div>
-          <a routerLink="/{{ isAdmin() ? 'admin' : 'user' }}/dashboard" class="dashboard-link">
-            <img class="uv-logo" src="assets/icons/uv.png" alt="uv.png" />
-            <strong class="dashboard-text">Seguimiento egresados</strong>
-          </a>
-        </div>
-
-        <div class="left-content" *ngIf="isAuth()">
-          <a routerLink="/auth/login" class="dashboard-link">
-            <img class="uv-logo" src="assets/icons/uv.png" alt="uv.png" />
-            <strong class="dashboard-text">Seguimiento egresados</strong>
-          </a>
-        </div>
-
-        <!-- Contenido a la derecha -->
-        <div class="right-content" *ngIf="!isAuth()">
-          <p-avatar
-            image="assets/icons/fotoperfil.png"
-            size="large"
-            shape="circle"
-            class="avatar"
-            (click)="menu.toggle($event)"
-          ></p-avatar>
-          <p-tieredMenu #menu [model]="menuItems" popup appendTo="body"></p-tieredMenu>
-        </div>
+<p-toolbar styleClass="custom-toolbar">
+  <!-- Contenido izquierdo -->
+  <ng-template pTemplate="start">
+    <div class="navbar-start">
+      <!-- Sidebar solo cuando no es auth -->
+      <div *ngIf="!isAuth()" class="sidebar-wrapper">
+        <app-sidebar [nameUser]="userName" [isAdmin]="isAdmin()"></app-sidebar>
       </div>
+
+      <!-- Logo y título -->
+      <a [routerLink]="getHomeRoute()" class="brand-link">
+        <img src="assets/icons/logouv.png" alt="UV Logo" class="brand-logo" />
+        <span class="brand-text">Seguimiento egresados</span>
+      </a>
     </div>
-  </div>
-</header>
+  </ng-template>
+
+  <!-- Contenido derecho -->
+  <ng-template pTemplate="end">
+    <div class="navbar-end" *ngIf="!isAuth()">
+      <!-- Avatar y menú solo cuando no es auth -->
+      <p-button
+        icon="pi pi-user"
+        [rounded]="true"
+        [outlined]="true"
+        severity="secondary"
+        (click)="menu.toggle($event)"
+        [ariaLabel]="'Menú de usuario'"
+        class="user-menu-btn"
+      ></p-button>
+
+      <p-tieredMenu
+        #menu
+        [model]="menuItems"
+        [popup]="true"
+        appendTo="body"
+      ></p-tieredMenu>
+    </div>
+  </ng-template>
+</p-toolbar>
