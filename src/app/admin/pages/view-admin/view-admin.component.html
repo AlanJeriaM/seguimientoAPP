@@ -18,53 +18,57 @@
         [showCurrentPageReport]="true"
         [loading]="loading"
       >
-        <ng-template pTemplate="caption">
-          <div class="grid">
-            <!-- Sección de búsqueda - ocupa toda la fila en móvil -->
-            <div class="col-12 lg:col-6 mb-2">
-              <div class="flex flex-wrap align-items-center gap-2">
-                <span class="p-input-icon-left flex-1 lg:flex-none" style="min-width: 200px;">
-                  <i class="pi pi-search"></i>
-                  <input
-                    pInputText
-                    type="text"
-                    [value]="searchText"
-                    (input)="buscarAdministradores($event)"
-                    placeholder="Buscar"
-                    class="w-full lg:w-auto"
-                  />
-                </span>
-                <p-button
-                  styleClass="p-button-text p-button-sm"
-                  icon="pi pi-filter-slash"
-                  (click)="limpiarFiltros()"
-                  pTooltip="Limpiar filtros"
-                ></p-button>
-              </div>
-            </div>
+<!-- En tu template, reemplaza la sección de búsqueda por esto: -->
+<ng-template pTemplate="caption">
+  <div class="grid">
+    <!-- Sección de búsqueda - reorganizada para móviles -->
+    <div class="col-12 lg:col-6 mb-2">
+      <div class="flex align-items-center gap-2">
+        <!-- Input de búsqueda - flex-1 para que tome el espacio disponible -->
+        <span class="p-input-icon-left flex-1 lg:flex-none" style="min-width: 200px;">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            [value]="searchText"
+            (input)="buscarAdministradores($event)"
+            placeholder="Buscar"
+            class="w-full lg:w-auto"
+          />
+        </span>
+        <!-- Botón limpiar filtros - ancho fijo para móviles -->
+        <p-button
+          styleClass="p-button-text p-button-sm flex-shrink-0"
+          icon="pi pi-filter-slash"
+          (click)="limpiarFiltros()"
+          pTooltip="Limpiar filtros"
+          [ngStyle]="{'width': 'auto', 'min-width': '2.5rem'}"
+        ></p-button>
+      </div>
+    </div>
 
-            <!-- Sección de botones - ahora con w-full en móviles -->
-            <div class="col-12 lg:col-6 mb-2">
-              <div class="flex flex-column lg:flex-row justify-content-start lg:justify-content-end gap-2">
-                <p-button
-                  pRipple
-                  label="Nuevo administrador"
-                  icon="pi pi-plus"
-                  styleClass="p-button-sm p-button-success w-full lg:w-auto"
-                  (click)="nuevoAdministrador()"
-                  pTooltip="Crear nuevo administrador"
-                ></p-button>
-                <p-button
-                  pRipple
-                  label="Actualizar"
-                  icon="pi pi-refresh"
-                  styleClass="p-button-sm p-button-info w-full lg:w-auto"
-                  (click)="actualizarDatos()"
-                ></p-button>
-              </div>
-            </div>
-          </div>
-        </ng-template>
+    <!-- Sección de botones - sin cambios -->
+    <div class="col-12 lg:col-6 mb-2">
+      <div class="flex flex-column lg:flex-row justify-content-start lg:justify-content-end gap-2">
+        <p-button
+          pRipple
+          label="Nuevo administrador"
+          icon="pi pi-plus"
+          styleClass="p-button-sm p-button-success w-full lg:w-auto"
+          (click)="nuevoAdministrador()"
+          pTooltip="Crear nuevo administrador"
+        ></p-button>
+        <p-button
+          pRipple
+          label="Actualizar"
+          icon="pi pi-refresh"
+          styleClass="p-button-sm p-button-info w-full lg:w-auto"
+          (click)="actualizarDatos()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</ng-template>
         <ng-template pTemplate="header">
           <tr>
             <th>ID</th>
@@ -143,16 +147,7 @@
             </td>
           </tr>
         </ng-template>
-        <ng-template pTemplate="loadingbody" let-columns>
-          <tr>
-            <td [attr.colspan]="6" class="text-center">
-              <div class="p-4">
-                <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
-                <p class="mt-2">Cargando administradores...</p>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
+        <!-- TEMPLATE DE LOADING REMOVIDO - PrimeNG ya maneja el spinner automáticamente -->
       </p-table>
     </p-card>
   </div>

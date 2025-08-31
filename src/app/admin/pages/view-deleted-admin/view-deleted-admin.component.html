@@ -18,37 +18,50 @@
         [showCurrentPageReport]="true"
         [loading]="loading"
       >
+
         <ng-template pTemplate="caption">
-          <div class="flex flex-wrap justify-content-between align-content-center">
-            <div class="mb-2 sm:mb-0">
-              <span class="p-input-icon-left">
-                <i class="pi pi-search"></i>
-                <input
-                  pInputText
-                  type="text"
-                  [value]="searchText"
-                  (input)="buscarAdministradores($event)"
-                  placeholder="Buscar"
-                />
-              </span>
-              <p-button
-                styleClass="p-button-text p-button-sm ml-2"
-                icon="pi pi-filter-slash"
-                (click)="limpiarFiltros()"
-                pTooltip="Limpiar filtros"
-              ></p-button>
+          <div class="grid">
+           
+            <div class="col-12 lg:col-6 mb-2">
+              <div class="flex align-items-center gap-2">
+                <!-- Input de búsqueda - flex-1 para que tome el espacio disponible -->
+                <span class="p-input-icon-left flex-1 lg:flex-none" style="min-width: 200px;">
+                  <i class="pi pi-search"></i>
+                  <input
+                    pInputText
+                    type="text"
+                    [value]="searchText"
+                    (input)="buscarAdministradores($event)"
+                    placeholder="Buscar"
+                    class="w-full lg:w-auto"
+                  />
+                </span>
+                <!-- Botón limpiar filtros - ancho fijo para móviles -->
+                <p-button
+                  styleClass="p-button-text p-button-sm flex-shrink-0"
+                  icon="pi pi-filter-slash"
+                  (click)="limpiarFiltros()"
+                  pTooltip="Limpiar filtros"
+                  [ngStyle]="{'width': 'auto', 'min-width': '2.5rem'}"
+                ></p-button>
+              </div>
             </div>
-            <div>
-              <p-button
-                pRipple
-                label="Actualizar"
-                icon="pi pi-refresh"
-                styleClass="p-button-sm p-button-info"
-                (click)="actualizarDatos()"
-              ></p-button>
+
+            <!-- Sección de botones -->
+            <div class="col-12 lg:col-6 mb-2">
+              <div class="flex flex-column lg:flex-row justify-content-start lg:justify-content-end gap-2">
+                <p-button
+                  pRipple
+                  label="Actualizar"
+                  icon="pi pi-refresh"
+                  styleClass="p-button-sm p-button-info w-full lg:w-auto"
+                  (click)="actualizarDatos()"
+                ></p-button>
+              </div>
             </div>
           </div>
         </ng-template>
+
         <ng-template pTemplate="header">
           <tr>
             <th>ID</th>
@@ -59,6 +72,7 @@
             <th style="width: 150px">Acciones</th>
           </tr>
         </ng-template>
+
         <ng-template pTemplate="body" let-admin>
           <tr>
             <td>
@@ -87,21 +101,21 @@
             </td>
             <td>
               <span class="p-column-title">Fecha Eliminación</span>
-              {{ admin.fecha_eliminacion | date:'dd/MM/yyyy HH:mm' }}
+              {{ admin.fecha_eliminacion ? (admin.fecha_eliminacion | date:'dd/MM/yyyy HH:mm') : 'N/A' }}
             </td>
             <td class="text-right" style="width: 150px">
-              <div class="flex">
+              <div class="flex flex-wrap gap-1 justify-content-end">
                 <p-button
                   pRipple
                   icon="pi pi-undo"
-                  styleClass="p-button-sm p-button-success mr-2"
+                  styleClass="p-button-sm p-button-success"
                   pTooltip="Reactivar administrador"
                   (click)="reactivarAdministrador(admin)"
                 ></p-button>
                 <p-button
                   pRipple
                   icon="pi pi-trash"
-                  styleClass="p-button-sm p-button-danger mr-2"
+                  styleClass="p-button-sm p-button-danger"
                   pTooltip="Eliminar permanentemente"
                   (click)="eliminarPermanentemente(admin)"
                 ></p-button>
@@ -109,6 +123,7 @@
             </td>
           </tr>
         </ng-template>
+
         <ng-template pTemplate="emptymessage" let-columns>
           <tr>
             <td [attr.colspan]="6" class="text-center">
@@ -120,16 +135,7 @@
             </td>
           </tr>
         </ng-template>
-        <ng-template pTemplate="loadingbody" let-columns>
-          <tr>
-            <td [attr.colspan]="6" class="text-center">
-              <div class="p-4">
-                <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
-                <p class="mt-2">Cargando administradores eliminados...</p>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
+        <!-- TEMPLATE DE LOADING REMOVIDO - PrimeNG ya maneja el spinner automáticamente -->
       </p-table>
     </p-card>
   </div>
