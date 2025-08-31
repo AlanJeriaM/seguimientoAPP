@@ -176,10 +176,8 @@ export class ViewDeletedAdminComponent implements OnInit, OnDestroy {
       showCancelButton: true,
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Sí, eliminar',
+      confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
-      focusCancel: true,
-      reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
         // Segundo diálogo de confirmación
