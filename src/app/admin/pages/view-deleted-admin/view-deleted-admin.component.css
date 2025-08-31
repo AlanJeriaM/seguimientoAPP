@@ -1,0 +1,146 @@
+/* Asegurar que SweetAlert2 aparezca sobre los modals de PrimeNG */
+::ng-deep .swal2-container {
+  z-index: 10000 !important;
+}
+
+::ng-deep .swal2-popup {
+  z-index: 10001 !important;
+}
+
+/* Botones de SweetAlert2 responsivos */
+::ng-deep .swal2-actions {
+  width: 100% !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+  padding: 0 0.5rem !important;
+}
+
+::ng-deep .swal2-confirm,
+::ng-deep .swal2-cancel,
+::ng-deep .swal2-deny {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+/* Para pantallas más grandes, mantener diseño horizontal */
+@media screen and (min-width: 640px) {
+  ::ng-deep .swal2-actions {
+    flex-direction: row !important;
+    width: auto !important;
+    padding: 0 !important;
+  }
+
+  ::ng-deep .swal2-confirm,
+  ::ng-deep .swal2-cancel,
+  ::ng-deep .swal2-deny {
+    width: auto !important;
+    margin: 0.3125em !important;
+    padding: 0.625em 1.5em !important;
+    font-size: 1em !important;
+  }
+}
+
+/* Asegurar responsividad completa de la tabla */
+::ng-deep .p-datatable {
+  width: 100%;
+}
+
+::ng-deep .p-datatable .p-datatable-wrapper {
+  overflow-x: auto;
+}
+
+/* Mejorar espaciado en dispositivos móviles */
+@media screen and (max-width: 768px) {
+  ::ng-deep .p-datatable .p-datatable-thead > tr > th,
+  ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.5rem !important;
+    font-size: 0.875rem;
+  }
+
+  ::ng-deep .p-button-sm {
+    padding: 0.375rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  ::ng-deep .p-tag-sm {
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+}
+
+/* Estilo para botones en móviles */
+@media screen and (max-width: 640px) {
+  ::ng-deep .p-card .p-card-body .p-card-content .flex.gap-2 {
+    flex-direction: column;
+  }
+
+  ::ng-deep .p-button.w-full {
+    width: 100% !important;
+  }
+}
+
+/* SOLUCIÓN ESPECÍFICA PARA EL INPUT Y BOTÓN DE BÚSQUEDA */
+@media screen and (max-width: 991px) {
+  /* Forzar que el contenedor de búsqueda mantenga flex-direction row */
+  ::ng-deep .grid .col-12:first-child .flex.align-items-center.gap-2 {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Input ocupa 75% del espacio */
+  ::ng-deep .grid .col-12:first-child .flex.align-items-center.gap-2 .p-input-icon-left {
+    flex: 3 !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+
+  /* Botón ocupa 25% del espacio */
+  ::ng-deep .grid .col-12:first-child .flex.align-items-center.gap-2 .p-button {
+    flex: 1 !important;
+    flex-shrink: 0 !important;
+    min-width: 2.5rem !important;
+    max-width: 4rem !important;
+  }
+
+  /* Asegurar que el input dentro del span sea 100% */
+  ::ng-deep .grid .col-12:first-child .flex.align-items-center.gap-2 .p-input-icon-left .p-inputtext {
+    width: 100% !important;
+  }
+}
+
+/* Asegurar que los inputs sean completamente responsivos */
+::ng-deep .p-inputtext {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+::ng-deep .p-input-icon-left > .p-inputtext {
+  padding-left: 2.5rem;
+}
+
+/* Espaciado mejorado para elementos flex */
+::ng-deep .flex.gap-2 {
+  gap: 0.5rem;
+}
+
+::ng-deep .flex.gap-1 {
+  gap: 0.25rem;
+}
+
+/* Mejorar la visualización de la paginación en móviles */
+@media screen and (max-width: 768px) {
+  ::ng-deep .p-paginator {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  ::ng-deep .p-paginator .p-paginator-pages {
+    flex-wrap: wrap;
+  }
+}

@@ -1,13 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AdminService } from '../../../core/services/admin/admin.service';
 import Swal from 'sweetalert2';
+import { TableLazyLoadEvent } from 'primeng/table';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-view-deleted-admin',
   templateUrl: './view-deleted-admin.component.html',
   styleUrls: ['./view-deleted-admin.component.css']
 })
-export class ViewDeletedAdminComponent implements OnInit {
+export class ViewDeletedAdminComponent implements OnInit, OnDestroy {
 
   administradoresEliminados: any[] = [];
   loading: boolean = false;
@@ -16,10 +19,27 @@ export class ViewDeletedAdminComponent implements OnInit {
   pageSize: number = 10;
   searchText: string = '';
 
-  constructor(private adminService: AdminService) {}
+  // Subject para manejar el debounce de búsqueda
+  private searchSubject = new Subject<string>();
+
+  constructor(private adminService: AdminService) {
+    // Configurar el debounce para la búsqueda
+    this.searchSubject.pipe(
+      debounceTime(500), // Esperar 500ms después de que el usuario deje de escribir
+      distinctUntilChanged() // Solo proceder si el valor cambió
+    ).subscribe(searchValue => {
+      this.searchText = searchValue;
+      this.cargarAdministradoresEliminados(1, searchValue);
+    });
+  }
 
   ngOnInit() {
     this.cargarAdministradoresEliminados();
+  }
+
+  ngOnDestroy() {
+    // Completar el subject para evitar memory leaks
+    this.searchSubject.complete();
   }
 
   cargarAdministradoresEliminados(page: number = 1, search: string = '') {
@@ -36,6 +56,15 @@ export class ViewDeletedAdminComponent implements OnInit {
 
           console.log('Administradores eliminados cargados:', this.administradoresEliminados.length);
           console.log('Total registros eliminados:', this.totalRecords);
+
+          // Debug: mostrar datos de cada administrador eliminado
+          this.administradoresEliminados.forEach((admin, index) => {
+            console.log(`Admin eliminado ${index + 1}:`, {
+              id: admin.id,
+              nombre: admin.nombre_usuario,
+              fecha_eliminacion: admin.fecha_eliminacion
+            });
+          });
         } else {
           console.error('Error:', resp.msj);
           this.administradoresEliminados = [];
@@ -61,9 +90,11 @@ export class ViewDeletedAdminComponent implements OnInit {
     });
   }
 
+  // Método mejorado para la búsqueda con debounce
   buscarAdministradores(event: any) {
     const searchValue = event.target.value;
-    this.cargarAdministradoresEliminados(1, searchValue);
+    // En lugar de llamar directamente a cargar datos, enviamos el valor al Subject
+    this.searchSubject.next(searchValue);
   }
 
   limpiarFiltros() {
@@ -72,6 +103,8 @@ export class ViewDeletedAdminComponent implements OnInit {
     if (searchInput) {
       searchInput.value = '';
     }
+    // Limpiar también el subject y cargar datos limpios inmediatamente
+    this.searchSubject.next('');
     this.cargarAdministradoresEliminados(1, '');
   }
 
@@ -214,17 +247,31 @@ export class ViewDeletedAdminComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error:', error);
+        // Manejar diferentes tipos de errores
+        let mensajeError = 'Error de conexión con el servidor';
+
+        if (error.status === 400) {
+          mensajeError = error.error?.msj || 'Datos inválidos';
+        } else if (error.status === 404) {
+          mensajeError = error.error?.msj || 'Administrador no encontrado';
+        } else if (error.status === 500) {
+          mensajeError = error.error?.msj || 'Error interno del servidor';
+        }
+
         Swal.fire({
           icon: 'error',
           title: 'Error de conexión',
-          text: 'No se pudo conectar con el servidor. Inténtalo de nuevo.'
+          text: mensajeError,
+          confirmButtonText: 'Entendido'
         });
       }
     });
   }
 
-  onPageChange(event: any) {
-    const page = (event.first / event.rows) + 1;
+  // Manejo de paginación actualizado igual que en view-admin
+  onPageChange(event: TableLazyLoadEvent) {
+    console.log('Evento de paginación:', event);
+    const page = ((event.first || 0) / (event.rows || this.pageSize)) + 1;
     this.cargarAdministradoresEliminados(page, this.searchText);
   }
 
