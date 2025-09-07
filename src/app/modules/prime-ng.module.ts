@@ -40,6 +40,12 @@ import { TagModule } from 'primeng/tag';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DialogModule } from 'primeng/dialog';
 import { ToolbarModule } from 'primeng/toolbar';
+import { TabViewModule } from 'primeng/tabview';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { SliderModule } from 'primeng/slider';
+import { DividerModule } from 'primeng/divider';
 
 
 
@@ -83,7 +89,12 @@ const primeNgModules = [
   SelectButtonModule,
   DialogModule,
   ToolbarModule,
-
+  TabViewModule,
+  ConfirmDialogModule,
+  OverlayPanelModule,
+  ProgressBarModule,
+  SliderModule,
+  DividerModule
 
   // PaginatorModule
 ]

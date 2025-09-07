@@ -46,7 +46,8 @@ export class SidebarComponent {
       },
       { label: 'Encuestas', icon: 'pi pi-book', items: [
           { label: 'Crear encuesta', icon: 'pi pi-fw pi-bookmark', routerLink: '/admin/create-encuesta' },
-          { label: 'Listado Encuestas', icon: 'pi pi-fw pi-bookmark-fill', routerLink: '/admin/view-encuesta' }
+          { label: 'Listado encuestas', icon: 'pi pi-fw pi-bookmark-fill', routerLink: '/admin/view-encuesta' },
+          { label: 'Resultados y analíticas', icon: 'pi pi-fw pi-chart-bar', routerLink: '/admin/view-encuestas-resultados' }
         ]
       }
     ];

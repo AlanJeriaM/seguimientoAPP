@@ -143,3 +143,10 @@
     padding: 0.5rem 1.25rem !important;
   }
 }
+
+::ng-deep .my-swal-actions {
+  flex-direction: column-reverse !important; /* En móviles: confirmar arriba */
+}
+
+
+

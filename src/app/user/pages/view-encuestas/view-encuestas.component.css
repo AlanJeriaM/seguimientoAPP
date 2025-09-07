@@ -1,0 +1,343 @@
+.encuestas-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.page-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-color-secondary);
+  margin: 0;
+}
+
+/* Controles y filtros */
+.controls-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  flex: 1;
+  min-width: 250px;
+}
+
+.filter-wrapper {
+  min-width: 200px;
+}
+
+::ng-deep .filter-dropdown {
+  width: 100%;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+.loading-text {
+  font-size: 1.1rem;
+  color: var(--text-color-secondary);
+  margin: 0;
+}
+
+/* Grid de encuestas */
+.encuestas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Empty state */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  color: var(--text-color);
+  margin: 1rem 0 0.5rem 0;
+}
+
+.empty-message {
+  font-size: 1rem;
+  color: var(--text-color-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Card de encuesta */
+.encuesta-card {
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+/* Encuesta destacada */
+.encuesta-destacada {
+  animation: destacar 2s ease-in-out;
+}
+
+@keyframes destacar {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+  }
+}
+
+.encuesta-destacada ::ng-deep .p-card {
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 25px rgba(33, 150, 243, 0.2);
+}
+
+::ng-deep .encuesta-card .p-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .encuesta-card .p-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+::ng-deep .encuesta-card .p-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* Header de la card */
+.card-header {
+  padding: 1.5rem 1.5rem 0 1.5rem;
+}
+
+.header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.encuesta-titulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.3;
+  flex: 1;
+}
+
+/* Estados */
+.estado-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.estado-no-iniciada {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.estado-en-progreso {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.estado-completada {
+  background-color: #e8f5e8;
+  color: #388e3c;
+}
+
+/* Contenido de la card */
+.card-content {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.encuesta-descripcion {
+  color: var(--text-color-secondary);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.encuesta-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+}
+
+/* Progreso */
+.progress-section {
+  margin-top: auto;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progress-label {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.progress-percentage {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+::ng-deep .progress-bar .p-progressbar {
+  height: 8px;
+  border-radius: 4px;
+}
+
+::ng-deep .progress-bar .p-progressbar-value {
+  border-radius: 4px;
+}
+
+.progress-note {
+  color: var(--text-color-secondary);
+  font-style: italic;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+/* Encuesta completada */
+.completed-section {
+  margin-top: auto;
+}
+
+.completed-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.completed-text {
+  font-weight: 600;
+  color: var(--green-500);
+}
+
+.completion-date {
+  color: var(--text-color-secondary);
+  font-style: italic;
+}
+
+/* Footer de la card */
+.card-footer {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .encuestas-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .controls-section {
+    flex-direction: column;
+  }
+
+  .search-wrapper,
+  .filter-wrapper {
+    min-width: unset;
+  }
+
+  .encuestas-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .header-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .estado-badge {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .encuestas-container {
+    padding: 0.5rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card-content {
+    padding: 1rem;
+  }
+
+  .card-footer {
+    padding: 0 1rem 1rem 1rem;
+  }
+}

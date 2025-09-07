@@ -1,21 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { NotificacionService, Notificacion } from '../../../core/services/notificacion/notificacion.service';
 import { MenuItem } from 'primeng/api';
+import { OverlayPanel } from 'primeng/overlaypanel';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-navbar-shared',
   templateUrl: './navbar-shared.component.html',
   styleUrls: ['./navbar-shared.component.css']
 })
-export class NavbarSharedComponent implements OnInit {
+export class NavbarSharedComponent implements OnInit, OnDestroy {
+  @ViewChild('notificationPanel') notificationPanel!: OverlayPanel;
 
   userName: string = '';
   menuItems: MenuItem[] = [];
 
+  // Propiedades para notificaciones
+  notificaciones: Notificacion[] = [];
+  contadorNoLeidas: number = 0;
+  cargandoNotificaciones: boolean = false;
+
+  private destroy$ = new Subject<void>();
+
   constructor(
     private router: Router,
     private authService: AuthService,
+    private notificacionService: NotificacionService
   ) { }
 
   ngOnInit(): void {
@@ -33,6 +45,28 @@ export class NavbarSharedComponent implements OnInit {
         command: () => this.logOut()
       }
     ];
+
+    // Solo inicializar notificaciones para usuarios
+    if (this.isUser()) {
+      this.inicializarNotificaciones();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private inicializarNotificaciones(): void {
+    // Suscribirse al contador de notificaciones no leídas
+    this.notificacionService.contadorNoLeidas$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(contador => {
+        this.contadorNoLeidas = contador;
+      });
+
+    // Inicializar el servicio
+    this.notificacionService.inicializar();
   }
 
   // Método auxiliar para obtener la ruta de inicio
@@ -59,5 +93,110 @@ export class NavbarSharedComponent implements OnInit {
   logOut() {
     this.authService.logOut();
     this.router.navigate(['auth']);
+  }
+
+  // Métodos para notificaciones
+  toggleNotificaciones(event: Event): void {
+    if (this.notificationPanel.overlayVisible) {
+      this.notificationPanel.hide();
+    } else {
+      this.cargarNotificaciones();
+      this.notificationPanel.toggle(event);
+    }
+  }
+
+  private cargarNotificaciones(): void {
+    this.cargandoNotificaciones = true;
+    this.notificacionService.obtenerNotificaciones(1, 10).subscribe({
+      next: (response) => {
+        if (response.ok) {
+          this.notificaciones = response.data.notificaciones;
+        }
+        this.cargandoNotificaciones = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar notificaciones:', error);
+        this.cargandoNotificaciones = false;
+      }
+    });
+  }
+
+  abrirNotificacion(notificacion: Notificacion): void {
+    // Marcar como leída si no lo está
+    if (!notificacion.leida) {
+      this.notificacionService.marcarComoLeida(notificacion.id).subscribe({
+        next: () => {
+          notificacion.leida = true;
+          this.notificacionService.decrementarContador();
+        },
+        error: (error) => {
+          console.error('Error al marcar notificación como leída:', error);
+        }
+      });
+    }
+
+    // Cerrar panel y navegar según el tipo de notificación
+    this.notificationPanel.hide();
+
+    if (notificacion.tipo === 'NUEVA_ENCUESTA') {
+      // Navegar a view-encuestas y resaltar la encuesta específica
+      this.router.navigate(['/user/view-encuestas'], {
+        queryParams: { encuesta_id: notificacion.encuesta_id, destacar: true }
+      });
+    }
+  }
+
+  marcarTodasComoLeidas(): void {
+    const notificacionesNoLeidas = this.notificaciones.filter(n => !n.leida);
+
+    notificacionesNoLeidas.forEach(notificacion => {
+      this.notificacionService.marcarComoLeida(notificacion.id).subscribe({
+        next: () => {
+          notificacion.leida = true;
+        },
+        error: (error) => {
+          console.error('Error al marcar notificación como leída:', error);
+        }
+      });
+    });
+
+    // Actualizar contador
+    this.notificacionService.actualizarContadorNoLeidas();
+  }
+
+  verTodasLasNotificaciones(): void {
+    this.notificationPanel.hide();
+    // Podrías crear una página dedicada para ver todas las notificaciones
+    // this.router.navigate(['/user/notificaciones']);
+  }
+
+  getNotificationIcon(tipo: string): string {
+    switch (tipo) {
+      case 'NUEVA_ENCUESTA':
+        return 'pi pi-file-plus';
+      case 'RECORDATORIO':
+        return 'pi pi-clock';
+      case 'ENCUESTA_COMPLETADA':
+        return 'pi pi-check-circle';
+      case 'SISTEMA':
+        return 'pi pi-info-circle';
+      default:
+        return 'pi pi-bell';
+    }
+  }
+
+  getNotificationIconClass(tipo: string): string {
+    switch (tipo) {
+      case 'NUEVA_ENCUESTA':
+        return 'text-blue-500';
+      case 'RECORDATORIO':
+        return 'text-orange-500';
+      case 'ENCUESTA_COMPLETADA':
+        return 'text-green-500';
+      case 'SISTEMA':
+        return 'text-purple-500';
+      default:
+        return 'text-gray-500';
+    }
   }
 }

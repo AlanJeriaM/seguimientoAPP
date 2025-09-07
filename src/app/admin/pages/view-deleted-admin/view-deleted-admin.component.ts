@@ -165,10 +165,10 @@ export class ViewDeletedAdminComponent implements OnInit, OnDestroy {
           <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
             <p><strong>Nombre:</strong> ${admin.nombre_completo}</p>
             <p><strong>Correo:</strong> ${admin.email_usuario}</p>
-            <p><strong>Rol:</strong> ${admin.rol}</p>
+            <p><strong>Rol:</strong> ${admin.rol === 'ADMIN-USER' ? 'Administrador' : admin.rol}</p>
           </div>
           <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px;">
-            <p style="margin: 0; color: #856404;"><strong>ADVERTENCIA:</strong> Esta acción es IRREVERSIBLE.</p>
+            <p style="margin: 0; color: #856404;"><strong>ADVERTENCIA:</strong> Esta acción no se puede deshacer</p>
           </div>
         </div>
       `,
@@ -225,8 +225,7 @@ export class ViewDeletedAdminComponent implements OnInit, OnDestroy {
             title: 'Administrador eliminado permanentemente',
             html: `
               <div style="text-align: left;">
-                <p><strong>${admin.nombre_completo}</strong> ha sido eliminado permanentemente del sistema.</p>
-                <p><small>Esta acción no se puede deshacer.</small></p>
+                <p><strong>${admin.nombre_completo}</strong> ha sido eliminado correctamente del sistema</p>
               </div>
             `,
             timer: 3000,

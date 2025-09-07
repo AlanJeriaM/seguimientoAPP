@@ -410,7 +410,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
               title: 'Administrador actualizado',
               text: 'Los datos han sido actualizados correctamente',
               timer: 2000,
-              showConfirmButton: false
+              showConfirmButton: false,
             });
             this.displayDialog = false;
             this.cargarAdministradores(this.currentPage, this.searchText);
@@ -441,7 +441,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
               title: 'Administrador creado',
               text: 'El nuevo administrador ha sido creado correctamente',
               timer: 2000,
-              showConfirmButton: false
+              showConfirmButton: false,
             });
             this.displayDialog = false;
             this.cargarAdministradores(this.currentPage, this.searchText);
@@ -488,7 +488,11 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      customClass: {
+        actions: 'my-swal-actions' // clase personalizada para manejar orden
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         this.adminService.desactivarAdministrador(admin.id).subscribe({
@@ -530,7 +534,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
         <div style="text-align: left;">
           <p><strong>Nombre:</strong> ${admin.nombre_completo}</p>
           <p><strong>Correo:</strong> ${admin.email_usuario}</p>
-          <p><strong>Rol:</strong> ${admin.rol}</p>
+          <p><strong>Rol:</strong> ${admin.rol === 'ADMIN-USER' ? 'Administrador' : admin.rol}</p>
           <p><strong>Fecha de registro:</strong> ${new Date(admin.fecha_registro).toLocaleDateString('es-ES')}</p>
         </div>
       `,

@@ -21,7 +21,7 @@
 
         <ng-template pTemplate="caption">
           <div class="grid">
-           
+
             <div class="col-12 lg:col-6 mb-2">
               <div class="flex align-items-center gap-2">
                 <!-- Input de búsqueda - flex-1 para que tome el espacio disponible -->
@@ -65,7 +65,7 @@
         <ng-template pTemplate="header">
           <tr>
             <th>ID</th>
-            <th>Nombre Completo</th>
+            <th>Nombre</th>
             <th>Correo</th>
             <th>Rol</th>
             <th>Fecha Eliminación</th>
@@ -80,7 +80,7 @@
               {{ admin.id }}
             </td>
             <td>
-              <span class="p-column-title">Nombre Completo</span>
+              <span class="p-column-title">Nombre</span>
               <div>
                 {{ admin.nombre_completo }}
                 <br>
@@ -94,17 +94,17 @@
             <td>
               <span class="p-column-title">Rol</span>
               <p-tag
-                [value]="admin.rol"
-                [severity]="admin.rol === 'ADMIN-USER' ? 'info' : 'warning'"
-                styleClass="p-tag-sm"
-              ></p-tag>
+              [value]="admin.rol === 'ADMIN-USER' ? 'Administrador' : admin.rol"
+              [severity]="admin.rol === 'ADMIN-USER' ? 'info' : 'warning'"
+              styleClass="p-tag-sm"
+            ></p-tag>
             </td>
             <td>
               <span class="p-column-title">Fecha Eliminación</span>
               {{ admin.fecha_eliminacion ? (admin.fecha_eliminacion | date:'dd/MM/yyyy HH:mm') : 'N/A' }}
             </td>
             <td class="text-right" style="width: 150px">
-              <div class="flex flex-wrap gap-1 justify-content-end">
+              <div class="flex flex-wrap gap-1 justify-content-start">
                 <p-button
                   pRipple
                   icon="pi pi-undo"

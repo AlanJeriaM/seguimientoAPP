@@ -8,10 +8,11 @@ import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.co
 import { UserRoutingModule } from './user-routing.module';
 import { PrimeNgModule } from '../modules/prime-ng.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { EncuestaCompletadaComponent } from './pages/encuesta-completada/encuesta-completada.component';
 import { SharedModule } from '../shared/shared.module';
+import { ResponderEncuestaComponent } from './pages/responder-encuesta/responder-encuesta.component';
 
 
 
@@ -20,7 +21,8 @@ import { SharedModule } from '../shared/shared.module';
     MainComponent,
     MiProfileComponent,
     ViewEncuestasComponent,
-    EncuestaCompletadaComponent
+    EncuestaCompletadaComponent,
+    ResponderEncuestaComponent
   ],
   imports: [
     CommonModule,
@@ -28,10 +30,12 @@ import { SharedModule } from '../shared/shared.module';
     UserRoutingModule,
     PrimeNgModule,
     ReactiveFormsModule,
+    FormsModule,
     NgbModule,
   ],
   providers: [
     MessageService,
+    ConfirmationService,
   ]
 })
 export class UserModule { }
