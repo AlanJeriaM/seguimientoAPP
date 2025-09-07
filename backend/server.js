@@ -7,6 +7,8 @@ const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
 const dashboardRoutes = require('./src/routes/dashboard');
 const adminRoutes = require('./src/routes/admins');
+const encuestaRoutes = require('./src/routes/encuestas');
+const respuestaRoutes = require('./src/routes/respuestas');
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admins', adminRoutes);
+app.use('/api/encuestas', encuestaRoutes);
+app.use('/api/respuestas', respuestaRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,40 +1,143 @@
-<!-- <div class="p-grid p-justify-center">
-  <div class="p-col-12 p-md-8 p-lg-6">
-    <p-card>
-      <ng-template pTemplate="header">
-        <h1 class="text-center p-mb-4">{{ surveyTitle }}</h1>
-      </ng-template>
-
-      <div class="p-fluid">
-        <div *ngFor="let question of questions; let i = index" class="mt-4">
-          <p-fieldset [legend]="'Pregunta ' + (i + 1)">
-            <p>{{ question.text }}</p>
-
-
-            <div *ngIf="question.type === 'multiple'">
-              <div *ngFor="let option of question.options; let j = index" class="p-field mt-2">
-                <p-radioButton
-                  name="option-{{ i }}"
-                  [(ngModel)]="userResponses[i]"
-                  [value]="option"
-                  inputId="option-{{ i }}-{{ j }}"
-                ></p-radioButton>
-                <label for="option-{{ i }}-{{ j }}">{{ option }}</label>
-              </div>
-            </div>
-          </p-fieldset>
-        </div>
-      </div>
-
-      <div class="text-right mr-2 mt-4">
-        <p-button
-          pRipple
-          label="Enviar respuestas"
-          (onClick)="submitResponses()"
-          icon="pi pi-check"
-          styleClass="p-button-success"
-        ></p-button>
-      </div>
-    </p-card>
+<div class="encuestas-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h2 class="page-title">
+      <i class="pi pi-file-text mr-2"></i>
+      Mis Encuestas
+    </h2>
+    <p class="page-subtitle">Completa las encuestas disponibles y contribuye con tu feedback</p>
   </div>
-</div> -->
+
+  <!-- Controles y filtros -->
+  <div class="controls-section">
+    <div class="search-wrapper">
+      <span class="p-input-icon-left w-full">
+        <i class="pi pi-search"></i>
+        <input 
+          type="text" 
+          pInputText 
+          placeholder="Buscar encuestas..." 
+          [(ngModel)]="searchText"
+          class="w-full"
+        />
+      </span>
+    </div>
+    
+    <div class="filter-wrapper">
+      <p-dropdown 
+        [options]="estados" 
+        [(ngModel)]="estadoFiltro" 
+        optionLabel="label" 
+        optionValue="value"
+        placeholder="Filtrar por estado"
+        [showClear]="false"
+        class="filter-dropdown"
+      ></p-dropdown>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+    <p class="loading-text">Cargando encuestas disponibles...</p>
+  </div>
+
+  <!-- Lista de encuestas -->
+  <div *ngIf="!loading" class="encuestas-grid">
+    <!-- Mensaje cuando no hay encuestas -->
+    <div *ngIf="encuestasFiltradas.length === 0" class="empty-state">
+      <i class="pi pi-inbox text-6xl text-400"></i>
+      <h3 class="empty-title">No hay encuestas disponibles</h3>
+      <p class="empty-message">
+        <span *ngIf="searchText || estadoFiltro !== 'TODAS'">
+          No se encontraron encuestas que coincidan con tus filtros.
+        </span>
+        <span *ngIf="!searchText && estadoFiltro === 'TODAS'">
+          En este momento no tienes encuestas pendientes por completar.
+        </span>
+      </p>
+    </div>
+
+    <!-- Cards de encuestas -->
+    <div *ngFor="let encuesta of encuestasFiltradas" 
+         class="encuesta-card"
+         [ngClass]="{'encuesta-destacada': isEncuestaDestacada(encuesta)}">
+      <p-card styleClass="h-full">
+        <!-- Header de la card -->
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <div class="header-info">
+              <h4 class="encuesta-titulo">{{ encuesta.titulo }}</h4>
+              <span 
+                [class]="'estado-badge ' + getEstadoBadgeClass(encuesta.estado_usuario || 'NO_INICIADA')"
+              >
+                {{ getEstadoLabel(encuesta.estado_usuario || 'NO_INICIADA') }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+
+        <!-- Contenido de la card -->
+        <div class="card-content">
+          <p class="encuesta-descripcion">{{ encuesta.descripcion }}</p>
+          
+          <div class="encuesta-meta">
+            <div class="meta-item">
+              <i class="pi pi-clock text-blue-500"></i>
+              <span>{{ encuesta.tiempo_estimado }} minutos</span>
+            </div>
+            <div class="meta-item">
+              <i class="pi pi-calendar text-green-500"></i>
+              <span>Hasta: {{ encuesta.fecha_fin | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+          <!-- Barra de progreso para encuestas en progreso -->
+          <div *ngIf="encuesta.estado_usuario === 'EN_PROGRESO'" class="progress-section">
+            <div class="progress-info">
+              <span class="progress-label">Progreso:</span>
+              <span class="progress-percentage">{{ encuesta.progreso }}%</span>
+            </div>
+            <p-progressBar 
+              [value]="encuesta.progreso" 
+              [showValue]="false"
+              styleClass="progress-bar"
+            ></p-progressBar>
+            <small class="progress-note">
+              Última respuesta: {{ encuesta.ultima_respuesta | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+          </div>
+
+          <!-- Mensaje para encuestas completadas -->
+          <div *ngIf="encuesta.estado_usuario === 'COMPLETADA'" class="completed-section">
+            <div class="completed-info">
+              <i class="pi pi-check-circle text-green-500 mr-2"></i>
+              <span class="completed-text">¡Encuesta completada!</span>
+            </div>
+            <small class="completion-date">
+              Completada el: {{ encuesta.ultima_respuesta | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Footer de la card -->
+        <ng-template pTemplate="footer">
+          <div class="card-footer">
+            <p-button 
+              [label]="getBotonTexto(encuesta)"
+              [icon]="getBotonIcono(encuesta)"
+              [severity]="getBotonSeverity(encuesta)"
+              (click)="encuesta.estado_usuario === 'EN_PROGRESO' ? continuarEncuesta(encuesta) : 
+                       encuesta.estado_usuario === 'COMPLETADA' ? verResultados(encuesta) : 
+                       iniciarEncuesta(encuesta)"
+              styleClass="w-full"
+            ></p-button>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para mensajes -->
+<p-toast></p-toast>

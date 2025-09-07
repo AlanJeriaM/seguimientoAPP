@@ -5,6 +5,7 @@ import { ViewUsersComponent } from './pages/view-users/view-users.component';
 import { ViewDeletedUsersComponent } from './pages/view-deleted-users/view-deleted-users.component';
 import { CreateEncuestaComponent } from './pages/create-encuesta/create-encuesta.component';
 import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.component';
+import { ViewEncuestasResultadosComponent } from './pages/view-encuestas-resultados/view-encuestas-resultados.component';
 import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
 import { SharedDashboardComponent } from '../shared/pages/shared-dashboard/shared-dashboard.component';
 import { ViewAdminComponent } from './pages/view-admin/view-admin.component';
@@ -21,7 +22,9 @@ const routes: Routes = [
         { path: 'view-admin', component: ViewAdminComponent },
         { path: 'view-deleted-admin', component: ViewDeletedAdminComponent },
         { path: 'create-encuesta', component: CreateEncuestaComponent},
+        { path: 'editar-encuesta/:id', component: CreateEncuestaComponent},
         { path: 'view-encuesta', component: ViewEncuestasComponent},
+        { path: 'view-encuestas-resultados', component: ViewEncuestasResultadosComponent},
         { path: 'dashboard', component: SharedDashboardComponent},
         { path: '**', redirectTo: 'dashboard' }
       ],

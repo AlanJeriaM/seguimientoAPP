@@ -51,6 +51,7 @@
 .navbar-end {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
 }
 
 /* Botón de usuario */
@@ -83,6 +84,138 @@
       display: none;
     }
   }
+}
+
+/* Notificaciones */
+.notification-wrapper {
+  position: relative;
+}
+
+::ng-deep .notification-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+::ng-deep .notification-badge {
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.75rem;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Panel de notificaciones */
+.notification-panel {
+  padding: 0;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface-ground);
+}
+
+.notification-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.notification-content {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.empty-notifications {
+  text-align: center;
+  padding: 2rem;
+}
+
+.loading-notifications {
+  text-align: center;
+  padding: 2rem;
+}
+
+.notification-item {
+  display: flex;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--surface-border);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.notification-item:hover {
+  background-color: var(--surface-hover);
+}
+
+.notification-item.unread {
+  background-color: var(--highlight-bg);
+  border-left: 3px solid var(--primary-color);
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--surface-100);
+}
+
+.notification-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-item-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+  line-height: 1.3;
+}
+
+.notification-message {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.notification-time {
+  font-size: 0.75rem;
+}
+
+.notification-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.unread-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+}
+
+.notification-footer {
+  padding: 0.75rem;
+  border-top: 1px solid var(--surface-border);
+  background: var(--surface-ground);
 }
 
 /* Mejoras adicionales para el menú */

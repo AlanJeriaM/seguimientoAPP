@@ -33,6 +33,9 @@ const connectDB = async () => {
     // Cambiado a false para evitar crear índices duplicados
     await sequelize.sync({ alter: false }); // solo crea tablas que no existen
     console.log('Modelos sincronizados con la base de datos');
+    
+    // Importar asociaciones después de la sincronización
+    require('./associations');
   } catch (error) {
     console.error('Error al conectar con la base de datos:', error);
     process.exit(1);

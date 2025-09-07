@@ -18,6 +18,80 @@
   <!-- Contenido derecho -->
   <ng-template pTemplate="end">
     <div class="navbar-end" *ngIf="!isAuth()">
+      <!-- Campanita de notificaciones solo para usuarios -->
+      <div *ngIf="isUser()" class="notification-wrapper">
+        <p-button
+          icon="pi pi-bell"
+          [rounded]="true"
+          [outlined]="true"
+          severity="info"
+          (click)="toggleNotificaciones($event)"
+          [ariaLabel]="'Notificaciones'"
+          class="notification-btn"
+          [badge]="contadorNoLeidas > 0 ? contadorNoLeidas.toString() : undefined"
+          badgeClass="notification-badge"
+        ></p-button>
+
+        <p-overlayPanel #notificationPanel [showCloseIcon]="true" [style]="{'width': '400px', 'max-height': '500px'}" appendTo="body">
+          <ng-template pTemplate="content">
+            <div class="notification-panel">
+              <div class="notification-header">
+                <h4 class="notification-title">Notificaciones</h4>
+                <p-button
+                  *ngIf="contadorNoLeidas > 0"
+                  label="Marcar todas como leídas"
+                  icon="pi pi-check-circle"
+                  [text]="true"
+                  size="small"
+                  (click)="marcarTodasComoLeidas()"
+                ></p-button>
+              </div>
+
+              <div class="notification-content" *ngIf="!cargandoNotificaciones; else loadingTemplate">
+                <div *ngIf="notificaciones.length === 0" class="empty-notifications">
+                  <i class="pi pi-bell-slash text-4xl text-400"></i>
+                  <p class="text-400 mt-2">No tienes notificaciones</p>
+                </div>
+
+                <div *ngFor="let notificacion of notificaciones"
+                     class="notification-item"
+                     [ngClass]="{'unread': !notificacion.leida}"
+                     (click)="abrirNotificacion(notificacion)">
+                  <div class="notification-icon">
+                    <i [class]="getNotificationIcon(notificacion.tipo)" [ngClass]="getNotificationIconClass(notificacion.tipo)"></i>
+                  </div>
+                  <div class="notification-body">
+                    <h5 class="notification-item-title">{{ notificacion.titulo }}</h5>
+                    <p class="notification-message">{{ notificacion.mensaje | slice:0:100 }}{{ notificacion.mensaje.length > 100 ? '...' : '' }}</p>
+                    <small class="notification-time text-400">{{ notificacion.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</small>
+                  </div>
+                  <div class="notification-actions" *ngIf="!notificacion.leida">
+                    <span class="unread-indicator"></span>
+                  </div>
+                </div>
+              </div>
+
+              <ng-template #loadingTemplate>
+                <div class="loading-notifications">
+                  <p-progressSpinner [style]="{'width': '30px', 'height': '30px'}"></p-progressSpinner>
+                  <p class="text-center mt-2">Cargando notificaciones...</p>
+                </div>
+              </ng-template>
+
+              <div class="notification-footer" *ngIf="notificaciones.length > 0">
+                <p-button
+                  label="Ver todas"
+                  icon="pi pi-list"
+                  [text]="true"
+                  class="w-full"
+                  (click)="verTodasLasNotificaciones()"
+                ></p-button>
+              </div>
+            </div>
+          </ng-template>
+        </p-overlayPanel>
+      </div>
+
       <!-- Avatar y menú solo cuando no es auth -->
       <p-button
         icon="pi pi-user"

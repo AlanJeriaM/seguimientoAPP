@@ -14,8 +14,9 @@ import { SharedModule } from '../shared/shared.module';
 import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
 import { ViewAdminComponent } from './pages/view-admin/view-admin.component';
 import { ViewDeletedAdminComponent } from './pages/view-deleted-admin/view-deleted-admin.component';
+import { ViewEncuestasResultadosComponent } from './pages/view-encuestas-resultados/view-encuestas-resultados.component';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 
 @NgModule({
@@ -28,6 +29,7 @@ import { MessageService } from 'primeng/api';
     MiProfileComponent,
     ViewAdminComponent,
     ViewDeletedAdminComponent,
+    ViewEncuestasResultadosComponent,
   ],
   imports: [
     CommonModule,
@@ -38,6 +40,6 @@ import { MessageService } from 'primeng/api';
     ReactiveFormsModule,
     ToastModule,
   ],
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class AdminModule { }

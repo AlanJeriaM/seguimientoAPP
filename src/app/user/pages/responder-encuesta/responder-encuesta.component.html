@@ -1,0 +1,244 @@
+<div class="responder-encuesta-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+    <h3>Cargando encuesta...</h3>
+    <p>Por favor espera mientras preparamos las preguntas</p>
+  </div>
+
+  <!-- Encuesta cargada -->
+  <div *ngIf="!loading && encuesta" class="encuesta-wrapper">
+    <!-- Header con información de la encuesta -->
+    <div class="encuesta-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h2 class="encuesta-titulo">
+            <i class="pi pi-file-text mr-2"></i>
+            {{ encuesta.titulo }}
+          </h2>
+          <p class="encuesta-descripcion">{{ encuesta.descripcion }}</p>
+          <div class="encuesta-meta">
+            <span class="meta-item">
+              <i class="pi pi-clock text-blue-500"></i>
+              Tiempo estimado: {{ encuesta.tiempo_estimado }} minutos
+            </span>
+            <span class="meta-item" *ngIf="encuesta.es_anonima">
+              <i class="pi pi-eye-slash text-green-500"></i>
+              Respuesta anónima
+            </span>
+          </div>
+        </div>
+        <div class="action-section">
+          <p-button 
+            label="Salir" 
+            icon="pi pi-times"
+            [outlined]="true"
+            severity="secondary"
+            (click)="salir()"
+          ></p-button>
+        </div>
+      </div>
+
+      <!-- Barra de progreso -->
+      <div class="progress-section">
+        <div class="progress-info">
+          <span class="progress-text">Pregunta {{ getPreguntaActualTexto() }}</span>
+          <span class="progress-percentage">{{ progreso }}% completado</span>
+        </div>
+        <p-progressBar 
+          [value]="progreso" 
+          [showValue]="false"
+          styleClass="progress-bar"
+        ></p-progressBar>
+      </div>
+    </div>
+
+    <!-- Formulario de respuestas -->
+    <form [formGroup]="formularioRespuestas" (ngSubmit)="enviarRespuestas()" *ngIf="formularioRespuestas">
+      <div class="pregunta-container">
+        <!-- Pregunta actual -->
+        <div 
+          *ngIf="encuesta.preguntas[preguntaActual] as pregunta" 
+          class="pregunta-card active"
+        >
+          <div class="pregunta-header">
+            <div class="pregunta-numero">Pregunta {{ preguntaActual + 1 }}</div>
+            <span class="pregunta-requerida" *ngIf="pregunta.es_requerida">*</span>
+          </div>
+
+          <h3 class="pregunta-texto">{{ pregunta.texto }}</h3>
+
+          <div class="respuesta-input" [formGroupName]="'respuestas'">
+            <div [formGroupName]="preguntaActual">
+              
+              <!-- TEXTO CORTO -->
+              <div *ngIf="pregunta.tipo === 'TEXTO_CORTO'">
+                <input 
+                  type="text" 
+                  pInputText 
+                  formControlName="respuesta"
+                  placeholder="Escribe tu respuesta..."
+                  class="w-full"
+                  [class.ng-invalid]="getPreguntaControl(preguntaActual).get('respuesta')?.invalid && getPreguntaControl(preguntaActual).get('respuesta')?.touched"
+                />
+              </div>
+
+              <!-- TEXTO LARGO -->
+              <div *ngIf="pregunta.tipo === 'TEXTO_LARGO'">
+                <textarea 
+                  pInputTextarea 
+                  formControlName="respuesta"
+                  placeholder="Escribe tu respuesta detallada..."
+                  rows="4"
+                  class="w-full"
+                  [class.ng-invalid]="getPreguntaControl(preguntaActual).get('respuesta')?.invalid && getPreguntaControl(preguntaActual).get('respuesta')?.touched"
+                ></textarea>
+              </div>
+
+              <!-- OPCIÓN ÚNICA -->
+              <div *ngIf="pregunta.tipo === 'OPCION_UNICA'" class="opciones-container">
+                <div *ngIf="pregunta.opciones && pregunta.opciones.length > 0; else noOpciones">
+                  <div *ngFor="let opcion of pregunta.opciones; let j = index" class="opcion-item">
+                    <p-radioButton 
+                      [inputId]="'radio_pregunta_' + pregunta.id + '_opcion_' + j"
+                      [value]="opcion"
+                      formControlName="respuesta"
+                    ></p-radioButton>
+                    <label [for]="'radio_pregunta_' + pregunta.id + '_opcion_' + j" class="opcion-label">{{ opcion }}</label>
+                  </div>
+                </div>
+                <ng-template #noOpciones>
+                  <div class="error-opciones">
+                    <i class="pi pi-exclamation-triangle text-orange-500"></i>
+                    <p>Esta pregunta no tiene opciones configuradas. Contacta al administrador.</p>
+                  </div>
+                </ng-template>
+              </div>
+
+              <!-- OPCIÓN MÚLTIPLE -->
+              <div *ngIf="pregunta.tipo === 'OPCION_MULTIPLE'" class="opciones-container">
+                <div *ngIf="pregunta.opciones && pregunta.opciones.length > 0; else noOpcionesMultiple">
+                  <div *ngFor="let opcion of pregunta.opciones; let j = index" class="opcion-item">
+                    <p-checkbox 
+                      [inputId]="'check_pregunta_' + pregunta.id + '_opcion_' + j"
+                      [binary]="true"
+                      (onChange)="onOpcionMultipleChange(preguntaActual, j, $event.checked)"
+                    ></p-checkbox>
+                    <label [for]="'check_pregunta_' + pregunta.id + '_opcion_' + j" class="opcion-label">{{ opcion }}</label>
+                  </div>
+                </div>
+                <ng-template #noOpcionesMultiple>
+                  <div class="error-opciones">
+                    <i class="pi pi-exclamation-triangle text-orange-500"></i>
+                    <p>Esta pregunta no tiene opciones configuradas. Contacta al administrador.</p>
+                  </div>
+                </ng-template>
+              </div>
+
+              <!-- ESCALA -->
+              <div *ngIf="pregunta.tipo === 'ESCALA'" class="escala-container">
+                <div class="escala-labels">
+                  <span>{{ pregunta.configuracion?.min_label || 'Mínimo' }}</span>
+                  <span>{{ pregunta.configuracion?.max_label || 'Máximo' }}</span>
+                </div>
+                <p-slider 
+                  formControlName="respuesta"
+                  [min]="pregunta.configuracion?.min_value || 1"
+                  [max]="pregunta.configuracion?.max_value || 10"
+                  [step]="pregunta.configuracion?.step || 1"
+                  class="w-full"
+                ></p-slider>
+                <div class="escala-value">
+                  Valor seleccionado: {{ getPreguntaControl(preguntaActual).get('respuesta')?.value }}
+                </div>
+              </div>
+
+              <!-- NÚMERO -->
+              <div *ngIf="pregunta.tipo === 'NUMERO'">
+                <p-inputNumber 
+                  formControlName="respuesta"
+                  placeholder="Ingresa un número..."
+                  [min]="pregunta.configuracion?.min_value"
+                  [max]="pregunta.configuracion?.max_value"
+                  [useGrouping]="false"
+                  class="w-full"
+                ></p-inputNumber>
+              </div>
+
+              <!-- FECHA -->
+              <div *ngIf="pregunta.tipo === 'FECHA'">
+                <p-calendar 
+                  formControlName="respuesta"
+                  placeholder="Selecciona una fecha..."
+                  [showIcon]="true"
+                  dateFormat="dd/mm/yy"
+                  class="w-full"
+                ></p-calendar>
+              </div>
+
+              <!-- Mensaje de error -->
+              <small 
+                class="error-message" 
+                *ngIf="getPreguntaControl(preguntaActual).get('respuesta')?.invalid && getPreguntaControl(preguntaActual).get('respuesta')?.touched"
+              >
+                <i class="pi pi-exclamation-circle"></i>
+                Esta pregunta es requerida
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navegación entre preguntas -->
+      <div class="navegacion-container">
+        <div class="navegacion-buttons">
+          <p-button 
+            label="Anterior"
+            icon="pi pi-chevron-left"
+            [outlined]="true"
+            (click)="anteriorPregunta()"
+            [disabled]="preguntaActual === 0"
+          ></p-button>
+
+          <div class="navegacion-info">
+            <span class="pregunta-contador">{{ getPreguntaActualTexto() }}</span>
+          </div>
+
+          <p-button 
+            *ngIf="preguntaActual < totalPreguntas - 1"
+            label="Siguiente"
+            icon="pi pi-chevron-right"
+            iconPos="right"
+            (click)="siguientePregunta()"
+          ></p-button>
+
+          <p-button 
+            *ngIf="preguntaActual === totalPreguntas - 1"
+            label="Enviar Respuestas"
+            icon="pi pi-check"
+            iconPos="right"
+            severity="success"
+            [loading]="enviando"
+            type="submit"
+          ></p-button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!loading && !encuesta" class="error-container">
+    <i class="pi pi-exclamation-triangle text-6xl text-orange-500"></i>
+    <h3>Encuesta no encontrada</h3>
+    <p>La encuesta que intentas responder no existe o no está disponible.</p>
+    <p-button 
+      label="Volver a encuestas" 
+      icon="pi pi-arrow-left"
+      (click)="salir()"
+    ></p-button>
+  </div>
+</div>
+
+<!-- Toast y confirmaciones -->
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
