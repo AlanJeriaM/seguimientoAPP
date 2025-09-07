@@ -150,7 +150,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   nuevaEncuesta(): void {
-    this.router.navigate(['/admin/crear-encuesta']);
+    this.router.navigate(['/admin/create-encuesta']);
   }
 
   editarEncuesta(encuesta: Encuesta): void {
