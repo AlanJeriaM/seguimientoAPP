@@ -256,9 +256,9 @@ export class CreateEncuestaComponent implements OnInit {
   saveSurvey(): void {
     if (this.encuestaForm.valid) {
       this.loading = true;
-      
+
       const formValue = this.encuestaForm.value;
-      
+
       // Preparar datos para enviar
       const encuesta: Encuesta = {
         titulo: formValue.titulo.trim(),
@@ -277,7 +277,7 @@ export class CreateEncuestaComponent implements OnInit {
             .filter((opcion: any) => opcion && opcion.value && typeof opcion.value === 'string' && opcion.value.trim())
             .map((opcion: any) => opcion.value.trim());
           const opciones = opcionesValidas.length > 0 ? opcionesValidas : null;
-          
+
           return {
             texto: pregunta.texto.trim(),
             tipo: pregunta.tipo,
@@ -291,8 +291,8 @@ export class CreateEncuestaComponent implements OnInit {
 
       if (this.editMode && this.encuestaId) {
         // Actualizar encuesta existente
-        // console.log('🔄 Actualizando encuesta ID:', this.encuestaId);
-        // console.log('🔄 Datos a enviar:', encuesta);
+        // console.log('Actualizando encuesta ID:', this.encuestaId);
+        // console.log('Datos a enviar:', encuesta);
         this.encuestaService.actualizarEncuesta(this.encuestaId, encuesta).subscribe({
           next: (response) => {
             this.messageService.add({
@@ -300,7 +300,7 @@ export class CreateEncuestaComponent implements OnInit {
               summary: 'Éxito',
               detail: 'Encuesta actualizada correctamente'
             });
-            this.router.navigate(['/admin/encuestas']);
+            this.router.navigate(['/admin/view-encuesta']);
           },
           error: (error) => {
             this.messageService.add({
@@ -349,10 +349,10 @@ export class CreateEncuestaComponent implements OnInit {
         if (response.ok) {
           const encuesta = response.data;
           // console.log('Encuesta cargada:', encuesta);
-          
+
           // Limpiar preguntas existentes
           this.questions.clear();
-          
+
           // Llenar el formulario con los datos de la encuesta
           this.encuestaForm.patchValue({
             titulo: encuesta.titulo,
@@ -373,8 +373,8 @@ export class CreateEncuestaComponent implements OnInit {
               let configuracionParsed = null;
               if (pregunta.configuracion) {
                 try {
-                  configuracionParsed = typeof pregunta.configuracion === 'string' 
-                    ? JSON.parse(pregunta.configuracion) 
+                  configuracionParsed = typeof pregunta.configuracion === 'string'
+                    ? JSON.parse(pregunta.configuracion)
                     : pregunta.configuracion;
                 } catch (e) {
                   console.warn('Error al parsear configuración:', e);
@@ -401,7 +401,7 @@ export class CreateEncuestaComponent implements OnInit {
               let opcionesArray = preguntaGroup.get('opciones') as FormArray;
               if (pregunta.opciones) {
                 let opciones: string[] = [];
-                
+
                 if (typeof pregunta.opciones === 'string') {
                   try {
                     opciones = JSON.parse(pregunta.opciones);
@@ -412,7 +412,7 @@ export class CreateEncuestaComponent implements OnInit {
                 } else if (Array.isArray(pregunta.opciones)) {
                   opciones = pregunta.opciones;
                 }
-                
+
                 opciones.forEach((opcion: string) => {
                   if (opcion && opcion.trim()) {
                     opcionesArray.push(this.fb.group({
@@ -474,7 +474,7 @@ export class CreateEncuestaComponent implements OnInit {
     if (index > 0) {
       const currentQuestion = this.questions.at(index);
       const previousQuestion = this.questions.at(index - 1);
-      
+
       this.questions.setControl(index, previousQuestion);
       this.questions.setControl(index - 1, currentQuestion);
     }
@@ -484,7 +484,7 @@ export class CreateEncuestaComponent implements OnInit {
     if (index < this.questions.length - 1) {
       const currentQuestion = this.questions.at(index);
       const nextQuestion = this.questions.at(index + 1);
-      
+
       this.questions.setControl(index, nextQuestion);
       this.questions.setControl(index + 1, currentQuestion);
     }
