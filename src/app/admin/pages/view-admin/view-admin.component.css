@@ -148,5 +148,17 @@
   flex-direction: column-reverse !important; /* En móviles: confirmar arriba */
 }
 
+/* En escritorio se mantiene en fila con confirm a la derecha */
+@media (min-width: 768px) {
+  ::ng-deep .my-swal-actions {
+    flex-direction: row !important;
+  }
 
+  ::ng-deep .my-swal-actions .swal2-confirm {
+    order: 2;
+  }
 
+  ::ng-deep .my-swal-actions .swal2-cancel {
+    order: 1;
+  }
+}
