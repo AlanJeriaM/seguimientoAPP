@@ -1,5 +1,5 @@
 <div class="grid">
-  <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+  <div class="col-12">
     <p-card class="text-center" header="Usuarios Registrados con LinkedIn">
       <div class="flex justify-content-between align-content-center mb-2">
       </div>
@@ -18,37 +18,49 @@
         [showCurrentPageReport]="true"
         [loading]="loading"
       >
-        <ng-template pTemplate="caption">
-          <div class="flex flex-wrap justify-content-between align-content-center">
-            <div class="mb-2 sm:mb-0">
-              <span class="p-input-icon-left">
-                <i class="pi pi-search"></i>
-                <input
-                  pInputText
-                  type="text"
-                  [value]="searchText"
-                  (input)="buscarUsuarios($event)"
-                  placeholder="Buscar"
-                />
-              </span>
-              <p-button
-                styleClass="p-button-text p-button-sm ml-2"
-                icon="pi pi-filter-slash"
-                (click)="limpiarFiltros()"
-                pTooltip="Limpiar filtros"
-              ></p-button>
-            </div>
-            <div>
-              <p-button
-                pRipple
-                label="Actualizar"
-                icon="pi pi-refresh"
-                styleClass="p-button-sm p-button-info"
-                (click)="actualizarDatos()"
-              ></p-button>
-            </div>
-          </div>
-        </ng-template>
+<!-- En tu template, reemplaza la sección de búsqueda por esto: -->
+<ng-template pTemplate="caption">
+  <div class="grid">
+    <!-- Sección de búsqueda - reorganizada para móviles -->
+    <div class="col-12 lg:col-6 mb-2">
+      <div class="flex align-items-center gap-2">
+        <!-- Input de búsqueda - flex-1 para que tome el espacio disponible -->
+        <span class="p-input-icon-left flex-1 lg:flex-none" style="min-width: 200px;">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            [value]="searchText"
+            (input)="buscarUsuarios($event)"
+            placeholder="Buscar"
+            class="w-full lg:w-auto"
+          />
+        </span>
+        <!-- Botón limpiar filtros - ancho fijo para móviles -->
+        <p-button
+          styleClass="p-button-text p-button-sm flex-shrink-0"
+          icon="pi pi-filter-slash"
+          (click)="limpiarFiltros()"
+          pTooltip="Limpiar filtros"
+          [ngStyle]="{'width': 'auto', 'min-width': '2.5rem'}"
+        ></p-button>
+      </div>
+    </div>
+
+    <!-- Sección de botones - sin cambios -->
+    <div class="col-12 lg:col-6 mb-2">
+      <div class="flex flex-column lg:flex-row justify-content-start lg:justify-content-end gap-2">
+        <p-button
+          pRipple
+          label="Actualizar"
+          icon="pi pi-refresh"
+          styleClass="p-button-sm p-button-info w-full lg:w-auto"
+          (click)="actualizarDatos()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</ng-template>
         <ng-template pTemplate="header">
           <tr>
             <th>ID</th>
@@ -106,27 +118,27 @@
               {{ usuario.ultimo_acceso | date:'short' }}
             </td>
             <td class="text-right" style="width: 150px">
-              <div class="flex">
+              <div class="flex flex-wrap gap-1 justify-content-end">
                 <p-button
                   pRipple
-                  icon="pi pi-trash"
-                  styleClass="p-button-sm p-button-danger mr-2"
-                  pTooltip="Eliminar usuario"
-                  (click)="eliminarUsuario(usuario)"
+                  icon="pi pi-eye"
+                  styleClass="p-button-sm p-button-info"
+                  pTooltip="Ver usuario"
+                  (click)="verUsuario(usuario)"
                 ></p-button>
                 <p-button
                   pRipple
                   icon="pi pi-pencil"
-                  styleClass="p-button-sm p-button-warning mr-2"
+                  styleClass="p-button-sm p-button-warning"
                   pTooltip="Editar usuario"
                   (click)="editarUsuario(usuario)"
                 ></p-button>
                 <p-button
                   pRipple
-                  icon="pi pi-eye"
-                  styleClass="p-button-sm p-button-info mr-2"
-                  pTooltip="Ver usuario"
-                  (click)="verUsuario(usuario)"
+                  icon="pi pi-trash"
+                  styleClass="p-button-sm p-button-danger"
+                  pTooltip="Eliminar usuario"
+                  (click)="eliminarUsuario(usuario)"
                 ></p-button>
               </div>
             </td>
@@ -143,17 +155,168 @@
             </td>
           </tr>
         </ng-template>
-        <ng-template pTemplate="loadingbody" let-columns>
-          <tr>
-            <td [attr.colspan]="8" class="text-center">
-              <div class="p-4">
-                <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
-                <p class="mt-2">Cargando usuarios...</p>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
+        <!-- TEMPLATE DE LOADING REMOVIDO - PrimeNG ya maneja el spinner automáticamente -->
       </p-table>
     </p-card>
   </div>
 </div>
+
+<!-- Modal para ver/editar usuario -->
+<p-dialog
+  [(visible)]="displayDialog"
+  [header]="editMode ? 'Editar Usuario' : 'Ver Usuario'"
+  [modal]="true"
+  [style]="{width: '95vw', maxWidth: '600px'}"
+  [contentStyle]="{'padding': '1rem', 'overflow-y': 'auto', 'max-height': '80vh'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '90vw', '640px': '95vw'}"
+  [dismissableMask]="true"
+>
+  <form [formGroup]="userForm" (ngSubmit)="guardarUsuario()" *ngIf="selectedUser">
+    <div class="grid">
+      <div class="col-12 sm:col-6">
+        <label for="nombre" class="block text-900 font-medium mb-2">
+          Nombre*
+        </label>
+        <input
+          id="nombre"
+          pInputText
+          type="text"
+          formControlName="nombre"
+          placeholder="Ingrese el nombre"
+          class="w-full"
+          [class.ng-invalid]="isFieldInvalid('nombre')"
+          [class.ng-dirty]="isFieldInvalid('nombre')"
+          [readonly]="!editMode"
+        />
+        <span
+          *ngIf="isFieldInvalid('nombre') && editMode"
+          class="error-message text-red-500 text-sm mt-1 block">
+          {{ getFieldError('nombre') }}
+        </span>
+      </div>
+
+      <div class="col-12 sm:col-6">
+        <label for="correo" class="block text-900 font-medium mb-2">
+          Correo Electrónico*
+        </label>
+        <input
+          id="correo"
+          pInputText
+          type="email"
+          formControlName="correo"
+          placeholder="usuario@ejemplo.com"
+          class="w-full"
+          [class.ng-invalid]="isFieldInvalid('correo')"
+          [class.ng-dirty]="isFieldInvalid('correo')"
+          [readonly]="!editMode"
+        />
+        <span *ngIf="isFieldInvalid('correo') && editMode"
+          class="error-message text-red-500 text-sm mt-1 block">
+          {{ getFieldError('correo') }}
+        </span>
+      </div>
+
+      <div class="col-12 sm:col-6">
+        <label for="empresa" class="block text-900 font-medium mb-2">
+          Empresa Actual
+        </label>
+        <input
+          id="empresa"
+          pInputText
+          type="text"
+          formControlName="empresa_actual"
+          placeholder="Nombre de la empresa"
+          class="w-full"
+          [readonly]="!editMode"
+        />
+      </div>
+
+      <div class="col-12 sm:col-6">
+        <label for="posicion" class="block text-900 font-medium mb-2">
+          Posición Actual
+        </label>
+        <input
+          id="posicion"
+          pInputText
+          type="text"
+          formControlName="posicion_actual"
+          placeholder="Cargo o posición"
+          class="w-full"
+          [readonly]="!editMode"
+        />
+      </div>
+
+      <div class="col-12 sm:col-6">
+        <label for="ubicacion" class="block text-900 font-medium mb-2">
+          Ubicación
+        </label>
+        <input
+          id="ubicacion"
+          pInputText
+          type="text"
+          formControlName="ubicacion"
+          placeholder="Ciudad, País"
+          class="w-full"
+          [readonly]="!editMode"
+        />
+      </div>
+
+      <div class="col-12 sm:col-6">
+        <label for="industria" class="block text-900 font-medium mb-2">
+          Industria
+        </label>
+        <input
+          id="industria"
+          pInputText
+          type="text"
+          formControlName="industria"
+          placeholder="Sector industrial"
+          class="w-full"
+          [readonly]="!editMode"
+        />
+      </div>
+
+      <div class="col-12 sm:col-6" *ngIf="!editMode">
+        <label for="ultimo_acceso" class="block text-900 font-medium mb-2">
+          Último Acceso
+        </label>
+        <input
+          id="ultimo_acceso"
+          pInputText
+          type="text"
+          [value]="selectedUser.ultimo_acceso | date:'dd/MM/yyyy HH:mm'"
+          placeholder="Sin acceso registrado"
+          class="w-full readonly-field"
+          readonly
+          tabindex="-1"
+        />
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
+        label="Cerrar"
+        icon="pi pi-times"
+        (click)="cancelarDialog()"
+        styleClass="p-button-danger w-full sm:w-auto"
+      ></p-button>
+      <p-button
+        *ngIf="editMode"
+        label="Actualizar"
+        icon="pi pi-check"
+        [disabled]="userForm.invalid"
+        (click)="guardarUsuario()"
+        styleClass="p-button-warning w-full sm:w-auto"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>

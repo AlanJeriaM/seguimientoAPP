@@ -6,6 +6,7 @@ const {
   desactivarUsuario,
   obtenerMiPerfil,
   actualizarMiPerfil,
+  actualizarUsuario,
   obtenerEstadisticas,
   obtenerUsuariosEliminados,
   reactivarUsuario,
@@ -22,6 +23,7 @@ router.get('/', verificarToken, verificarAdmin, obtenerUsuarios);
 router.get('/estadisticas', verificarToken, verificarAdmin, obtenerEstadisticas);
 router.get('/eliminados', verificarToken, verificarAdmin, obtenerUsuariosEliminados);
 router.get('/:id', verificarToken, verificarAdmin, obtenerUsuarioPorId);
+router.put('/:id', verificarToken, verificarAdmin, actualizarUsuario);
 router.delete('/:id', verificarToken, verificarAdmin, desactivarUsuario);
 router.put('/reactivar/:id', verificarToken, verificarAdmin, reactivarUsuario);
 router.delete('/eliminar-permanente/:id', verificarToken, verificarAdmin, eliminarUsuarioPermanentemente);

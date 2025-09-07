@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { MessageService } from 'primeng/api';
+import { Subject, takeUntil } from 'rxjs';
 import Swal from 'sweetalert2';
 import { TableLazyLoadEvent } from 'primeng/table';
 
@@ -8,7 +11,7 @@ import { TableLazyLoadEvent } from 'primeng/table';
   templateUrl: './view-users.component.html',
   styleUrls: ['./view-users.component.css']
 })
-export class ViewUsersComponent implements OnInit {
+export class ViewUsersComponent implements OnInit, OnDestroy {
 
   usuarios: any[] = [];
   loading: boolean = false;
@@ -16,11 +19,39 @@ export class ViewUsersComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 10;
   searchText: string = '';
+  displayDialog: boolean = false;
+  editMode: boolean = false;
+  selectedUser?: any;
+  userForm!: FormGroup;
 
-  constructor(private authService: AuthService) {}
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private authService: AuthService,
+    private messageService: MessageService,
+    private formBuilder: FormBuilder
+  ) {
+    this.inicializarFormulario();
+  }
 
   ngOnInit() {
     this.cargarUsuarios();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  inicializarFormulario(): void {
+    this.userForm = this.formBuilder.group({
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      correo: ['', [Validators.required, Validators.email]],
+      empresa_actual: [''],
+      posicion_actual: [''],
+      ubicacion: [''],
+      industria: ['']
+    });
   }
 
   cargarUsuarios(page: number = 1, search: string = '') {
@@ -89,7 +120,11 @@ export class ViewUsersComponent implements OnInit {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      customClass: {
+        actions: 'my-swal-actions'
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         this.authService.desactivarUsuario(usuario.id).subscribe({
@@ -124,14 +159,105 @@ export class ViewUsersComponent implements OnInit {
     });
   }
 
-  verUsuario(usuario: any) {
-    // Implementar vista detallada del usuario
-    console.log('Ver usuario:', usuario);
+  verUsuario(usuario: any): void {
+    this.selectedUser = { ...usuario };
+    this.editMode = false;
+    this.cargarDatosEnFormulario();
+    this.displayDialog = true;
   }
 
-  editarUsuario(usuario: any) {
-    // Implementar edición de usuario
-    console.log('Editar usuario:', usuario);
+  editarUsuario(usuario: any): void {
+    this.selectedUser = { ...usuario };
+    this.editMode = true;
+    this.cargarDatosEnFormulario();
+    this.displayDialog = true;
+  }
+
+  cargarDatosEnFormulario(): void {
+    if (this.selectedUser) {
+      this.userForm.patchValue({
+        nombre: this.selectedUser.nombre || '',
+        correo: this.selectedUser.correo || '',
+        empresa_actual: this.selectedUser.empresa_actual || '',
+        posicion_actual: this.selectedUser.posicion_actual || '',
+        ubicacion: this.selectedUser.ubicacion || '',
+        industria: this.selectedUser.industria || ''
+      });
+
+      if (!this.editMode) {
+        this.userForm.disable();
+      } else {
+        this.userForm.enable();
+      }
+    }
+  }
+
+  guardarUsuario(): void {
+    if (this.userForm.valid && this.selectedUser && this.editMode) {
+      const datosActualizados = {
+        ...this.userForm.value,
+        id: this.selectedUser.id
+      };
+
+      this.authService.actualizarUsuario(this.selectedUser.id, datosActualizados).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (response) => {
+          if (response.ok) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Usuario actualizado correctamente'
+            });
+            this.displayDialog = false;
+            this.cargarUsuarios(this.currentPage, this.searchText);
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: response.msj || 'Error al actualizar el usuario'
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error al actualizar usuario:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error del servidor al actualizar el usuario'
+          });
+        }
+      });
+    }
+  }
+
+  cancelarDialog(): void {
+    this.displayDialog = false;
+    this.editMode = false;
+    this.selectedUser = undefined;
+    this.userForm.reset();
+    this.inicializarFormulario();
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.userForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.userForm.get(fieldName);
+    if (field && field.errors) {
+      if (field.errors['required']) {
+        return 'Este campo es requerido';
+      }
+      if (field.errors['email']) {
+        return 'Ingrese un correo válido';
+      }
+      if (field.errors['minlength']) {
+        return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
+      }
+    }
+    return '';
   }
 
   onPageChange(event: TableLazyLoadEvent) {
