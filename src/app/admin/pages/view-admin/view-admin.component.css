@@ -162,3 +162,10 @@
     order: 1;
   }
 }
+
+/* Orden de botones en modal PrimeNG - Solo móviles */
+@media screen and (max-width: 640px) {
+  ::ng-deep .p-dialog .p-dialog-footer .flex.flex-column {
+    flex-direction: column-reverse !important;
+  }
+}

@@ -282,14 +282,14 @@
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelarDialog()"
-        styleClass="p-button-danger w-full sm:w-auto order-2 sm:order-1"
+        styleClass="p-button-danger w-full sm:w-auto"
       ></p-button>
       <p-button
       [label]="editMode ? 'Actualizar' : 'Crear'"
       icon="pi pi-check"
       [disabled]="adminForm.invalid"
       (click)="guardarAdministrador()"
-      [styleClass]="(editMode ? 'p-button-warning' : 'p-button-success') + ' w-full sm:w-auto order-1 sm:order-2'"
+      [styleClass]="(editMode ? 'p-button-warning' : 'p-button-success') + ' w-full sm:w-auto'"
     ></p-button>
     </div>
   </ng-template>
