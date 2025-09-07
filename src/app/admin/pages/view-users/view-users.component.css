@@ -1,0 +1,193 @@
+/* SweetAlert2 z-index y estilos base */
+::ng-deep .swal2-container {
+  z-index: 10000 !important;
+}
+
+::ng-deep .swal2-popup {
+  z-index: 10001 !important;
+  font-size: 0.875rem !important;
+  padding: 0.75rem !important;
+}
+
+::ng-deep .swal2-title {
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  margin: 0 0 0.5rem 0 !important;
+}
+
+::ng-deep .swal2-content,
+::ng-deep .swal2-html-container {
+  font-size: 0.875rem !important;
+  margin: 0 !important;
+  padding: 0 0 0.75rem 0 !important;
+}
+
+::ng-deep .swal2-actions {
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+  margin: 0.5rem 0 0 0 !important;
+}
+
+::ng-deep .swal2-confirm,
+::ng-deep .swal2-cancel,
+::ng-deep .swal2-deny {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  border-radius: 0.375rem !important;
+}
+
+/* PrimeNG Modal estilos base */
+::ng-deep .p-dialog .p-dialog-header,
+::ng-deep .p-dialog .p-dialog-content,
+::ng-deep .p-dialog .p-dialog-footer {
+  padding: 0.75rem !important;
+}
+
+::ng-deep .p-dialog .p-dialog-title {
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+}
+
+::ng-deep .p-dialog label {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.375rem !important;
+}
+
+::ng-deep .p-dialog .p-inputtext,
+::ng-deep .p-dialog .p-button {
+  font-size: 0.875rem !important;
+  padding: 0.5rem 1rem !important;
+}
+
+::ng-deep .p-dialog .error-message {
+  font-size: 0.75rem !important;
+  margin-top: 0.25rem !important;
+}
+
+::ng-deep .p-dialog {
+  margin: 0.5rem;
+}
+
+::ng-deep .p-dialog .p-dialog-content {
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+/* Responsive: Móviles */
+@media screen and (max-width: 640px) {
+  ::ng-deep .p-dialog {
+    margin: 0.25rem;
+  }
+
+  ::ng-deep .p-dialog .p-dialog-header,
+  ::ng-deep .p-dialog .p-dialog-content,
+  ::ng-deep .p-dialog .p-dialog-footer {
+    padding: 0.5rem !important;
+  }
+
+  ::ng-deep .p-dialog .p-dialog-title {
+    font-size: 0.875rem !important;
+  }
+
+  ::ng-deep .p-dialog label {
+    font-size: 0.8125rem !important;
+  }
+
+  ::ng-deep .p-dialog .p-inputtext,
+  ::ng-deep .p-dialog .p-button {
+    font-size: 0.8125rem !important;
+    padding: 0.4375rem 0.875rem !important;
+  }
+
+  ::ng-deep .p-dialog .error-message {
+    font-size: 0.6875rem !important;
+  }
+
+  ::ng-deep .swal2-popup {
+    font-size: 0.8125rem !important;
+    padding: 0.5rem !important;
+  }
+
+  ::ng-deep .swal2-title {
+    font-size: 0.875rem !important;
+  }
+
+  ::ng-deep .swal2-content,
+  ::ng-deep .swal2-html-container {
+    font-size: 0.8125rem !important;
+  }
+
+  ::ng-deep .swal2-confirm,
+  ::ng-deep .swal2-cancel,
+  ::ng-deep .swal2-deny {
+    padding: 0.4375rem 0.875rem !important;
+    font-size: 0.8125rem !important;
+  }
+}
+
+/* Responsive: Desktop - SweetAlert2 horizontal */
+@media screen and (min-width: 640px) {
+  ::ng-deep .swal2-actions {
+    flex-direction: row !important;
+    justify-content: center !important;
+  }
+
+  ::ng-deep .swal2-confirm,
+  ::ng-deep .swal2-cancel,
+  ::ng-deep .swal2-deny {
+    width: auto !important;
+    padding: 0.5rem 1.25rem !important;
+  }
+}
+
+::ng-deep .my-swal-actions {
+  flex-direction: column-reverse !important; /* En móviles: confirmar arriba */
+}
+
+/* En escritorio se mantiene en fila con confirm a la derecha */
+@media (min-width: 768px) {
+  ::ng-deep .my-swal-actions {
+    flex-direction: row !important;
+  }
+
+  ::ng-deep .my-swal-actions .swal2-confirm {
+    order: 2;
+  }
+
+  ::ng-deep .my-swal-actions .swal2-cancel {
+    order: 1;
+  }
+}
+
+/* Orden de botones en modal PrimeNG - Solo móviles */
+@media screen and (max-width: 640px) {
+  ::ng-deep .p-dialog .p-dialog-footer .flex.flex-column {
+    flex-direction: column-reverse !important;
+  }
+}
+
+/* Estilos para campos readonly que no deben parecer editables */
+::ng-deep .readonly-field {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: default !important;
+  border-color: #dee2e6 !important;
+}
+
+::ng-deep .readonly-field:focus {
+  outline: none !important;
+  border-color: #dee2e6 !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .readonly-field:hover {
+  border-color: #dee2e6 !important;
+}
+
+::ng-deep .readonly-field::selection {
+  background: transparent !important;
+}

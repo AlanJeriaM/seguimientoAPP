@@ -308,6 +308,120 @@ const actualizarMiPerfil = async (req, res) => {
   }
 };
 
+// Actualizar usuario (para administradores)
+const actualizarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      nombre, 
+      correo,
+      posicion_actual, 
+      empresa_actual, 
+      ubicacion, 
+      industria 
+    } = req.body;
+
+    // Validaciones básicas
+    if (!id || isNaN(id)) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'ID de usuario inválido'
+      });
+    }
+
+    if (!nombre || nombre.trim() === '') {
+      return res.status(400).json({
+        ok: false,
+        msj: 'El nombre es requerido'
+      });
+    }
+
+    if (!correo || correo.trim() === '') {
+      return res.status(400).json({
+        ok: false,
+        msj: 'El correo es requerido'
+      });
+    }
+
+    // Verificar que el usuario existe
+    const user = await User.findOne({
+      where: { id, activo: true }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        msj: 'Usuario no encontrado'
+      });
+    }
+
+    // Verificar si el correo ya existe en otro usuario
+    if (correo.toLowerCase() !== user.correo.toLowerCase()) {
+      const correoExistente = await User.findOne({
+        where: { 
+          correo: correo.toLowerCase(),
+          id: { [require('sequelize').Op.ne]: id },
+          activo: true
+        }
+      });
+
+      if (correoExistente) {
+        return res.status(400).json({
+          ok: false,
+          msj: 'Ya existe un usuario con ese correo electrónico'
+        });
+      }
+    }
+
+    // Actualizar datos del usuario
+    const datosActualizados = {
+      nombre: nombre.trim(),
+      correo: correo.toLowerCase().trim(),
+      posicion_actual: posicion_actual?.trim() || null,
+      empresa_actual: empresa_actual?.trim() || null,
+      ubicacion: ubicacion?.trim() || null,
+      industria: industria?.trim() || null
+    };
+
+    await user.update(datosActualizados);
+
+    // Obtener usuario actualizado
+    const usuarioActualizado = await User.findByPk(user.id, {
+      attributes: { exclude: ['linkedin_data'] }
+    });
+
+    const usuarioFormateado = {
+      id: usuarioActualizado.id,
+      nombre: usuarioActualizado.nombre,
+      correo: usuarioActualizado.correo,
+      perfil_imagen_url: usuarioActualizado.perfil_imagen_url,
+      posicion_actual: usuarioActualizado.posicion_actual || 'No especificada',
+      empresa_actual: usuarioActualizado.empresa_actual || 'No especificada',
+      ubicacion: usuarioActualizado.ubicacion || 'No especificada',
+      industria: usuarioActualizado.industria || 'No especificada',
+      ultimo_acceso: usuarioActualizado.ultimo_acceso,
+      fecha_registro: usuarioActualizado.created_at,
+      rol: usuarioActualizado.rol,
+      activo: usuarioActualizado.activo
+    };
+
+    console.log(`Usuario actualizado por admin: ${usuarioActualizado.nombre} (ID: ${id})`);
+
+    res.json({
+      ok: true,
+      msj: 'Usuario actualizado correctamente',
+      usuario: usuarioFormateado
+    });
+
+  } catch (error) {
+    console.error('Error en actualizarUsuario:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al actualizar usuario'
+    });
+  }
+};
+
 // Estadísticas para dashboard
 const obtenerEstadisticas = async (req, res) => {
   try {
@@ -598,6 +712,7 @@ module.exports = {
   desactivarUsuario,
   obtenerMiPerfil,
   actualizarMiPerfil,
+  actualizarUsuario,
   obtenerEstadisticas,
   obtenerUsuariosEliminados,
   reactivarUsuario,

@@ -149,6 +149,17 @@ export class AuthService {
       );
   }
 
+  // Actualizar usuario (para admin)
+  actualizarUsuario(id: number, datosActualizados: any): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('token', sessionStorage.getItem('token') || '');
+
+    return this.http.put<any>(`${this.url}/api/users/${id}`, datosActualizados, { headers })
+      .pipe(
+        catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al actualizar usuario' }))
+      );
+  }
+
   // Obtener usuarios eliminados (para admin)
   obtenerUsuariosEliminados(page: number = 1, limit: number = 10, search: string = ''): Observable<any> {
     const headers = new HttpHeaders()
