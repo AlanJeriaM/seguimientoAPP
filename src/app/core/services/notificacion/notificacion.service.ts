@@ -33,10 +33,7 @@ export class NotificacionService {
   public contadorNoLeidas$ = this.contadorNoLeidasSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Polling cada 30 segundos para actualizar el contador
-    interval(30000).subscribe(() => {
-      this.actualizarContadorNoLeidas();
-    });
+    // No hacer polling automático - se inicializará manualmente cuando sea necesario
   }
 
   /**

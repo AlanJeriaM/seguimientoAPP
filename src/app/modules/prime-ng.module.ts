@@ -46,6 +46,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SliderModule } from 'primeng/slider';
 import { DividerModule } from 'primeng/divider';
+import { StepsModule } from 'primeng/steps';
 
 
 
@@ -94,7 +95,8 @@ const primeNgModules = [
   OverlayPanelModule,
   ProgressBarModule,
   SliderModule,
-  DividerModule
+  DividerModule,
+  StepsModule
 
   // PaginatorModule
 ]
