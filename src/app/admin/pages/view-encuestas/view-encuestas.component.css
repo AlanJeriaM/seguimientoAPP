@@ -33,6 +33,16 @@
   color: #991b1b;
 }
 
+.estado-expirada {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.estado-proximamente {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
 /* Estilos para la tabla */
 :host ::ng-deep .p-datatable {
   font-size: 0.875rem;

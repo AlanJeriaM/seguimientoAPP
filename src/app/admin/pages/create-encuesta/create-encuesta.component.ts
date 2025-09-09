@@ -15,14 +15,12 @@ export class CreateEncuestaComponent implements OnInit {
   loading = false;
   editMode = false;
   encuestaId?: number;
+  today = new Date();
 
   questionTypes = [
-    { label: 'Texto Corto', value: 'TEXTO_CORTO' },
-    { label: 'Texto Largo', value: 'TEXTO_LARGO' },
+    { label: 'Texto', value: 'TEXTO_LARGO' },
     { label: 'Opción Única', value: 'OPCION_UNICA' },
     { label: 'Opción Múltiple', value: 'OPCION_MULTIPLE' },
-    { label: 'Escala', value: 'ESCALA' },
-    { label: 'Fecha', value: 'FECHA' },
     { label: 'Número', value: 'NUMERO' }
   ];
 
@@ -74,8 +72,8 @@ export class CreateEncuestaComponent implements OnInit {
       titulo: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       descripcion: [''],
       estado: ['BORRADOR', Validators.required],
-      fecha_inicio: [null],
-      fecha_fin: [null],
+      fecha_inicio: [null, [this.fechaInicioValidator()]],
+      fecha_fin: [null, [this.fechaFinValidator()]],
       tiempo_estimado: [10, [Validators.required, Validators.min(1), Validators.max(120)]],
       max_respuestas: [null],
       es_anonima: [false],
@@ -94,7 +92,7 @@ export class CreateEncuestaComponent implements OnInit {
   addQuestion(): void {
     const questionGroup = this.fb.group({
       texto: ['', [Validators.required, Validators.minLength(3)]],
-      tipo: ['TEXTO_CORTO', Validators.required],
+      tipo: ['TEXTO_LARGO', Validators.required],
       es_requerida: [true],
       opciones: this.fb.array([]),
       configuracion: this.fb.group({
@@ -126,19 +124,12 @@ export class CreateEncuestaComponent implements OnInit {
       // Agregar opciones por defecto
       opciones.push(this.createOption());
       opciones.push(this.createOption());
-    } else if (tipo === 'ESCALA') {
-      // Configurar escala por defecto
-      question.get('configuracion')?.patchValue({
-        min_value: 1,
-        max_value: 5,
-        step: 1
-      });
     }
   }
 
   createOption(): FormGroup {
     return this.fb.group({
-      value: ['', Validators.required]
+      value: ['', [Validators.required, this.duplicateOptionValidator()]]
     });
   }
 
@@ -168,13 +159,6 @@ export class CreateEncuestaComponent implements OnInit {
     return tipo === 'OPCION_UNICA' || tipo === 'OPCION_MULTIPLE';
   }
 
-  canShowEscala(tipo: string): boolean {
-    return tipo === 'ESCALA';
-  }
-
-  canShowFecha(tipo: string): boolean {
-    return tipo === 'FECHA';
-  }
 
   canShowNumero(tipo: string): boolean {
     return tipo === 'NUMERO';
@@ -194,7 +178,7 @@ export class CreateEncuestaComponent implements OnInit {
     for (const key of Object.keys(errors)) {
       switch (key) {
         case 'required':
-          return 'Este campo es requerido';
+          return 'El campo es requerido';
         case 'minlength':
           return `Mínimo ${errors['minlength'].requiredLength} caracteres.`;
         case 'maxlength':
@@ -203,9 +187,75 @@ export class CreateEncuestaComponent implements OnInit {
           return `Valor mínimo: ${errors['min'].min}`;
         case 'max':
           return `Valor máximo: ${errors['max'].max}`;
+        case 'fechaInicioInvalida':
+          return 'La fecha de inicio no puede ser menor a la fecha actual';
+        case 'fechaFinInvalida':
+          return 'La fecha de fin debe ser mayor a la fecha de inicio';
+        case 'opcionDuplicada':
+          return 'Esta opción ya existe';
       }
     }
     return null;
+  }
+
+  // Validador para fecha de inicio (no puede ser menor a hoy)
+  fechaInicioValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(control.value);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      if (selectedDate < today) {
+        return { fechaInicioInvalida: true };
+      }
+      return null;
+    };
+  }
+
+  // Validador para fecha de fin (debe ser mayor a fecha de inicio)
+  fechaFinValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const fechaInicio = this.encuestaForm?.get('fecha_inicio')?.value;
+      if (!fechaInicio) return null;
+      
+      const fechaInicioDate = new Date(fechaInicio);
+      const fechaFinDate = new Date(control.value);
+      
+      if (fechaFinDate <= fechaInicioDate) {
+        return { fechaFinInvalida: true };
+      }
+      return null;
+    };
+  }
+
+  // Validador para opciones duplicadas
+  duplicateOptionValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value || !control.value.trim()) return null;
+      
+      const currentValue = control.value.trim().toLowerCase();
+      const parentFormArray = control.parent?.parent as FormArray;
+      
+      if (!parentFormArray) return null;
+      
+      const duplicateIndex = parentFormArray.controls.findIndex((option, index) => {
+        const optionValue = option.get('value')?.value;
+        return optionValue && 
+               optionValue.trim().toLowerCase() === currentValue && 
+               option !== control.parent;
+      });
+      
+      if (duplicateIndex !== -1) {
+        return { opcionDuplicada: true };
+      }
+      
+      return null;
+    };
   }
 
   uniqueOptionsValidator(): ValidatorFn {

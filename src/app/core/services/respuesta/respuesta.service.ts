@@ -139,7 +139,8 @@ export class RespuestaService {
       fecha_inicio: new Date(encuesta.fecha_inicio),
       fecha_fin: new Date(encuesta.fecha_fin),
       estado_usuario: encuesta.ya_respondida ? 'COMPLETADA' : 'NO_INICIADA',
-      progreso: encuesta.ya_respondida ? 100 : 0
+      progreso: encuesta.ya_respondida ? 100 : 0,
+      ultima_respuesta: encuesta.ultima_respuesta ? new Date(encuesta.ultima_respuesta) : undefined
     };
   }
 

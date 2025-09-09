@@ -296,13 +296,20 @@ const actualizarEncuesta = async (req, res) => {
       });
     }
 
-    // Si la encuesta ya tiene respuestas, solo permitir cambios menores
+    // Si la encuesta ya tiene respuestas, verificar si se están modificando las fechas
     const tieneRespuestas = await Respuesta.count({ where: { encuesta_id: id } });
     if (tieneRespuestas > 0 && estado === 'ACTIVA') {
-      return res.status(400).json({
-        ok: false,
-        msj: 'No se puede activar una encuesta que ya tiene respuestas'
-      });
+      // Verificar si se están modificando las fechas de inicio o fin
+      const fechaInicioCambiada = fecha_inicio && new Date(fecha_inicio).getTime() !== new Date(encuesta.fecha_inicio || 0).getTime();
+      const fechaFinCambiada = fecha_fin && new Date(fecha_fin).getTime() !== new Date(encuesta.fecha_fin || 0).getTime();
+      
+      // Si no se están modificando las fechas, no permitir activar
+      if (!fechaInicioCambiada && !fechaFinCambiada) {
+        return res.status(400).json({
+          ok: false,
+          msj: 'No se puede activar una encuesta que ya tiene respuestas. Modifica las fechas de inicio o fin para permitir la activación.'
+        });
+      }
     }
 
     // Actualizar encuesta

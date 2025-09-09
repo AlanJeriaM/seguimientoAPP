@@ -39,7 +39,8 @@ const obtenerEncuestasDisponibles = async (req, res) => {
           where: { 
             encuesta_id: encuesta.id,
             usuario_id: usuarioId
-          }
+          },
+          order: [['fecha_creacion', 'DESC']]
         });
 
         const totalPreguntas = await Pregunta.count({
@@ -52,7 +53,8 @@ const obtenerEncuestasDisponibles = async (req, res) => {
         return {
           ...encuesta.toJSON(),
           ya_respondida: !!yaRespondio,
-          total_preguntas: totalPreguntas
+          total_preguntas: totalPreguntas,
+          ultima_respuesta: yaRespondio ? yaRespondio.fecha_creacion : null
         };
       })
     );
