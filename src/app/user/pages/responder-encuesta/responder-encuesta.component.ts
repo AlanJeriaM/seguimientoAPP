@@ -20,6 +20,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   // Estados
   loading = false;
   enviando = false;
+  formularioDeshabilitado = false;
   preguntaActual = 0;
   totalPreguntas = 0;
   progreso = 0;
@@ -264,6 +265,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   private procesarEnvio(): void {
     this.enviando = true;
+    this.formularioDeshabilitado = true; // Deshabilitar formulario inmediatamente
     const respuestas = this.extraerRespuestas();
 
     this.respuestaService.enviarRespuestas(this.encuestaId, respuestas, this.sessionToken)
@@ -281,6 +283,9 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               this.router.navigate(['/user/encuesta-completada', this.encuestaId]);
             }, 2000);
+          } else {
+            // Si hay error, re-habilitar el formulario
+            this.formularioDeshabilitado = false;
           }
           this.enviando = false;
         },
@@ -291,6 +296,8 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
             summary: 'Error',
             detail: 'No se pudieron enviar las respuestas. Inténtalo de nuevo.'
           });
+          // Re-habilitar el formulario en caso de error
+          this.formularioDeshabilitado = false;
           this.enviando = false;
         }
       });
