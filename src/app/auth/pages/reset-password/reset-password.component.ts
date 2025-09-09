@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
+
+
 
 @Component({
   selector: 'app-reset-password',
@@ -9,11 +12,12 @@ import { AuthService } from '../../../core/services/auth/auth.service';
   styleUrls: ['./reset-password.component.css']
 })
 export class ResetPasswordComponent implements OnInit {
-  
+
   resetForm: FormGroup;
   codeForm: FormGroup;
   newPasswordForm: FormGroup;
-  
+  private emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$";
+
   currentStep: 'email' | 'code' | 'password' = 'email';
   loading = false;
   emailSent = false;
@@ -22,9 +26,28 @@ export class ResetPasswordComponent implements OnInit {
   countdown = 0;
   canResendCode = false;
   
+  // Control para emails no válidos
+  emailBlocked = false;
+  blockedEmail = '';
+  emailErrorType: 'not_found' | 'inactive' | 'none' = 'none';
+  
+  // Control para códigos agotados
+  codeBlocked = false;
+  
+  // Control para formulario de contraseña completado
+  passwordChangeCompleted = false;
+
   // Para mostrar/ocultar contraseñas
   showNewPassword = false;
   showConfirmPassword = false;
+
+  stepItems = [
+    { label: 'Correo' },
+    { label: 'Código' },
+    { label: 'Contraseña' }
+  ];
+
+  activeIndex = 0;
 
   // Propiedad computada para saber si puede verificar código
   get canVerifyCode(): boolean {
@@ -34,16 +57,17 @@ export class ResetPasswordComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private router: Router
   ) {
     this.resetForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.pattern(this.emailPattern)]],
     });
-    
+
     this.codeForm = this.fb.group({
       code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
     });
-    
+
     this.newPasswordForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
@@ -52,12 +76,14 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  
   // Validar que las contraseñas coincidan
   passwordMatchValidator(group: FormGroup) {
     const newPassword = group.get('newPassword')?.value;
     const confirmPassword = group.get('confirmPassword')?.value;
     return newPassword === confirmPassword ? null : { passwordMismatch: true };
   }
+
 
   // Paso 1: Enviar código de verificación
   async sendResetCode() {
@@ -70,27 +96,35 @@ export class ResetPasswordComponent implements OnInit {
       return;
     }
 
+    // Si el email está bloqueado, no permitir envío
+    if (this.emailBlocked && this.blockedEmail === this.resetForm.get('email')?.value) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Email no válido',
+        detail: 'Este correo no está registrado como administrador'
+      });
+      return;
+    }
+
     this.loading = true;
     const email = this.resetForm.get('email')?.value;
 
     try {
       const response = await this.authService.sendResetCode(email).toPromise();
-      
+
       if (response.ok) {
         this.emailSent = true;
         this.currentStep = 'code';
         this.startCountdown();
+        this.resetEmailBlock();
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Código de verificación enviado a tu correo'
+          detail: 'Código de verificación enviado al correo'
         });
       } else {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: response.msj || 'Error al enviar el código'
-        });
+        // Manejar diferentes tipos de errores
+        this.handleEmailError(response.msj, email);
       }
     } catch (error) {
       this.messageService.add({
@@ -101,6 +135,52 @@ export class ResetPasswordComponent implements OnInit {
     } finally {
       this.loading = false;
     }
+  }
+
+  // Manejar errores de email
+  private handleEmailError(errorMessage: string, email: string): void {
+    if (errorMessage && errorMessage.includes('No se encontró un administrador')) {
+      this.emailBlocked = true;
+      this.blockedEmail = email;
+      this.emailErrorType = 'not_found';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Email no válido',
+        detail: 'Este correo no está registrado como administrador'
+      });
+    } else if (errorMessage && errorMessage.includes('inactivo')) {
+      this.emailBlocked = true;
+      this.blockedEmail = email;
+      this.emailErrorType = 'inactive';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Cuenta inactiva',
+        detail: 'La cuenta de administrador está inactiva'
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: errorMessage || 'Error al enviar el código'
+      });
+    }
+  }
+
+  // Resetear bloqueo de email
+  resetEmailBlock(): void {
+    this.emailBlocked = false;
+    this.blockedEmail = '';
+    this.emailErrorType = 'none';
+    // Resetear el estado touched del campo email para evitar validación inmediata
+    this.resetForm.get('email')?.markAsUntouched();
+  }
+
+  // Limpiar email bloqueado y permitir nuevo intento
+  clearBlockedEmail(): void {
+    this.resetEmailBlock();
+    this.resetForm.get('email')?.setValue('');
+    this.resetForm.get('email')?.markAsUntouched();
+    this.resetForm.get('email')?.markAsPristine();
   }
 
   // Paso 2: Verificar código
@@ -130,7 +210,7 @@ export class ResetPasswordComponent implements OnInit {
 
     try {
       const response = await this.authService.verifyResetCode(email, code).toPromise();
-      
+
       if (response.ok) {
         this.currentStep = 'password';
         this.messageService.add({
@@ -141,9 +221,10 @@ export class ResetPasswordComponent implements OnInit {
       } else {
         this.codeAttempts++;
         this.codeForm.get('code')?.setValue('');
-        
+
         if (this.codeAttempts >= this.maxCodeAttempts) {
           // Usuario agotó todos los intentos
+          this.codeBlocked = true;
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -198,17 +279,18 @@ export class ResetPasswordComponent implements OnInit {
 
     try {
       const response = await this.authService.resetPassword(email, newPassword).toPromise();
-      
+
       if (response.ok) {
+        this.passwordChangeCompleted = true;
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Contraseña cambiada correctamente'
+          detail: 'Contraseña cambiada correctamente. Redirigiendo al login...'
         });
-        
-        // Resetear formularios y volver al paso 1
+
+        // Redirigir al login después de 2 segundos
         setTimeout(() => {
-          this.resetToInitialState();
+          this.router.navigate(['/auth/login']);
         }, 2000);
       } else {
         this.messageService.add({
@@ -235,11 +317,12 @@ export class ResetPasswordComponent implements OnInit {
 
     try {
       const response = await this.authService.sendResetCode(email).toPromise();
-      
+
       if (response.ok) {
         // Resetear completamente el estado de intentos
         this.codeAttempts = 0;
         this.canResendCode = false;
+        this.codeBlocked = false;
         this.codeForm.reset();
         this.startCountdown();
         this.messageService.add({
@@ -269,7 +352,7 @@ export class ResetPasswordComponent implements OnInit {
   startCountdown() {
     this.countdown = 60; // 60 segundos
     this.canResendCode = false;
-    
+
     const timer = setInterval(() => {
       this.countdown--;
       if (this.countdown <= 0) {
@@ -287,6 +370,8 @@ export class ResetPasswordComponent implements OnInit {
       this.codeAttempts = 0;
       this.canResendCode = false;
       this.countdown = 0;
+      this.codeBlocked = false;
+      this.resetEmailBlock();
       this.codeForm.reset();
     } else if (this.currentStep === 'password') {
       this.currentStep = 'code';
@@ -300,6 +385,9 @@ export class ResetPasswordComponent implements OnInit {
     this.codeAttempts = 0;
     this.canResendCode = false;
     this.countdown = 0;
+    this.codeBlocked = false;
+    this.passwordChangeCompleted = false;
+    this.resetEmailBlock();
     this.resetForm.reset();
     this.codeForm.reset();
     this.newPasswordForm.reset();
@@ -309,6 +397,11 @@ export class ResetPasswordComponent implements OnInit {
 
   // Toggle para mostrar/ocultar contraseñas
   togglePasswordVisibility(field: 'newPassword' | 'confirmPassword') {
+    // No permitir toggle si está cargando o completado
+    if (this.loading || this.passwordChangeCompleted) {
+      return;
+    }
+    
     if (field === 'newPassword') {
       this.showNewPassword = !this.showNewPassword;
     } else {
@@ -324,4 +417,6 @@ export class ResetPasswordComponent implements OnInit {
       return this.showConfirmPassword ? 'text' : 'password';
     }
   }
+
+
 }

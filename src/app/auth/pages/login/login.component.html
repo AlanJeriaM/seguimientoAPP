@@ -1,61 +1,119 @@
 <div class="login-container">
-  <div class="login-card" [ngClass]="{ 'small-card': esAdmin, 'large-card': !esAdmin }">
-    <button pButton (click)="esAdmin = !esAdmin; resetForm()"
-            label="{{ esAdmin ? 'Egresados' : 'Administrador' }}"
-            class="p-button-sm toggle-button"></button>
+  <div class="login-card" [ngClass]="{ 'admin-card': esAdmin, 'graduate-card': !esAdmin }">
 
+    <!-- Toggle Button -->
+    <button pButton
+            (click)="esAdmin = !esAdmin; resetForm()"
+            [label]="esAdmin ? 'Egresados' : 'Administrador'"
+            class="toggle-button p-button-outlined p-button-sm"
+            icon="">
+    </button>
+
+    <!-- Header Section -->
     <div class="login-header">
-      <img [src]="esAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'"
-           alt="Logo"
-           class="logo">
-      <h1>{{ esAdmin ? 'Administrador' : 'Egresados' }}</h1>
-      <p>{{ esAdmin ? 'Iniciar sesión Administrador' : 'Iniciar sesión Egresados' }}</p>
+      <div class="logo-container">
+        <img [src]="esAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'"
+             alt="Logo"
+             class="logo">
+        <div class="logo-glow"></div>
+      </div>
+
+      <h1 class="login-title">{{ esAdmin ? 'Panel Administrativo' : 'Portal Egresados' }}</h1>
+      <p class="login-subtitle">{{ esAdmin ? 'Acceso exclusivo para administradores' : 'Bienvenido al portal de egresados' }}</p>
     </div>
 
-    <form [formGroup]="formularioLogin" (ngSubmit)="login()">
-      <!-- Campos y botón para administrador -->
-      <div *ngIf="esAdmin">
-        <div class="form-group">
-          <label for="emailUsuario">Correo electrónico</label>
-          <input id="emailUsuario"
-                 type="email"
-                 pInputText
-                 formControlName="emailUsuario"
-                 placeholder="admin@correo.com">
-          <span *ngIf="campoInvalido('emailUsuario')" class="error-message">El correo es inválido</span>
+    <!-- Form Section -->
+    <form [formGroup]="formularioLogin" (ngSubmit)="login()" class="login-form">
+
+      <!-- Admin Form -->
+      <div *ngIf="esAdmin" class="form-section">
+        <div class="input-group">
+          <label for="emailUsuario" class="input-label">
+            <i class="pi pi-envelope"></i>
+            Correo Electrónico
+          </label>
+          <div class="input-wrapper">
+            <input id="emailUsuario"
+                   type="email"
+                   pInputText
+                   formControlName="emailUsuario"
+                   placeholder="Ingrese su correo"
+                   class="modern-input">
+            <span *ngIf="campoInvalido('emailUsuario')" class="error-message">
+              <i class="pi pi-exclamation-triangle"></i>
+              El correo electrónico es inválido
+            </span>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="contrasenia">Contraseña</label>
-          <input id="contrasenia"
-                      type="password"
-                      formControlName="contrasenia"
-                      placeholder="**********">
-          <span *ngIf="campoInvalido('contrasenia')" class="error-message">La contraseña es obligatoria</span>
+        <div class="input-group">
+          <label for="contrasenia" class="input-label">
+            <i class="pi pi-lock"></i>
+            Contraseña
+          </label>
+          <div class="input-wrapper">
+            <p-password
+              id="contrasenia"
+              formControlName="contrasenia"
+              placeholder="Ingrese su contraseña"
+              [feedback]="false"
+              [toggleMask]="true"
+              styleClass="modern-password"
+              inputStyleClass="modern-password-input">
+            </p-password>
+            <span *ngIf="campoInvalido('contrasenia')" class="error-message">
+              <i class="pi pi-exclamation-triangle"></i>
+              La contraseña es obligatoria
+            </span>
+          </div>
         </div>
 
-        <div class="remember-forgot">
-          <a routerLink="/auth/reset-password" class="forgot-password">¿Olvidaste tu contraseña?</a>
+        <div class="forgot-password-section">
+          <a routerLink="/auth/reset-password" class="forgot-link">
+            <i class="pi pi-question-circle"></i>
+            ¿Olvidaste tu contraseña?
+          </a>
         </div>
 
-        <div class="form-group p-d-flex p-jc-start">
+        <div class="button-section">
           <p-button type="submit"
-                    icon="pi pi-user"
-                    label="Iniciar sesión"
+                    icon="pi pi-sign-in"
+                    label="Iniciar Sesión"
                     [disabled]="formularioLogin.invalid"
-                    styleClass="w-full text-xs sm:text-sm md:text-base">
+                    [loading]="false"
+                    styleClass="login-button admin-button">
           </p-button>
         </div>
       </div>
 
-      <!-- Botón para egresados -->
-      <div *ngIf="!esAdmin" class="form-group button-container">
-        <p-button label="Iniciar sesión con LinkedIn"
-                  icon="pi pi-linkedin"
-                  (click)="loginWithLinkedIn()"
-                  styleClass="w-full text-xs sm:text-sm md:text-base">
-        </p-button>
+      <!-- Graduate Form -->
+      <div *ngIf="!esAdmin" class="form-section graduate-section">
+        <div class="linkedin-info">
+          <i class="pi pi-linkedin linkedin-icon"></i>
+          <h3>Conecta con tu perfil profesional</h3>
+          <p>Accede de forma rápida y segura usando tu cuenta de LinkedIn</p>
+        </div>
+
+        <div class="button-section">
+          <p-button label="Continuar con LinkedIn"
+                    icon="pi pi-linkedin"
+                    (click)="loginWithLinkedIn()"
+                    styleClass="linkedin-button">
+          </p-button>
+        </div>
+
+        <!-- <div class="security-note">
+          <i class="pi pi-shield"></i>
+          <span>Tus datos están protegidos y seguros</span>
+        </div> -->
       </div>
     </form>
+  </div>
+
+  <!-- Background Decoration -->
+  <div class="bg-decoration">
+    <div class="decoration-circle circle-1"></div>
+    <div class="decoration-circle circle-2"></div>
+    <div class="decoration-circle circle-3"></div>
   </div>
 </div>

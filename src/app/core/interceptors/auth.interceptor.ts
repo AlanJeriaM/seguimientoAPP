@@ -16,9 +16,20 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private router: Router) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    // Obtener el token del sessionStorage
-    const token = sessionStorage.getItem('token');
+    // Rutas que no requieren autenticación (públicas)
+    const publicRoutes = [
+      '/api/auth/send-reset-code',
+      '/api/auth/verify-reset-code',
+      '/api/auth/reset-password',
+      '/api/auth/login',
+      '/api/auth/linkedin'
+    ];
 
+    // Verificar si la ruta actual es pública
+    const isPublicRoute = publicRoutes.some(route => request.url.includes(route));
+
+    // Obtener el token del sessionStorage solo si no es una ruta pública
+    const token = !isPublicRoute ? sessionStorage.getItem('token') : null;
 
     if (token) {
       // Preparar headers
@@ -42,8 +53,8 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
 
-        // Si el error es 401 (Unauthorized), redirigir al login
-        if (error.status === 401) {
+        // Si el error es 401 (Unauthorized) y NO es una ruta pública, redirigir al login
+        if (error.status === 401 && !isPublicRoute) {
           console.error('Token expirado o inválido. Redirigiendo al login...');
           sessionStorage.removeItem('token');
           this.router.navigate(['/auth/login']);

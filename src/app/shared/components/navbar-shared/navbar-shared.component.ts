@@ -31,24 +31,36 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.userName = this.authService.usuario.nombreUsuario;
-    this.menuItems = [
-      {
-        label: 'Mi Perfil',
-        icon: 'pi pi-user',
-        routerLink: this.isAdmin() ? '/admin/mi-perfil' : '/user/mi-perfil'
-      },
-      { separator: true },
-      {
-        label: 'Cerrar sesión',
-        icon: 'pi pi-sign-out',
-        command: () => this.logOut()
-      }
-    ];
+    // Solo inicializar si hay un usuario autenticado
+    if (this.authService.usuario && this.authService.usuario.nombreUsuario) {
+      this.userName = this.authService.usuario.nombreUsuario;
+      this.menuItems = [
+        {
+          label: 'Mi Perfil',
+          icon: 'pi pi-user',
+          routerLink: this.isAdmin() ? '/admin/mi-perfil' : '/user/mi-perfil'
+        },
+        { separator: true },
+        {
+          label: 'Cerrar sesión',
+          icon: 'pi pi-sign-out',
+          command: () => this.logOut()
+        }
+      ];
 
-    // Solo inicializar notificaciones para usuarios
-    if (this.isUser()) {
-      this.inicializarNotificaciones();
+      // Solo inicializar notificaciones para usuarios autenticados
+      if (this.isUser()) {
+        this.inicializarNotificaciones();
+      }
+    } else {
+      // Usuario no autenticado - mostrar solo opciones básicas
+      this.menuItems = [
+        {
+          label: 'Iniciar Sesión',
+          icon: 'pi pi-sign-in',
+          routerLink: '/auth/login'
+        }
+      ];
     }
   }
 
