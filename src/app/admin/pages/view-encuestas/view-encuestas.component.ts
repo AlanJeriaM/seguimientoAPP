@@ -320,7 +320,33 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     });
   }
 
-  getEstadoBadgeClass(estado: string): string {
+  getEstadoBadgeClass(estado: string, encuesta?: Encuesta): string {
+    if (encuesta) {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0); // Inicio del día actual
+      
+      // Si la encuesta está expirada, usar clase específica
+      if (encuesta.fecha_fin) {
+        const fechaFin = new Date(encuesta.fecha_fin);
+        fechaFin.setHours(23, 59, 59, 999);
+        
+        if (fechaFin < hoy) {
+          return 'estado-expirada';
+        }
+      }
+      
+      // Si la encuesta tiene fecha de inicio en el futuro, usar clase específica
+      // Solo si el estado es ACTIVA (no para BORRADOR, PAUSADA, etc.)
+      if (encuesta.fecha_inicio && estado === 'ACTIVA') {
+        const fechaInicio = new Date(encuesta.fecha_inicio);
+        fechaInicio.setHours(0, 0, 0, 0);
+        
+        if (fechaInicio > hoy) {
+          return 'estado-proximamente';
+        }
+      }
+    }
+    
     switch (estado) {
       case 'BORRADOR':
         return 'estado-borrador';
@@ -335,7 +361,33 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     }
   }
 
-  getEstadoLabel(estado: string): string {
+  getEstadoLabel(estado: string, encuesta?: Encuesta): string {
+    if (encuesta) {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0); // Inicio del día actual
+      
+      // Si la encuesta tiene fecha de fin y ya pasó, mostrar "Expirada"
+      if (encuesta.fecha_fin) {
+        const fechaFin = new Date(encuesta.fecha_fin);
+        fechaFin.setHours(23, 59, 59, 999); // Fin del día de expiración
+        
+        if (fechaFin < hoy) {
+          return 'Expirada';
+        }
+      }
+      
+      // Si la encuesta tiene fecha de inicio en el futuro, mostrar "Próximamente"
+      // Solo si el estado es ACTIVA (no para BORRADOR, PAUSADA, etc.)
+      if (encuesta.fecha_inicio && estado === 'ACTIVA') {
+        const fechaInicio = new Date(encuesta.fecha_inicio);
+        fechaInicio.setHours(0, 0, 0, 0); // Inicio del día de inicio
+        
+        if (fechaInicio > hoy) {
+          return 'Próximamente';
+        }
+      }
+    }
+    
     switch (estado) {
       case 'BORRADOR':
         return 'Borrador';
@@ -348,6 +400,21 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
       default:
         return estado;
     }
+  }
+
+  /**
+   * Verifica si una encuesta está expirada
+   */
+  isEncuestaExpirada(encuesta: Encuesta): boolean {
+    if (!encuesta.fecha_fin) {
+      return false; // Si no tiene fecha de fin, no está expirada
+    }
+    
+    const fechaFin = new Date(encuesta.fecha_fin);
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999); // Fin del día actual
+    
+    return fechaFin < hoy;
   }
 
   cerrarDialog(): void {

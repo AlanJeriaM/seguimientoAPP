@@ -103,6 +103,26 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   iniciarEncuesta(encuesta: EncuestaDisponible): void {
+    // Verificar si la encuesta está expirada
+    if (this.isEncuestaExpirada(encuesta)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Encuesta Expirada',
+        detail: 'Esta encuesta ya ha expirado y no se puede responder'
+      });
+      return;
+    }
+
+    // Verificar si la encuesta está próxima
+    if (this.isEncuestaProxima(encuesta)) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Encuesta Próxima',
+        detail: `Esta encuesta estará disponible a partir del ${new Date(encuesta.fecha_inicio!).toLocaleDateString()}`
+      });
+      return;
+    }
+
     if (encuesta.estado_usuario === 'COMPLETADA') {
       this.messageService.add({
         severity: 'info',
@@ -117,6 +137,26 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   continuarEncuesta(encuesta: EncuestaDisponible): void {
+    // Verificar si la encuesta está expirada
+    if (this.isEncuestaExpirada(encuesta)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Encuesta Expirada',
+        detail: 'Esta encuesta ya ha expirado y no se puede continuar'
+      });
+      return;
+    }
+
+    // Verificar si la encuesta está próxima
+    if (this.isEncuestaProxima(encuesta)) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Encuesta Próxima',
+        detail: `Esta encuesta estará disponible a partir del ${new Date(encuesta.fecha_inicio!).toLocaleDateString()}`
+      });
+      return;
+    }
+
     if (encuesta.estado_usuario !== 'EN_PROGRESO') {
       this.iniciarEncuesta(encuesta);
       return;
@@ -169,6 +209,16 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   getBotonTexto(encuesta: EncuestaDisponible): string {
+    // Si la encuesta está expirada, mostrar texto específico
+    if (this.isEncuestaExpirada(encuesta)) {
+      return 'Expirada';
+    }
+    
+    // Si la encuesta está próxima, mostrar texto específico
+    if (this.isEncuestaProxima(encuesta)) {
+      return 'Próximamente';
+    }
+    
     switch (encuesta.estado_usuario) {
       case 'NO_INICIADA':
         return 'Iniciar';
@@ -182,6 +232,16 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   getBotonIcono(encuesta: EncuestaDisponible): string {
+    // Si la encuesta está expirada, mostrar icono específico
+    if (this.isEncuestaExpirada(encuesta)) {
+      return 'pi pi-clock';
+    }
+    
+    // Si la encuesta está próxima, mostrar icono específico
+    if (this.isEncuestaProxima(encuesta)) {
+      return 'pi pi-calendar-plus';
+    }
+    
     switch (encuesta.estado_usuario) {
       case 'NO_INICIADA':
         return 'pi pi-play';
@@ -195,6 +255,16 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   getBotonSeverity(encuesta: EncuestaDisponible): "success" | "info" | "help" | "primary" | "secondary" | "contrast" | "warning" | "danger" {
+    // Si la encuesta está expirada, usar severity de advertencia
+    if (this.isEncuestaExpirada(encuesta)) {
+      return 'secondary';
+    }
+    
+    // Si la encuesta está próxima, usar severity de información
+    if (this.isEncuestaProxima(encuesta)) {
+      return 'info';
+    }
+    
     switch (encuesta.estado_usuario) {
       case 'NO_INICIADA':
         return 'primary';
@@ -205,6 +275,66 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
       default:
         return 'primary';
     }
+  }
+
+  /**
+   * Verifica si una encuesta está expirada
+   */
+  isEncuestaExpirada(encuesta: EncuestaDisponible): boolean {
+    if (!encuesta.fecha_fin) {
+      return false; // Si no tiene fecha de fin, no está expirada
+    }
+    
+    const fechaFin = new Date(encuesta.fecha_fin);
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999); // Fin del día actual
+    
+    return fechaFin < hoy;
+  }
+
+  /**
+   * Verifica si una encuesta está próxima (fecha de inicio en el futuro)
+   */
+  isEncuestaProxima(encuesta: EncuestaDisponible): boolean {
+    // Si la encuesta ya está completada, no está próxima
+    if (encuesta.estado_usuario === 'COMPLETADA') {
+      return false;
+    }
+    
+    // Si no tiene fecha de inicio, no está próxima
+    if (!encuesta.fecha_inicio) {
+      return false;
+    }
+    
+    const fechaInicio = new Date(encuesta.fecha_inicio);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Inicio del día actual
+    fechaInicio.setHours(0, 0, 0, 0); // Inicio del día de inicio
+    
+    // Si la fecha de inicio es mayor al día actual, está próxima
+    return fechaInicio > hoy;
+  }
+
+  /**
+   * Verifica si el botón debe estar deshabilitado
+   */
+  isBotonDeshabilitado(encuesta: EncuestaDisponible): boolean {
+    // Si la encuesta está expirada, deshabilitar el botón
+    if (this.isEncuestaExpirada(encuesta)) {
+      return true;
+    }
+    
+    // Si la encuesta está próxima (fecha de inicio en el futuro), deshabilitar el botón
+    if (this.isEncuestaProxima(encuesta)) {
+      return true;
+    }
+    
+    // Si ya está completada, no deshabilitar (para ver resultados)
+    if (encuesta.estado_usuario === 'COMPLETADA') {
+      return false;
+    }
+    
+    return false;
   }
 
   /**

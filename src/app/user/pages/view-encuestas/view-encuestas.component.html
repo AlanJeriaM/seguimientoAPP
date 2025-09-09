@@ -87,9 +87,33 @@
               <span>{{ encuesta.tiempo_estimado }} minutos</span>
             </div>
             <div class="meta-item">
-              <i class="pi pi-calendar text-green-500"></i>
-              <span>Hasta: {{ encuesta.fecha_fin | date:'dd/MM/yyyy' }}</span>
+              <i class="pi pi-calendar" [ngClass]="isEncuestaExpirada(encuesta) ? 'text-red-500' : 'text-green-500'"></i>
+              <span [ngClass]="isEncuestaExpirada(encuesta) ? 'text-red-500' : ''">
+                Hasta: {{ encuesta.fecha_fin | date:'dd/MM/yyyy' }}
+              </span>
             </div>
+          </div>
+
+          <!-- Mensaje para encuestas próximas -->
+          <div *ngIf="isEncuestaProxima(encuesta)" class="upcoming-section">
+            <div class="upcoming-info">
+              <i class="pi pi-calendar-plus text-blue-500 mr-2"></i>
+              <span class="upcoming-text">Esta encuesta estará disponible próximamente</span>
+            </div>
+            <small class="upcoming-note">
+              Disponible a partir del {{ encuesta.fecha_inicio | date:'dd/MM/yyyy' }}
+            </small>
+          </div>
+
+          <!-- Mensaje para encuestas expiradas -->
+          <div *ngIf="isEncuestaExpirada(encuesta)" class="expired-section">
+            <div class="expired-info">
+              <i class="pi pi-exclamation-triangle text-red-500 mr-2"></i>
+              <span class="expired-text">Esta encuesta ha expirado</span>
+            </div>
+            <small class="expired-note">
+              Ya no es posible responder esta encuesta
+            </small>
           </div>
 
           <!-- Barra de progreso para encuestas en progreso -->
@@ -127,6 +151,7 @@
               [label]="getBotonTexto(encuesta)"
               [icon]="getBotonIcono(encuesta)"
               [severity]="getBotonSeverity(encuesta)"
+              [disabled]="isBotonDeshabilitado(encuesta)"
               (click)="encuesta.estado_usuario === 'EN_PROGRESO' ? continuarEncuesta(encuesta) : 
                        encuesta.estado_usuario === 'COMPLETADA' ? verResultados(encuesta) : 
                        iniciarEncuesta(encuesta)"
