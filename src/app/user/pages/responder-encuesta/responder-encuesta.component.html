@@ -34,6 +34,7 @@
             icon="pi pi-times"
             [outlined]="true"
             severity="secondary"
+            [disabled]="formularioDeshabilitado"
             (click)="salir()"
           ></p-button>
         </div>
@@ -54,7 +55,7 @@
     </div>
 
     <!-- Formulario de respuestas -->
-    <form [formGroup]="formularioRespuestas" (ngSubmit)="enviarRespuestas()" *ngIf="formularioRespuestas">
+    <form [formGroup]="formularioRespuestas" (ngSubmit)="enviarRespuestas()" *ngIf="formularioRespuestas" [class.form-disabled]="formularioDeshabilitado">
       <div class="pregunta-container">
         <!-- Pregunta actual -->
         <div 
@@ -79,6 +80,7 @@
                   formControlName="respuesta"
                   placeholder="Escribe tu respuesta..."
                   class="w-full"
+                  [disabled]="formularioDeshabilitado"
                   [class.ng-invalid]="getPreguntaControl(preguntaActual).get('respuesta')?.invalid && getPreguntaControl(preguntaActual).get('respuesta')?.touched"
                 />
               </div>
@@ -91,6 +93,7 @@
                   placeholder="Escribe tu respuesta detallada..."
                   rows="4"
                   class="w-full"
+                  [disabled]="formularioDeshabilitado"
                   [class.ng-invalid]="getPreguntaControl(preguntaActual).get('respuesta')?.invalid && getPreguntaControl(preguntaActual).get('respuesta')?.touched"
                 ></textarea>
               </div>
@@ -103,6 +106,7 @@
                       [inputId]="'radio_pregunta_' + pregunta.id + '_opcion_' + j"
                       [value]="opcion"
                       formControlName="respuesta"
+                      [disabled]="formularioDeshabilitado"
                     ></p-radioButton>
                     <label [for]="'radio_pregunta_' + pregunta.id + '_opcion_' + j" class="opcion-label">{{ opcion }}</label>
                   </div>
@@ -122,6 +126,7 @@
                     <p-checkbox 
                       [inputId]="'check_pregunta_' + pregunta.id + '_opcion_' + j"
                       [binary]="true"
+                      [disabled]="formularioDeshabilitado"
                       (onChange)="onOpcionMultipleChange(preguntaActual, j, $event.checked)"
                     ></p-checkbox>
                     <label [for]="'check_pregunta_' + pregunta.id + '_opcion_' + j" class="opcion-label">{{ opcion }}</label>
@@ -161,6 +166,7 @@
                   [min]="pregunta.configuracion?.min_value"
                   [max]="pregunta.configuracion?.max_value"
                   [useGrouping]="false"
+                  [disabled]="formularioDeshabilitado"
                   class="w-full"
                 ></p-inputNumber>
               </div>
@@ -197,7 +203,7 @@
             icon="pi pi-chevron-left"
             [outlined]="true"
             (click)="anteriorPregunta()"
-            [disabled]="preguntaActual === 0"
+            [disabled]="preguntaActual === 0 || formularioDeshabilitado"
           ></p-button>
 
           <div class="navegacion-info">
@@ -210,6 +216,7 @@
             icon="pi pi-chevron-right"
             iconPos="right"
             (click)="siguientePregunta()"
+            [disabled]="formularioDeshabilitado"
           ></p-button>
 
           <p-button 
@@ -219,6 +226,7 @@
             iconPos="right"
             severity="success"
             [loading]="enviando"
+            [disabled]="formularioDeshabilitado"
             type="submit"
           ></p-button>
         </div>

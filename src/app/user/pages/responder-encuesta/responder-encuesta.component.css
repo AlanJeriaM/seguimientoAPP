@@ -411,3 +411,26 @@
 .pregunta-card.active {
   animation: slideIn 0.3s ease-out;
 }
+
+/* Formulario deshabilitado */
+.form-disabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.form-disabled .pregunta-card {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+}
+
+.form-disabled .pregunta-texto {
+  color: #6c757d;
+}
+
+.form-disabled .opcion-label {
+  color: #6c757d;
+}
+
+.form-disabled .p-button {
+  opacity: 0.5;
+}
