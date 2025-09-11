@@ -33,6 +33,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   loading = true;
   error: string | null = null;
   errores: string[] = [];
+  imageError = false;
 
   // Chart references
   private charts: { [key: string]: Chart } = {};
@@ -550,5 +551,10 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     if (!this.tecnologiasDemandadas.length) return 0;
     const maxDemanda = this.tecnologiasDemandadas[0].demanda || 1;
     return (demanda / maxDemanda) * 100;
+  }
+
+  handleImageError(event: any): void {
+    console.log('Error cargando imagen de perfil, usando iniciales');
+    this.imageError = true;
   }
 }

@@ -226,3 +226,13 @@
 ::ng-deep .p-tieredmenu .p-menuitem-link {
   padding: 0.75rem 1rem;
 }
+
+/* Hover rojo para el botón "Cerrar sesión" */
+::ng-deep .p-tieredmenu .p-menuitem:last-child .p-menuitem-link:hover {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+::ng-deep .p-tieredmenu .p-menuitem:last-child .p-menuitem-link:hover .p-menuitem-icon {
+  color: #dc2626 !important;
+}
