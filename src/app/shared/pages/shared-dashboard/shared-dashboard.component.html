@@ -34,7 +34,16 @@
       <!-- Perfil Personal del Usuario -->
       <div class="profile-header" *ngIf="perfilUsuario">
         <div class="profile-avatar">
+          <img
+            *ngIf="perfilUsuario?.perfil_imagen_url && !imageError"
+            [src]="perfilUsuario.perfil_imagen_url"
+            alt="Perfil de LinkedIn"
+            class="border-circle shadow-3"
+            style="width: 80px; height: 80px; object-fit: cover;"
+            (error)="handleImageError($event)"
+          >
           <p-avatar
+            *ngIf="!perfilUsuario?.perfil_imagen_url || imageError"
             [label]="getUserInitials()"
             size="xlarge"
             shape="circle"

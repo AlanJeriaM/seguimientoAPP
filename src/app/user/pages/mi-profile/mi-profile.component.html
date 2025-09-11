@@ -64,10 +64,6 @@
             <!-- Profile Meta -->
             <div class="flex flex-column gap-2">
               <div class="flex align-items-center gap-2 text-600">
-                <i class="pi pi-calendar text-primary"></i>
-                <span class="text-sm">Perfil creado el: {{ getProfileCreationDate() }}</span>
-              </div>
-              <div class="flex align-items-center gap-2 text-600">
                 <i class="pi pi-clock text-primary"></i>
                 <span class="text-sm" *ngIf="perfil.ultimo_acceso; else primerAcceso">
                   Último acceso: {{ getFormattedDateTime(perfil.ultimo_acceso) }}

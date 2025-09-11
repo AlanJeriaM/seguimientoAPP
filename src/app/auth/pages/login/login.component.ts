@@ -109,7 +109,7 @@ export class LoginComponent implements OnInit {
   }
 
   loginWithLinkedIn() {
-    if (this.isProduction) {
+    if (environment.useRealLinkedIn) {
       this.loginWithLinkedInReal();
     } else {
       this.loginWithLinkedInSimulado();
