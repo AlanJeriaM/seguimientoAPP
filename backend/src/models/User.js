@@ -79,6 +79,52 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     allowNull: true,
     comment: 'Fecha cuando el usuario fue desactivado/eliminado'
+  },
+  // Campos adicionales para métricas y análisis
+  perfil_completo: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Indica si el usuario completó todos los campos obligatorios del perfil'
+  },
+  años_experiencia: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Años totales de experiencia profesional'
+  },
+  nivel_educacion: {
+    type: DataTypes.ENUM('Técnico', 'Licenciatura', 'Maestría', 'Doctorado', 'Otro'),
+    allowNull: true,
+    comment: 'Nivel más alto de educación completado'
+  },
+  especialidad_tecnica: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Especialidad técnica principal (JavaScript, Python, Java, etc.)'
+  },
+  tipo_empleo_actual: {
+    type: DataTypes.ENUM('Tiempo completo', 'Part-time', 'Freelance', 'Desempleado', 'Estudiante'),
+    allowNull: true,
+    comment: 'Tipo de empleo actual'
+  },
+  rango_salarial: {
+    type: DataTypes.ENUM('0-500k', '500k-1M', '1M-1.5M', '1.5M-2M', '2M-3M', '3M+', 'Prefiero no decir'),
+    allowNull: true,
+    comment: 'Rango salarial mensual en CLP para análisis estadístico'
+  },
+  disponibilidad_cambio: {
+    type: DataTypes.ENUM('Activamente buscando', 'Abierto a oportunidades', 'No disponible', 'No seguro'),
+    allowNull: true,
+    comment: 'Disponibilidad para cambio de trabajo'
+  },
+  tecnologias_principales: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    comment: 'Array de tecnologías principales que maneja'
+  },
+  area_interes: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Área de interés profesional (Frontend, Backend, DevOps, etc.)'
   }
 }, {
   tableName: 'users',

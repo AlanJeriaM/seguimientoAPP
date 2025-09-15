@@ -25,6 +25,12 @@ export class AuthInterceptor implements HttpInterceptor {
       '/api/auth/linkedin'
     ];
 
+    // Rutas que requieren autenticación pero no deben causar redirección en caso de error
+    const protectedButNoRedirectRoutes = [
+      '/api/users/verificar-perfil-completo',
+      '/api/auth/renew'
+    ];
+
     // Verificar si la ruta actual es pública
     const isPublicRoute = publicRoutes.some(route => request.url.includes(route));
 
@@ -53,8 +59,11 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
 
-        // Si el error es 401 (Unauthorized) y NO es una ruta pública, redirigir al login
-        if (error.status === 401 && !isPublicRoute) {
+        // Verificar si es una ruta protegida que no debe causar redirección
+        const isProtectedNoRedirect = protectedButNoRedirectRoutes.some(route => request.url.includes(route));
+
+        // Si el error es 401 (Unauthorized) y NO es una ruta pública ni protegida sin redirección, redirigir al login
+        if (error.status === 401 && !isPublicRoute && !isProtectedNoRedirect) {
           console.error('Token expirado o inválido. Redirigiendo al login...');
           sessionStorage.removeItem('token');
           this.router.navigate(['/auth/login']);

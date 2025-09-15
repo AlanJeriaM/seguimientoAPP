@@ -97,8 +97,67 @@ const verificarCliente = async (req, res, next) => {
   }
 };
 
+// Verificar que el usuario sea admin o cliente (para dashboard)
+const verificarAdminOCliente = async (req, res, next) => {
+  try {
+    // Verificar que req.usuario existe (del middleware verificarToken)
+    if (!req.usuario) {
+      console.error('Error en verificarAdminOCliente: req.usuario es undefined');
+      return res.status(401).json({
+        ok: false,
+        msj: 'Usuario no autenticado'
+      });
+    }
+
+    const { id, rol } = req.usuario;
+    
+    if (rol !== 'ADMIN-USER' && rol !== 'CLIENT-USER') {
+      return res.status(403).json({
+        ok: false,
+        msj: 'Acceso denegado'
+      });
+    }
+
+    // Obtener el usuario completo de la base de datos según su rol
+    let usuario = null;
+    
+    if (rol === 'ADMIN-USER') {
+      usuario = await Admin.findByPk(id);
+      if (!usuario || !usuario.activo) {
+        return res.status(403).json({
+          ok: false,
+          msj: 'Administrador no encontrado o inactivo'
+        });
+      }
+    } else if (rol === 'CLIENT-USER') {
+      usuario = await User.findByPk(id);
+      if (!usuario || !usuario.activo) {
+        return res.status(403).json({
+          ok: false,
+          msj: 'Usuario no encontrado o inactivo'
+        });
+      }
+    }
+
+    // Actualizar último acceso
+    await usuario.update({ ultimo_acceso: new Date() });
+
+    // Establecer el usuario completo en req.user (para compatibilidad con otros middlewares)
+    req.user = usuario;
+    
+    next();
+  } catch (error) {
+    console.error('Error en verificarAdminOCliente:', error);
+    return res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor'
+    });
+  }
+};
+
 module.exports = {
   verificarToken,
   verificarAdmin,
-  verificarCliente
+  verificarCliente,
+  verificarAdminOCliente
 };

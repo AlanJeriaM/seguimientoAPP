@@ -188,11 +188,37 @@ const linkedinCallback = async (req, res) => {
         console.log('Usuario creado con ID:', user.id);
       } else {
         console.log('Actualizando usuario existente...');
-        await user.update({
-          ...linkedinData,
+        
+        // Solo actualizar campos que están vacíos o null para preservar datos editados por el usuario
+        const datosParaActualizar = {
+          // Siempre actualizar estos campos críticos
+          nombre: linkedinData.nombre,
+          correo: linkedinData.correo,
+          perfil_imagen_url: linkedinData.perfil_imagen_url,
           linkedin_data: linkedinData,
           ultimo_acceso: new Date()
-        });
+        };
+
+        // Solo actualizar campos de perfil si están vacíos en la BD
+        if (!user.posicion_actual || user.posicion_actual === 'No especificada') {
+          datosParaActualizar.posicion_actual = linkedinData.posicion_actual;
+        }
+        if (!user.empresa_actual || user.empresa_actual === 'No especificada') {
+          datosParaActualizar.empresa_actual = linkedinData.empresa_actual;
+        }
+        if (!user.ubicacion || user.ubicacion === 'No especificada') {
+          datosParaActualizar.ubicacion = linkedinData.ubicacion;
+        }
+        if (!user.resumen || user.resumen === 'Sin resumen') {
+          datosParaActualizar.resumen = linkedinData.resumen;
+        }
+        if (!user.industria || user.industria === 'No especificada') {
+          datosParaActualizar.industria = linkedinData.industria;
+        }
+
+        console.log('📋 Datos que se actualizarán:', datosParaActualizar);
+        
+        await user.update(datosParaActualizar);
         console.log('Usuario actualizado');
       }
 

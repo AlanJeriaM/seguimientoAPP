@@ -65,6 +65,52 @@ export interface PerfilUsuario {
   rol: string;
 }
 
+// Nuevas interfaces para métricas avanzadas
+export interface DistribucionExperiencia {
+  rango: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface DistribucionEducacion {
+  nivel: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface TecnologiaPopular {
+  tecnologia: string;
+  cantidad: number;
+  porcentaje: number;
+  tendencia: 'up' | 'down' | 'stable';
+}
+
+export interface EstadisticasSalariales {
+  rango: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface DistribucionAreas {
+  area: string;
+  cantidad: number;
+  porcentaje: number;
+  demandaLaboral: number;
+}
+
+export interface MetricasAvanzadas {
+  distribucionExperiencia: DistribucionExperiencia[];
+  distribucionEducacion: DistribucionEducacion[];
+  tecnologiasPopulares: TecnologiaPopular[];
+  estadisticasSalariales: EstadisticasSalariales[];
+  distribucionAreas: DistribucionAreas[];
+  tiposEmpleo: {
+    tipo: string;
+    cantidad: number;
+    porcentaje: number;
+  }[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -254,5 +300,16 @@ export class DashboardService {
         observer.complete();
       });
     });
+  }
+
+  // Obtener métricas avanzadas basadas en los nuevos campos del perfil
+  obtenerMetricasAvanzadas(): Observable<{ ok: boolean; metricas?: MetricasAvanzadas; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/metricas-avanzadas`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener métricas avanzadas' 
+        }))
+      );
   }
 }

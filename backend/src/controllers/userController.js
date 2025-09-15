@@ -220,7 +220,17 @@ const obtenerMiPerfil = async (req, res) => {
       industria: user.industria || 'No especificada',
       ultimo_acceso: user.ultimo_acceso,
       fecha_registro: user.created_at,
-      rol: user.rol
+      rol: user.rol,
+      // Nuevos campos para métricas
+      perfil_completo: user.perfil_completo || false,
+      años_experiencia: user.años_experiencia,
+      nivel_educacion: user.nivel_educacion,
+      especialidad_tecnica: user.especialidad_tecnica,
+      tipo_empleo_actual: user.tipo_empleo_actual,
+      rango_salarial: user.rango_salarial,
+      disponibilidad_cambio: user.disponibilidad_cambio,
+      tecnologias_principales: user.tecnologias_principales,
+      area_interes: user.area_interes
     };
 
     res.json({
@@ -247,7 +257,16 @@ const actualizarMiPerfil = async (req, res) => {
       empresa_actual, 
       ubicacion, 
       resumen, 
-      industria 
+      industria,
+      // Nuevos campos para métricas
+      años_experiencia,
+      nivel_educacion,
+      especialidad_tecnica,
+      tipo_empleo_actual,
+      rango_salarial,
+      disponibilidad_cambio,
+      tecnologias_principales,
+      area_interes
     } = req.body;
 
     // Validaciones básicas
@@ -258,6 +277,12 @@ const actualizarMiPerfil = async (req, res) => {
       });
     }
 
+    console.log('📤 Datos recibidos del frontend:', {
+      nombre, posicion_actual, empresa_actual, ubicacion, industria, resumen,
+      años_experiencia, nivel_educacion, especialidad_tecnica, tipo_empleo_actual,
+      rango_salarial, disponibilidad_cambio, area_interes
+    });
+
     // Actualizar datos del usuario
     const datosActualizados = {
       nombre: nombre.trim(),
@@ -265,10 +290,40 @@ const actualizarMiPerfil = async (req, res) => {
       empresa_actual: empresa_actual?.trim() || null,
       ubicacion: ubicacion?.trim() || null,
       resumen: resumen?.trim() || null,
-      industria: industria?.trim() || null
+      industria: industria?.trim() || null,
+      // Nuevos campos para métricas
+      años_experiencia: años_experiencia !== undefined ? parseInt(años_experiencia) : null,
+      nivel_educacion: nivel_educacion?.trim() || null,
+      especialidad_tecnica: especialidad_tecnica?.trim() || null,
+      tipo_empleo_actual: tipo_empleo_actual?.trim() || null,
+      rango_salarial: rango_salarial?.trim() || null,
+      disponibilidad_cambio: disponibilidad_cambio?.trim() || null,
+      tecnologias_principales: Array.isArray(tecnologias_principales) ? tecnologias_principales : null,
+      area_interes: area_interes?.trim() || null
     };
 
+    // Verificar si todos los campos obligatorios están completos
+    const camposObligatorios = [
+      'años_experiencia',
+      'nivel_educacion', 
+      'especialidad_tecnica',
+      'tipo_empleo_actual',
+      'disponibilidad_cambio',
+      'area_interes'
+    ];
+
+    const perfilCompleto = camposObligatorios.every(campo => {
+      const valor = datosActualizados[campo];
+      return valor !== null && valor !== undefined && valor !== '';
+    });
+
+    datosActualizados.perfil_completo = perfilCompleto;
+    
+    console.log('💾 Datos que se van a guardar en BD:', datosActualizados);
+
     await user.update(datosActualizados);
+    
+    console.log('✅ Datos guardados en BD para usuario:', user.id);
 
     // Obtener usuario actualizado
     const usuarioActualizado = await User.findByPk(user.id, {
@@ -287,7 +342,17 @@ const actualizarMiPerfil = async (req, res) => {
       industria: usuarioActualizado.industria || 'No especificada',
       ultimo_acceso: usuarioActualizado.ultimo_acceso,
       fecha_registro: usuarioActualizado.created_at,
-      rol: usuarioActualizado.rol
+      rol: usuarioActualizado.rol,
+      // Nuevos campos para métricas
+      perfil_completo: usuarioActualizado.perfil_completo || false,
+      años_experiencia: usuarioActualizado.años_experiencia,
+      nivel_educacion: usuarioActualizado.nivel_educacion,
+      especialidad_tecnica: usuarioActualizado.especialidad_tecnica,
+      tipo_empleo_actual: usuarioActualizado.tipo_empleo_actual,
+      rango_salarial: usuarioActualizado.rango_salarial,
+      disponibilidad_cambio: usuarioActualizado.disponibilidad_cambio,
+      tecnologias_principales: usuarioActualizado.tecnologias_principales,
+      area_interes: usuarioActualizado.area_interes
     };
 
     console.log(`Perfil actualizado para usuario ${usuarioActualizado.nombre} (ID: ${user.id})`);
@@ -706,6 +771,70 @@ const eliminarUsuarioPermanentemente = async (req, res) => {
   }
 };
 
+// Verificar si el perfil está completo
+const verificarPerfilCompleto = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findByPk(userId, {
+      attributes: [
+        'id',
+        'perfil_completo',
+        'años_experiencia',
+        'nivel_educacion',
+        'especialidad_tecnica',
+        'tipo_empleo_actual',
+        'rango_salarial',
+        'disponibilidad_cambio',
+        'area_interes',
+        'tecnologias_principales'
+      ]
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        msj: 'Usuario no encontrado'
+      });
+    }
+
+    // Verificar si todos los campos obligatorios están completos
+    const camposObligatorios = [
+      'años_experiencia',
+      'nivel_educacion',
+      'especialidad_tecnica',
+      'tipo_empleo_actual',
+      'disponibilidad_cambio',
+      'area_interes'
+    ];
+
+    const perfilCompleto = camposObligatorios.every(campo => 
+      user[campo] !== null && user[campo] !== undefined && user[campo] !== ''
+    );
+
+    // Actualizar el estado del perfil si cambió
+    if (user.perfil_completo !== perfilCompleto) {
+      await user.update({ perfil_completo: perfilCompleto });
+    }
+
+    res.json({
+      ok: true,
+      perfil_completo: perfilCompleto,
+      campos_faltantes: camposObligatorios.filter(campo => 
+        user[campo] === null || user[campo] === undefined || user[campo] === ''
+      )
+    });
+
+  } catch (error) {
+    console.error('Error verificando perfil completo:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al verificar perfil',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
 module.exports = {
   obtenerUsuarios,
   obtenerUsuarioPorId,
@@ -716,5 +845,6 @@ module.exports = {
   obtenerEstadisticas,
   obtenerUsuariosEliminados,
   reactivarUsuario,
-  eliminarUsuarioPermanentemente
+  eliminarUsuarioPermanentemente,
+  verificarPerfilCompleto
 };

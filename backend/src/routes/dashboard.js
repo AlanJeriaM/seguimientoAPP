@@ -1,31 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const { verificarToken } = require('../middleware/auth');
-
 const {
   obtenerEstadisticasMercado,
+  obtenerMetricasAvanzadas,
   obtenerTecnologiasMasDemandadas,
   obtenerDistribucionSalarial,
   obtenerEmpresasQueContratanMas,
   obtenerTendenciasMercado
 } = require('../controllers/dashboardController');
+const { verificarToken, verificarAdminOCliente } = require('../middleware/auth');
 
-// Todas las rutas requieren autenticación
-router.use(verificarToken);
+// Rutas del dashboard (accesibles para admin y usuario)
+router.get('/estadisticas-mercado', verificarToken, verificarAdminOCliente, obtenerEstadisticasMercado);
 
-// GET /api/dashboard/estadisticas-mercado - Estadísticas generales del mercado
-router.get('/estadisticas-mercado', obtenerEstadisticasMercado);
+router.get('/metricas-avanzadas', verificarToken, verificarAdminOCliente, obtenerMetricasAvanzadas);
 
-// GET /api/dashboard/tecnologias-demandadas - Tecnologías más demandadas
-router.get('/tecnologias-demandadas', obtenerTecnologiasMasDemandadas);
-
-// GET /api/dashboard/distribucion-salarial - Distribución salarial por industria
-router.get('/distribucion-salarial', obtenerDistribucionSalarial);
-
-// GET /api/dashboard/empresas-contratan - Empresas que más contratan
-router.get('/empresas-contratan', obtenerEmpresasQueContratanMas);
-
-// GET /api/dashboard/tendencias-mercado - Tendencias del mercado laboral
-router.get('/tendencias-mercado', obtenerTendenciasMercado);
+router.get('/tecnologias-demandadas', verificarToken, verificarAdminOCliente, obtenerTecnologiasMasDemandadas);
+router.get('/distribucion-salarial', verificarToken, verificarAdminOCliente, obtenerDistribucionSalarial);
+router.get('/empresas-contratan', verificarToken, verificarAdminOCliente, obtenerEmpresasQueContratanMas);
+router.get('/tendencias-mercado', verificarToken, verificarAdminOCliente, obtenerTendenciasMercado);
 
 module.exports = router;

@@ -10,13 +10,15 @@ const {
   obtenerEstadisticas,
   obtenerUsuariosEliminados,
   reactivarUsuario,
-  eliminarUsuarioPermanentemente
+  eliminarUsuarioPermanentemente,
+  verificarPerfilCompleto
 } = require('../controllers/userController');
 const { verificarToken, verificarAdmin, verificarCliente } = require('../middleware/auth');
 
 // Rutas para usuarios cliente
 router.get('/mi-perfil', verificarToken, verificarCliente, obtenerMiPerfil);
 router.put('/mi-perfil', verificarToken, verificarCliente, actualizarMiPerfil);
+router.get('/verificar-perfil-completo', verificarToken, verificarCliente, verificarPerfilCompleto);
 
 // Rutas para administradores
 router.get('/', verificarToken, verificarAdmin, obtenerUsuarios);
