@@ -154,8 +154,7 @@ const obtenerMetricasAvanzadas = async (req, res) => {
       .map(([tecnologia, cantidad]) => ({
         tecnologia,
         cantidad,
-        porcentaje: Math.round((cantidad / totalUsuarios) * 100),
-        tendencia: 'stable' // Simplificado por ahora
+        porcentaje: Math.round((cantidad / totalUsuarios) * 100)
       }))
       .sort((a, b) => b.cantidad - a.cantidad)
       .slice(0, 10);
@@ -182,8 +181,7 @@ const obtenerMetricasAvanzadas = async (req, res) => {
       .map(([area, cantidad]) => ({
         area,
         cantidad,
-        porcentaje: Math.round((cantidad / totalUsuarios) * 100),
-        demandaLaboral: Math.floor(Math.random() * 100) + 50 // Simplificado
+        porcentaje: Math.round((cantidad / totalUsuarios) * 100)
       }))
       .sort((a, b) => b.cantidad - a.cantidad);
 
@@ -272,72 +270,53 @@ const obtenerDistribucionSalarial = async (req, res) => {
 
     console.log('📊 Usuarios encontrados para distribución salarial:', distribucion.length);
 
+    // Función para convertir rango salarial a valor promedio
+    const convertirRangoASalario = (rango) => {
+      switch(rango) {
+        case '0-500k': return 400000;
+        case '500k-1M': return 750000;
+        case '1M-1.5M': return 1250000;
+        case '1.5M-2M': return 1750000;
+        case '2M-3M': return 2500000;
+        case '3M+': return 3500000;
+        default: return 1000000; // Valor por defecto
+      }
+    };
+
     const distribuciones = {};
     distribucion.forEach(user => {
       const industria = user.industria || 'Sin especificar';
+      const salarioPromedio = convertirRangoASalario(user.rango_salarial);
+      
       if (!distribuciones[industria]) {
         distribuciones[industria] = {
           industria,
           cantidad: 0,
-          salarioMinimo: 500000,
-          salarioMaximo: 3000000,
-          salarioPromedio: 1500000,
-          variacionMensual: Math.floor(Math.random() * 20) - 10
+          salariosTotales: 0,
+          salarios: []
         };
       }
+      
       distribuciones[industria].cantidad++;
+      distribuciones[industria].salariosTotales += salarioPromedio;
+      distribuciones[industria].salarios.push(salarioPromedio);
     });
 
-    let resultado = Object.values(distribuciones);
+    // Calcular promedios reales por industria
+    Object.keys(distribuciones).forEach(industria => {
+      const data = distribuciones[industria];
+      data.salarioPromedio = Math.round(data.salariosTotales / data.cantidad);
+      data.salarioMinimo = Math.min(...data.salarios);
+      data.salarioMaximo = Math.max(...data.salarios);
+      
+      // Eliminar campos temporales
+      delete data.salariosTotales;
+      delete data.salarios;
+    });
+
+    const resultado = Object.values(distribuciones);
     
-    // Si no hay suficientes datos reales, generar datos de muestra
-    if (resultado.length === 0) {
-      console.log('⚠️ No hay datos salariales reales, generando datos de muestra...');
-      resultado = [
-        {
-          industria: 'Tecnología',
-          cantidad: 15,
-          salarioMinimo: 800000,
-          salarioMaximo: 3500000,
-          salarioPromedio: 2100000,
-          variacionMensual: 8
-        },
-        {
-          industria: 'Finanzas',
-          cantidad: 8,
-          salarioMinimo: 1000000,
-          salarioMaximo: 4000000,
-          salarioPromedio: 2400000,
-          variacionMensual: 5
-        },
-        {
-          industria: 'Salud',
-          cantidad: 6,
-          salarioMinimo: 900000,
-          salarioMaximo: 3200000,
-          salarioPromedio: 1800000,
-          variacionMensual: 3
-        },
-        {
-          industria: 'Educación',
-          cantidad: 4,
-          salarioMinimo: 600000,
-          salarioMaximo: 2000000,
-          salarioPromedio: 1200000,
-          variacionMensual: 2
-        },
-        {
-          industria: 'Energía y servicios públicos',
-          cantidad: 3,
-          salarioMinimo: 1200000,
-          salarioMaximo: 3800000,
-          salarioPromedio: 2500000,
-          variacionMensual: 6
-        }
-      ];
-    }
-    
-    console.log('📈 Distribución salarial final:', resultado);
+    console.log(`📈 Distribución salarial real de ${resultado.length} industrias:`, resultado);
 
     res.json({
       ok: true,
@@ -356,29 +335,71 @@ const obtenerDistribucionSalarial = async (req, res) => {
 // Obtener empresas que más contratan (simulado)
 const obtenerEmpresasQueContratanMas = async (req, res) => {
   try {
+    // Función para convertir rango salarial a valor promedio
+    const convertirRangoASalario = (rango) => {
+      switch(rango) {
+        case '0-500k': return 400000;
+        case '500k-1M': return 750000;
+        case '1M-1.5M': return 1250000;
+        case '1.5M-2M': return 1750000;
+        case '2M-3M': return 2500000;
+        case '3M+': return 3500000;
+        default: return 1000000; // Valor por defecto
+      }
+    };
+
     const empresas = await User.findAll({
       where: { 
         activo: true,
         empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
       },
-      attributes: ['empresa_actual']
+      attributes: ['empresa_actual', 'rango_salarial', 'satisfaccion_laboral']
     });
 
-    const empresaCount = {};
+    const empresaData = {};
     empresas.forEach(user => {
       const empresa = user.empresa_actual;
-      empresaCount[empresa] = (empresaCount[empresa] || 0) + 1;
+      const salario = convertirRangoASalario(user.rango_salarial);
+      
+      if (!empresaData[empresa]) {
+        empresaData[empresa] = {
+          empresa,
+          totalEmpleados: 0,
+          salarios: [],
+          satisfacciones: []
+        };
+      }
+      
+      empresaData[empresa].totalEmpleados++;
+      if (user.rango_salarial && user.rango_salarial !== 'Prefiero no decir') {
+        empresaData[empresa].salarios.push(salario);
+      }
+      if (user.satisfaccion_laboral && user.satisfaccion_laboral >= 1 && user.satisfaccion_laboral <= 5) {
+        empresaData[empresa].satisfacciones.push(user.satisfaccion_laboral);
+      }
     });
 
-    const empresasContratantes = Object.entries(empresaCount)
-      .map(([empresa, totalEmpleados]) => ({
-        empresa,
-        totalEmpleados,
-        vacantesAbiertas: Math.floor(Math.random() * 10) + 1,
-        promedioSalario: Math.floor(Math.random() * 2000000) + 800000,
-        satisfaccionLaboral: Math.floor(Math.random() * 30) + 70,
-        tipoEmpresa: ['Startup', 'Corporación', 'Pyme', 'Multinacional'][Math.floor(Math.random() * 4)]
-      }))
+    const empresasContratantes = Object.values(empresaData)
+      .map(data => {
+        // Calcular salario promedio real si hay datos, sino usar promedio del mercado
+        const promedioSalario = data.salarios.length > 0 
+          ? Math.round(data.salarios.reduce((sum, sal) => sum + sal, 0) / data.salarios.length)
+          : 1200000; // Promedio del mercado chileno
+        
+        // Calcular satisfacción promedio real si hay datos
+        const satisfaccionPromedio = data.satisfacciones.length > 0 
+          ? parseFloat((data.satisfacciones.reduce((sum, sat) => sum + sat, 0) / data.satisfacciones.length).toFixed(1))
+          : null;
+        
+        return {
+          empresa: data.empresa,
+          totalEmpleados: data.totalEmpleados,
+          promedioSalario,
+          satisfaccionPromedio,
+          tipoEmpresa: data.totalEmpleados >= 100 ? 'Corporación' : 
+                      data.totalEmpleados >= 50 ? 'Pyme' : 'Startup'
+        };
+      })
       .sort((a, b) => b.totalEmpleados - a.totalEmpleados)
       .slice(0, 10);
 
@@ -396,12 +417,13 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
   }
 };
 
-// Obtener tendencias del mercado (simulado)
+// Obtener tendencias del mercado basadas en datos reales
 const obtenerTendenciasMercado = async (req, res) => {
   try {
     const ultimosSeisMeses = [];
     const fechaActual = new Date();
 
+    // Calcular datos reales para los últimos 6 meses
     for (let i = 5; i >= 0; i--) {
       const fecha = new Date(fechaActual);
       fecha.setMonth(fecha.getMonth() - i);
@@ -409,6 +431,7 @@ const obtenerTendenciasMercado = async (req, res) => {
       const inicioMes = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
       const finMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
 
+      // Nuevos registros del mes
       const nuevosRegistros = await User.count({
         where: {
           activo: true,
@@ -416,18 +439,35 @@ const obtenerTendenciasMercado = async (req, res) => {
         }
       });
 
+      // Usuarios con perfil completo en ese mes
+      const perfilesCompletos = await User.count({
+        where: {
+          activo: true,
+          perfil_completo: true,
+          created_at: { [Op.between]: [inicioMes, finMes] }
+        }
+      });
+
       ultimosSeisMeses.push({
         mes: fecha.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
         nuevosRegistros,
-        demandaLaboral: Math.floor(Math.random() * 50) + 50,
-        satisfaccionPromedio: Math.floor(Math.random() * 20) + 70
+        perfilesCompletos
       });
     }
 
+    // Calcular resumen basado en datos reales
+    const totalNuevosRegistros = ultimosSeisMeses.reduce((sum, mes) => sum + mes.nuevosRegistros, 0);
+    const totalPerfilesCompletos = ultimosSeisMeses.reduce((sum, mes) => sum + mes.perfilesCompletos, 0);
+    
+    // Calcular crecimiento real comparando últimos 3 vs primeros 3 meses
+    const primerosTres = ultimosSeisMeses.slice(0, 3).reduce((sum, mes) => sum + mes.nuevosRegistros, 0);
+    const ultimosTres = ultimosSeisMeses.slice(3, 6).reduce((sum, mes) => sum + mes.nuevosRegistros, 0);
+    const crecimientoMensual = primerosTres > 0 ? Math.round(((ultimosTres - primerosTres) / primerosTres) * 100) : 0;
+
     const resumen = {
-      crecimientoMensual: Math.floor(Math.random() * 20) + 5,
-      promedioSatisfaccion: Math.floor(Math.random() * 20) + 75,
-      promedioDemanda: Math.floor(Math.random() * 30) + 60
+      crecimientoMensual,
+      totalRegistros: totalNuevosRegistros,
+      porcentajePerfilCompleto: totalNuevosRegistros > 0 ? Math.round((totalPerfilesCompletos / totalNuevosRegistros) * 100) : 0
     };
 
     res.json({
@@ -447,11 +487,93 @@ const obtenerTendenciasMercado = async (req, res) => {
   }
 };
 
+// Obtener estadísticas de satisfacción laboral
+const obtenerSatisfaccionLaboral = async (req, res) => {
+  try {
+    // Obtener todos los datos de satisfacción por empresa
+    const usuarios = await User.findAll({
+      where: { 
+        activo: true,
+        satisfaccion_laboral: { [Op.not]: null, [Op.between]: [1, 5] },
+        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
+      },
+      attributes: ['empresa_actual', 'satisfaccion_laboral']
+    });
+
+    // Agrupar por empresa y calcular promedios
+    const satisfaccionPorEmpresa = {};
+    usuarios.forEach(user => {
+      const empresa = user.empresa_actual;
+      if (!satisfaccionPorEmpresa[empresa]) {
+        satisfaccionPorEmpresa[empresa] = {
+          empresa,
+          satisfacciones: [],
+          totalEmpleados: 0
+        };
+      }
+      satisfaccionPorEmpresa[empresa].satisfacciones.push(user.satisfaccion_laboral);
+      satisfaccionPorEmpresa[empresa].totalEmpleados++;
+    });
+
+    // Calcular promedios y preparar datos para el gráfico
+    const empresasConSatisfaccion = Object.values(satisfaccionPorEmpresa)
+      .map(data => ({
+        empresa: data.empresa,
+        satisfaccionPromedio: parseFloat((data.satisfacciones.reduce((sum, sat) => sum + sat, 0) / data.satisfacciones.length).toFixed(1)),
+        totalRespuestas: data.satisfacciones.length,
+        distribucion: {
+          estrellas1: data.satisfacciones.filter(s => s === 1).length,
+          estrellas2: data.satisfacciones.filter(s => s === 2).length,
+          estrellas3: data.satisfacciones.filter(s => s === 3).length,
+          estrellas4: data.satisfacciones.filter(s => s === 4).length,
+          estrellas5: data.satisfacciones.filter(s => s === 5).length
+        }
+      }))
+      .filter(empresa => empresa.totalRespuestas >= 2) // Solo empresas con al menos 2 respuestas
+      .sort((a, b) => b.satisfaccionPromedio - a.satisfaccionPromedio)
+      .slice(0, 15); // Top 15 empresas
+
+    // Calcular estadísticas generales
+    const todasLasSatisfacciones = usuarios.map(u => u.satisfaccion_laboral);
+    const satisfaccionGeneral = todasLasSatisfacciones.length > 0 
+      ? parseFloat((todasLasSatisfacciones.reduce((sum, sat) => sum + sat, 0) / todasLasSatisfacciones.length).toFixed(1))
+      : 0;
+
+    const distribucionGeneral = {
+      estrellas1: todasLasSatisfacciones.filter(s => s === 1).length,
+      estrellas2: todasLasSatisfacciones.filter(s => s === 2).length,
+      estrellas3: todasLasSatisfacciones.filter(s => s === 3).length,
+      estrellas4: todasLasSatisfacciones.filter(s => s === 4).length,
+      estrellas5: todasLasSatisfacciones.filter(s => s === 5).length
+    };
+
+    res.json({
+      ok: true,
+      satisfaccion: {
+        empresas: empresasConSatisfaccion,
+        general: {
+          satisfaccionPromedio: satisfaccionGeneral,
+          totalRespuestas: todasLasSatisfacciones.length,
+          distribucion: distribucionGeneral
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerSatisfaccionLaboral:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al obtener satisfacción laboral'
+    });
+  }
+};
+
 module.exports = {
   obtenerEstadisticasMercado,
   obtenerMetricasAvanzadas,
   obtenerTecnologiasMasDemandadas,
   obtenerDistribucionSalarial,
   obtenerEmpresasQueContratanMas,
-  obtenerTendenciasMercado
+  obtenerTendenciasMercado,
+  obtenerSatisfaccionLaboral
 };

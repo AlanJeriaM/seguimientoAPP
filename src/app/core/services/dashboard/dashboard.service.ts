@@ -30,25 +30,23 @@ export interface DistribucionSalarial {
 export interface EmpresaContratante {
   empresa: string;
   totalEmpleados: number;
-  vacantesAbiertas: number;
   promedioSalario: number;
-  satisfaccionLaboral: number;
+  satisfaccionPromedio: number | null;
   tipoEmpresa: string;
 }
 
 export interface TendenciaMensual {
   mes: string;
   nuevosRegistros: number;
-  demandaLaboral: number;
-  satisfaccionPromedio: number;
+  perfilesCompletos: number;
 }
 
 export interface TendenciasMercado {
   ultimosSeisMeses: TendenciaMensual[];
   resumen: {
     crecimientoMensual: number;
-    promedioSatisfaccion: number;
-    promedioDemanda: number;
+    totalRegistros: number;
+    porcentajePerfilCompleto: number;
   };
 }
 
@@ -82,7 +80,6 @@ export interface TecnologiaPopular {
   tecnologia: string;
   cantidad: number;
   porcentaje: number;
-  tendencia: 'up' | 'down' | 'stable';
 }
 
 export interface EstadisticasSalariales {
@@ -95,7 +92,6 @@ export interface DistribucionAreas {
   area: string;
   cantidad: number;
   porcentaje: number;
-  demandaLaboral: number;
 }
 
 export interface MetricasAvanzadas {
@@ -109,6 +105,35 @@ export interface MetricasAvanzadas {
     cantidad: number;
     porcentaje: number;
   }[];
+}
+
+// Interfaces para satisfacción laboral
+export interface EmpresaSatisfaccion {
+  empresa: string;
+  satisfaccionPromedio: number;
+  totalRespuestas: number;
+  distribucion: {
+    estrellas1: number;
+    estrellas2: number;
+    estrellas3: number;
+    estrellas4: number;
+    estrellas5: number;
+  };
+}
+
+export interface SatisfaccionLaboral {
+  empresas: EmpresaSatisfaccion[];
+  general: {
+    satisfaccionPromedio: number;
+    totalRespuestas: number;
+    distribucion: {
+      estrellas1: number;
+      estrellas2: number;
+      estrellas3: number;
+      estrellas4: number;
+      estrellas5: number;
+    };
+  };
 }
 
 @Injectable({
@@ -309,6 +334,17 @@ export class DashboardService {
         catchError(err => of({ 
           ok: false, 
           msj: err.error?.msj || 'Error al obtener métricas avanzadas' 
+        }))
+      );
+  }
+
+  // Obtener satisfacción laboral
+  obtenerSatisfaccionLaboral(): Observable<{ ok: boolean; satisfaccion?: SatisfaccionLaboral; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/satisfaccion-laboral`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener satisfacción laboral' 
         }))
       );
   }

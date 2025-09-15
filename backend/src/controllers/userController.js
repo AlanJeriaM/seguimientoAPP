@@ -230,7 +230,8 @@ const obtenerMiPerfil = async (req, res) => {
       rango_salarial: user.rango_salarial,
       disponibilidad_cambio: user.disponibilidad_cambio,
       tecnologias_principales: user.tecnologias_principales,
-      area_interes: user.area_interes
+      area_interes: user.area_interes,
+      satisfaccion_laboral: user.satisfaccion_laboral
     };
 
     res.json({
@@ -266,7 +267,8 @@ const actualizarMiPerfil = async (req, res) => {
       rango_salarial,
       disponibilidad_cambio,
       tecnologias_principales,
-      area_interes
+      area_interes,
+      satisfaccion_laboral
     } = req.body;
 
     // Validaciones básicas
@@ -299,7 +301,8 @@ const actualizarMiPerfil = async (req, res) => {
       rango_salarial: rango_salarial?.trim() || null,
       disponibilidad_cambio: disponibilidad_cambio?.trim() || null,
       tecnologias_principales: Array.isArray(tecnologias_principales) ? tecnologias_principales : null,
-      area_interes: area_interes?.trim() || null
+      area_interes: area_interes?.trim() || null,
+      satisfaccion_laboral: satisfaccion_laboral !== undefined && satisfaccion_laboral !== '' ? parseInt(satisfaccion_laboral) : null
     };
 
     // Verificar si todos los campos obligatorios están completos
@@ -352,7 +355,8 @@ const actualizarMiPerfil = async (req, res) => {
       rango_salarial: usuarioActualizado.rango_salarial,
       disponibilidad_cambio: usuarioActualizado.disponibilidad_cambio,
       tecnologias_principales: usuarioActualizado.tecnologias_principales,
-      area_interes: usuarioActualizado.area_interes
+      area_interes: usuarioActualizado.area_interes,
+      satisfaccion_laboral: usuarioActualizado.satisfaccion_laboral
     };
 
     console.log(`Perfil actualizado para usuario ${usuarioActualizado.nombre} (ID: ${user.id})`);

@@ -36,6 +36,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 
 import { AccordionModule } from 'primeng/accordion';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { RatingModule } from 'primeng/rating';
 import { TagModule } from 'primeng/tag';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DialogModule } from 'primeng/dialog';
@@ -77,6 +78,7 @@ const primeNgModules = [
   PasswordModule,
   AccordionModule,
   MultiSelectModule,
+  RatingModule,
 
   // de pruebas
   DropdownModule,
