@@ -27,8 +27,8 @@
 
 <!-- Mensaje de perfil obligatorio -->
 <div *ngIf="!loading && !error && isCompletionMode" class="p-4 lg:p-6 max-w-screen-xl mx-auto mb-4">
-  <p-message 
-    severity="info" 
+  <p-message
+    severity="info"
     styleClass="w-full">
     <ng-template pTemplate="content">
       <div class="flex align-items-center gap-3 p-2">
@@ -36,7 +36,7 @@
         <div>
           <h4 class="m-0 mb-2 font-semibold">¡Completa tu perfil para acceder al dashboard!</h4>
           <p class="m-0 text-sm">
-            Para generar métricas precisas del mercado laboral y brindarte la mejor experiencia, 
+            Para generar métricas precisas del mercado laboral y brindarte la mejor experiencia,
             necesitamos que completes algunos campos adicionales de tu perfil profesional.
           </p>
         </div>
@@ -442,6 +442,27 @@
             <small class="text-500 block mt-1">
               <i class="pi pi-shield mr-1"></i>
               Esta información es completamente anónima y se usa solo para estadísticas generales
+            </small>
+          </div>
+        </div>
+
+        <!-- Satisfacción Laboral -->
+        <div class="field">
+          <label for="satisfaccion_laboral" class="block text-900 font-medium mb-2">
+            <i class="pi pi-star mr-2 text-primary"></i>
+            Satisfacción Laboral Actual
+          </label>
+          <div class="input-wrapper">
+            <p-rating
+              id="satisfaccion_laboral"
+              formControlName="satisfaccion_laboral"
+              [stars]="5"
+              [cancel]="false"
+              styleClass="w-full">
+            </p-rating>
+            <small class="text-500 block mt-1">
+              <i class="pi pi-info-circle mr-1"></i>
+              Califique del 1 al 5 su nivel de satisfacción en su trabajo actual
             </small>
           </div>
         </div>

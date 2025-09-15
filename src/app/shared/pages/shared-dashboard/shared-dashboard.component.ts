@@ -14,7 +14,8 @@ import {
   DistribucionEducacion,
   TecnologiaPopular,
   EstadisticasSalariales,
-  DistribucionAreas
+  DistribucionAreas,
+  SatisfaccionLaboral
 } from '../../../core/services/dashboard/dashboard.service';
 
 Chart.register(...registerables);
@@ -38,6 +39,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
   // Nuevas métricas avanzadas
   metricasAvanzadas: MetricasAvanzadas | null = null;
+  satisfaccionLaboral: SatisfaccionLaboral | null = null;
 
   loading = true;
   error: string | null = null;
@@ -162,6 +164,9 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
             // Cargar métricas avanzadas
             this.loadMetricasAvanzadas();
+            
+            // Cargar datos de satisfacción laboral
+            this.loadSatisfaccionLaboral();
 
             this.loading = false;
           },
@@ -202,65 +207,38 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
+  loadSatisfaccionLaboral() {
+    this.dashboardService.obtenerSatisfaccionLaboral()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.satisfaccion) {
+            this.satisfaccionLaboral = response.satisfaccion;
+            console.log('Datos de satisfacción laboral cargados:', this.satisfaccionLaboral);
+            
+            // Renderizar gráfico de satisfacción
+            setTimeout(() => {
+              this.renderSatisfaccionLaboralChart();
+            }, 200);
+          } else {
+            console.warn('No se pudieron cargar los datos de satisfacción laboral:', response.msj);
+          }
+        },
+        error: (error) => {
+          console.error('Error cargando satisfacción laboral:', error);
+        }
+      });
+  }
+
 
 
   private renderAllCharts() {
-    this.renderTecnologiasDemandadasChart();
     this.renderDistribucionSalarialChart();
     this.renderEmpresasContratantesChart();
     this.renderTendenciasMercadoChart();
     this.renderEstadisticasGeneralesChart();
   }
 
-  private renderTecnologiasDemandadasChart() {
-    const ctx = document.getElementById('tecnologiasDemandadasChart') as HTMLCanvasElement;
-    if (!ctx || !this.tecnologiasDemandadas.length) return;
-
-    this.destroyChart('tecnologiasDemandadas');
-
-    // Tomar las top 10 tecnologías
-    const topTecnologias = this.tecnologiasDemandadas.slice(0, 10);
-
-    this.charts['tecnologiasDemandadas'] = new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: topTecnologias.map(t => t.nombre),
-        datasets: [{
-          label: 'Demanda en el mercado',
-          data: topTecnologias.map(t => t.demanda),
-          backgroundColor: 'rgba(0, 119, 181, 0.15)',
-          borderColor: '#0077b5',
-          borderWidth: 3,
-          pointBackgroundColor: '#0077b5',
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          pointRadius: 6,
-          pointHoverRadius: 8
-        }]
-      },
-      options: {
-        ...this.chartOptions,
-        scales: {
-          r: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 119, 181, 0.1)'
-            },
-            pointLabels: {
-              font: {
-                family: 'Inter, sans-serif',
-                size: 12,
-                weight: 500
-              }
-            },
-            ticks: {
-              display: false
-            }
-          }
-        }
-      }
-    });
-  }
 
   private renderDistribucionSalarialChart() {
     console.log('🎨 Intentando renderizar gráfico de distribución salarial...');
@@ -279,67 +257,148 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
     this.destroyChart('distribucionSalarial');
 
+    // Función para formatear números con puntos como separadores de miles
+    const formatCurrency = (value: number): string => {
+      return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
+    };
+
+    // Ordenar datos por salario promedio para mejor visualización
+    const sortedData = [...this.distribucionSalarial].sort((a, b) => b.salarioPromedio - a.salarioPromedio);
+
     this.charts['distribucionSalarial'] = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: this.distribucionSalarial.map(d => d.industria),
+        labels: sortedData.map(d => d.industria),
         datasets: [
           {
-            label: 'Salario Promedio (CLP)',
-            data: this.distribucionSalarial.map(d => d.salarioPromedio),
-            backgroundColor: 'rgba(0, 119, 181, 0.8)',
-            borderRadius: 6
-          },
-          {
-            label: 'Profesionales',
-            data: this.distribucionSalarial.map(d => d.cantidad * 1), // Escalar para visualización
-            backgroundColor: 'rgba(255, 107, 53, 0.8)',
-            borderRadius: 6,
-            yAxisID: 'y1'
+            label: 'Salario Promedio',
+            data: sortedData.map(d => d.salarioPromedio),
+            backgroundColor: [
+              'rgba(52, 152, 219, 0.8)',  // Azul
+              'rgba(46, 204, 113, 0.8)',  // Verde
+              'rgba(155, 89, 182, 0.8)',  // Púrpura
+              'rgba(241, 196, 15, 0.8)',  // Amarillo
+              'rgba(231, 76, 60, 0.8)',   // Rojo
+              'rgba(230, 126, 34, 0.8)',  // Naranja
+              'rgba(52, 73, 94, 0.8)',    // Gris oscuro
+              'rgba(26, 188, 156, 0.8)'   // Turquesa
+            ],
+            borderColor: [
+              'rgba(52, 152, 219, 1)',
+              'rgba(46, 204, 113, 1)',
+              'rgba(155, 89, 182, 1)',
+              'rgba(241, 196, 15, 1)',
+              'rgba(231, 76, 60, 1)',
+              'rgba(230, 126, 34, 1)',
+              'rgba(52, 73, 94, 1)',
+              'rgba(26, 188, 156, 1)'
+            ],
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false
           }
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
         scales: {
           y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            ticks: {
-              callback: function(value) {
-                return new Intl.NumberFormat('es-CL', {
-                  style: 'currency',
-                  currency: 'CLP',
-                  minimumFractionDigits: 0
-                }).format(Number(value));
-              }
-            }
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
+            beginAtZero: true,
             grid: {
-              drawOnChartArea: false,
+              color: 'rgba(0, 0, 0, 0.05)'
             },
             ticks: {
+              padding: 10,
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
               callback: function(value) {
-                return Math.round(Number(value) / 100000);
+                return formatCurrency(Number(value));
               }
+            },
+            title: {
+              display: true,
+              text: 'Salario Promedio (CLP)',
+              font: {
+                size: 12,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#2c3e50'
             }
           },
           x: {
             grid: {
               display: false
+            },
+            ticks: {
+              maxRotation: 45,
+              minRotation: 0,
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              color: '#2c3e50'
+            },
+            title: {
+              display: true,
+              text: 'Industrias',
+              font: {
+                size: 12,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#2c3e50'
             }
           }
         },
-        plugins: this.chartOptions.plugins
+        plugins: {
+          ...this.chartOptions.plugins,
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: {
+                size: 12,
+                family: 'Inter, sans-serif'
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#3498db',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              title: function(tooltipItems) {
+                return `Industria: ${tooltipItems[0].label}`;
+              },
+              label: function(context) {
+                const dataIndex = context.dataIndex;
+                const industryData = sortedData[dataIndex];
+                return [
+                  `Salario Promedio: ${formatCurrency(industryData.salarioPromedio)}`,
+                  `Profesionales: ${industryData.cantidad}`
+                ];
+              }
+            }
+          }
+        }
       }
     });
   }
+
 
   private renderEmpresasContratantesChart() {
     const ctx = document.getElementById('empresasContratantesChart') as HTMLCanvasElement;
@@ -381,12 +440,32 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             callbacks: {
               label: function(context: any) {
                 const emp = topEmpresas[context.dataIndex];
-                return [
+                // Función para formatear números con puntos
+                const formatCurrency = (value: number): string => {
+                  return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
+                };
+                
+                // Función para crear estrellitas
+                const formatStars = (rating: number | null): string => {
+                  if (rating === null || rating === undefined) return 'Sin datos';
+                  const fullStars = '★'.repeat(Math.floor(rating));
+                  const hasHalfStar = rating % 1 >= 0.5;
+                  const halfStar = hasHalfStar ? '☆' : '';
+                  const emptyStars = '☆'.repeat(5 - Math.floor(rating) - (hasHalfStar ? 1 : 0));
+                  return `${fullStars}${halfStar}${emptyStars} (${rating}/5)`;
+                };
+                
+                const tooltipLines = [
                   `Empleados: ${emp.totalEmpleados}`,
-                  // `Vacantes: ${emp.vacantesAbiertas}`,
-                  // `Tipo: ${emp.tipoEmpresa}`,
-                  // `Satisfacción: ${emp.satisfaccionLaboral.toFixed(1)}/5.0`
+                  `Salario Promedio: ${formatCurrency(emp.promedioSalario)}`,
+                  `Tipo: ${emp.tipoEmpresa}`
                 ];
+                
+                if (emp.satisfaccionPromedio !== null && emp.satisfaccionPromedio !== undefined) {
+                  tooltipLines.push(`Satisfacción: ${formatStars(emp.satisfaccionPromedio)}`);
+                }
+                
+                return tooltipLines;
               }
             }
           }
@@ -414,23 +493,15 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             borderColor: '#0077b5',
             backgroundColor: 'rgba(0, 119, 181, 0.1)',
             tension: 0.4,
-            yAxisID: 'y'
+            fill: true
           },
           {
-            label: 'Demanda Laboral (%)',
-            data: meses.map(m => m.demandaLaboral),
+            label: 'Perfiles Completos',
+            data: meses.map(m => m.perfilesCompletos),
             borderColor: '#00d084',
             backgroundColor: 'rgba(0, 208, 132, 0.1)',
             tension: 0.4,
-            yAxisID: 'y1'
-          },
-          {
-            label: 'Satisfacción Promedio',
-            data: meses.map(m => m.satisfaccionPromedio * 20), // Escalar para visualización
-            borderColor: '#ff6b35',
-            backgroundColor: 'rgba(255, 107, 53, 0.1)',
-            tension: 0.4,
-            yAxisID: 'y1'
+            fill: true
           }
         ]
       },
@@ -439,21 +510,22 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         maintainAspectRatio: false,
         scales: {
           y: {
-            type: 'linear',
-            display: true,
-            position: 'left'
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            grid: {
-              drawOnChartArea: false,
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            },
+            title: {
+              display: true,
+              text: 'Cantidad de Usuarios'
             }
           },
           x: {
             grid: {
               display: false
+            },
+            title: {
+              display: true,
+              text: 'Período (Últimos 6 meses)'
             }
           }
         },
@@ -566,6 +638,15 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     return this.perfilUsuario?.industria || 'Industria no especificada';
   }
 
+  formatSatisfactionStars(rating: number | null): string {
+    if (rating === null || rating === undefined) return 'Sin datos';
+    const fullStars = '★'.repeat(Math.floor(rating));
+    const hasHalfStar = rating % 1 >= 0.5;
+    const halfStar = hasHalfStar ? '☆' : '';
+    const emptyStars = '☆'.repeat(5 - Math.floor(rating) - (hasHalfStar ? 1 : 0));
+    return `${fullStars}${halfStar}${emptyStars} (${rating}/5)`;
+  }
+
   getNuevosProfesionales(): number {
     return this.estadisticasMercado?.nuevosProfesionalesEsteMes || 0;
   }
@@ -618,10 +699,104 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
     this.renderExperienciaChart();
     this.renderEducacionChart();
-    this.renderTecnologiasPopularesChart();
     this.renderSalarioChart();
     this.renderAreasInteresChart();
     this.renderTiposEmpleoChart();
+  }
+
+  private renderSatisfaccionLaboralChart() {
+    if (!this.satisfaccionLaboral?.empresas?.length) return;
+
+    const canvas = document.getElementById('satisfaccionLaboralChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Destruir chart anterior si existe
+    if (this.charts['satisfaccionLaboral']) {
+      this.charts['satisfaccionLaboral'].destroy();
+    }
+
+    // Tomar las top 10 empresas con mejor satisfacción
+    const topEmpresas = this.satisfaccionLaboral.empresas.slice(0, 10);
+
+    this.charts['satisfaccionLaboral'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: topEmpresas.map(emp => emp.empresa),
+        datasets: [{
+          label: 'Satisfacción Promedio',
+          data: topEmpresas.map(emp => emp.satisfaccionPromedio),
+          backgroundColor: [
+            '#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#FF4500',
+            '#FF1493', '#DA70D6', '#9370DB', '#7B68EE', '#6495ED'
+          ],
+          borderColor: [
+            '#B8860B', '#CD853F', '#D2691E', '#DC143C', '#B22222',
+            '#C71585', '#BA55D3', '#8A2BE2', '#483D8B', '#4682B4'
+          ],
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y' as const,
+        scales: {
+          x: {
+            beginAtZero: true,
+            max: 5,
+            ticks: {
+              stepSize: 1,
+              callback: function(value) {
+                return `${value} ★`;
+              }
+            },
+            title: {
+              display: true,
+              text: 'Satisfacción Promedio (1-5 estrellas)'
+            }
+          },
+          y: {
+            ticks: {
+              font: {
+                size: 10
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: true,
+            text: 'Satisfacción Laboral por Empresa',
+            font: {
+              size: 16,
+              weight: 'bold'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: (context: any) => {
+                const empresa = topEmpresas[context.dataIndex];
+                const stars = '★'.repeat(Math.floor(empresa.satisfaccionPromedio)) + 
+                            '☆'.repeat(5 - Math.floor(empresa.satisfaccionPromedio));
+                return [
+                  `Satisfacción: ${empresa.satisfaccionPromedio}/5`,
+                  `Estrellas: ${stars}`,
+                  `Respuestas: ${empresa.totalRespuestas}`
+                ];
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   private renderExperienciaChart() {
@@ -714,46 +889,6 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  private renderTecnologiasPopularesChart() {
-    if (!this.metricasAvanzadas?.tecnologiasPopulares) return;
-
-    const canvas = document.getElementById('tecnologiasPopularesChart') as HTMLCanvasElement;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    if (this.charts['tecnologiasPopulares']) {
-      this.charts['tecnologiasPopulares'].destroy();
-    }
-
-    const data = this.metricasAvanzadas.tecnologiasPopulares.slice(0, 8); // Top 8
-
-    this.charts['tecnologiasPopulares'] = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: data.map(item => item.tecnologia),
-        datasets: [{
-          label: 'Profesionales',
-          data: data.map(item => item.cantidad),
-          backgroundColor: '#4BC0C0',
-          borderColor: '#36A0A0',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        ...this.chartOptions,
-        indexAxis: 'y',
-        plugins: {
-          ...this.chartOptions.plugins,
-          title: {
-            display: true,
-            text: 'Especialidades Técnicas Más Populares'
-          }
-        }
-      }
-    });
-  }
 
   private renderSalarioChart() {
     if (!this.metricasAvanzadas?.estadisticasSalariales) return;

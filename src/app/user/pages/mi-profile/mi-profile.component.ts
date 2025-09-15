@@ -29,6 +29,7 @@ export interface PerfilUsuario {
   disponibilidad_cambio?: string;
   tecnologias_principales?: string[];
   area_interes?: string;
+  satisfaccion_laboral?: number;
 }
 
 @Component({
@@ -39,7 +40,7 @@ export interface PerfilUsuario {
 })
 export class MiProfileComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  
+
   perfilForm!: FormGroup;
   perfil: PerfilUsuario | null = null;
   loading = true;
@@ -204,12 +205,13 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       area_interes: ['', [Validators.required]],
       // Campos opcionales
       rango_salarial: [''],
-      tecnologias_principales: [[]]
+      tecnologias_principales: [[]],
+      satisfaccion_laboral: ['']
     });
   }
 
   cargarPerfil() {
-    console.log('🔄 Iniciando carga de perfil...');
+    console.log('Iniciando carga de perfil...');
     this.loading = true;
     this.error = null;
 
@@ -220,11 +222,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
           console.log('📡 Respuesta del servidor:', response);
           if (response.ok) {
             this.perfil = response.usuario;
-            console.log('✅ Perfil cargado:', this.perfil);
+            console.log('Perfil cargado:', this.perfil);
             this.populateForm();
           } else {
             this.error = response.msj || 'Error al cargar el perfil';
-            console.log('❌ Error en respuesta:', this.error);
+            console.log('Error en respuesta:', this.error);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
@@ -234,7 +236,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (error) => {
-          console.error('❌ Error HTTP cargando perfil:', error);
+          console.error('Error HTTP cargando perfil:', error);
           this.error = 'Error al cargar el perfil';
           this.loading = false;
           this.messageService.add({
@@ -248,10 +250,10 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   private populateForm() {
     if (this.perfil) {
-      console.log('📅 Fecha de registro (created_at):', this.perfil.fecha_registro);
-      console.log('📅 Fecha formateada:', this.getFormattedDate(this.perfil.fecha_registro));
-      console.log('🕐 Último acceso:', this.perfil.ultimo_acceso);
-      
+      console.log('Fecha de registro (created_at):', this.perfil.fecha_registro);
+      console.log('Fecha formateada:', this.getFormattedDate(this.perfil.fecha_registro));
+      console.log('Último acceso:', this.perfil.ultimo_acceso);
+
       this.perfilForm.patchValue({
         // Campos básicos
         nombre: this.perfil.nombre || '',
@@ -268,7 +270,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         disponibilidad_cambio: this.perfil.disponibilidad_cambio || '',
         area_interes: this.perfil.area_interes || '',
         rango_salarial: this.perfil.rango_salarial || '',
-        tecnologias_principales: this.perfil.tecnologias_principales || []
+        tecnologias_principales: this.perfil.tecnologias_principales || [],
+        satisfaccion_laboral: this.perfil.satisfaccion_laboral || ''
       });
     }
   }
@@ -289,9 +292,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   private guardarPerfil() {
     this.saving = true;
     const datosActualizados = this.perfilForm.value;
-    
-    console.log('📤 Datos que se van a guardar:', datosActualizados);
-    console.log('🔍 Campos básicos a guardar:', {
+
+    console.log('Datos que se van a guardar:', datosActualizados);
+    console.log('Campos básicos a guardar:', {
       posicion_actual: datosActualizados.posicion_actual,
       empresa_actual: datosActualizados.empresa_actual,
       ubicacion: datosActualizados.ubicacion,
@@ -302,11 +305,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('📥 Respuesta del servidor después de guardar:', response);
+          console.log('Respuesta del servidor después de guardar:', response);
           if (response.ok) {
             this.perfil = response.usuario;
             if (this.perfil) {
-              console.log('✅ Perfil actualizado recibido:', {
+              console.log('Perfil actualizado recibido:', {
                 posicion_actual: this.perfil.posicion_actual,
                 empresa_actual: this.perfil.empresa_actual,
                 ubicacion: this.perfil.ubicacion,
@@ -364,10 +367,10 @@ export class MiProfileComponent implements OnInit, OnDestroy {
               detail: 'Ahora puedes acceder a todas las funcionalidades',
               life: 3000
             });
-            
+
             // Limpiar cache del guard antes de redirigir
             this.profileGuard.clearCache();
-            
+
             setTimeout(() => {
               this.router.navigate(['/user/dashboard']);
             }, 1500);
@@ -436,14 +439,14 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   getFormattedDate(date: Date | null): string {
     if (!date) return 'No disponible';
-    
+
     const fechaObj = new Date(date);
-    
+
     // Verificar si la fecha es válida
     if (isNaN(fechaObj.getTime())) {
       return 'Fecha inválida';
     }
-    
+
     return fechaObj.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -454,13 +457,13 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   getFormattedDateTime(date: Date | null): string {
     if (!date) return 'No disponible';
-    
+
     const fechaObj = new Date(date);
-    
+
     if (isNaN(fechaObj.getTime())) {
       return 'Fecha inválida';
     }
-    
+
     return fechaObj.toLocaleString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -476,24 +479,24 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       console.log('⚠️ No hay fecha_registro en el perfil');
       return 'No disponible';
     }
-    
+
     console.log('📅 Fecha de registro raw:', this.perfil.fecha_registro);
     const fechaCreacion = new Date(this.perfil.fecha_registro);
     console.log('📅 Fecha de registro parseada:', fechaCreacion);
-    
+
     if (isNaN(fechaCreacion.getTime())) {
-      console.log('❌ Fecha de registro inválida');
+      console.log('Fecha de registro inválida');
       return 'Fecha inválida';
     }
-    
+
     const fechaFormateada = fechaCreacion.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       timeZone: 'America/Santiago'
     });
-    
-    console.log('✅ Fecha de registro formateada:', fechaFormateada);
+
+    console.log('Fecha de registro formateada:', fechaFormateada);
     return fechaFormateada;
   }
 

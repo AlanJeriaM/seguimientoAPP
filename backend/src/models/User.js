@@ -125,6 +125,15 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
     comment: 'Área de interés profesional (Frontend, Backend, DevOps, etc.)'
+  },
+  satisfaccion_laboral: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    validate: {
+      min: 1,
+      max: 5
+    },
+    comment: 'Nivel de satisfacción laboral actual (1-5 estrellas)'
   }
 }, {
   tableName: 'users',

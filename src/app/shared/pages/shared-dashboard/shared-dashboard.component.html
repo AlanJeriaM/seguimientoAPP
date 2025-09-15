@@ -148,25 +148,6 @@
   <div class="charts-section">
     <div class="grid">
 
-      <!-- Tecnologías más Demandadas -->
-      <div class="col-12 lg:col-6">
-        <p-card styleClass="chart-card h-full">
-          <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Tecnologías Más Demandadas</h3>
-              <p-tag
-                value="Mercado laboral"
-                severity="info"
-                styleClass="info-tag">
-              </p-tag>
-            </div>
-          </ng-template>
-
-          <div class="chart-container">
-            <canvas id="tecnologiasDemandadasChart"></canvas>
-          </div>
-        </p-card>
-      </div>
 
       <!-- Distribución Salarial por Industria -->
       <div class="col-12 lg:col-6">
@@ -294,16 +275,12 @@
               </div>
               <div class="company-details">
                 <div class="detail-item">
-                  <i class="pi pi-briefcase"></i>
-                  <span>{{ empresa.vacantesAbiertas }} vacantes abiertas</span>
-                </div>
-                <div class="detail-item">
                   <i class="pi pi-dollar"></i>
                   <span>{{ empresa.promedioSalario | currency:'CLP':'symbol':'1.0-0' }} promedio</span>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item" *ngIf="empresa.satisfaccionPromedio !== null">
                   <i class="pi pi-star"></i>
-                  <span>{{ empresa.satisfaccionLaboral | number:'1.1-1' }}/5.0 satisfacción</span>
+                  <span>{{ formatSatisfactionStars(empresa.satisfaccionPromedio) }}</span>
                 </div>
               </div>
             </div>
@@ -371,6 +348,35 @@
   </div>
 
 
+  <!-- Satisfacción Laboral -->
+  <div class="satisfaction-section mt-6" *ngIf="satisfaccionLaboral && satisfaccionLaboral.empresas.length > 0">
+    <h2 class="section-title mb-4">
+      <i class="pi pi-star mr-2"></i>
+      Satisfacción Laboral por Empresa
+    </h2>
+
+    <div class="grid">
+      <div class="col-12">
+        <p-card styleClass="chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Top Empresas con Mejor Satisfacción Laboral</h3>
+              <p-tag
+                [value]="'Promedio general: ' + (satisfaccionLaboral.general.satisfaccionPromedio | number:'1.1-1') + '/5 ★'"
+                severity="success"
+                styleClass="info-tag">
+              </p-tag>
+            </div>
+          </ng-template>
+
+          <div class="chart-container large-chart">
+            <canvas id="satisfaccionLaboralChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
   <!-- Métricas Avanzadas del Mercado Laboral -->
   <div class="advanced-metrics-section mt-6" *ngIf="metricasAvanzadas">
     <h2 class="section-title mb-4">
@@ -410,20 +416,6 @@
         </p-card>
       </div>
 
-      <!-- Tecnologías Populares -->
-      <div class="col-12 lg:col-6 xl:col-4">
-        <p-card styleClass="h-full chart-card">
-          <ng-template pTemplate="header">
-            <div class="card-header">
-              <h3>Especialidades Técnicas</h3>
-              <i class="pi pi-code chart-icon"></i>
-            </div>
-          </ng-template>
-          <div class="chart-container" style="height: 300px;">
-            <canvas id="tecnologiasPopularesChart"></canvas>
-          </div>
-        </p-card>
-      </div>
     </div>
 
     <!-- Segunda fila de gráficos -->

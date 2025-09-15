@@ -6,7 +6,8 @@ const {
   obtenerTecnologiasMasDemandadas,
   obtenerDistribucionSalarial,
   obtenerEmpresasQueContratanMas,
-  obtenerTendenciasMercado
+  obtenerTendenciasMercado,
+  obtenerSatisfaccionLaboral
 } = require('../controllers/dashboardController');
 const { verificarToken, verificarAdminOCliente } = require('../middleware/auth');
 
@@ -19,5 +20,6 @@ router.get('/tecnologias-demandadas', verificarToken, verificarAdminOCliente, ob
 router.get('/distribucion-salarial', verificarToken, verificarAdminOCliente, obtenerDistribucionSalarial);
 router.get('/empresas-contratan', verificarToken, verificarAdminOCliente, obtenerEmpresasQueContratanMas);
 router.get('/tendencias-mercado', verificarToken, verificarAdminOCliente, obtenerTendenciasMercado);
+router.get('/satisfaccion-laboral', verificarToken, verificarAdminOCliente, obtenerSatisfaccionLaboral);
 
 module.exports = router;
