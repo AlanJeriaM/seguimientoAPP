@@ -1,14 +1,20 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { Subject, takeUntil } from 'rxjs';
-import { 
-  DashboardService, 
-  EstadisticasMercado, 
-  TecnologiaDemandada, 
-  DistribucionSalarial, 
-  EmpresaContratante, 
-  TendenciasMercado, 
-  PerfilUsuario 
+import {
+  DashboardService,
+  EstadisticasMercado,
+  TecnologiaDemandada,
+  DistribucionSalarial,
+  EmpresaContratante,
+  TendenciasMercado,
+  PerfilUsuario,
+  MetricasAvanzadas,
+  DistribucionExperiencia,
+  DistribucionEducacion,
+  TecnologiaPopular,
+  EstadisticasSalariales,
+  DistribucionAreas
 } from '../../../core/services/dashboard/dashboard.service';
 
 Chart.register(...registerables);
@@ -29,7 +35,10 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   distribucionSalarial: DistribucionSalarial[] = [];
   empresasContratantes: EmpresaContratante[] = [];
   tendenciasMercado: TendenciasMercado | null = null;
-  
+
+  // Nuevas métricas avanzadas
+  metricasAvanzadas: MetricasAvanzadas | null = null;
+
   loading = true;
   error: string | null = null;
   errores: string[] = [];
@@ -37,8 +46,6 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
   // Chart references
   private charts: { [key: string]: Chart } = {};
-
-
 
   // Chart options
   private chartOptions = {
@@ -118,7 +125,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (datos) => {
             console.log('Datos recibidos del dashboard:', datos);
-            
+
             // Asignar datos recibidos
             if (datos.estadisticasMercado) {
               this.estadisticasMercado = datos.estadisticasMercado;
@@ -128,6 +135,9 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             }
             if (datos.distribucionSalarial) {
               this.distribucionSalarial = datos.distribucionSalarial;
+              console.log('Distribución salarial cargada:', this.distribucionSalarial);
+            } else {
+              console.warn('No se recibió distribución salarial');
             }
             if (datos.empresas) {
               this.empresasContratantes = datos.empresas;
@@ -150,6 +160,9 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               this.renderAllCharts();
             }, 100);
 
+            // Cargar métricas avanzadas
+            this.loadMetricasAvanzadas();
+
             this.loading = false;
           },
           error: (error) => {
@@ -164,6 +177,29 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       console.error('Dashboard error:', error);
       this.loading = false;
     }
+  }
+
+  loadMetricasAvanzadas() {
+    this.dashboardService.obtenerMetricasAvanzadas()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.metricas) {
+            this.metricasAvanzadas = response.metricas;
+            console.log('Métricas avanzadas cargadas:', this.metricasAvanzadas);
+
+            // Renderizar gráficos de métricas avanzadas
+            setTimeout(() => {
+              this.renderAdvancedCharts();
+            }, 200);
+          } else {
+            console.warn('No se pudieron cargar las métricas avanzadas:', response.msj);
+          }
+        },
+        error: (error) => {
+          console.error('Error cargando métricas avanzadas:', error);
+        }
+      });
   }
 
 
@@ -227,8 +263,19 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   }
 
   private renderDistribucionSalarialChart() {
+    console.log('🎨 Intentando renderizar gráfico de distribución salarial...');
+    console.log('📊 Datos disponibles:', this.distribucionSalarial?.length, this.distribucionSalarial);
+
     const ctx = document.getElementById('distribucionSalarialChart') as HTMLCanvasElement;
-    if (!ctx || !this.distribucionSalarial.length) return;
+    if (!ctx) {
+      console.error('Canvas distribucionSalarialChart no encontrado');
+      return;
+    }
+
+    if (!this.distribucionSalarial.length) {
+      console.warn('No hay datos de distribución salarial para mostrar');
+      return;
+    }
 
     this.destroyChart('distribucionSalarial');
 
@@ -245,7 +292,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           },
           {
             label: 'Profesionales',
-            data: this.distribucionSalarial.map(d => d.cantidad * 100000), // Escalar para visualización
+            data: this.distribucionSalarial.map(d => d.cantidad * 1), // Escalar para visualización
             backgroundColor: 'rgba(255, 107, 53, 0.8)',
             borderRadius: 6,
             yAxisID: 'y1'
@@ -336,9 +383,9 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 const emp = topEmpresas[context.dataIndex];
                 return [
                   `Empleados: ${emp.totalEmpleados}`,
-                  `Vacantes: ${emp.vacantesAbiertas}`,
-                  `Tipo: ${emp.tipoEmpresa}`,
-                  `Satisfacción: ${emp.satisfaccionLaboral.toFixed(1)}/5.0`
+                  // `Vacantes: ${emp.vacantesAbiertas}`,
+                  // `Tipo: ${emp.tipoEmpresa}`,
+                  // `Satisfacción: ${emp.satisfaccionLaboral.toFixed(1)}/5.0`
                 ];
               }
             }
@@ -519,10 +566,6 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     return this.perfilUsuario?.industria || 'Industria no especificada';
   }
 
-  getTotalProfesionales(): number {
-    return this.estadisticasMercado?.totalProfesionales || 0;
-  }
-
   getNuevosProfesionales(): number {
     return this.estadisticasMercado?.nuevosProfesionalesEsteMes || 0;
   }
@@ -538,12 +581,12 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   getUserInitials(): string {
     const fullName = this.getFullName();
     if (!fullName || fullName === 'Usuario') return 'US';
-    
+
     const names = fullName.trim().split(' ');
     if (names.length === 1) {
       return names[0].charAt(0).toUpperCase();
     }
-    
+
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
   }
 
@@ -556,5 +599,283 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   handleImageError(event: any): void {
     console.log('Error cargando imagen de perfil, usando iniciales');
     this.imageError = true;
+  }
+
+  getTotalProfesionales(): number {
+    if (!this.metricasAvanzadas) return 0;
+
+    // Sumar todas las cantidades de las distribuciones
+    let total = 0;
+    if (this.metricasAvanzadas.distribucionExperiencia) {
+      total = this.metricasAvanzadas.distribucionExperiencia.reduce((acc, item) => acc + item.cantidad, 0);
+    }
+
+    return total;
+  }
+
+  private renderAdvancedCharts() {
+    if (!this.metricasAvanzadas) return;
+
+    this.renderExperienciaChart();
+    this.renderEducacionChart();
+    this.renderTecnologiasPopularesChart();
+    this.renderSalarioChart();
+    this.renderAreasInteresChart();
+    this.renderTiposEmpleoChart();
+  }
+
+  private renderExperienciaChart() {
+    if (!this.metricasAvanzadas?.distribucionExperiencia) return;
+
+    const canvas = document.getElementById('experienciaChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Destruir chart anterior si existe
+    if (this.charts['experiencia']) {
+      this.charts['experiencia'].destroy();
+    }
+
+    const data = this.metricasAvanzadas.distribucionExperiencia;
+
+    this.charts['experiencia'] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: data.map(item => item.rango),
+        datasets: [{
+          data: data.map(item => item.cantidad),
+          backgroundColor: [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        ...this.chartOptions,
+        plugins: {
+          ...this.chartOptions.plugins,
+          title: {
+            display: true,
+            text: 'Distribución por Años de Experiencia'
+          }
+        }
+      }
+    });
+  }
+
+  private renderEducacionChart() {
+    if (!this.metricasAvanzadas?.distribucionEducacion) return;
+
+    const canvas = document.getElementById('educacionChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.charts['educacion']) {
+      this.charts['educacion'].destroy();
+    }
+
+    const data = this.metricasAvanzadas.distribucionEducacion;
+
+    this.charts['educacion'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(item => item.nivel),
+        datasets: [{
+          label: 'Cantidad',
+          data: data.map(item => item.cantidad),
+          backgroundColor: '#36A2EB',
+          borderColor: '#2E8BC0',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        ...this.chartOptions,
+        plugins: {
+          ...this.chartOptions.plugins,
+          title: {
+            display: true,
+            text: 'Distribución por Nivel de Educación'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private renderTecnologiasPopularesChart() {
+    if (!this.metricasAvanzadas?.tecnologiasPopulares) return;
+
+    const canvas = document.getElementById('tecnologiasPopularesChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.charts['tecnologiasPopulares']) {
+      this.charts['tecnologiasPopulares'].destroy();
+    }
+
+    const data = this.metricasAvanzadas.tecnologiasPopulares.slice(0, 8); // Top 8
+
+    this.charts['tecnologiasPopulares'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(item => item.tecnologia),
+        datasets: [{
+          label: 'Profesionales',
+          data: data.map(item => item.cantidad),
+          backgroundColor: '#4BC0C0',
+          borderColor: '#36A0A0',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        ...this.chartOptions,
+        indexAxis: 'y',
+        plugins: {
+          ...this.chartOptions.plugins,
+          title: {
+            display: true,
+            text: 'Especialidades Técnicas Más Populares'
+          }
+        }
+      }
+    });
+  }
+
+  private renderSalarioChart() {
+    if (!this.metricasAvanzadas?.estadisticasSalariales) return;
+
+    const canvas = document.getElementById('salarioChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.charts['salario']) {
+      this.charts['salario'].destroy();
+    }
+
+    const data = this.metricasAvanzadas.estadisticasSalariales;
+
+    this.charts['salario'] = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: data.map(item => item.rango),
+        datasets: [{
+          data: data.map(item => item.cantidad),
+          backgroundColor: [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6B6B'
+          ]
+        }]
+      },
+      options: {
+        ...this.chartOptions,
+        plugins: {
+          ...this.chartOptions.plugins,
+          title: {
+            display: true,
+            text: 'Distribución de Rangos Salariales'
+          }
+        }
+      }
+    });
+  }
+
+
+  private renderAreasInteresChart() {
+    if (!this.metricasAvanzadas?.distribucionAreas) return;
+
+    const canvas = document.getElementById('areasInteresChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.charts['areasInteres']) {
+      this.charts['areasInteres'].destroy();
+    }
+
+    const data = this.metricasAvanzadas.distribucionAreas.slice(0, 8); // Top 8
+
+    this.charts['areasInteres'] = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: data.map(item => item.area),
+        datasets: [{
+          label: 'Profesionales',
+          data: data.map(item => item.cantidad),
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        ...this.chartOptions,
+        plugins: {
+          ...this.chartOptions.plugins,
+          title: {
+            display: true,
+            text: 'Áreas de Interés Profesional'
+          }
+        },
+        scales: {
+          r: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  private renderTiposEmpleoChart() {
+    if (!this.metricasAvanzadas?.tiposEmpleo) return;
+
+    const canvas = document.getElementById('tiposEmpleoChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.charts['tiposEmpleo']) {
+      this.charts['tiposEmpleo'].destroy();
+    }
+
+    const data = this.metricasAvanzadas.tiposEmpleo;
+
+    this.charts['tiposEmpleo'] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: data.map(item => item.tipo),
+        datasets: [{
+          data: data.map(item => item.cantidad),
+          backgroundColor: [
+            '#FF9F40', '#FF6384', '#36A2EB', '#4BC0C0', '#9966FF'
+          ]
+        }]
+      },
+      options: {
+        ...this.chartOptions,
+        plugins: {
+          ...this.chartOptions.plugins,
+          title: {
+            display: true,
+            text: 'Tipos de Empleo Actual'
+          }
+        }
+      }
+    });
   }
 }

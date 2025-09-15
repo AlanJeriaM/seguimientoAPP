@@ -6,6 +6,7 @@ import { ViewEncuestasComponent } from './pages/view-encuestas/view-encuestas.co
 import { EncuestaCompletadaComponent } from './pages/encuesta-completada/encuesta-completada.component';
 import { ResponderEncuestaComponent } from './pages/responder-encuesta/responder-encuesta.component';
 import { SharedDashboardComponent } from '../shared/pages/shared-dashboard/shared-dashboard.component';
+import { ProfileCompletionGuard } from '../core/guards/profile-completion.guard';
 
 const routes: Routes = [
   {
@@ -13,11 +14,11 @@ const routes: Routes = [
     component: MainComponent,
     children: [
       { path: 'mi-perfil', component: MiProfileComponent },
-      { path: 'dashboard', component: SharedDashboardComponent },
-      { path: 'view-encuestas', component: ViewEncuestasComponent },
-      { path: 'responder-encuesta/:id', component: ResponderEncuestaComponent },
-      { path: 'encuesta-completada', component: EncuestaCompletadaComponent },
-      { path: 'encuesta-completada/:id', component: EncuestaCompletadaComponent },
+      { path: 'dashboard', component: SharedDashboardComponent, canActivate: [ProfileCompletionGuard] },
+      { path: 'view-encuestas', component: ViewEncuestasComponent, canActivate: [ProfileCompletionGuard] },
+      { path: 'responder-encuesta/:id', component: ResponderEncuestaComponent, canActivate: [ProfileCompletionGuard] },
+      { path: 'encuesta-completada', component: EncuestaCompletadaComponent, canActivate: [ProfileCompletionGuard] },
+      { path: 'encuesta-completada/:id', component: EncuestaCompletadaComponent, canActivate: [ProfileCompletionGuard] },
       { path: '**', redirectTo: 'dashboard' }
     ],
   }

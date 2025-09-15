@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { MessageService } from 'primeng/api';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProfileCompletionGuard } from '../../../core/guards/profile-completion.guard';
 
 export interface PerfilUsuario {
   id: number;
@@ -17,6 +19,16 @@ export interface PerfilUsuario {
   ultimo_acceso: Date | null;
   fecha_registro: Date;
   rol: string;
+  // Nuevos campos para métricas
+  perfil_completo?: boolean;
+  años_experiencia?: number;
+  nivel_educacion?: string;
+  especialidad_tecnica?: string;
+  tipo_empleo_actual?: string;
+  rango_salarial?: string;
+  disponibilidad_cambio?: string;
+  tecnologias_principales?: string[];
+  area_interes?: string;
 }
 
 @Component({
@@ -34,6 +46,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   saving = false;
   error: string | null = null;
   imageError = false;
+  isCompletionMode = false; // Indica si estamos en modo de completar perfil obligatorio
 
   // Opciones para dropdowns
   industriasOpciones = [
@@ -53,15 +66,115 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Otros'
   ];
 
+  // Nuevas opciones para campos de métricas
+  nivelesEducacion = [
+    'Técnico',
+    'Licenciatura',
+    'Maestría',
+    'Doctorado',
+    'Otro'
+  ];
+
+  tiposEmpleo = [
+    'Tiempo completo',
+    'Part-time',
+    'Freelance',
+    'Desempleado',
+    'Estudiante'
+  ];
+
+  rangosSalariales = [
+    '0-500k',
+    '500k-1M',
+    '1M-1.5M',
+    '1.5M-2M',
+    '2M-3M',
+    '3M+',
+    'Prefiero no decir'
+  ];
+
+  disponibilidadOpciones = [
+    'Activamente buscando',
+    'Abierto a oportunidades',
+    'No disponible',
+    'No seguro'
+  ];
+
+  areasInteres = [
+    'Frontend Development',
+    'Backend Development',
+    'Full Stack Development',
+    'DevOps',
+    'Data Science',
+    'Machine Learning',
+    'Mobile Development',
+    'QA/Testing',
+    'UI/UX Design',
+    'Product Management',
+    'Project Management',
+    'Cybersecurity',
+    'Cloud Computing',
+    'Otro'
+  ];
+
+  especialidadesTecnicas = [
+    'JavaScript',
+    'Python',
+    'Java',
+    'C#',
+    'PHP',
+    'TypeScript',
+    'React',
+    'Angular',
+    'Vue.js',
+    'Node.js',
+    '.NET',
+    'Spring',
+    'Laravel',
+    'Django',
+    'Ruby on Rails',
+    'Go',
+    'Rust',
+    'Kotlin',
+    'Swift',
+    'Flutter',
+    'React Native',
+    'Otro'
+  ];
+
+  tecnologiasPrincipales = [
+    'JavaScript', 'TypeScript', 'Python', 'Java', 'C#', 'PHP', 'Go', 'Rust',
+    'React', 'Angular', 'Vue.js', 'Node.js', 'Express', 'Django', 'Flask',
+    'Spring Boot', 'Laravel', '.NET', 'PostgreSQL', 'MySQL', 'MongoDB',
+    'Redis', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'Google Cloud',
+    'Git', 'Jenkins', 'GitLab CI', 'Figma', 'Adobe XD', 'Sketch'
+  ];
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private profileGuard: ProfileCompletionGuard
   ) {
     this.initializeForm();
   }
 
   ngOnInit() {
+    // Verificar si estamos en modo de completar perfil
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.isCompletionMode = params['completar'] === 'true';
+      if (params['mensaje']) {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Completar Perfil',
+          detail: params['mensaje'],
+          life: 5000
+        });
+      }
+    });
+
     // Agregar un pequeño delay para asegurar que todo esté inicializado
     setTimeout(() => {
       this.cargarPerfil();
@@ -75,12 +188,23 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   private initializeForm() {
     this.perfilForm = this.fb.group({
+      // Campos básicos
       nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       posicion_actual: ['', [Validators.maxLength(150)]],
       empresa_actual: ['', [Validators.maxLength(150)]],
       ubicacion: ['', [Validators.maxLength(100)]],
       industria: ['', [Validators.maxLength(100)]],
-      resumen: ['', [Validators.maxLength(500)]]
+      resumen: ['', [Validators.maxLength(500)]],
+      // Nuevos campos obligatorios para métricas
+      años_experiencia: ['', [Validators.required, Validators.min(0), Validators.max(50)]],
+      nivel_educacion: ['', [Validators.required]],
+      especialidad_tecnica: ['', [Validators.required]],
+      tipo_empleo_actual: ['', [Validators.required]],
+      disponibilidad_cambio: ['', [Validators.required]],
+      area_interes: ['', [Validators.required]],
+      // Campos opcionales
+      rango_salarial: [''],
+      tecnologias_principales: [[]]
     });
   }
 
@@ -129,12 +253,22 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       console.log('🕐 Último acceso:', this.perfil.ultimo_acceso);
       
       this.perfilForm.patchValue({
+        // Campos básicos
         nombre: this.perfil.nombre || '',
         posicion_actual: this.perfil.posicion_actual === 'No especificada' ? '' : this.perfil.posicion_actual,
         empresa_actual: this.perfil.empresa_actual === 'No especificada' ? '' : this.perfil.empresa_actual,
         ubicacion: this.perfil.ubicacion === 'No especificada' ? '' : this.perfil.ubicacion,
         industria: this.perfil.industria === 'No especificada' ? '' : this.perfil.industria,
-        resumen: this.perfil.resumen === 'Sin resumen' ? '' : this.perfil.resumen
+        resumen: this.perfil.resumen === 'Sin resumen' ? '' : this.perfil.resumen,
+        // Nuevos campos para métricas
+        años_experiencia: this.perfil.años_experiencia || '',
+        nivel_educacion: this.perfil.nivel_educacion || '',
+        especialidad_tecnica: this.perfil.especialidad_tecnica || '',
+        tipo_empleo_actual: this.perfil.tipo_empleo_actual || '',
+        disponibilidad_cambio: this.perfil.disponibilidad_cambio || '',
+        area_interes: this.perfil.area_interes || '',
+        rango_salarial: this.perfil.rango_salarial || '',
+        tecnologias_principales: this.perfil.tecnologias_principales || []
       });
     }
   }
@@ -155,18 +289,40 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   private guardarPerfil() {
     this.saving = true;
     const datosActualizados = this.perfilForm.value;
+    
+    console.log('📤 Datos que se van a guardar:', datosActualizados);
+    console.log('🔍 Campos básicos a guardar:', {
+      posicion_actual: datosActualizados.posicion_actual,
+      empresa_actual: datosActualizados.empresa_actual,
+      ubicacion: datosActualizados.ubicacion,
+      industria: datosActualizados.industria
+    });
 
     this.authService.actualizarMiPerfil(datosActualizados)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
+          console.log('📥 Respuesta del servidor después de guardar:', response);
           if (response.ok) {
             this.perfil = response.usuario;
+            if (this.perfil) {
+              console.log('✅ Perfil actualizado recibido:', {
+                posicion_actual: this.perfil.posicion_actual,
+                empresa_actual: this.perfil.empresa_actual,
+                ubicacion: this.perfil.ubicacion,
+                industria: this.perfil.industria
+              });
+            }
             this.messageService.add({
               severity: 'success',
               summary: 'Éxito',
               detail: 'Perfil actualizado correctamente'
             });
+
+            // Si estábamos en modo de completar perfil, verificar si ahora está completo
+            if (this.isCompletionMode) {
+              this.verificarPerfilYRedirigir();
+            }
           } else {
             this.messageService.add({
               severity: 'error',
@@ -193,6 +349,43 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       const control = this.perfilForm.get(key);
       control?.markAsTouched();
     });
+  }
+
+  private verificarPerfilYRedirigir() {
+    this.authService.verificarPerfilCompleto()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.perfil_completo) {
+            // Perfil completo, redirigir al dashboard
+            this.messageService.add({
+              severity: 'success',
+              summary: '¡Perfil Completo!',
+              detail: 'Ahora puedes acceder a todas las funcionalidades',
+              life: 3000
+            });
+            
+            // Limpiar cache del guard antes de redirigir
+            this.profileGuard.clearCache();
+            
+            setTimeout(() => {
+              this.router.navigate(['/user/dashboard']);
+            }, 1500);
+          } else {
+            // Aún faltan campos, mostrar cuáles
+            const camposFaltantes = response.campos_faltantes || [];
+            this.messageService.add({
+              severity: 'warn',
+              summary: 'Perfil Incompleto',
+              detail: `Aún faltan campos: ${camposFaltantes.join(', ')}`,
+              life: 5000
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error verificando perfil completo:', error);
+        }
+      });
   }
 
   // Helpers para validaciones

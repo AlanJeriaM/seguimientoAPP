@@ -4,13 +4,13 @@ const User = require('./src/models/User');
 
 const initializeDatabase = async () => {
   try {
-    console.log('🔄 Conectando a MySQL...');
+    console.log('Conectando a MySQL...');
     await sequelize.authenticate();
-    console.log('✅ Conexión a MySQL establecida');
+    console.log('Conexión a MySQL establecida');
 
-    console.log('🔄 Sincronizando modelos...');
-    await sequelize.sync({ alter: false }); // Cambiado a false para evitar índices duplicados
-    console.log('✅ Tablas creadas/actualizadas');
+    console.log('Sincronizando modelos...');
+    await sequelize.sync({ alter: true }); // Usar alter: true para actualizar campos existentes
+    console.log('Tablas creadas/actualizadas');
 
     // Crear admin por defecto
     const adminExistente = await Admin.findOne({
@@ -24,9 +24,9 @@ const initializeDatabase = async () => {
         nombre_usuario: 'Super Admin',
         rol: 'ADMIN-USER'
       });
-      console.log('✅ Admin creado: admin@admin.com / admin123');
+      console.log('Admin creado: admin@admin.com / admin123');
     } else {
-      console.log('ℹ️  Admin ya existe');
+      console.log('ℹAdmin ya existe');
     }
 
     // Crear usuario de prueba
@@ -44,15 +44,15 @@ const initializeDatabase = async () => {
         ubicacion: 'Santiago, Chile',
         industria: 'Tecnología'
       });
-      console.log('✅ Usuario de prueba creado');
+      console.log('Usuario de prueba creado');
     } else {
-      console.log('ℹ️  Usuario de prueba ya existe');
+      console.log('ℹUsuario de prueba ya existe');
     }
 
-    console.log('🎉 Base de datos inicializada correctamente');
+    console.log('Base de datos inicializada correctamente');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error('Error:', error);
     process.exit(1);
   }
 };

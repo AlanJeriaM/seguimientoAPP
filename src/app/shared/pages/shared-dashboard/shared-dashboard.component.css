@@ -170,7 +170,6 @@
 
 /* Estilos para títulos de gráficos y tarjetas */
 .card-header-custom h3,
-.insights-card .p-card-header h3,
 .info-card .p-card-header h3 {
   margin: 0;
   padding: 0.5rem 0;
@@ -189,8 +188,7 @@
 }
 
 :host ::ng-deep .chart-card .p-card .p-card-header,
-:host ::ng-deep .info-card .p-card .p-card-header,
-:host ::ng-deep .insights-card .p-card .p-card-header {
+:host ::ng-deep .info-card .p-card .p-card-header {
   padding: 1.5rem 1.5rem 1rem 1.5rem !important;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
   border-bottom: 1px solid #dee2e6 !important;
@@ -218,6 +216,173 @@
   flex: 1;
 }
 
+/* Estilos para Métricas Avanzadas */
+.advanced-metrics-section {
+  margin-top: 2rem;
+  padding: 0;
+}
+
+.advanced-metrics-section .section-title {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.advanced-metrics-section .section-title i {
+  color: #3498db;
+}
+
+.chart-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px 8px 0 0;
+}
+
+.chart-card .card-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.chart-card .card-header .chart-icon {
+  color: #3498db;
+  font-size: 1.2rem;
+}
+
+.chart-container {
+  position: relative;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.metric-summary {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  transition: all 0.3s ease;
+}
+
+.metric-summary:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.metric-summary h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-summary .metric-value {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.2;
+}
+
+.metric-summary small {
+  color: #6c757d;
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* Responsividad para gráficos avanzados */
+@media (max-width: 768px) {
+  .advanced-metrics-section .section-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .chart-container {
+    height: 250px !important;
+    padding: 0.5rem;
+  }
+  
+  .chart-card .card-header {
+    padding: 0.75rem;
+  }
+  
+  .chart-card .card-header h3 {
+    font-size: 1rem;
+  }
+  
+  .metric-summary {
+    padding: 0.75rem;
+    margin: 0.25rem 0;
+  }
+  
+  .metric-summary .metric-value {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .chart-container {
+    height: 220px !important;
+    padding: 0.25rem;
+  }
+  
+  .metric-summary .metric-value {
+    font-size: 1.1rem;
+  }
+  
+  .metric-summary h4 {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animaciones para los gráficos */
+.chart-card {
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading state para métricas avanzadas */
+.advanced-metrics-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #6c757d;
+}
+
+.advanced-metrics-loading i {
+  margin-right: 0.5rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Espaciado para etiquetas de información */
 .card-header-custom .info-tag {
   margin-left: 1rem;
@@ -232,8 +397,7 @@
 
 /* Espaciado para el contenido de las tarjetas */
 :host ::ng-deep .chart-card .p-card .p-card-body,
-:host ::ng-deep .info-card .p-card .p-card-body,
-:host ::ng-deep .insights-card .p-card .p-card-body {
+:host ::ng-deep .info-card .p-card .p-card-body {
   padding: 1.5rem;
 }
 
@@ -286,10 +450,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* Espaciado para la sección de insights */
-.insights-section {
-  margin: 2rem 0;
-}
 
 /* Espaciado para mensajes de error */
 .errors-section {
@@ -375,37 +535,6 @@
   margin-bottom: 1rem;
 }
 
-/* Espaciado para insights */
-.insights-grid {
-  margin-top: 1.5rem;
-}
-
-.insight-item {
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  border-radius: var(--border-radius-sm);
-  background: rgba(255, 255, 255, 0.1);
-  transition: var(--transition);
-}
-
-.insight-item:last-child {
-  margin-bottom: 0;
-}
-
-.insight-content h4 {
-  margin: 0 0 0.75rem 0;
-  padding: 0.25rem 0;
-}
-
-.insight-value {
-  margin: 0 0 0.5rem 0;
-  padding: 0.25rem 0;
-}
-
-.insight-description {
-  margin: 0;
-  padding: 0.25rem 0;
-}
 
 /* Technology List */
 .technology-list {
@@ -643,8 +772,7 @@
 /* Estilos específicos para títulos dentro de tarjetas */
 :host ::ng-deep .p-card .p-card-header h3,
 :host ::ng-deep .chart-card .p-card .p-card-header h3,
-:host ::ng-deep .info-card .p-card .p-card-header h3,
-:host ::ng-deep .insights-card .p-card .p-card-header h3 {
+:host ::ng-deep .info-card .p-card .p-card-header h3 {
   margin: 0 !important;
   padding: 0 !important;
   color: #2c3e50 !important;
@@ -674,4 +802,171 @@
   font-weight: 600;
   line-height: 1.4;
   flex: 1;
+}
+
+/* Estilos para Métricas Avanzadas */
+.advanced-metrics-section {
+  margin-top: 2rem;
+  padding: 0;
+}
+
+.advanced-metrics-section .section-title {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.advanced-metrics-section .section-title i {
+  color: #3498db;
+}
+
+.chart-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px 8px 0 0;
+}
+
+.chart-card .card-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.chart-card .card-header .chart-icon {
+  color: #3498db;
+  font-size: 1.2rem;
+}
+
+.chart-container {
+  position: relative;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.metric-summary {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  transition: all 0.3s ease;
+}
+
+.metric-summary:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.metric-summary h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-summary .metric-value {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.2;
+}
+
+.metric-summary small {
+  color: #6c757d;
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* Responsividad para gráficos avanzados */
+@media (max-width: 768px) {
+  .advanced-metrics-section .section-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .chart-container {
+    height: 250px !important;
+    padding: 0.5rem;
+  }
+  
+  .chart-card .card-header {
+    padding: 0.75rem;
+  }
+  
+  .chart-card .card-header h3 {
+    font-size: 1rem;
+  }
+  
+  .metric-summary {
+    padding: 0.75rem;
+    margin: 0.25rem 0;
+  }
+  
+  .metric-summary .metric-value {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .chart-container {
+    height: 220px !important;
+    padding: 0.25rem;
+  }
+  
+  .metric-summary .metric-value {
+    font-size: 1.1rem;
+  }
+  
+  .metric-summary h4 {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animaciones para los gráficos */
+.chart-card {
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading state para métricas avanzadas */
+.advanced-metrics-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #6c757d;
+}
+
+.advanced-metrics-loading i {
+  margin-right: 0.5rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

@@ -25,6 +25,26 @@
   </p-button>
 </div>
 
+<!-- Mensaje de perfil obligatorio -->
+<div *ngIf="!loading && !error && isCompletionMode" class="p-4 lg:p-6 max-w-screen-xl mx-auto mb-4">
+  <p-message 
+    severity="info" 
+    styleClass="w-full">
+    <ng-template pTemplate="content">
+      <div class="flex align-items-center gap-3 p-2">
+        <i class="pi pi-info-circle text-2xl"></i>
+        <div>
+          <h4 class="m-0 mb-2 font-semibold">¡Completa tu perfil para acceder al dashboard!</h4>
+          <p class="m-0 text-sm">
+            Para generar métricas precisas del mercado laboral y brindarte la mejor experiencia, 
+            necesitamos que completes algunos campos adicionales de tu perfil profesional.
+          </p>
+        </div>
+      </div>
+    </ng-template>
+  </p-message>
+</div>
+
 <!-- Main Profile Content -->
 <div *ngIf="!loading && !error && perfil" class="p-4 lg:p-6 max-w-screen-xl mx-auto">
 
@@ -247,6 +267,182 @@
                 {{ perfilForm.get('resumen')?.value?.length || 0 }}/500 caracteres
               </small>
             </div>
+          </div>
+        </div>
+
+        <!-- Sección: Información Profesional para Métricas -->
+        <div class="section-divider my-5">
+          <div class="flex align-items-center gap-3 mb-4">
+            <div class="flex align-items-center justify-content-center border-circle bg-primary text-white"
+                 style="width: 2.5rem; height: 2.5rem;">
+              <i class="pi pi-chart-bar text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-900 m-0">Información para Métricas</h3>
+              <p class="text-600 m-0 text-sm">Datos necesarios para generar estadísticas del mercado laboral</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Años de Experiencia -->
+        <div class="field">
+          <label for="años_experiencia" class="block text-900 font-medium mb-2">
+            <i class="pi pi-clock mr-2 text-primary"></i>
+            Años de Experiencia *
+          </label>
+          <div class="input-wrapper">
+            <p-inputNumber
+              id="años_experiencia"
+              formControlName="años_experiencia"
+              placeholder="Ej: 5"
+              [min]="0"
+              [max]="50"
+              [class]="'w-full ' + (isFieldInvalid('años_experiencia') ? 'ng-invalid ng-dirty' : '')"
+              suffix=" años">
+            </p-inputNumber>
+            <small *ngIf="isFieldInvalid('años_experiencia')" class="p-error block mt-1">
+              {{ getFieldError('años_experiencia') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Nivel de Educación -->
+        <div class="field">
+          <label for="nivel_educacion" class="block text-900 font-medium mb-2">
+            <i class="pi pi-book mr-2 text-primary"></i>
+            Nivel de Educación *
+          </label>
+          <div class="input-wrapper">
+            <p-dropdown
+              id="nivel_educacion"
+              formControlName="nivel_educacion"
+              [options]="nivelesEducacion"
+              placeholder="Seleccione su nivel de educación"
+              [class]="'w-full ' + (isFieldInvalid('nivel_educacion') ? 'ng-invalid ng-dirty' : '')"
+              styleClass="w-full">
+            </p-dropdown>
+            <small *ngIf="isFieldInvalid('nivel_educacion')" class="p-error block mt-1">
+              {{ getFieldError('nivel_educacion') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Especialidad Técnica -->
+        <div class="field">
+          <label for="especialidad_tecnica" class="block text-900 font-medium mb-2">
+            <i class="pi pi-code mr-2 text-primary"></i>
+            Especialidad Técnica Principal *
+          </label>
+          <div class="input-wrapper">
+            <p-dropdown
+              id="especialidad_tecnica"
+              formControlName="especialidad_tecnica"
+              [options]="especialidadesTecnicas"
+              placeholder="Seleccione su especialidad principal"
+              [class]="'w-full ' + (isFieldInvalid('especialidad_tecnica') ? 'ng-invalid ng-dirty' : '')"
+              styleClass="w-full">
+            </p-dropdown>
+            <small *ngIf="isFieldInvalid('especialidad_tecnica')" class="p-error block mt-1">
+              {{ getFieldError('especialidad_tecnica') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Tipo de Empleo Actual -->
+        <div class="field">
+          <label for="tipo_empleo_actual" class="block text-900 font-medium mb-2">
+            <i class="pi pi-briefcase mr-2 text-primary"></i>
+            Tipo de Empleo Actual *
+          </label>
+          <div class="input-wrapper">
+            <p-dropdown
+              id="tipo_empleo_actual"
+              formControlName="tipo_empleo_actual"
+              [options]="tiposEmpleo"
+              placeholder="Seleccione su situación laboral actual"
+              [class]="'w-full ' + (isFieldInvalid('tipo_empleo_actual') ? 'ng-invalid ng-dirty' : '')"
+              styleClass="w-full">
+            </p-dropdown>
+            <small *ngIf="isFieldInvalid('tipo_empleo_actual')" class="p-error block mt-1">
+              {{ getFieldError('tipo_empleo_actual') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Área de Interés -->
+        <div class="field">
+          <label for="area_interes" class="block text-900 font-medium mb-2">
+            <i class="pi pi-star mr-2 text-primary"></i>
+            Área de Interés *
+          </label>
+          <div class="input-wrapper">
+            <p-dropdown
+              id="area_interes"
+              formControlName="area_interes"
+              [options]="areasInteres"
+              placeholder="Seleccione su área de interés principal"
+              [class]="'w-full ' + (isFieldInvalid('area_interes') ? 'ng-invalid ng-dirty' : '')"
+              styleClass="w-full">
+            </p-dropdown>
+            <small *ngIf="isFieldInvalid('area_interes')" class="p-error block mt-1">
+              {{ getFieldError('area_interes') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Disponibilidad para Cambio -->
+        <div class="field">
+          <label for="disponibilidad_cambio" class="block text-900 font-medium mb-2">
+            <i class="pi pi-search mr-2 text-primary"></i>
+            Disponibilidad para Cambio de Trabajo *
+          </label>
+          <div class="input-wrapper">
+            <p-dropdown
+              id="disponibilidad_cambio"
+              formControlName="disponibilidad_cambio"
+              [options]="disponibilidadOpciones"
+              placeholder="Seleccione su disponibilidad"
+              [class]="'w-full ' + (isFieldInvalid('disponibilidad_cambio') ? 'ng-invalid ng-dirty' : '')"
+              styleClass="w-full">
+            </p-dropdown>
+            <small *ngIf="isFieldInvalid('disponibilidad_cambio')" class="p-error block mt-1">
+              {{ getFieldError('disponibilidad_cambio') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Sección: Información Opcional -->
+        <div class="section-divider my-5">
+          <div class="flex align-items-center gap-3 mb-4">
+            <div class="flex align-items-center justify-content-center border-circle bg-secondary text-white"
+                 style="width: 2.5rem; height: 2.5rem;">
+              <i class="pi pi-info-circle text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-900 m-0">Información Opcional</h3>
+              <p class="text-600 m-0 text-sm">Datos adicionales para análisis más detallados</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rango Salarial -->
+        <div class="field">
+          <label for="rango_salarial" class="block text-900 font-medium mb-2">
+            <i class="pi pi-dollar mr-2 text-primary"></i>
+            Rango Salarial (CLP mensual)
+          </label>
+          <div class="input-wrapper">
+            <p-dropdown
+              id="rango_salarial"
+              formControlName="rango_salarial"
+              [options]="rangosSalariales"
+              placeholder="Seleccione su rango salarial (opcional)"
+              styleClass="w-full">
+            </p-dropdown>
+            <small class="text-500 block mt-1">
+              <i class="pi pi-shield mr-1"></i>
+              Esta información es completamente anónima y se usa solo para estadísticas generales
+            </small>
           </div>
         </div>
 

@@ -127,6 +127,17 @@ export class AuthService {
       );
   }
 
+  // Verificar si el perfil está completo
+  verificarPerfilCompleto(): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('token', sessionStorage.getItem('token') || '');
+
+    return this.http.get<any>(`${this.url}/api/users/verificar-perfil-completo`, { headers })
+      .pipe(
+        catchError(err => of({ ok: false, perfil_completo: false, msj: err.error?.msj || 'Error al verificar perfil' }))
+      );
+  }
+
   // Actualizar mi perfil (para usuario)
   actualizarMiPerfil(datosActualizados: any): Observable<any> {
     const headers = new HttpHeaders()

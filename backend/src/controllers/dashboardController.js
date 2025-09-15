@@ -4,21 +4,9 @@ const { Op } = require('sequelize');
 // Obtener estadísticas generales del mercado laboral
 const obtenerEstadisticasMercado = async (req, res) => {
   try {
-    // Total de profesionales en la plataforma
-    const totalProfesionales = await User.count({ 
-      where: { 
-        activo: true,
-        posicion_actual: {
-          [Op.and]: [
-            { [Op.not]: null },
-            { [Op.ne]: '' },
-            { [Op.ne]: 'No especificada' }
-          ]
-        }
-      }
-    });
-
-    // Nuevos registros este mes
+    const totalProfesionales = await User.count({ where: { activo: true } });
+    
+    // Nuevos profesionales este mes
     const inicioMes = new Date();
     inicioMes.setDate(1);
     inicioMes.setHours(0, 0, 0, 0);
@@ -26,286 +14,427 @@ const obtenerEstadisticasMercado = async (req, res) => {
     const nuevosProfesionalesEsteMes = await User.count({
       where: {
         activo: true,
-        created_at: {
-          [Op.gte]: inicioMes
-        }
+        created_at: { [Op.gte]: inicioMes }
       }
     });
 
-    // Total de empresas diferentes en la plataforma
+    // Empresas únicas
     const empresasUnicas = await User.count({
       distinct: true,
       col: 'empresa_actual',
-      where: {
+      where: { 
         activo: true,
-        empresa_actual: {
-          [Op.and]: [
-            { [Op.not]: null },
-            { [Op.ne]: '' },
-            { [Op.ne]: 'No especificada' }
-          ]
-        }
+        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
       }
     });
 
-    // Total de industrias diferentes
+    // Industrias únicas
     const industriasUnicas = await User.count({
       distinct: true,
       col: 'industria',
-      where: {
+      where: { 
         activo: true,
-        industria: {
-          [Op.and]: [
-            { [Op.not]: null },
-            { [Op.ne]: '' },
-            { [Op.ne]: 'No especificada' }
-          ]
-        }
+        industria: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
       }
     });
 
+    // Calcular porcentaje de crecimiento
+    const mesAnterior = new Date();
+    mesAnterior.setMonth(mesAnterior.getMonth() - 1);
+    mesAnterior.setDate(1);
+    mesAnterior.setHours(0, 0, 0, 0);
+
+    const profesionalesMesAnterior = await User.count({
+      where: {
+        activo: true,
+        created_at: { [Op.lt]: inicioMes, [Op.gte]: mesAnterior }
+      }
+    });
+
+    const porcentajeCrecimiento = profesionalesMesAnterior > 0 
+      ? Math.round(((nuevosProfesionalesEsteMes - profesionalesMesAnterior) / profesionalesMesAnterior) * 100)
+      : 100;
+
+    const estadisticas = {
+      totalProfesionales,
+      nuevosProfesionalesEsteMes,
+      empresasUnicas,
+      industriasUnicas,
+      porcentajeCrecimiento
+    };
+
     res.json({
       ok: true,
-      estadisticas: {
-        totalProfesionales,
-        nuevosProfesionalesEsteMes,
-        empresasUnicas,
-        industriasUnicas,
-        porcentajeCrecimiento: totalProfesionales > 0 ? 
-          Math.round((nuevosProfesionalesEsteMes / totalProfesionales) * 100) : 0
-      }
+      estadisticas
     });
 
   } catch (error) {
     console.error('Error en obtenerEstadisticasMercado:', error);
     res.status(500).json({
       ok: false,
-      msj: 'Error del servidor al obtener estadísticas del mercado',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      msj: 'Error del servidor al obtener estadísticas del mercado'
     });
   }
 };
 
-// Obtener distribución de tecnologías/skills más demandadas
-const obtenerTecnologiasMasDemandadas = async (req, res) => {
+// Obtener métricas avanzadas basadas en los nuevos campos del perfil
+const obtenerMetricasAvanzadas = async (req, res) => {
   try {
-    // Simular análisis de palabras clave en posiciones actuales
-    const posiciones = await User.findAll({
-      where: {
+    const usuariosActivos = await User.findAll({
+      where: { 
         activo: true,
-        posicion_actual: {
-          [Op.and]: [
-            { [Op.not]: null },
-            { [Op.ne]: '' },
-            { [Op.ne]: 'No especificada' }
-          ]
-        }
+        perfil_completo: true // Solo usuarios con perfil completo
       },
-      attributes: ['posicion_actual'],
-      raw: true
+      attributes: [
+        'años_experiencia',
+        'nivel_educacion',
+        'especialidad_tecnica',
+        'tipo_empleo_actual',
+        'rango_salarial',
+        'tecnologias_principales',
+        'area_interes'
+      ]
     });
 
-    // Palabras clave tecnológicas comunes
-    const tecnologias = [
-      'JavaScript', 'Python', 'Java', 'React', 'Angular', 'Node.js',
-      'TypeScript', 'SQL', 'MongoDB', 'PostgreSQL', 'AWS', 'Docker',
-      'Git', 'Kubernetes', 'Vue.js', 'PHP', 'C#', '.NET', 'Go', 'Rust'
-    ];
+    const totalUsuarios = usuariosActivos.length;
 
-    const conteoTecnologias = {};
-    tecnologias.forEach(tech => conteoTecnologias[tech] = 0);
-
-    // Contar ocurrencias en posiciones
-    posiciones.forEach(pos => {
-      const posicion = pos.posicion_actual.toLowerCase();
-      tecnologias.forEach(tech => {
-        if (posicion.includes(tech.toLowerCase())) {
-          conteoTecnologias[tech]++;
+    if (totalUsuarios === 0) {
+      return res.json({
+        ok: true,
+        metricas: {
+          distribucionExperiencia: [],
+          distribucionEducacion: [],
+          tecnologiasPopulares: [],
+          estadisticasSalariales: [],
+          distribucionAreas: [],
+          tiposEmpleo: []
         }
       });
+    }
+
+    // 1. Distribución por años de experiencia
+    const experienciaRangos = {
+      '0-2 años': { min: 0, max: 2 },
+      '3-5 años': { min: 3, max: 5 },
+      '6-10 años': { min: 6, max: 10 },
+      '11-15 años': { min: 11, max: 15 },
+      '16+ años': { min: 16, max: 100 }
+    };
+
+    const distribucionExperiencia = Object.entries(experienciaRangos).map(([rango, limits]) => {
+      const cantidad = usuariosActivos.filter(user => 
+        user.años_experiencia >= limits.min && user.años_experiencia <= limits.max
+      ).length;
+      return {
+        rango,
+        cantidad,
+        porcentaje: Math.round((cantidad / totalUsuarios) * 100)
+      };
     });
 
-    // Convertir a array y ordenar
-    const tecnologiasOrdenadas = Object.entries(conteoTecnologias)
-      .map(([nombre, demanda]) => ({ nombre, demanda }))
-      .sort((a, b) => b.demanda - a.demanda)
-      .slice(0, 15); // Top 15
+    // 2. Distribución por nivel de educación
+    const distribucionEducacion = ['Técnico', 'Licenciatura', 'Maestría', 'Doctorado', 'Otro'].map(nivel => {
+      const cantidad = usuariosActivos.filter(user => user.nivel_educacion === nivel).length;
+      return {
+        nivel,
+        cantidad,
+        porcentaje: Math.round((cantidad / totalUsuarios) * 100)
+      };
+    }).filter(item => item.cantidad > 0);
+
+    // 3. Tecnologías más populares (desde especialidad_tecnica)
+    const tecnologiaCount = {};
+    usuariosActivos.forEach(user => {
+      if (user.especialidad_tecnica) {
+        tecnologiaCount[user.especialidad_tecnica] = (tecnologiaCount[user.especialidad_tecnica] || 0) + 1;
+      }
+    });
+
+    const tecnologiasPopulares = Object.entries(tecnologiaCount)
+      .map(([tecnologia, cantidad]) => ({
+        tecnologia,
+        cantidad,
+        porcentaje: Math.round((cantidad / totalUsuarios) * 100),
+        tendencia: 'stable' // Simplificado por ahora
+      }))
+      .sort((a, b) => b.cantidad - a.cantidad)
+      .slice(0, 10);
+
+    // 4. Estadísticas salariales
+    const estadisticasSalariales = ['0-500k', '500k-1M', '1M-1.5M', '1.5M-2M', '2M-3M', '3M+', 'Prefiero no decir'].map(rango => {
+      const cantidad = usuariosActivos.filter(user => user.rango_salarial === rango).length;
+      return {
+        rango,
+        cantidad,
+        porcentaje: Math.round((cantidad / totalUsuarios) * 100)
+      };
+    }).filter(item => item.cantidad > 0);
+
+    // 5. Distribución por áreas de interés
+    const areaCount = {};
+    usuariosActivos.forEach(user => {
+      if (user.area_interes) {
+        areaCount[user.area_interes] = (areaCount[user.area_interes] || 0) + 1;
+      }
+    });
+
+    const distribucionAreas = Object.entries(areaCount)
+      .map(([area, cantidad]) => ({
+        area,
+        cantidad,
+        porcentaje: Math.round((cantidad / totalUsuarios) * 100),
+        demandaLaboral: Math.floor(Math.random() * 100) + 50 // Simplificado
+      }))
+      .sort((a, b) => b.cantidad - a.cantidad);
+
+    // 6. Tipos de empleo
+    const tiposEmpleo = ['Tiempo completo', 'Part-time', 'Freelance', 'Desempleado', 'Estudiante'].map(tipo => {
+      const cantidad = usuariosActivos.filter(user => user.tipo_empleo_actual === tipo).length;
+      return {
+        tipo,
+        cantidad,
+        porcentaje: Math.round((cantidad / totalUsuarios) * 100)
+      };
+    }).filter(item => item.cantidad > 0);
+
+    const metricas = {
+      distribucionExperiencia,
+      distribucionEducacion,
+      tecnologiasPopulares,
+      estadisticasSalariales,
+      distribucionAreas,
+      tiposEmpleo
+    };
 
     res.json({
       ok: true,
-      tecnologias: tecnologiasOrdenadas
+      metricas
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerMetricasAvanzadas:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al obtener métricas avanzadas'
+    });
+  }
+};
+
+// Obtener tecnologías más demandadas (simulado)
+const obtenerTecnologiasMasDemandadas = async (req, res) => {
+  try {
+    // Contar especialidades técnicas más populares
+    const tecnologias = await User.findAll({
+      where: { 
+        activo: true,
+        especialidad_tecnica: { [Op.not]: null, [Op.ne]: '' }
+      },
+      attributes: ['especialidad_tecnica']
+    });
+
+    const tecnologiaCount = {};
+    tecnologias.forEach(user => {
+      const tech = user.especialidad_tecnica;
+      tecnologiaCount[tech] = (tecnologiaCount[tech] || 0) + 1;
+    });
+
+    const tecnologiasDemandadas = Object.entries(tecnologiaCount)
+      .map(([nombre, demanda]) => ({ nombre, demanda }))
+      .sort((a, b) => b.demanda - a.demanda)
+      .slice(0, 10);
+
+    res.json({
+      ok: true,
+      tecnologias: tecnologiasDemandadas
     });
 
   } catch (error) {
     console.error('Error en obtenerTecnologiasMasDemandadas:', error);
     res.status(500).json({
       ok: false,
-      msj: 'Error al obtener tecnologías más demandadas',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      msj: 'Error del servidor al obtener tecnologías demandadas'
     });
   }
 };
 
-// Obtener distribución salarial por industria (simulada)
+// Obtener distribución salarial (simulado)
 const obtenerDistribucionSalarial = async (req, res) => {
   try {
-    const industriasConUsuarios = await User.findAll({
-      where: {
+    console.log('🔍 Obteniendo distribución salarial...');
+    
+    const distribucion = await User.findAll({
+      where: { 
         activo: true,
-        industria: {
-          [Op.and]: [
-            { [Op.not]: null },
-            { [Op.ne]: '' },
-            { [Op.ne]: 'No especificada' }
-          ]
-        }
+        rango_salarial: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'Prefiero no decir' }
       },
-      attributes: [
-        'industria',
-        [User.sequelize.fn('COUNT', User.sequelize.col('id')), 'cantidad']
-      ],
-      group: ['industria'],
-      order: [[User.sequelize.fn('COUNT', User.sequelize.col('id')), 'DESC']],
-      limit: 8,
-      raw: true
+      attributes: ['rango_salarial', 'industria']
     });
 
-    // Simular rangos salariales para cada industria
-    const rangosBaseSalarial = {
-      'Tecnología': { min: 1800000, max: 4500000, promedio: 2800000 },
-      'Servicios financieros': { min: 2000000, max: 5000000, promedio: 3200000 },
-      'Consultoría': { min: 1600000, max: 4000000, promedio: 2600000 },
-      'Educación': { min: 1200000, max: 2800000, promedio: 1800000 },
-      'Salud': { min: 1500000, max: 3500000, promedio: 2200000 },
-      'Retail': { min: 1000000, max: 2500000, promedio: 1600000 },
-      'Manufactura': { min: 1300000, max: 3000000, promedio: 2000000 },
-      'Default': { min: 1400000, max: 3200000, promedio: 2100000 }
-    };
+    console.log('📊 Usuarios encontrados para distribución salarial:', distribucion.length);
 
-    const distribucionSalarial = industriasConUsuarios.map(item => {
-      const industria = item.industria;
-      const cantidad = parseInt(item.cantidad);
-      const rango = rangosBaseSalarial[industria] || rangosBaseSalarial['Default'];
-      
-      return {
-        industria,
-        cantidad,
-        salarioMinimo: rango.min,
-        salarioMaximo: rango.max,
-        salarioPromedio: rango.promedio,
-        // Simular variaciones
-        variacionMensual: Math.round((Math.random() - 0.5) * 10) // +/- 5%
-      };
+    const distribuciones = {};
+    distribucion.forEach(user => {
+      const industria = user.industria || 'Sin especificar';
+      if (!distribuciones[industria]) {
+        distribuciones[industria] = {
+          industria,
+          cantidad: 0,
+          salarioMinimo: 500000,
+          salarioMaximo: 3000000,
+          salarioPromedio: 1500000,
+          variacionMensual: Math.floor(Math.random() * 20) - 10
+        };
+      }
+      distribuciones[industria].cantidad++;
     });
+
+    let resultado = Object.values(distribuciones);
+    
+    // Si no hay suficientes datos reales, generar datos de muestra
+    if (resultado.length === 0) {
+      console.log('⚠️ No hay datos salariales reales, generando datos de muestra...');
+      resultado = [
+        {
+          industria: 'Tecnología',
+          cantidad: 15,
+          salarioMinimo: 800000,
+          salarioMaximo: 3500000,
+          salarioPromedio: 2100000,
+          variacionMensual: 8
+        },
+        {
+          industria: 'Finanzas',
+          cantidad: 8,
+          salarioMinimo: 1000000,
+          salarioMaximo: 4000000,
+          salarioPromedio: 2400000,
+          variacionMensual: 5
+        },
+        {
+          industria: 'Salud',
+          cantidad: 6,
+          salarioMinimo: 900000,
+          salarioMaximo: 3200000,
+          salarioPromedio: 1800000,
+          variacionMensual: 3
+        },
+        {
+          industria: 'Educación',
+          cantidad: 4,
+          salarioMinimo: 600000,
+          salarioMaximo: 2000000,
+          salarioPromedio: 1200000,
+          variacionMensual: 2
+        },
+        {
+          industria: 'Energía y servicios públicos',
+          cantidad: 3,
+          salarioMinimo: 1200000,
+          salarioMaximo: 3800000,
+          salarioPromedio: 2500000,
+          variacionMensual: 6
+        }
+      ];
+    }
+    
+    console.log('📈 Distribución salarial final:', resultado);
 
     res.json({
       ok: true,
-      distribucionSalarial
+      distribucionSalarial: resultado
     });
 
   } catch (error) {
     console.error('Error en obtenerDistribucionSalarial:', error);
     res.status(500).json({
       ok: false,
-      msj: 'Error al obtener distribución salarial',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      msj: 'Error del servidor al obtener distribución salarial'
     });
   }
 };
 
-// Obtener empresas que más contratan
+// Obtener empresas que más contratan (simulado)
 const obtenerEmpresasQueContratanMas = async (req, res) => {
   try {
-    const empresasMasComunes = await User.findAll({
-      where: {
+    const empresas = await User.findAll({
+      where: { 
         activo: true,
-        empresa_actual: {
-          [Op.and]: [
-            { [Op.not]: null },
-            { [Op.ne]: '' },
-            { [Op.ne]: 'No especificada' }
-          ]
-        }
+        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
       },
-      attributes: [
-        'empresa_actual',
-        [User.sequelize.fn('COUNT', User.sequelize.col('id')), 'totalEmpleados']
-      ],
-      group: ['empresa_actual'],
-      order: [[User.sequelize.fn('COUNT', User.sequelize.col('id')), 'DESC']],
-      limit: 10,
-      raw: true
+      attributes: ['empresa_actual']
     });
 
-    // Simular datos adicionales para cada empresa
-    const empresasConDetalles = empresasMasComunes.map(emp => {
-      const totalEmpleados = parseInt(emp.totalEmpleados);
-      return {
-        empresa: emp.empresa_actual,
-        totalEmpleados,
-        // Simular datos adicionales
-        vacantesAbiertas: Math.round(totalEmpleados * 0.15), // 15% aproximado
-        promedioSalario: 2000000 + (Math.random() * 1500000), // Entre 2M y 3.5M
-        satisfaccionLaboral: 3.5 + (Math.random() * 1.5), // Entre 3.5 y 5.0
-        tipoEmpresa: totalEmpleados > 5 ? 'Grande' : totalEmpleados > 2 ? 'Mediana' : 'Pequeña'
-      };
+    const empresaCount = {};
+    empresas.forEach(user => {
+      const empresa = user.empresa_actual;
+      empresaCount[empresa] = (empresaCount[empresa] || 0) + 1;
     });
+
+    const empresasContratantes = Object.entries(empresaCount)
+      .map(([empresa, totalEmpleados]) => ({
+        empresa,
+        totalEmpleados,
+        vacantesAbiertas: Math.floor(Math.random() * 10) + 1,
+        promedioSalario: Math.floor(Math.random() * 2000000) + 800000,
+        satisfaccionLaboral: Math.floor(Math.random() * 30) + 70,
+        tipoEmpresa: ['Startup', 'Corporación', 'Pyme', 'Multinacional'][Math.floor(Math.random() * 4)]
+      }))
+      .sort((a, b) => b.totalEmpleados - a.totalEmpleados)
+      .slice(0, 10);
 
     res.json({
       ok: true,
-      empresas: empresasConDetalles
+      empresas: empresasContratantes
     });
 
   } catch (error) {
     console.error('Error en obtenerEmpresasQueContratanMas:', error);
     res.status(500).json({
       ok: false,
-      msj: 'Error al obtener empresas que más contratan',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      msj: 'Error del servidor al obtener empresas'
     });
   }
 };
 
-// Obtener tendencias del mercado laboral
+// Obtener tendencias del mercado (simulado)
 const obtenerTendenciasMercado = async (req, res) => {
   try {
-    // Obtener datos de los últimos 6 meses
-    const meses = [];
+    const ultimosSeisMeses = [];
     const fechaActual = new Date();
-    
+
     for (let i = 5; i >= 0; i--) {
-      const fecha = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - i, 1);
-      const siguienteMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - i + 1, 1);
+      const fecha = new Date(fechaActual);
+      fecha.setMonth(fecha.getMonth() - i);
       
-      const registros = await User.count({
+      const inicioMes = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
+      const finMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
+
+      const nuevosRegistros = await User.count({
         where: {
           activo: true,
-          created_at: {
-            [Op.gte]: fecha,
-            [Op.lt]: siguienteMes
-          }
+          created_at: { [Op.between]: [inicioMes, finMes] }
         }
       });
 
-      meses.push({
+      ultimosSeisMeses.push({
         mes: fecha.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
-        nuevosRegistros: registros,
-        // Simular datos adicionales
-        demandaLaboral: Math.round(70 + Math.random() * 30), // Entre 70-100%
-        satisfaccionPromedio: +(3.5 + Math.random() * 1.5).toFixed(1) // Entre 3.5-5.0
+        nuevosRegistros,
+        demandaLaboral: Math.floor(Math.random() * 50) + 50,
+        satisfaccionPromedio: Math.floor(Math.random() * 20) + 70
       });
     }
+
+    const resumen = {
+      crecimientoMensual: Math.floor(Math.random() * 20) + 5,
+      promedioSatisfaccion: Math.floor(Math.random() * 20) + 75,
+      promedioDemanda: Math.floor(Math.random() * 30) + 60
+    };
 
     res.json({
       ok: true,
       tendencias: {
-        ultimosSeisMeses: meses,
-        resumen: {
-          crecimientoMensual: meses.length > 1 ? 
-            meses[meses.length - 1].nuevosRegistros - meses[meses.length - 2].nuevosRegistros : 0,
-          promedioSatisfaccion: +(meses.reduce((acc, m) => acc + m.satisfaccionPromedio, 0) / meses.length).toFixed(1),
-          promedioDemanda: Math.round(meses.reduce((acc, m) => acc + m.demandaLaboral, 0) / meses.length)
-        }
+        ultimosSeisMeses,
+        resumen
       }
     });
 
@@ -313,14 +442,14 @@ const obtenerTendenciasMercado = async (req, res) => {
     console.error('Error en obtenerTendenciasMercado:', error);
     res.status(500).json({
       ok: false,
-      msj: 'Error al obtener tendencias del mercado',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      msj: 'Error del servidor al obtener tendencias'
     });
   }
 };
 
 module.exports = {
   obtenerEstadisticasMercado,
+  obtenerMetricasAvanzadas,
   obtenerTecnologiasMasDemandadas,
   obtenerDistribucionSalarial,
   obtenerEmpresasQueContratanMas,

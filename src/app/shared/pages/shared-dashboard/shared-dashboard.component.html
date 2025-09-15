@@ -339,7 +339,7 @@
                     <div class="salary-range">
                       <span class="range-label">Rango salarial:</span>
                       <span class="range-value">
-                        {{ dist.salarioMinimo | currency:'CLP':'symbol':'1.0-0' }} - 
+                        {{ dist.salarioMinimo | currency:'CLP':'symbol':'1.0-0' }} -
                         {{ dist.salarioMaximo | currency:'CLP':'symbol':'1.0-0' }}
                       </span>
                     </div>
@@ -370,43 +370,148 @@
     </div>
   </div>
 
-  <!-- Market Insights Section -->
-  <div class="insights-section mt-6" *ngIf="tendenciasMercado">
-    <p-card styleClass="insights-card">
-      <ng-template pTemplate="header">
-        <h3>Insights del Mercado Laboral</h3>
-      </ng-template>
 
-      <div class="insights-grid">
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="insight-item">
-              <div class="insight-icon">
-                <i class="pi pi-heart"></i>
-              </div>
-              <div class="insight-content">
-                <h4>Satisfacción Promedio</h4>
-                <p class="insight-value">{{ tendenciasMercado.resumen.promedioSatisfaccion }}/5.0</p>
-                <p class="insight-description">nivel de satisfacción laboral</p>
-              </div>
+  <!-- Métricas Avanzadas del Mercado Laboral -->
+  <div class="advanced-metrics-section mt-6" *ngIf="metricasAvanzadas">
+    <h2 class="section-title mb-4">
+      <i class="pi pi-chart-line mr-2"></i>
+      Análisis Avanzado del Mercado Laboral
+    </h2>
+
+    <!-- Primera fila de gráficos -->
+    <div class="grid mb-4">
+      <!-- Distribución por Experiencia -->
+      <div class="col-12 lg:col-6 xl:col-4">
+        <p-card styleClass="h-full chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h3>Años de Experiencia</h3>
+              <i class="pi pi-clock chart-icon"></i>
             </div>
+          </ng-template>
+          <div class="chart-container" style="height: 300px;">
+            <canvas id="experienciaChart"></canvas>
           </div>
-          
-          <div class="col-12 md:col-6">
-            <div class="insight-item">
-              <div class="insight-icon">
-                <i class="pi pi-trending-up"></i>
-              </div>
-              <div class="insight-content">
-                <h4>Demanda Promedio</h4>
-                <p class="insight-value">{{ tendenciasMercado.resumen.promedioDemanda }}%</p>
-                <p class="insight-description">nivel de demanda laboral</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </p-card>
       </div>
-    </p-card>
+
+      <!-- Distribución por Educación -->
+      <div class="col-12 lg:col-6 xl:col-4">
+        <p-card styleClass="h-full chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h3>Nivel de Educación</h3>
+              <i class="pi pi-book chart-icon"></i>
+            </div>
+          </ng-template>
+          <div class="chart-container" style="height: 300px;">
+            <canvas id="educacionChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Tecnologías Populares -->
+      <div class="col-12 lg:col-6 xl:col-4">
+        <p-card styleClass="h-full chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h3>Especialidades Técnicas</h3>
+              <i class="pi pi-code chart-icon"></i>
+            </div>
+          </ng-template>
+          <div class="chart-container" style="height: 300px;">
+            <canvas id="tecnologiasPopularesChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+    </div>
+
+    <!-- Segunda fila de gráficos -->
+    <div class="grid mb-4">
+      <!-- Distribución Salarial -->
+      <div class="col-12 lg:col-6 xl:col-4">
+        <p-card styleClass="h-full chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h3>Rangos Salariales</h3>
+              <i class="pi pi-dollar chart-icon"></i>
+            </div>
+          </ng-template>
+          <div class="chart-container" style="height: 300px;">
+            <canvas id="salarioChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+
+      <!-- Áreas de Interés -->
+      <div class="col-12 lg:col-6 xl:col-4">
+        <p-card styleClass="h-full chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h3>Áreas de Interés</h3>
+              <i class="pi pi-star chart-icon"></i>
+            </div>
+          </ng-template>
+          <div class="chart-container" style="height: 300px;">
+            <canvas id="areasInteresChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+    </div>
+
+    <!-- Tercera fila -->
+    <div class="grid mb-4">
+      <!-- Tipos de Empleo -->
+      <div class="col-12 lg:col-6 xl:col-4">
+        <p-card styleClass="h-full chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h3>Tipos de Empleo</h3>
+              <i class="pi pi-briefcase chart-icon"></i>
+            </div>
+          </ng-template>
+          <div class="chart-container" style="height: 300px;">
+            <canvas id="tiposEmpleoChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Estadísticas de Perfil Completo -->
+      <div class="col-12 lg:col-6 xl:col-8">
+        <p-card styleClass="h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h3>Resumen de Métricas Avanzadas</h3>
+              <i class="pi pi-chart-bar chart-icon"></i>
+            </div>
+          </ng-template>
+          <div class="grid">
+            <div class="col-6 md:col-3">
+              <div class="metric-summary">
+                <h4>Total Profesionales</h4>
+                <p class="metric-value">{{ getTotalProfesionales() }}</p>
+                <small>Con perfil completo</small>
+              </div>
+            </div>
+            <div class="col-6 md:col-3" *ngIf="metricasAvanzadas.tecnologiasPopulares.length > 0">
+              <div class="metric-summary">
+                <h4>Top Tecnología</h4>
+                <p class="metric-value">{{ metricasAvanzadas.tecnologiasPopulares[0].tecnologia }}</p>
+                <small>{{ metricasAvanzadas.tecnologiasPopulares[0].cantidad }} profesionales</small>
+              </div>
+            </div>
+            <div class="col-6 md:col-3" *ngIf="metricasAvanzadas.distribucionAreas.length > 0">
+              <div class="metric-summary">
+                <h4>Área Principal</h4>
+                <p class="metric-value">{{ metricasAvanzadas.distribucionAreas[0].area }}</p>
+                <small>{{ metricasAvanzadas.distribucionAreas[0].cantidad }} profesionales</small>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
   </div>
 
   <!-- Error Messages -->
