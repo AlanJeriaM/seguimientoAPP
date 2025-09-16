@@ -400,7 +400,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   getFieldError(fieldName: string): string {
     const field = this.perfilForm.get(fieldName);
     if (field?.errors) {
-      if (field.errors['required']) return `${this.getFieldLabel(fieldName)} es requerido`;
+      if (field.errors['required']) return 'el campo es requerido';
       if (field.errors['minlength']) return `${this.getFieldLabel(fieldName)} debe tener al menos ${field.errors['minlength'].requiredLength} caracteres`;
       if (field.errors['maxlength']) return `${this.getFieldLabel(fieldName)} no puede exceder ${field.errors['maxlength'].requiredLength} caracteres`;
     }
@@ -476,13 +476,13 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   getProfileCreationDate(): string {
     if (!this.perfil?.fecha_registro) {
-      console.log('⚠️ No hay fecha_registro en el perfil');
+      console.log('No hay fecha_registro en el perfil');
       return 'No disponible';
     }
 
-    console.log('📅 Fecha de registro raw:', this.perfil.fecha_registro);
+    console.log('Fecha de registro:', this.perfil.fecha_registro);
     const fechaCreacion = new Date(this.perfil.fecha_registro);
-    console.log('📅 Fecha de registro parseada:', fechaCreacion);
+    console.log('Fecha de registro parseada:', fechaCreacion);
 
     if (isNaN(fechaCreacion.getTime())) {
       console.log('Fecha de registro inválida');

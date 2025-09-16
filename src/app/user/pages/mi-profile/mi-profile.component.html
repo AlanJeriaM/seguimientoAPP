@@ -6,7 +6,7 @@
       fill="transparent"
       animationDuration="1s">
     </p-progressSpinner>
-    <h3 class="mt-4 text-primary font-medium">Cargando perfil...</h3>
+    <h3 class="mt-4 text-primary font-medium loading-text">Cargando perfil...</h3>
   </div>
 </div>
 
@@ -26,16 +26,16 @@
 </div>
 
 <!-- Mensaje de perfil obligatorio -->
-<div *ngIf="!loading && !error && isCompletionMode" class="p-4 lg:p-6 max-w-screen-xl mx-auto mb-4">
+<div *ngIf="!loading && !error && isCompletionMode" class="p-2 md:p-4 lg:p-6 max-w-screen-xl mx-auto mb-4">
   <p-message
     severity="info"
     styleClass="w-full">
     <ng-template pTemplate="content">
-      <div class="flex align-items-center gap-3 p-2">
-        <i class="pi pi-info-circle text-2xl"></i>
-        <div>
-          <h4 class="m-0 mb-2 font-semibold">¡Completa tu perfil para acceder al dashboard!</h4>
-          <p class="m-0 text-sm">
+      <div class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 p-2">
+        <i class="pi pi-info-circle text-2xl text-blue-500 flex-shrink-0"></i>
+        <div class="flex-1">
+          <h4 class="m-0 mb-2 font-semibold text-base md:text-lg">¡Completa tu perfil para acceder al dashboard!</h4>
+          <p class="m-0 text-sm md:text-base line-height-3">
             Para generar métricas precisas del mercado laboral y brindarte la mejor experiencia,
             necesitamos que completes algunos campos adicionales de tu perfil profesional.
           </p>
@@ -46,15 +46,15 @@
 </div>
 
 <!-- Main Profile Content -->
-<div *ngIf="!loading && !error && perfil" class="p-4 lg:p-6 max-w-screen-xl mx-auto">
+<div *ngIf="!loading && !error && perfil" class="p-2 md:p-4 lg:p-6 max-w-screen-xl mx-auto">
 
   <!-- Header Section -->
-  <div class="mb-6">
+  <div class="mb-4 md:mb-6">
     <p-card styleClass="border-round-lg shadow-4 mb-4">
-      <div class="flex flex-column lg:flex-row justify-content-between align-items-center gap-4 p-2">
+      <div class="flex flex-column lg:flex-row justify-content-between align-items-start lg:align-items-center gap-4 p-2 md:p-4">
 
         <!-- Profile Avatar and Info Section -->
-        <div class="flex flex-column sm:flex-row align-items-center gap-3 text-center sm:text-left w-full lg:w-auto">
+        <div class="flex flex-column sm:flex-row align-items-center sm:align-items-start gap-3 text-center sm:text-left w-full lg:w-auto">
 
           <!-- Avatar Container -->
           <div class="flex-shrink-0">
@@ -62,8 +62,7 @@
               *ngIf="perfil.perfil_imagen_url && !imageError"
               [src]="perfil.perfil_imagen_url"
               alt="Perfil"
-              class="border-circle shadow-3"
-              style="width: 80px; height: 80px; object-fit: cover;"
+              class="border-circle shadow-3 profile-image"
               (error)="handleImageError($event)"
             >
             <p-avatar
@@ -72,24 +71,24 @@
               size="xlarge"
               shape="circle"
               styleClass="shadow-3"
-              [style]="{'background-color': '#0077b5', 'color': '#ffffff', 'font-size': '2rem'}">
+              [style]="{'background-color': '#0077b5', 'color': '#ffffff', 'font-size': '2rem', 'width': '80px', 'height': '80px'}">
             </p-avatar>
           </div>
 
           <!-- Profile Info -->
-          <div class="flex-1">
-            <h1 class="text-3xl lg:text-4xl font-bold text-900 mb-2 line-height-3">{{ perfil.nombre }}</h1>
-            <p class="text-lg text-700 mb-3">{{ perfil.correo }}</p>
+          <div class="flex-1 w-full sm:w-auto">
+            <h1 class="profile-name text-2xl sm:text-3xl lg:text-4xl font-bold text-900 mb-2 line-height-3 word-wrap">{{ perfil.nombre }}</h1>
+            <p class="text-base md:text-lg text-700 mb-3 word-wrap">{{ perfil.correo }}</p>
 
             <!-- Profile Meta -->
             <div class="flex flex-column gap-2">
-              <div class="flex align-items-center gap-2 text-600">
-                <i class="pi pi-clock text-primary"></i>
-                <span class="text-sm" *ngIf="perfil.ultimo_acceso; else primerAcceso">
+              <div class="flex align-items-center gap-2 text-600 justify-content-center sm:justify-content-start">
+                <i class="pi pi-clock text-primary flex-shrink-0"></i>
+                <span class="text-xs sm:text-sm" *ngIf="perfil.ultimo_acceso; else primerAcceso">
                   Último acceso: {{ getFormattedDateTime(perfil.ultimo_acceso) }}
                 </span>
                 <ng-template #primerAcceso>
-                  <span class="text-sm">Primer acceso</span>
+                  <span class="text-xs sm:text-sm">Primer acceso</span>
                 </ng-template>
               </div>
             </div>
@@ -97,7 +96,7 @@
         </div>
 
         <!-- Profile Actions -->
-        <div class="flex-shrink-0">
+        <div class="flex-shrink-0 w-full lg:w-auto flex justify-content-center lg:justify-content-end">
           <p-tag
             [value]="perfil.rol === 'CLIENT-USER' ? 'Usuario' : 'Administrador'"
             [severity]="perfil.rol === 'CLIENT-USER' ? 'info' : 'success'"
@@ -113,29 +112,29 @@
   <div class="profile-form-section">
     <p-card styleClass="border-round-lg shadow-3">
       <ng-template pTemplate="header">
-        <div class="text-center p-4 bg-gray-50 border-round-top-lg">
-          <h2 class="text-2xl lg:text-3xl font-semibold text-900 mb-2 flex align-items-center justify-content-center gap-2">
+        <div class="text-center p-3 md:p-4 bg-gray-50 border-round-top-lg">
+          <h2 class="text-xl md:text-2xl lg:text-3xl font-semibold text-900 mb-2 flex align-items-center justify-content-center gap-2">
             <i class="pi pi-user-edit text-primary"></i>
             Editar Perfil
           </h2>
-          <p class="text-600 m-0">Actualiza tu información profesional</p>
+          <p class="text-600 m-0 text-sm md:text-base">Actualiza tu información profesional</p>
         </div>
       </ng-template>
 
-      <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()" class="p-4">
+      <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()" class="p-2 md:p-4">
 
         <!-- Información Personal Section -->
-        <div class="mb-6 pb-4 border-bottom-1 surface-border">
-          <h3 class="flex align-items-center gap-3 mb-4 text-xl font-semibold text-700">
+        <div class="mb-4 md:mb-6 pb-4 border-bottom-1 surface-border">
+          <h3 class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 mb-4 text-lg md:text-xl font-semibold text-700">
             <i class="pi pi-user text-primary"></i>
-            Información Personal
+            <span>Información Personal</span>
           </h3>
 
           <div class="grid">
             <!-- Nombre Completo -->
             <div class="col-12 md:col-6">
-              <div class="field mb-4">
-                <label for="nombre" class="block text-900 font-medium mb-2">
+              <div class="field mb-3 md:mb-4">
+                <label for="nombre" class="block text-900 font-medium mb-2 text-sm md:text-base">
                   Nombre Completo <span class="text-red-500 font-bold">*</span>
                 </label>
                 <input
@@ -146,7 +145,7 @@
                   placeholder="Ingrese su nombre completo"
                   [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('nombre') ? 'p-invalid' : '')"
                 />
-                <small *ngIf="isFieldInvalid('nombre')" class="p-error block mt-1">
+                <small *ngIf="isFieldInvalid('nombre')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('nombre') }}
                 </small>
               </div>
@@ -154,8 +153,8 @@
 
             <!-- Ubicación -->
             <div class="col-12 md:col-6">
-              <div class="field mb-4">
-                <label for="ubicacion" class="block text-900 font-medium mb-2">Ubicación</label>
+              <div class="field mb-3 md:mb-4">
+                <label for="ubicacion" class="block text-900 font-medium mb-2 text-sm md:text-base">Ubicación</label>
                 <input
                   pInputText
                   id="ubicacion"
@@ -164,7 +163,7 @@
                   placeholder="Ciudad, País"
                   [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('ubicacion') ? 'p-invalid' : '')"
                 />
-                <small *ngIf="isFieldInvalid('ubicacion')" class="p-error block mt-1">
+                <small *ngIf="isFieldInvalid('ubicacion')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('ubicacion') }}
                 </small>
               </div>
@@ -173,17 +172,17 @@
         </div>
 
         <!-- Información Profesional Section -->
-        <div class="mb-6 pb-4 border-bottom-1 surface-border">
-          <h3 class="flex align-items-center gap-3 mb-4 text-xl font-semibold text-700">
+        <div class="mb-4 md:mb-6 pb-4 border-bottom-1 surface-border">
+          <h3 class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 mb-4 text-lg md:text-xl font-semibold text-700">
             <i class="pi pi-briefcase text-primary"></i>
-            Información Profesional
+            <span>Información Profesional</span>
           </h3>
 
           <div class="grid">
             <!-- Posición Actual -->
             <div class="col-12 md:col-6">
-              <div class="field mb-4">
-                <label for="posicion_actual" class="block text-900 font-medium mb-2">Posición Actual</label>
+              <div class="field mb-3 md:mb-4">
+                <label for="posicion_actual" class="block text-900 font-medium mb-2 text-sm md:text-base">Posición Actual</label>
                 <input
                   pInputText
                   id="posicion_actual"
@@ -192,7 +191,7 @@
                   placeholder="ej. Senior Developer, Product Manager"
                   [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('posicion_actual') ? 'p-invalid' : '')"
                 />
-                <small *ngIf="isFieldInvalid('posicion_actual')" class="p-error block mt-1">
+                <small *ngIf="isFieldInvalid('posicion_actual')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('posicion_actual') }}
                 </small>
               </div>
@@ -200,8 +199,8 @@
 
             <!-- Empresa Actual -->
             <div class="col-12 md:col-6">
-              <div class="field mb-4">
-                <label for="empresa_actual" class="block text-900 font-medium mb-2">Empresa Actual</label>
+              <div class="field mb-3 md:mb-4">
+                <label for="empresa_actual" class="block text-900 font-medium mb-2 text-sm md:text-base">Empresa Actual</label>
                 <input
                   pInputText
                   id="empresa_actual"
@@ -210,7 +209,7 @@
                   placeholder="ej. Google, Microsoft, Startup XYZ"
                   [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('empresa_actual') ? 'p-invalid' : '')"
                 />
-                <small *ngIf="isFieldInvalid('empresa_actual')" class="p-error block mt-1">
+                <small *ngIf="isFieldInvalid('empresa_actual')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('empresa_actual') }}
                 </small>
               </div>
@@ -218,8 +217,8 @@
 
             <!-- Industria -->
             <div class="col-12">
-              <div class="field mb-4">
-                <label for="industria" class="block text-900 font-medium mb-2">Industria</label>
+              <div class="field mb-3 md:mb-4">
+                <label for="industria" class="block text-900 font-medium mb-2 text-sm md:text-base">Industria</label>
                 <p-dropdown
                   id="industria"
                   formControlName="industria"
@@ -229,7 +228,7 @@
                   [showClear]="true"
                   styleClass="w-full">
                 </p-dropdown>
-                <small *ngIf="isFieldInvalid('industria')" class="p-error block mt-1">
+                <small *ngIf="isFieldInvalid('industria')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('industria') }}
                 </small>
               </div>
@@ -238,16 +237,16 @@
         </div>
 
         <!-- Resumen Profesional Section -->
-        <div class="mb-6">
-          <h3 class="flex align-items-center gap-3 mb-4 text-xl font-semibold text-700">
+        <div class="mb-4 md:mb-6 pb-4 border-bottom-1 surface-border">
+          <h3 class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 mb-4 text-lg md:text-xl font-semibold text-700">
             <i class="pi pi-file-edit text-primary"></i>
-            Resumen Profesional
+            <span>Resumen Profesional</span>
           </h3>
 
           <div class="field">
-            <label for="resumen" class="block text-900 font-medium mb-2">
+            <label for="resumen" class="block text-900 font-medium mb-2 text-sm md:text-base">
               Resumen
-              <span class="text-500 font-normal text-sm ml-1">(Opcional)</span>
+              <span class="text-500 font-normal text-xs sm:text-sm ml-1">(Opcional)</span>
             </label>
             <textarea
               pInputTextarea
@@ -259,11 +258,11 @@
               [class]="'w-full ' + (isFieldInvalid('resumen') ? 'p-invalid' : '')"
               styleClass="w-full">
             </textarea>
-            <div class="flex justify-content-between align-items-center mt-1">
-              <small *ngIf="isFieldInvalid('resumen')" class="p-error">
+            <div class="flex flex-column sm:flex-row justify-content-between align-items-start sm:align-items-center gap-1 mt-1">
+              <small *ngIf="isFieldInvalid('resumen')" class="p-error text-xs md:text-sm">
                 {{ getFieldError('resumen') }}
               </small>
-              <small class="text-500 text-right">
+              <small class="text-500 text-xs md:text-sm">
                 {{ perfilForm.get('resumen')?.value?.length || 0 }}/500 caracteres
               </small>
             </div>
@@ -271,199 +270,204 @@
         </div>
 
         <!-- Sección: Información Profesional para Métricas -->
-        <div class="section-divider my-5">
-          <div class="flex align-items-center gap-3 mb-4">
-            <div class="flex align-items-center justify-content-center border-circle bg-primary text-white"
+        <div class="mb-4 md:mb-6">
+          <div class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 mb-4">
+            <div class="flex align-items-center justify-content-center border-circle bg-primary text-white flex-shrink-0"
                  style="width: 2.5rem; height: 2.5rem;">
-              <i class="pi pi-chart-bar text-lg"></i>
+              <i class="pi pi-chart-bar text-base md:text-lg"></i>
             </div>
-            <div>
-              <h3 class="text-xl font-semibold text-900 m-0">Información para Métricas</h3>
-              <p class="text-600 m-0 text-sm">Datos necesarios para generar estadísticas del mercado laboral</p>
+            <div class="flex-1">
+              <h3 class="text-lg md:text-xl font-semibold text-900 m-0">Información para Métricas</h3>
+              <p class="text-600 m-0 text-xs sm:text-sm">Datos necesarios para generar estadísticas del mercado laboral</p>
             </div>
           </div>
-        </div>
 
-        <!-- Años de Experiencia -->
-        <div class="field">
-          <label for="años_experiencia" class="block text-900 font-medium mb-2">
-            <i class="pi pi-clock mr-2 text-primary"></i>
-            Años de Experiencia *
-          </label>
-          <div class="input-wrapper">
-            <p-inputNumber
-              id="años_experiencia"
-              formControlName="años_experiencia"
-              placeholder="Ej: 5"
-              [min]="0"
-              [max]="50"
-              [class]="'w-full ' + (isFieldInvalid('años_experiencia') ? 'ng-invalid ng-dirty' : '')"
-              suffix=" años">
-            </p-inputNumber>
-            <small *ngIf="isFieldInvalid('años_experiencia')" class="p-error block mt-1">
-              {{ getFieldError('años_experiencia') }}
-            </small>
-          </div>
-        </div>
+          <div class="grid">
+            <!-- Años de Experiencia -->
+            <div class="col-12 md:col-6">
+              <div class="field mb-3 md:mb-4">
+                <label for="años_experiencia" class="block text-900 font-medium mb-2 text-sm md:text-base">
+                  <i class="pi pi-clock mr-2 text-primary"></i>
+                  Años de Experiencia <span class="text-red-500 font-bold">*</span>
+                </label>
+                <p-inputNumber
+                  id="años_experiencia"
+                  formControlName="años_experiencia"
+                  placeholder="Ej: 5"
+                  [min]="0"
+                  [max]="60"
+                  [class]="'w-full ' + (isFieldInvalid('años_experiencia') ? 'ng-invalid ng-dirty' : '')"
+                  >
+                </p-inputNumber>
+                <small *ngIf="isFieldInvalid('años_experiencia')" class="p-error block mt-1 text-xs md:text-sm">
+                  {{ getFieldError('años_experiencia') }}
+                </small>
+              </div>
+            </div>
 
-        <!-- Nivel de Educación -->
-        <div class="field">
-          <label for="nivel_educacion" class="block text-900 font-medium mb-2">
-            <i class="pi pi-book mr-2 text-primary"></i>
-            Nivel de Educación *
-          </label>
-          <div class="input-wrapper">
-            <p-dropdown
-              id="nivel_educacion"
-              formControlName="nivel_educacion"
-              [options]="nivelesEducacion"
-              placeholder="Seleccione su nivel de educación"
-              [class]="'w-full ' + (isFieldInvalid('nivel_educacion') ? 'ng-invalid ng-dirty' : '')"
-              styleClass="w-full">
-            </p-dropdown>
-            <small *ngIf="isFieldInvalid('nivel_educacion')" class="p-error block mt-1">
-              {{ getFieldError('nivel_educacion') }}
-            </small>
-          </div>
-        </div>
+            <!-- Nivel de Educación -->
+            <div class="col-12 md:col-6">
+              <div class="field mb-3 md:mb-4">
+                <label for="nivel_educacion" class="block text-900 font-medium mb-2 text-sm md:text-base">
+                  <i class="pi pi-book mr-2 text-primary"></i>
+                  Nivel de Educación <span class="text-red-500 font-bold">*</span>
+                </label>
+                <p-dropdown
+                  id="nivel_educacion"
+                  formControlName="nivel_educacion"
+                  [options]="nivelesEducacion"
+                  placeholder="Seleccione su nivel de educación"
+                  [class]="'w-full ' + (isFieldInvalid('nivel_educacion') ? 'ng-invalid ng-dirty' : '')"
+                  styleClass="w-full">
+                </p-dropdown>
+                <small *ngIf="isFieldInvalid('nivel_educacion')" class="p-error block mt-1 text-xs md:text-sm">
+                  {{ getFieldError('nivel_educacion') }}
+                </small>
+              </div>
+            </div>
 
-        <!-- Especialidad Técnica -->
-        <div class="field">
-          <label for="especialidad_tecnica" class="block text-900 font-medium mb-2">
-            <i class="pi pi-code mr-2 text-primary"></i>
-            Especialidad Técnica Principal *
-          </label>
-          <div class="input-wrapper">
-            <p-dropdown
-              id="especialidad_tecnica"
-              formControlName="especialidad_tecnica"
-              [options]="especialidadesTecnicas"
-              placeholder="Seleccione su especialidad principal"
-              [class]="'w-full ' + (isFieldInvalid('especialidad_tecnica') ? 'ng-invalid ng-dirty' : '')"
-              styleClass="w-full">
-            </p-dropdown>
-            <small *ngIf="isFieldInvalid('especialidad_tecnica')" class="p-error block mt-1">
-              {{ getFieldError('especialidad_tecnica') }}
-            </small>
-          </div>
-        </div>
+            <!-- Especialidad Técnica -->
+            <div class="col-12 md:col-6">
+              <div class="field mb-3 md:mb-4">
+                <label for="especialidad_tecnica" class="block text-900 font-medium mb-2 text-sm md:text-base">
+                  <i class="pi pi-code mr-2 text-primary"></i>
+                  Especialidad Técnica Principal <span class="text-red-500 font-bold">*</span>
+                </label>
+                <p-dropdown
+                  id="especialidad_tecnica"
+                  formControlName="especialidad_tecnica"
+                  [options]="especialidadesTecnicas"
+                  placeholder="Seleccione su especialidad principal"
+                  [class]="'w-full ' + (isFieldInvalid('especialidad_tecnica') ? 'ng-invalid ng-dirty' : '')"
+                  styleClass="w-full">
+                </p-dropdown>
+                <small *ngIf="isFieldInvalid('especialidad_tecnica')" class="p-error block mt-1 text-xs md:text-sm">
+                  {{ getFieldError('especialidad_tecnica') }}
+                </small>
+              </div>
+            </div>
 
-        <!-- Tipo de Empleo Actual -->
-        <div class="field">
-          <label for="tipo_empleo_actual" class="block text-900 font-medium mb-2">
-            <i class="pi pi-briefcase mr-2 text-primary"></i>
-            Tipo de Empleo Actual *
-          </label>
-          <div class="input-wrapper">
-            <p-dropdown
-              id="tipo_empleo_actual"
-              formControlName="tipo_empleo_actual"
-              [options]="tiposEmpleo"
-              placeholder="Seleccione su situación laboral actual"
-              [class]="'w-full ' + (isFieldInvalid('tipo_empleo_actual') ? 'ng-invalid ng-dirty' : '')"
-              styleClass="w-full">
-            </p-dropdown>
-            <small *ngIf="isFieldInvalid('tipo_empleo_actual')" class="p-error block mt-1">
-              {{ getFieldError('tipo_empleo_actual') }}
-            </small>
-          </div>
-        </div>
+            <!-- Tipo de Empleo Actual -->
+            <div class="col-12 md:col-6">
+              <div class="field mb-3 md:mb-4">
+                <label for="tipo_empleo_actual" class="block text-900 font-medium mb-2 text-sm md:text-base">
+                  <i class="pi pi-briefcase mr-2 text-primary"></i>
+                  Tipo de Empleo Actual <span class="text-red-500 font-bold">*</span>
+                </label>
+                <p-dropdown
+                  id="tipo_empleo_actual"
+                  formControlName="tipo_empleo_actual"
+                  [options]="tiposEmpleo"
+                  placeholder="Seleccione su situación laboral actual"
+                  [class]="'w-full ' + (isFieldInvalid('tipo_empleo_actual') ? 'ng-invalid ng-dirty' : '')"
+                  styleClass="w-full">
+                </p-dropdown>
+                <small *ngIf="isFieldInvalid('tipo_empleo_actual')" class="p-error block mt-1 text-xs md:text-sm">
+                  {{ getFieldError('tipo_empleo_actual') }}
+                </small>
+              </div>
+            </div>
 
-        <!-- Área de Interés -->
-        <div class="field">
-          <label for="area_interes" class="block text-900 font-medium mb-2">
-            <i class="pi pi-star mr-2 text-primary"></i>
-            Área de Interés *
-          </label>
-          <div class="input-wrapper">
-            <p-dropdown
-              id="area_interes"
-              formControlName="area_interes"
-              [options]="areasInteres"
-              placeholder="Seleccione su área de interés principal"
-              [class]="'w-full ' + (isFieldInvalid('area_interes') ? 'ng-invalid ng-dirty' : '')"
-              styleClass="w-full">
-            </p-dropdown>
-            <small *ngIf="isFieldInvalid('area_interes')" class="p-error block mt-1">
-              {{ getFieldError('area_interes') }}
-            </small>
-          </div>
-        </div>
+            <!-- Área de Interés -->
+            <div class="col-12 md:col-6">
+              <div class="field mb-3 md:mb-4">
+                <label for="area_interes" class="block text-900 font-medium mb-2 text-sm md:text-base">
+                  <i class="pi pi-star mr-2 text-primary"></i>
+                  Área de Interés <span class="text-red-500 font-bold">*</span>
+                </label>
+                <p-dropdown
+                  id="area_interes"
+                  formControlName="area_interes"
+                  [options]="areasInteres"
+                  placeholder="Seleccione su área de interés principal"
+                  [class]="'w-full ' + (isFieldInvalid('area_interes') ? 'ng-invalid ng-dirty' : '')"
+                  styleClass="w-full">
+                </p-dropdown>
+                <small *ngIf="isFieldInvalid('area_interes')" class="p-error block mt-1 text-xs md:text-sm">
+                  {{ getFieldError('area_interes') }}
+                </small>
+              </div>
+            </div>
 
-        <!-- Disponibilidad para Cambio -->
-        <div class="field">
-          <label for="disponibilidad_cambio" class="block text-900 font-medium mb-2">
-            <i class="pi pi-search mr-2 text-primary"></i>
-            Disponibilidad para Cambio de Trabajo *
-          </label>
-          <div class="input-wrapper">
-            <p-dropdown
-              id="disponibilidad_cambio"
-              formControlName="disponibilidad_cambio"
-              [options]="disponibilidadOpciones"
-              placeholder="Seleccione su disponibilidad"
-              [class]="'w-full ' + (isFieldInvalid('disponibilidad_cambio') ? 'ng-invalid ng-dirty' : '')"
-              styleClass="w-full">
-            </p-dropdown>
-            <small *ngIf="isFieldInvalid('disponibilidad_cambio')" class="p-error block mt-1">
-              {{ getFieldError('disponibilidad_cambio') }}
-            </small>
+            <!-- Disponibilidad para Cambio -->
+            <div class="col-12 md:col-6">
+              <div class="field mb-3 md:mb-4">
+                <label for="disponibilidad_cambio" class="block text-900 font-medium mb-2 text-sm md:text-base">
+                  <i class="pi pi-search mr-2 text-primary"></i>
+                  Disponibilidad para Cambio de Trabajo <span class="text-red-500 font-bold">*</span>
+                </label>
+                <p-dropdown
+                  id="disponibilidad_cambio"
+                  formControlName="disponibilidad_cambio"
+                  [options]="disponibilidadOpciones"
+                  placeholder="Seleccione su disponibilidad"
+                  [class]="'w-full ' + (isFieldInvalid('disponibilidad_cambio') ? 'ng-invalid ng-dirty' : '')"
+                  styleClass="w-full">
+                </p-dropdown>
+                <small *ngIf="isFieldInvalid('disponibilidad_cambio')" class="p-error block mt-1 text-xs md:text-sm">
+                  {{ getFieldError('disponibilidad_cambio') }}
+                </small>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Sección: Información Opcional -->
-        <div class="section-divider my-5">
-          <div class="flex align-items-center gap-3 mb-4">
-            <div class="flex align-items-center justify-content-center border-circle bg-secondary text-white"
+        <div class="mb-4 md:mb-6">
+          <div class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 mb-4">
+            <div class="flex align-items-center justify-content-center border-circle bg-secondary text-white flex-shrink-0"
                  style="width: 2.5rem; height: 2.5rem;">
-              <i class="pi pi-info-circle text-lg"></i>
+              <i class="pi pi-info-circle text-base md:text-lg"></i>
             </div>
-            <div>
-              <h3 class="text-xl font-semibold text-900 m-0">Información Opcional</h3>
-              <p class="text-600 m-0 text-sm">Datos adicionales para análisis más detallados</p>
+            <div class="flex-1">
+              <h3 class="text-lg md:text-xl font-semibold text-900 m-0">Información Opcional</h3>
+              <p class="text-600 m-0 text-xs sm:text-sm">Datos adicionales para análisis más detallados</p>
             </div>
           </div>
-        </div>
 
-        <!-- Rango Salarial -->
-        <div class="field">
-          <label for="rango_salarial" class="block text-900 font-medium mb-2">
-            <i class="pi pi-dollar mr-2 text-primary"></i>
-            Rango Salarial (CLP mensual)
-          </label>
-          <div class="input-wrapper">
-            <p-dropdown
-              id="rango_salarial"
-              formControlName="rango_salarial"
-              [options]="rangosSalariales"
-              placeholder="Seleccione su rango salarial (opcional)"
-              styleClass="w-full">
-            </p-dropdown>
-            <small class="text-500 block mt-1">
-              <i class="pi pi-shield mr-1"></i>
-              Esta información es completamente anónima y se usa solo para estadísticas generales
-            </small>
-          </div>
-        </div>
+          <div class="grid">
+            <!-- Rango Salarial -->
+            <div class="col-12 md:col-6">
+              <div class="field mb-3 md:mb-4">
+                <label for="rango_salarial" class="block text-900 font-medium mb-2 text-sm md:text-base">
+                  <i class="pi pi-dollar mr-2 text-primary"></i>
+                  Rango Salarial (CLP mensual)
+                </label>
+                <p-dropdown
+                  id="rango_salarial"
+                  formControlName="rango_salarial"
+                  [options]="rangosSalariales"
+                  placeholder="Seleccione su rango salarial (opcional)"
+                  styleClass="w-full">
+                </p-dropdown>
+                <small class="text-500 block mt-1 text-xs md:text-sm">
+                  <i class="pi pi-shield mr-1"></i>
+                  Esta información es completamente anónima y se usa solo para estadísticas generales
+                </small>
+              </div>
+            </div>
 
-        <!-- Satisfacción Laboral -->
-        <div class="field">
-          <label for="satisfaccion_laboral" class="block text-900 font-medium mb-2">
-            <i class="pi pi-star mr-2 text-primary"></i>
-            Satisfacción Laboral Actual
-          </label>
-          <div class="input-wrapper">
-            <p-rating
-              id="satisfaccion_laboral"
-              formControlName="satisfaccion_laboral"
-              [stars]="5"
-              [cancel]="false"
-              styleClass="w-full">
-            </p-rating>
-            <small class="text-500 block mt-1">
-              <i class="pi pi-info-circle mr-1"></i>
-              Califique del 1 al 5 su nivel de satisfacción en su trabajo actual
-            </small>
+            <!-- Satisfacción Laboral -->
+            <div class="col-12 md:col-6">
+              <div class="field mb-3 md:mb-4">
+                <label for="satisfaccion_laboral" class="block text-900 font-medium mb-2 text-sm md:text-base">
+                  <i class="pi pi-star mr-2 text-primary"></i>
+                  Satisfacción Laboral Actual
+                </label>
+                <div class="flex justify-content-center md:justify-content-start">
+                  <p-rating
+                    id="satisfaccion_laboral"
+                    formControlName="satisfaccion_laboral"
+                    [stars]="5"
+                    [cancel]="false">
+                  </p-rating>
+                </div>
+                <small class="text-500 block mt-1 text-xs md:text-sm text-center md:text-left">
+                  <i class="pi pi-info-circle mr-1"></i>
+                  Califique del 1 al 5 su nivel de satisfacción en su trabajo actual
+                </small>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -474,7 +478,7 @@
             label="Restablecer"
             icon="pi pi-refresh"
             severity="secondary"
-            styleClass="w-full sm:w-auto px-4 py-2"
+            styleClass="w-full sm:w-auto px-3 md:px-4 py-2"
             (onClick)="resetForm()"
             [disabled]="saving">
           </p-button>
@@ -484,7 +488,7 @@
             label="Guardar Cambios"
             icon="pi pi-save"
             severity="primary"
-            styleClass="w-full sm:w-auto px-4 py-2 font-semibold"
+            styleClass="w-full sm:w-auto px-3 md:px-4 py-2 font-semibold"
             [loading]="saving"
             [disabled]="perfilForm.invalid || saving">
           </p-button>
