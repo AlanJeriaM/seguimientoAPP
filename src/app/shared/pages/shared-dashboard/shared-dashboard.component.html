@@ -150,7 +150,7 @@
 
 
       <!-- Distribución Salarial por Industria -->
-      <div class="col-12 lg:col-6">
+      <div class="col-12 lg:col-12">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
@@ -170,7 +170,7 @@
       </div>
 
       <!-- Empresas que Más Contratan -->
-      <div class="col-12 lg:col-8">
+      <div class="col-12 lg:col-6">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
@@ -190,7 +190,7 @@
       </div>
 
       <!-- Estadísticas Generales -->
-      <div class="col-12 lg:col-4">
+      <div class="col-12 lg:col-6">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
@@ -377,6 +377,363 @@
     </div>
   </div>
 
+  <!-- Análisis de Experiencia Profesional -->
+  <div class="experience-analysis-section mt-6" *ngIf="(evolucionSalarial && evolucionSalarial.datos.length > 0) || (distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0)">
+    <h2 class="section-title mb-4">
+      <i class="pi pi-users mr-2"></i>
+      Análisis de Experiencia Profesional
+    </h2>
+
+    <div class="grid">
+      <!-- Evolución Salarial por Experiencia -->
+      <div class="col-12 lg:col-6" *ngIf="evolucionSalarial && evolucionSalarial.datos.length > 0">
+        <p-card styleClass="chart-card h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Evolución del Salario</h3>
+              <p-tag
+                [value]="'Salario promedio: $' + (evolucionSalarial.resumen.salarioPromedioGeneral | number:'1.0-0')"
+                severity="success"
+                styleClass="info-tag">
+              </p-tag>
+            </div>
+          </ng-template>
+
+          <div class="chart-container" style="height: 400px;">
+            <canvas id="evolucionSalarialChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Distribución de Profesionales por Experiencia -->
+      <div class="col-12 lg:col-6" *ngIf="distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0">
+        <p-card styleClass="chart-card h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Distribución de Profesionales</h3>
+              <div class="flex gap-2" *ngIf="distribucionExperienciaProfesionales.resumen.rangoMasPopular">
+                <p-tag
+                  [value]="'Más común: ' + distribucionExperienciaProfesionales.resumen.rangoMasPopular.rango"
+                  severity="info"
+                  styleClass="info-tag">
+                </p-tag>
+                <p-tag
+                  [value]="distribucionExperienciaProfesionales.resumen.totalProfesionales + ' profesionales'"
+                  severity="warning"
+                  styleClass="info-tag">
+                </p-tag>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="chart-container" style="height: 400px;">
+            <canvas id="distribucionExperienciaChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Estadísticas de Experiencia -->
+      <div class="col-12" *ngIf="distribucionExperienciaProfesionales">
+        <p-card styleClass="info-card">
+          <ng-template pTemplate="header">
+            <h3>Estadísticas del Mercado Laboral</h3>
+          </ng-template>
+
+          <div class="grid">
+            <div class="col-12 md:col-6 lg:col-4">
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="pi pi-chart-bar text-blue-500"></i>
+                </div>
+                <div class="metric-content">
+                  <p class="metric-value">{{ distribucionExperienciaProfesionales.resumen.experienciaPromedio }} años</p>
+                  <small>Experiencia promedio</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6 lg:col-4" *ngIf="distribucionExperienciaProfesionales.resumen.rangoMasPopular">
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="pi pi-users text-green-500"></i>
+                </div>
+                <div class="metric-content">
+                  <p class="metric-value">{{ distribucionExperienciaProfesionales.resumen.rangoMasPopular.porcentaje }}%</p>
+                  <small>{{ distribucionExperienciaProfesionales.resumen.rangoMasPopular.rango }} (más común)</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 md:col-6 lg:col-4">
+              <div class="metric-item">
+                <div class="metric-icon">
+                  <i class="pi pi-th-large text-purple-500"></i>
+                </div>
+                <div class="metric-content">
+                  <p class="metric-value">{{ distribucionExperienciaProfesionales.resumen.rangosConDatos }}</p>
+                  <small>Rangos con datos</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Análisis Tecnológico y Salarial -->
+  <div class="tech-salary-analysis-section mt-6" *ngIf="(experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0) || (mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0)">
+    <h2 class="section-title mb-4">
+      <i class="pi pi-cog mr-2"></i>
+      Análisis Tecnológico y Salarial
+    </h2>
+
+    <div class="grid">
+      <!-- Experiencia vs Número de Tecnologías -->
+      <div class="col-12" *ngIf="experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0">
+        <p-card styleClass="chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Experiencia vs Número de Tecnologías Dominadas</h3>
+              <div class="flex gap-2">
+                <p-tag
+                  [value]="'Promedio general: ' + experienciaVsTecnologias.resumen.promedioGeneralTecnologias + ' tecnologías'"
+                  severity="info"
+                  styleClass="info-tag">
+                </p-tag>
+                <p-tag
+                  [value]="'Máximo encontrado: ' + experienciaVsTecnologias.resumen.maxTecnologiasEncontradas + ' tecnologías'"
+                  severity="success"
+                  styleClass="info-tag">
+                </p-tag>
+                <p-tag
+                  [value]="experienciaVsTecnologias.resumen.totalProfesionales + ' profesionales'"
+                  severity="warning"
+                  styleClass="info-tag">
+                </p-tag>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="chart-container" style="height: 450px;">
+            <canvas id="experienciaVsTecnologiasChart"></canvas>
+          </div>
+
+          <ng-template pTemplate="footer">
+            <div class="chart-insights">
+              <p class="text-sm text-600">
+                <i class="pi pi-lightbulb mr-2"></i>
+                <strong>Insight:</strong> Este gráfico demuestra que mientras más experiencia profesional se adquiere,
+                mayor es la cantidad de tecnologías que se dominan. Los profesionales senior tienden a especializarse
+                en un stack tecnológico más amplio.
+              </p>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+
+      <!-- Mapa de Calor: Industria vs Nivel Salarial -->
+      <div class="col-12" *ngIf="mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0">
+        <p-card styleClass="chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Mapa de Calor: Industria vs Nivel Salarial</h3>
+              <div class="flex gap-2" *ngIf="mapaCalorIndustriaSalarial.estadisticas.industriaMasComun">
+                <p-tag
+                  [value]="'Industria líder: ' + mapaCalorIndustriaSalarial.estadisticas.industriaMasComun.nombre"
+                  severity="info"
+                  styleClass="info-tag">
+                </p-tag>
+                <p-tag
+                  [value]="mapaCalorIndustriaSalarial.estadisticas.totalIndustrias + ' industrias analizadas'"
+                  severity="success"
+                  styleClass="info-tag">
+                </p-tag>
+                <p-tag
+                  [value]="mapaCalorIndustriaSalarial.estadisticas.totalProfesionales + ' profesionales'"
+                  severity="warning"
+                  styleClass="info-tag">
+                </p-tag>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="chart-container" style="height: 500px;">
+            <canvas id="mapaCalorIndustriaSalarialChart"></canvas>
+          </div>
+
+          <ng-template pTemplate="footer">
+            <div class="chart-insights">
+              <p class="text-sm text-600">
+                <i class="pi pi-eye mr-2"></i>
+                <strong>Análisis:</strong> Este mapa de calor revela en qué industrias se concentran los profesionales
+                con diferentes niveles salariales. Las barras más altas en rangos salariales superiores indican industrias
+                que ofrecen mejores compensaciones.
+              </p>
+            </div>
+          </ng-template>
+
+          <!-- Distribución por Rangos Salariales -->
+          <ng-template pTemplate="content">
+            <div class="mt-4">
+              <h4 class="text-lg font-semibold mb-3">Distribución por Rangos Salariales</h4>
+              <div class="grid">
+                <div class="col-12 md:col-6 lg:col-4"
+                     *ngFor="let item of mapaCalorIndustriaSalarial.estadisticas.distribucionPorRango">
+                  <div class="metric-item border-round p-3 surface-100">
+                    <div class="flex align-items-center justify-content-between">
+                      <div>
+                        <p class="font-semibold text-900 mb-1">{{ item.rango }}</p>
+                        <small class="text-600">{{ item.cantidad }} profesionales</small>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-2xl font-bold text-primary">{{ item.porcentaje }}%</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado del Mercado Laboral -->
+  <div class="job-market-status-section mt-6" *ngIf="disponibilidadCambioTrabajo && disponibilidadCambioTrabajo.datos.length > 0">
+    <h2 class="section-title mb-4">
+      <i class="pi pi-briefcase mr-2"></i>
+      Estado del Mercado Laboral
+    </h2>
+
+    <div class="grid">
+      <!-- Gráfico de Disponibilidad para Cambio -->
+      <div class="col-12 lg:col-8">
+        <p-card styleClass="chart-card h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Disponibilidad para Cambio de Trabajo</h3>
+              <div class="flex gap-2" *ngIf="disponibilidadCambioTrabajo.resumen.opcionMasComun">
+                <p-tag
+                  [value]="'Más común: ' + disponibilidadCambioTrabajo.resumen.opcionMasComun.disponibilidad"
+                  severity="info"
+                  styleClass="info-tag">
+                </p-tag>
+                <p-tag
+                  [value]="disponibilidadCambioTrabajo.resumen.porcentajePotencialmenteDisponibles + '% potencialmente disponibles'"
+                  severity="success"
+                  styleClass="info-tag">
+                </p-tag>
+                <p-tag
+                  [value]="disponibilidadCambioTrabajo.resumen.totalProfesionales + ' profesionales'"
+                  severity="warning"
+                  styleClass="info-tag">
+                </p-tag>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="chart-container" style="height: 400px;">
+            <canvas id="disponibilidadCambioChart"></canvas>
+          </div>
+
+          <ng-template pTemplate="footer">
+            <div class="chart-insights">
+              <p class="text-sm text-600">
+                <i class="pi pi-info-circle mr-2"></i>
+                <strong>Estado del Mercado:</strong> Este gráfico muestra el estado de satisfacción laboral y
+                disponibilidad para cambios de los profesionales. Los datos revelan las tendencias del mercado
+                y qué tan contentos están los trabajadores en sus posiciones actuales.
+              </p>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+
+      <!-- Métricas de Disponibilidad -->
+      <div class="col-12 lg:col-4">
+        <p-card styleClass="info-card h-full">
+          <ng-template pTemplate="header">
+            <h3>Métricas de Disponibilidad</h3>
+          </ng-template>
+
+          <div class="availability-metrics">
+            <!-- Usuarios Activamente Buscando -->
+            <div class="metric-item border-round p-3 mb-3" style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #EF4444;">
+              <div class="flex align-items-center justify-content-between">
+                <div>
+                  <p class="font-semibold text-900 mb-1">Activamente Buscando</p>
+                  <small class="text-600">Alta disponibilidad</small>
+                </div>
+                <div class="text-right">
+                  <p class="text-2xl font-bold" style="color: #EF4444;">{{ disponibilidadCambioTrabajo.resumen.usuariosActivos }}</p>
+                  <small class="text-500">profesionales</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Usuarios Abiertos a Oportunidades -->
+            <div class="metric-item border-round p-3 mb-3" style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981;">
+              <div class="flex align-items-center justify-content-between">
+                <div>
+                  <p class="font-semibold text-900 mb-1">Abierto a Oportunidades</p>
+                  <small class="text-600">Disponibilidad media</small>
+                </div>
+                <div class="text-right">
+                  <p class="text-2xl font-bold" style="color: #10B981;">{{ disponibilidadCambioTrabajo.resumen.usuariosAbiertos }}</p>
+                  <small class="text-500">profesionales</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Usuarios No Seguros -->
+            <div class="metric-item border-round p-3 mb-3" style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid #F59E0B;">
+              <div class="flex align-items-center justify-content-between">
+                <div>
+                  <p class="font-semibold text-900 mb-1">No Seguro</p>
+                  <small class="text-600">Indecisión laboral</small>
+                </div>
+                <div class="text-right">
+                  <p class="text-2xl font-bold" style="color: #F59E0B;">{{ disponibilidadCambioTrabajo.resumen.usuariosIndecisos }}</p>
+                  <small class="text-500">profesionales</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Usuarios No Disponibles -->
+            <div class="metric-item border-round p-3 mb-3" style="background: rgba(107, 114, 128, 0.1); border-left: 4px solid #6B7280;">
+              <div class="flex align-items-center justify-content-between">
+                <div>
+                  <p class="font-semibold text-900 mb-1">No Disponible</p>
+                  <small class="text-600">Satisfechos actualmente</small>
+                </div>
+                <div class="text-right">
+                  <p class="text-2xl font-bold" style="color: #6B7280;">{{ disponibilidadCambioTrabajo.resumen.usuariosNoDisponibles }}</p>
+                  <small class="text-500">profesionales</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Potencialmente Disponibles -->
+            <div class="metric-item border-round p-3" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3B82F6;">
+              <div class="flex align-items-center justify-content-between">
+                <div>
+                  <p class="font-semibold text-900 mb-1">Total Potencialmente Disponibles</p>
+                  <small class="text-600">Activos + Abiertos</small>
+                </div>
+                <div class="text-right">
+                  <p class="text-2xl font-bold" style="color: #3B82F6;">{{ disponibilidadCambioTrabajo.resumen.usuariosPotencialmenteDisponibles }}</p>
+                  <small class="text-500">{{ disponibilidadCambioTrabajo.resumen.porcentajePotencialmenteDisponibles }}% del total</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
   <!-- Métricas Avanzadas del Mercado Laboral -->
   <div class="advanced-metrics-section mt-6" *ngIf="metricasAvanzadas">
     <h2 class="section-title mb-4">
@@ -387,7 +744,7 @@
     <!-- Primera fila de gráficos -->
     <div class="grid mb-4">
       <!-- Distribución por Experiencia -->
-      <div class="col-12 lg:col-6 xl:col-4">
+      <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
             <div class="card-header">
@@ -402,7 +759,7 @@
       </div>
 
       <!-- Distribución por Educación -->
-      <div class="col-12 lg:col-6 xl:col-4">
+      <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
             <div class="card-header">
@@ -421,7 +778,7 @@
     <!-- Segunda fila de gráficos -->
     <div class="grid mb-4">
       <!-- Distribución Salarial -->
-      <div class="col-12 lg:col-6 xl:col-4">
+      <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
             <div class="card-header">
@@ -437,7 +794,7 @@
 
 
       <!-- Áreas de Interés -->
-      <div class="col-12 lg:col-6 xl:col-4">
+      <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
             <div class="card-header">
@@ -455,7 +812,7 @@
     <!-- Tercera fila -->
     <div class="grid mb-4">
       <!-- Tipos de Empleo -->
-      <div class="col-12 lg:col-6 xl:col-4">
+      <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
             <div class="card-header">
@@ -470,7 +827,7 @@
       </div>
 
       <!-- Estadísticas de Perfil Completo -->
-      <div class="col-12 lg:col-6 xl:col-8">
+      <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full">
           <ng-template pTemplate="header">
             <div class="card-header">

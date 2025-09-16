@@ -167,7 +167,7 @@ const desactivarUsuario = async (req, res) => {
     }
 
     // Desactivar usuario y registrar fecha de eliminación
-    await user.update({ 
+    await user.update({
       activo: false,
       fecha_eliminacion: new Date()
     });
@@ -198,7 +198,7 @@ const desactivarUsuario = async (req, res) => {
 const obtenerMiPerfil = async (req, res) => {
   try {
     const user = req.user; // Viene del middleware
-    
+
     console.log('📋 Datos completos del usuario desde middleware:', {
       id: user.id,
       nombre: user.nombre,
@@ -252,12 +252,12 @@ const obtenerMiPerfil = async (req, res) => {
 const actualizarMiPerfil = async (req, res) => {
   try {
     const user = req.user; // Viene del middleware
-    const { 
-      nombre, 
-      posicion_actual, 
-      empresa_actual, 
-      ubicacion, 
-      resumen, 
+    const {
+      nombre,
+      posicion_actual,
+      empresa_actual,
+      ubicacion,
+      resumen,
       industria,
       // Nuevos campos para métricas
       años_experiencia,
@@ -279,7 +279,7 @@ const actualizarMiPerfil = async (req, res) => {
       });
     }
 
-    console.log('📤 Datos recibidos del frontend:', {
+    console.log('Datos recibidos del frontend:', {
       nombre, posicion_actual, empresa_actual, ubicacion, industria, resumen,
       años_experiencia, nivel_educacion, especialidad_tecnica, tipo_empleo_actual,
       rango_salarial, disponibilidad_cambio, area_interes
@@ -308,7 +308,7 @@ const actualizarMiPerfil = async (req, res) => {
     // Verificar si todos los campos obligatorios están completos
     const camposObligatorios = [
       'años_experiencia',
-      'nivel_educacion', 
+      'nivel_educacion',
       'especialidad_tecnica',
       'tipo_empleo_actual',
       'disponibilidad_cambio',
@@ -321,12 +321,12 @@ const actualizarMiPerfil = async (req, res) => {
     });
 
     datosActualizados.perfil_completo = perfilCompleto;
-    
-    console.log('💾 Datos que se van a guardar en BD:', datosActualizados);
+
+    console.log('Datos que se van a guardar en BD:', datosActualizados);
 
     await user.update(datosActualizados);
-    
-    console.log('✅ Datos guardados en BD para usuario:', user.id);
+
+    console.log('Datos guardados en BD para usuario:', user.id);
 
     // Obtener usuario actualizado
     const usuarioActualizado = await User.findByPk(user.id, {
@@ -381,13 +381,13 @@ const actualizarMiPerfil = async (req, res) => {
 const actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const { 
-      nombre, 
+    const {
+      nombre,
       correo,
-      posicion_actual, 
-      empresa_actual, 
-      ubicacion, 
-      industria 
+      posicion_actual,
+      empresa_actual,
+      ubicacion,
+      industria
     } = req.body;
 
     // Validaciones básicas
@@ -427,7 +427,7 @@ const actualizarUsuario = async (req, res) => {
     // Verificar si el correo ya existe en otro usuario
     if (correo.toLowerCase() !== user.correo.toLowerCase()) {
       const correoExistente = await User.findOne({
-        where: { 
+        where: {
           correo: correo.toLowerCase(),
           id: { [require('sequelize').Op.ne]: id },
           activo: true
@@ -695,7 +695,7 @@ const reactivarUsuario = async (req, res) => {
     }
 
     // Reactivar usuario y limpiar fecha de eliminación
-    await user.update({ 
+    await user.update({
       activo: true,
       ultimo_acceso: null, // Resetear último acceso
       fecha_eliminacion: null // Limpiar fecha de eliminación
@@ -812,7 +812,7 @@ const verificarPerfilCompleto = async (req, res) => {
       'area_interes'
     ];
 
-    const perfilCompleto = camposObligatorios.every(campo => 
+    const perfilCompleto = camposObligatorios.every(campo =>
       user[campo] !== null && user[campo] !== undefined && user[campo] !== ''
     );
 
@@ -824,7 +824,7 @@ const verificarPerfilCompleto = async (req, res) => {
     res.json({
       ok: true,
       perfil_completo: perfilCompleto,
-      campos_faltantes: camposObligatorios.filter(campo => 
+      campos_faltantes: camposObligatorios.filter(campo =>
         user[campo] === null || user[campo] === undefined || user[campo] === ''
       )
     });

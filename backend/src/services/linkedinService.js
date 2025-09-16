@@ -210,17 +210,17 @@ class LinkedInService {
   extractImageUrl(profilePicture) {
     try {
       if (!profilePicture) return null;
-      
+
       // Buscar la URL de imagen en la estructura de LinkedIn
       let imageUrl = profilePicture?.['displayImage~']?.elements?.[0]?.identifiers?.[0]?.identifier;
-      
+
       // Validar que la URL sea válida
       if (imageUrl && this.isValidImageUrl(imageUrl)) {
-        console.log('✅ URL de imagen válida:', imageUrl);
+        console.log('URL de imagen válida:', imageUrl);
         return imageUrl;
       }
-      
-      console.log('⚠️ URL de imagen inválida o no encontrada');
+
+      console.log('URL de imagen inválida o no encontrada');
       return null;
     } catch (error) {
       console.error('Error extrayendo URL de imagen:', error);
@@ -233,7 +233,7 @@ class LinkedInService {
     try {
       const validUrl = new URL(url);
       // Verificar que sea http/https y tenga un dominio válido
-      return ['http:', 'https:'].includes(validUrl.protocol) && 
+      return ['http:', 'https:'].includes(validUrl.protocol) &&
              validUrl.hostname.length > 0;
     } catch (error) {
       return false;

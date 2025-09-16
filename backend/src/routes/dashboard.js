@@ -7,7 +7,12 @@ const {
   obtenerDistribucionSalarial,
   obtenerEmpresasQueContratanMas,
   obtenerTendenciasMercado,
-  obtenerSatisfaccionLaboral
+  obtenerSatisfaccionLaboral,
+  obtenerEvolucionSalarial,
+  obtenerDistribucionExperiencia,
+  obtenerExperienciaVsTecnologias,
+  obtenerMapaCalorIndustriaSalarial,
+  obtenerDisponibilidadCambioTrabajo
 } = require('../controllers/dashboardController');
 const { verificarToken, verificarAdminOCliente } = require('../middleware/auth');
 
@@ -21,5 +26,10 @@ router.get('/distribucion-salarial', verificarToken, verificarAdminOCliente, obt
 router.get('/empresas-contratan', verificarToken, verificarAdminOCliente, obtenerEmpresasQueContratanMas);
 router.get('/tendencias-mercado', verificarToken, verificarAdminOCliente, obtenerTendenciasMercado);
 router.get('/satisfaccion-laboral', verificarToken, verificarAdminOCliente, obtenerSatisfaccionLaboral);
+router.get('/evolucion-salarial', verificarToken, verificarAdminOCliente, obtenerEvolucionSalarial);
+router.get('/distribucion-experiencia', verificarToken, verificarAdminOCliente, obtenerDistribucionExperiencia);
+router.get('/experiencia-vs-tecnologias', verificarToken, verificarAdminOCliente, obtenerExperienciaVsTecnologias);
+router.get('/mapa-calor-industria-salarial', verificarToken, verificarAdminOCliente, obtenerMapaCalorIndustriaSalarial);
+router.get('/disponibilidad-cambio-trabajo', verificarToken, verificarAdminOCliente, obtenerDisponibilidadCambioTrabajo);
 
 module.exports = router;
