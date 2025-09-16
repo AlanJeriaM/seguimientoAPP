@@ -15,7 +15,12 @@ import {
   TecnologiaPopular,
   EstadisticasSalariales,
   DistribucionAreas,
-  SatisfaccionLaboral
+  SatisfaccionLaboral,
+  EvolucionSalarial,
+  DistribucionExperienciaData,
+  ExperienciaVsTecnologiasData,
+  MapaCalorData,
+  DisponibilidadCambioData
 } from '../../../core/services/dashboard/dashboard.service';
 
 Chart.register(...registerables);
@@ -40,6 +45,11 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   // Nuevas métricas avanzadas
   metricasAvanzadas: MetricasAvanzadas | null = null;
   satisfaccionLaboral: SatisfaccionLaboral | null = null;
+  evolucionSalarial: EvolucionSalarial | null = null;
+  distribucionExperienciaProfesionales: DistribucionExperienciaData | null = null;
+  experienciaVsTecnologias: ExperienciaVsTecnologiasData | null = null;
+  mapaCalorIndustriaSalarial: MapaCalorData | null = null;
+  disponibilidadCambioTrabajo: DisponibilidadCambioData | null = null;
 
   loading = true;
   error: string | null = null;
@@ -167,6 +177,21 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             
             // Cargar datos de satisfacción laboral
             this.loadSatisfaccionLaboral();
+            
+            // Cargar datos de evolución salarial
+            this.loadEvolucionSalarial();
+            
+            // Cargar datos de distribución de experiencia
+            this.loadDistribucionExperiencia();
+            
+            // Cargar datos de experiencia vs tecnologías
+            this.loadExperienciaVsTecnologias();
+            
+            // Cargar datos de mapa de calor industria vs salario
+            this.loadMapaCalorIndustriaSalarial();
+            
+            // Cargar datos de disponibilidad para cambio de trabajo
+            this.loadDisponibilidadCambioTrabajo();
 
             this.loading = false;
           },
@@ -230,7 +255,120 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
+  loadEvolucionSalarial() {
+    this.dashboardService.obtenerEvolucionSalarial()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.evolucion) {
+            this.evolucionSalarial = response.evolucion;
+            console.log('Datos de evolución salarial cargados:', this.evolucionSalarial);
+            
+            // Renderizar gráfico de evolución salarial
+            setTimeout(() => {
+              this.renderEvolucionSalarialChart();
+            }, 200);
+          } else {
+            console.warn('No se pudieron cargar los datos de evolución salarial:', response.msj);
+          }
+        },
+        error: (error) => {
+          console.error('Error cargando evolución salarial:', error);
+        }
+      });
+  }
 
+  loadDistribucionExperiencia() {
+    this.dashboardService.obtenerDistribucionExperiencia()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.distribucion) {
+            this.distribucionExperienciaProfesionales = response.distribucion;
+            console.log('Datos de distribución de experiencia cargados:', this.distribucionExperienciaProfesionales);
+            
+            // Renderizar gráfico de distribución de experiencia
+            setTimeout(() => {
+              this.renderDistribucionExperienciaChart();
+            }, 200);
+          } else {
+            console.warn('No se pudieron cargar los datos de distribución de experiencia:', response.msj);
+          }
+        },
+        error: (error) => {
+          console.error('Error cargando distribución de experiencia:', error);
+        }
+      });
+  }
+
+  loadExperienciaVsTecnologias() {
+    this.dashboardService.obtenerExperienciaVsTecnologias()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.experienciaVsTecnologias) {
+            this.experienciaVsTecnologias = response.experienciaVsTecnologias;
+            console.log('Datos de experiencia vs tecnologías cargados:', this.experienciaVsTecnologias);
+            
+            // Renderizar gráfico de experiencia vs tecnologías
+            setTimeout(() => {
+              this.renderExperienciaVsTecnologiasChart();
+            }, 200);
+          } else {
+            console.warn('No se pudieron cargar los datos de experiencia vs tecnologías:', response.msj);
+          }
+        },
+        error: (error) => {
+          console.error('Error cargando experiencia vs tecnologías:', error);
+        }
+      });
+  }
+
+  loadMapaCalorIndustriaSalarial() {
+    this.dashboardService.obtenerMapaCalorIndustriaSalarial()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.mapaCalor) {
+            this.mapaCalorIndustriaSalarial = response.mapaCalor;
+            console.log('Datos de mapa de calor industria vs salario cargados:', this.mapaCalorIndustriaSalarial);
+            
+            // Renderizar mapa de calor industria vs salario
+            setTimeout(() => {
+              this.renderMapaCalorIndustriaSalarialChart();
+            }, 200);
+          } else {
+            console.warn('No se pudieron cargar los datos de mapa de calor industria vs salario:', response.msj);
+          }
+        },
+        error: (error) => {
+          console.error('Error cargando mapa de calor industria vs salario:', error);
+        }
+      });
+  }
+
+  loadDisponibilidadCambioTrabajo() {
+    this.dashboardService.obtenerDisponibilidadCambioTrabajo()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.disponibilidadCambio) {
+            this.disponibilidadCambioTrabajo = response.disponibilidadCambio;
+            console.log('Datos de disponibilidad de cambio cargados:', this.disponibilidadCambioTrabajo);
+            
+            // Renderizar gráfico de disponibilidad de cambio
+            setTimeout(() => {
+              this.renderDisponibilidadCambioChart();
+            }, 200);
+          } else {
+            console.warn('No se pudieron cargar los datos de disponibilidad de cambio:', response.msj);
+          }
+        },
+        error: (error) => {
+          console.error('Error cargando disponibilidad de cambio:', error);
+        }
+      });
+  }
 
   private renderAllCharts() {
     this.renderDistribucionSalarialChart();
@@ -457,8 +595,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 
                 const tooltipLines = [
                   `Empleados: ${emp.totalEmpleados}`,
-                  `Salario Promedio: ${formatCurrency(emp.promedioSalario)}`,
-                  `Tipo: ${emp.tipoEmpresa}`
+                  `Salario Promedio: ${formatCurrency(emp.promedioSalario)}`
                 ];
                 
                 if (emp.satisfaccionPromedio !== null && emp.satisfaccionPromedio !== undefined) {
@@ -794,6 +931,819 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               }
             }
           }
+        }
+      }
+    });
+  }
+
+  private renderEvolucionSalarialChart() {
+    if (!this.evolucionSalarial?.datos?.length) return;
+
+    const canvas = document.getElementById('evolucionSalarialChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Destruir chart anterior si existe
+    if (this.charts['evolucionSalarial']) {
+      this.charts['evolucionSalarial'].destroy();
+    }
+
+    const datos = this.evolucionSalarial.datos;
+
+    // Función para formatear moneda
+    const formatCurrency = (value: number): string => {
+      return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
+    };
+
+    this.charts['evolucionSalarial'] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: datos.map(item => item.rangoExperiencia),
+        datasets: [
+          {
+            label: 'Salario Promedio',
+            data: datos.map(item => item.salarioPromedio),
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 3,
+            pointBackgroundColor: '#3B82F6',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            fill: true,
+            tension: 0.4
+          },
+          {
+            label: 'Salario Máximo',
+            data: datos.map(item => item.salarioMaximo),
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.05)',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointBackgroundColor: '#10B981',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 1,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: false,
+            tension: 0.3
+          },
+          {
+            label: 'Salario Mínimo',
+            data: datos.map(item => item.salarioMinimo),
+            borderColor: '#F59E0B',
+            backgroundColor: 'rgba(245, 158, 11, 0.05)',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointBackgroundColor: '#F59E0B',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 1,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: false,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: false,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              padding: 15,
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              callback: function(value) {
+                return formatCurrency(Number(value));
+              }
+            },
+            title: {
+              display: true,
+              text: 'Salario (CLP)',
+              font: {
+                size: 13,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#374151'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              color: '#6B7280',
+              maxRotation: 45
+            },
+            title: {
+              display: true,
+              text: 'Años de Experiencia',
+              font: {
+                size: 13,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#374151'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: {
+                size: 12,
+                family: 'Inter, sans-serif'
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: 'Evolución del Salario según Años de Experiencia',
+            font: {
+              size: 16,
+              weight: 'bold',
+              family: 'Inter, sans-serif'
+            },
+            color: '#111827',
+            padding: 20
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#3B82F6',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              title: function(tooltipItems) {
+                return `Experiencia: ${tooltipItems[0].label}`;
+              },
+              label: function(context) {
+                const dataIndex = context.dataIndex;
+                const item = datos[dataIndex];
+                
+                if (context.datasetIndex === 0) {
+                  return [
+                    `Salario Promedio: ${formatCurrency(item.salarioPromedio)}`,
+                    `Profesionales: ${item.cantidad}`,
+                    `Rango: ${formatCurrency(item.salarioMinimo)} - ${formatCurrency(item.salarioMaximo)}`
+                  ];
+                } else if (context.datasetIndex === 1) {
+                  return `Salario Máximo: ${formatCurrency(item.salarioMaximo)}`;
+                } else {
+                  return `Salario Mínimo: ${formatCurrency(item.salarioMinimo)}`;
+                }
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
+  private renderDistribucionExperienciaChart() {
+    if (!this.distribucionExperienciaProfesionales?.datos?.length) return;
+
+    const canvas = document.getElementById('distribucionExperienciaChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Destruir chart anterior si existe
+    if (this.charts['distribucionExperiencia']) {
+      this.charts['distribucionExperiencia'].destroy();
+    }
+
+    const datos = this.distribucionExperienciaProfesionales.datos;
+
+    // Ordenar datos por cantidad de profesionales (mayor a menor)
+    const datosOrdenados = [...datos].sort((a, b) => b.cantidad - a.cantidad);
+
+    this.charts['distribucionExperiencia'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: datosOrdenados.map(item => item.rangoExperiencia),
+        datasets: [{
+          label: 'Cantidad de Profesionales',
+          data: datosOrdenados.map(item => item.cantidad),
+          backgroundColor: [
+            '#8B5CF6', // Púrpura
+            '#06B6D4', // Cyan
+            '#10B981', // Verde esmeralda
+            '#F59E0B', // Ámbar
+            '#EF4444', // Rojo
+            '#6366F1'  // Índigo
+          ],
+          borderColor: [
+            '#7C3AED',
+            '#0891B2',
+            '#059669',
+            '#D97706',
+            '#DC2626',
+            '#4F46E5'
+          ],
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y' as const, // Barras horizontales
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              callback: function(value) {
+                return `${value} profesionales`;
+              }
+            },
+            title: {
+              display: true,
+              text: 'Cantidad de Profesionales',
+              font: {
+                size: 13,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#374151'
+            }
+          },
+          y: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              color: '#6B7280'
+            },
+            title: {
+              display: true,
+              text: 'Años de Experiencia',
+              font: {
+                size: 13,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#374151'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false // No mostrar leyenda para un solo dataset
+          },
+          title: {
+            display: true,
+            text: 'Distribución de Profesionales por Años de Experiencia',
+            font: {
+              size: 16,
+              weight: 'bold',
+              family: 'Inter, sans-serif'
+            },
+            color: '#111827',
+            padding: 20
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#8B5CF6',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              title: function(tooltipItems) {
+                return `Experiencia: ${tooltipItems[0].label}`;
+              },
+              label: function(context) {
+                const dataIndex = context.dataIndex;
+                const item = datosOrdenados[dataIndex];
+                
+                return [
+                  `Profesionales: ${item.cantidad}`,
+                  `Porcentaje: ${item.porcentaje}% del total`,
+                  `Rango: ${item.añosMinimos}-${item.añosMaximos === 50 ? '50+' : item.añosMaximos} años`
+                ];
+              },
+              afterBody: function(tooltipItems) {
+                const total = datosOrdenados.reduce((sum, item) => sum + item.cantidad, 0);
+                return `Total del mercado: ${total} profesionales`;
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
+  private renderExperienciaVsTecnologiasChart() {
+    if (!this.experienciaVsTecnologias?.datos?.length) return;
+
+    const canvas = document.getElementById('experienciaVsTecnologiasChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Destruir chart anterior si existe
+    if (this.charts['experienciaVsTecnologias']) {
+      this.charts['experienciaVsTecnologias'].destroy();
+    }
+
+    const datos = this.experienciaVsTecnologias.datos;
+
+    this.charts['experienciaVsTecnologias'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: datos.map(item => item.rangoExperiencia),
+        datasets: [
+          {
+            label: 'Promedio de Tecnologías',
+            data: datos.map(item => item.promedioTecnologias),
+            backgroundColor: '#3B82F6',
+            borderColor: '#2563EB',
+            borderWidth: 2,
+            borderRadius: 6,
+            borderSkipped: false
+          },
+          {
+            label: 'Mediana de Tecnologías',
+            data: datos.map(item => item.mediaTecnologias),
+            backgroundColor: '#10B981',
+            borderColor: '#059669',
+            borderWidth: 2,
+            borderRadius: 6,
+            borderSkipped: false
+          },
+          {
+            label: 'Máximo de Tecnologías',
+            data: datos.map(item => item.maxTecnologias),
+            backgroundColor: '#F59E0B',
+            borderColor: '#D97706',
+            borderWidth: 2,
+            borderRadius: 6,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              color: '#6B7280',
+              maxRotation: 45
+            },
+            title: {
+              display: true,
+              text: 'Años de Experiencia',
+              font: {
+                size: 13,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#374151'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              stepSize: 1,
+              callback: function(value) {
+                return `${value} tecnologías`;
+              }
+            },
+            title: {
+              display: true,
+              text: 'Número de Tecnologías',
+              font: {
+                size: 13,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#374151'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: {
+                size: 12,
+                family: 'Inter, sans-serif'
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: 'Experiencia vs Número de Tecnologías Dominadas',
+            font: {
+              size: 16,
+              weight: 'bold',
+              family: 'Inter, sans-serif'
+            },
+            color: '#111827',
+            padding: 20
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#3B82F6',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              title: function(tooltipItems) {
+                return `Experiencia: ${tooltipItems[0].label}`;
+              },
+              label: function(context) {
+                const dataIndex = context.dataIndex;
+                const item = datos[dataIndex];
+                
+                if (context.datasetIndex === 0) {
+                  return [
+                    `Promedio: ${item.promedioTecnologias} tecnologías`,
+                    `Profesionales: ${item.cantidad}`,
+                    `Rango: ${item.minTecnologias} - ${item.maxTecnologias} tecnologías`
+                  ];
+                } else if (context.datasetIndex === 1) {
+                  return `Mediana: ${item.mediaTecnologias} tecnologías`;
+                } else {
+                  return `Máximo: ${item.maxTecnologias} tecnologías`;
+                }
+              },
+              afterBody: function(tooltipItems) {
+                const item = datos[tooltipItems[0].dataIndex];
+                return `Muestra que mientras más experiencia, más tecnologías se dominan.`;
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
+  private renderMapaCalorIndustriaSalarialChart() {
+    if (!this.mapaCalorIndustriaSalarial?.datos?.length) return;
+
+    const canvas = document.getElementById('mapaCalorIndustriaSalarialChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Destruir chart anterior si existe
+    if (this.charts['mapaCalorIndustriaSalarial']) {
+      this.charts['mapaCalorIndustriaSalarial'].destroy();
+    }
+
+    const datos = this.mapaCalorIndustriaSalarial;
+    const industriasLabels = datos.datos.map(fila => fila.industria);
+    const rangosSalariales = datos.rangosSalariales.sort((a, b) => a.orden - b.orden);
+    
+    // Crear datasets para cada rango salarial
+    const datasets = rangosSalariales.map((rango, index) => {
+      const colores = [
+        '#EF4444', // Rojo para <500k
+        '#F59E0B', // Ámbar para 500k-1M
+        '#10B981', // Verde para 1M-1.5M
+        '#3B82F6', // Azul para 1.5M-2M
+        '#8B5CF6', // Púrpura para 2M-3M
+        '#6366F1'  // Índigo para 3M+
+      ];
+      
+      return {
+        label: rango.label,
+        data: datos.datos.map(fila => {
+          const celda = fila.datos.find(d => d.rangoSalarial === rango.id);
+          return celda ? celda.cantidad : 0;
+        }),
+        backgroundColor: colores[index % colores.length],
+        borderColor: '#ffffff',
+        borderWidth: 1,
+        borderRadius: 4,
+        borderSkipped: false
+      };
+    });
+
+    this.charts['mapaCalorIndustriaSalarial'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: industriasLabels,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            stacked: true,
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 10,
+                family: 'Inter, sans-serif'
+              },
+              color: '#6B7280',
+              maxRotation: 45
+            },
+            title: {
+              display: true,
+              text: 'Industrias',
+              font: {
+                size: 13,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#374151'
+            }
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              callback: function(value) {
+                return `${value} profesionales`;
+              }
+            },
+            title: {
+              display: true,
+              text: 'Número de Profesionales',
+              font: {
+                size: 13,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              },
+              color: '#374151'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 15,
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: 'Mapa de Calor: Industria vs Nivel Salarial',
+            font: {
+              size: 16,
+              weight: 'bold',
+              family: 'Inter, sans-serif'
+            },
+            color: '#111827',
+            padding: 20
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#3B82F6',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              title: function(tooltipItems) {
+                return `${tooltipItems[0].label}`;
+              },
+              label: function(context) {
+                const industria = context.label;
+                const rangoSalarial = context.dataset.label;
+                // Para gráficos stacked, obtenemos el valor crudo del dataset
+                const cantidad = (context.raw as number) || 0;
+                
+                const filaIndustria = datos.datos.find(fila => fila.industria === industria);
+                const totalIndustria = filaIndustria ? filaIndustria.totalProfesionales : 0;
+                const porcentaje = totalIndustria > 0 ? Math.round((cantidad / totalIndustria) * 100) : 0;
+                
+                return [
+                  `${rangoSalarial}: ${cantidad} profesionales`,
+                  `${porcentaje}% de ${industria}`,
+                  `Total industria: ${totalIndustria} profesionales`
+                ];
+              },
+              afterBody: function(tooltipItems) {
+                return 'Muestra en qué industrias se concentran los mejores sueldos';
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
+  private renderDisponibilidadCambioChart() {
+    if (!this.disponibilidadCambioTrabajo?.datos?.length) return;
+
+    const canvas = document.getElementById('disponibilidadCambioChart') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Destruir chart anterior si existe
+    if (this.charts['disponibilidadCambio']) {
+      this.charts['disponibilidadCambio'].destroy();
+    }
+
+    const datos = this.disponibilidadCambioTrabajo.datos;
+
+    // Colores específicos para cada opción de disponibilidad
+    const coloresDisponibilidad = {
+      'Activamente buscando': '#EF4444', // Rojo - alta urgencia
+      'Abierto a oportunidades': '#10B981', // Verde - disponible
+      'No seguro': '#F59E0B', // Ámbar - indeciso
+      'No disponible': '#6B7280' // Gris - no disponible
+    };
+
+    const backgroundColors = datos.map(item => coloresDisponibilidad[item.disponibilidad as keyof typeof coloresDisponibilidad] || '#8B5CF6');
+    const borderColors = backgroundColors.map(color => color);
+
+    this.charts['disponibilidadCambio'] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: datos.map(item => item.disponibilidad),
+        datasets: [{
+          label: 'Profesionales',
+          data: datos.map(item => item.cantidad),
+          backgroundColor: backgroundColors,
+          borderColor: borderColors,
+          borderWidth: 2,
+          hoverBorderWidth: 3,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '50%', // Hace el donut más ancho
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: {
+                size: 12,
+                family: 'Inter, sans-serif'
+              },
+              generateLabels: function(chart) {
+                const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                const labels = original.call(this, chart);
+                
+                // Agregar porcentajes a las etiquetas
+                labels.forEach((label, index) => {
+                  const item = datos[index];
+                  label.text = `${item.disponibilidad} (${item.porcentaje}%)`;
+                });
+                
+                return labels;
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: 'Disponibilidad para Cambio de Trabajo',
+            font: {
+              size: 16,
+              weight: 'bold',
+              family: 'Inter, sans-serif'
+            },
+            color: '#111827',
+            padding: 20
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#3B82F6',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              title: function(tooltipItems) {
+                return tooltipItems[0].label;
+              },
+              label: function(context) {
+                const item = datos[context.dataIndex];
+                const total = datos.reduce((sum, d) => sum + d.cantidad, 0);
+                
+                return [
+                  `Profesionales: ${item.cantidad}`,
+                  `Porcentaje: ${item.porcentaje}%`,
+                  `Del total: ${total} profesionales`
+                ];
+              },
+              afterBody: function(tooltipItems) {
+                const item = datos[tooltipItems[0].dataIndex];
+                
+                // Agregar contexto específico según la disponibilidad
+                switch (item.disponibilidad) {
+                  case 'Activamente buscando':
+                    return 'Profesionales que buscan activamente nuevas oportunidades';
+                  case 'Abierto a oportunidades':
+                    return 'Profesionales dispuestos a considerar ofertas atractivas';
+                  case 'No seguro':
+                    return 'Profesionales indecisos sobre su situación laboral';
+                  case 'No disponible':
+                    return 'Profesionales satisfechos en sus trabajos actuales';
+                  default:
+                    return '';
+                }
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
         }
       }
     });

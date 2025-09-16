@@ -5,12 +5,12 @@ const { Op } = require('sequelize');
 const obtenerEstadisticasMercado = async (req, res) => {
   try {
     const totalProfesionales = await User.count({ where: { activo: true } });
-    
+
     // Nuevos profesionales este mes
     const inicioMes = new Date();
     inicioMes.setDate(1);
     inicioMes.setHours(0, 0, 0, 0);
-    
+
     const nuevosProfesionalesEsteMes = await User.count({
       where: {
         activo: true,
@@ -22,7 +22,7 @@ const obtenerEstadisticasMercado = async (req, res) => {
     const empresasUnicas = await User.count({
       distinct: true,
       col: 'empresa_actual',
-      where: { 
+      where: {
         activo: true,
         empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
       }
@@ -32,7 +32,7 @@ const obtenerEstadisticasMercado = async (req, res) => {
     const industriasUnicas = await User.count({
       distinct: true,
       col: 'industria',
-      where: { 
+      where: {
         activo: true,
         industria: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
       }
@@ -51,7 +51,7 @@ const obtenerEstadisticasMercado = async (req, res) => {
       }
     });
 
-    const porcentajeCrecimiento = profesionalesMesAnterior > 0 
+    const porcentajeCrecimiento = profesionalesMesAnterior > 0
       ? Math.round(((nuevosProfesionalesEsteMes - profesionalesMesAnterior) / profesionalesMesAnterior) * 100)
       : 100;
 
@@ -81,7 +81,7 @@ const obtenerEstadisticasMercado = async (req, res) => {
 const obtenerMetricasAvanzadas = async (req, res) => {
   try {
     const usuariosActivos = await User.findAll({
-      where: { 
+      where: {
         activo: true,
         perfil_completo: true // Solo usuarios con perfil completo
       },
@@ -122,7 +122,7 @@ const obtenerMetricasAvanzadas = async (req, res) => {
     };
 
     const distribucionExperiencia = Object.entries(experienciaRangos).map(([rango, limits]) => {
-      const cantidad = usuariosActivos.filter(user => 
+      const cantidad = usuariosActivos.filter(user =>
         user.años_experiencia >= limits.min && user.años_experiencia <= limits.max
       ).length;
       return {
@@ -223,7 +223,7 @@ const obtenerTecnologiasMasDemandadas = async (req, res) => {
   try {
     // Contar especialidades técnicas más populares
     const tecnologias = await User.findAll({
-      where: { 
+      where: {
         activo: true,
         especialidad_tecnica: { [Op.not]: null, [Op.ne]: '' }
       },
@@ -259,9 +259,9 @@ const obtenerTecnologiasMasDemandadas = async (req, res) => {
 const obtenerDistribucionSalarial = async (req, res) => {
   try {
     console.log('🔍 Obteniendo distribución salarial...');
-    
+
     const distribucion = await User.findAll({
-      where: { 
+      where: {
         activo: true,
         rango_salarial: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'Prefiero no decir' }
       },
@@ -287,7 +287,7 @@ const obtenerDistribucionSalarial = async (req, res) => {
     distribucion.forEach(user => {
       const industria = user.industria || 'Sin especificar';
       const salarioPromedio = convertirRangoASalario(user.rango_salarial);
-      
+
       if (!distribuciones[industria]) {
         distribuciones[industria] = {
           industria,
@@ -296,7 +296,7 @@ const obtenerDistribucionSalarial = async (req, res) => {
           salarios: []
         };
       }
-      
+
       distribuciones[industria].cantidad++;
       distribuciones[industria].salariosTotales += salarioPromedio;
       distribuciones[industria].salarios.push(salarioPromedio);
@@ -308,14 +308,14 @@ const obtenerDistribucionSalarial = async (req, res) => {
       data.salarioPromedio = Math.round(data.salariosTotales / data.cantidad);
       data.salarioMinimo = Math.min(...data.salarios);
       data.salarioMaximo = Math.max(...data.salarios);
-      
+
       // Eliminar campos temporales
       delete data.salariosTotales;
       delete data.salarios;
     });
 
     const resultado = Object.values(distribuciones);
-    
+
     console.log(`📈 Distribución salarial real de ${resultado.length} industrias:`, resultado);
 
     res.json({
@@ -349,7 +349,7 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
     };
 
     const empresas = await User.findAll({
-      where: { 
+      where: {
         activo: true,
         empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
       },
@@ -360,7 +360,7 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
     empresas.forEach(user => {
       const empresa = user.empresa_actual;
       const salario = convertirRangoASalario(user.rango_salarial);
-      
+
       if (!empresaData[empresa]) {
         empresaData[empresa] = {
           empresa,
@@ -369,7 +369,7 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
           satisfacciones: []
         };
       }
-      
+
       empresaData[empresa].totalEmpleados++;
       if (user.rango_salarial && user.rango_salarial !== 'Prefiero no decir') {
         empresaData[empresa].salarios.push(salario);
@@ -382,21 +382,21 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
     const empresasContratantes = Object.values(empresaData)
       .map(data => {
         // Calcular salario promedio real si hay datos, sino usar promedio del mercado
-        const promedioSalario = data.salarios.length > 0 
+        const promedioSalario = data.salarios.length > 0
           ? Math.round(data.salarios.reduce((sum, sal) => sum + sal, 0) / data.salarios.length)
           : 1200000; // Promedio del mercado chileno
-        
+
         // Calcular satisfacción promedio real si hay datos
-        const satisfaccionPromedio = data.satisfacciones.length > 0 
+        const satisfaccionPromedio = data.satisfacciones.length > 0
           ? parseFloat((data.satisfacciones.reduce((sum, sat) => sum + sat, 0) / data.satisfacciones.length).toFixed(1))
           : null;
-        
+
         return {
           empresa: data.empresa,
           totalEmpleados: data.totalEmpleados,
           promedioSalario,
           satisfaccionPromedio,
-          tipoEmpresa: data.totalEmpleados >= 100 ? 'Corporación' : 
+          tipoEmpresa: data.totalEmpleados >= 100 ? 'Corporación' :
                       data.totalEmpleados >= 50 ? 'Pyme' : 'Startup'
         };
       })
@@ -427,7 +427,7 @@ const obtenerTendenciasMercado = async (req, res) => {
     for (let i = 5; i >= 0; i--) {
       const fecha = new Date(fechaActual);
       fecha.setMonth(fecha.getMonth() - i);
-      
+
       const inicioMes = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
       const finMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
 
@@ -458,7 +458,7 @@ const obtenerTendenciasMercado = async (req, res) => {
     // Calcular resumen basado en datos reales
     const totalNuevosRegistros = ultimosSeisMeses.reduce((sum, mes) => sum + mes.nuevosRegistros, 0);
     const totalPerfilesCompletos = ultimosSeisMeses.reduce((sum, mes) => sum + mes.perfilesCompletos, 0);
-    
+
     // Calcular crecimiento real comparando últimos 3 vs primeros 3 meses
     const primerosTres = ultimosSeisMeses.slice(0, 3).reduce((sum, mes) => sum + mes.nuevosRegistros, 0);
     const ultimosTres = ultimosSeisMeses.slice(3, 6).reduce((sum, mes) => sum + mes.nuevosRegistros, 0);
@@ -492,7 +492,7 @@ const obtenerSatisfaccionLaboral = async (req, res) => {
   try {
     // Obtener todos los datos de satisfacción por empresa
     const usuarios = await User.findAll({
-      where: { 
+      where: {
         activo: true,
         satisfaccion_laboral: { [Op.not]: null, [Op.between]: [1, 5] },
         empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
@@ -535,7 +535,7 @@ const obtenerSatisfaccionLaboral = async (req, res) => {
 
     // Calcular estadísticas generales
     const todasLasSatisfacciones = usuarios.map(u => u.satisfaccion_laboral);
-    const satisfaccionGeneral = todasLasSatisfacciones.length > 0 
+    const satisfaccionGeneral = todasLasSatisfacciones.length > 0
       ? parseFloat((todasLasSatisfacciones.reduce((sum, sat) => sum + sat, 0) / todasLasSatisfacciones.length).toFixed(1))
       : 0;
 
@@ -568,6 +568,567 @@ const obtenerSatisfaccionLaboral = async (req, res) => {
   }
 };
 
+// Obtener evolución del salario según años de experiencia
+const obtenerEvolucionSalarial = async (req, res) => {
+  try {
+    // Obtener usuarios con experiencia y salario definidos
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        años_experiencia: { [Op.not]: null },
+        rango_salarial: {
+          [Op.not]: null,
+          [Op.ne]: '',
+          [Op.ne]: 'Prefiero no decir'
+        }
+      },
+      attributes: ['años_experiencia', 'rango_salarial']
+    });
+
+    console.log(`Usuarios encontrados para evolución salarial: ${usuarios.length}`);
+
+    // Función para convertir rango salarial a valor promedio
+    const convertirRangoASalario = (rango) => {
+      switch(rango) {
+        case '0-500k': return 400000;
+        case '500k-1M': return 750000;
+        case '1M-1.5M': return 1250000;
+        case '1.5M-2M': return 1750000;
+        case '2M-3M': return 2500000;
+        case '3M+': return 3500000;
+        default: return 1000000;
+      }
+    };
+
+    // Definir rangos de experiencia
+    const rangosExperiencia = [
+      { min: 0, max: 2, label: '0-2 años' },
+      { min: 3, max: 5, label: '3-5 años' },
+      { min: 6, max: 10, label: '6-10 años' },
+      { min: 11, max: 15, label: '11-15 años' },
+      { min: 16, max: 20, label: '16-20 años' },
+      { min: 21, max: 50, label: '21+ años' }
+    ];
+
+    // Agrupar usuarios por rango de experiencia
+    const evolucionSalarial = rangosExperiencia.map(rango => {
+      const usuariosEnRango = usuarios.filter(user =>
+        user.años_experiencia >= rango.min && user.años_experiencia <= rango.max
+      );
+
+      if (usuariosEnRango.length === 0) {
+        return {
+          rangoExperiencia: rango.label,
+          añosMinimos: rango.min,
+          añosMaximos: rango.max,
+          salarioPromedio: null,
+          cantidad: 0,
+          salarioMinimo: null,
+          salarioMaximo: null
+        };
+      }
+
+      // Calcular salarios para este rango
+      const salarios = usuariosEnRango.map(user => convertirRangoASalario(user.rango_salarial));
+      const salarioPromedio = Math.round(salarios.reduce((sum, sal) => sum + sal, 0) / salarios.length);
+      const salarioMinimo = Math.min(...salarios);
+      const salarioMaximo = Math.max(...salarios);
+
+      return {
+        rangoExperiencia: rango.label,
+        añosMinimos: rango.min,
+        añosMaximos: rango.max,
+        salarioPromedio,
+        cantidad: usuariosEnRango.length,
+        salarioMinimo,
+        salarioMaximo
+      };
+    }).filter(item => item.cantidad > 0); // Solo rangos con datos
+
+    console.log('📈 Evolución salarial calculada:', evolucionSalarial);
+
+    // Calcular estadísticas adicionales
+    const todosSalarios = usuarios.map(u => convertirRangoASalario(u.rango_salarial));
+    const salarioPromedioGeneral = todosSalarios.length > 0
+      ? Math.round(todosSalarios.reduce((sum, sal) => sum + sal, 0) / todosSalarios.length)
+      : 0;
+
+    const experienciaPromedio = usuarios.length > 0
+      ? Math.round(usuarios.reduce((sum, u) => sum + u.años_experiencia, 0) / usuarios.length)
+      : 0;
+
+    res.json({
+      ok: true,
+      evolucion: {
+        datos: evolucionSalarial,
+        resumen: {
+          salarioPromedioGeneral,
+          experienciaPromedio,
+          totalProfesionales: usuarios.length,
+          rangosConDatos: evolucionSalarial.length
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerEvolucionSalarial:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al obtener evolución salarial'
+    });
+  }
+};
+
+// Obtener distribución de profesionales por años de experiencia
+const obtenerDistribucionExperiencia = async (req, res) => {
+  try {
+    // Obtener usuarios activos con experiencia definida
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        años_experiencia: { [Op.not]: null }
+      },
+      attributes: ['años_experiencia']
+    });
+
+    console.log(`Usuarios encontrados para distribución de experiencia: ${usuarios.length}`);
+
+    // Definir los mismos rangos de experiencia que en evolución salarial
+    const rangosExperiencia = [
+      { min: 0, max: 2, label: '0-2 años' },
+      { min: 3, max: 5, label: '3-5 años' },
+      { min: 6, max: 10, label: '6-10 años' },
+      { min: 11, max: 15, label: '11-15 años' },
+      { min: 16, max: 20, label: '16-20 años' },
+      { min: 21, max: 50, label: '21+ años' }
+    ];
+
+    // Contar profesionales por rango de experiencia
+    const distribucionExperiencia = rangosExperiencia.map(rango => {
+      const usuariosEnRango = usuarios.filter(user =>
+        user.años_experiencia >= rango.min && user.años_experiencia <= rango.max
+      );
+
+      const cantidad = usuariosEnRango.length;
+      const porcentaje = usuarios.length > 0 ? Math.round((cantidad / usuarios.length) * 100) : 0;
+
+      return {
+        rangoExperiencia: rango.label,
+        añosMinimos: rango.min,
+        añosMaximos: rango.max,
+        cantidad,
+        porcentaje
+      };
+    }).filter(item => item.cantidad > 0); // Solo rangos con profesionales
+
+    console.log('📈 Distribución de experiencia calculada:', distribucionExperiencia);
+
+    // Calcular estadísticas adicionales
+    const experienciaPromedio = usuarios.length > 0
+      ? Math.round(usuarios.reduce((sum, u) => sum + u.años_experiencia, 0) / usuarios.length)
+      : 0;
+
+    // Encontrar el rango con más profesionales
+    const rangoMasPopular = distribucionExperiencia.length > 0
+      ? distribucionExperiencia.reduce((max, current) =>
+          current.cantidad > max.cantidad ? current : max
+        )
+      : null;
+
+    // Calcular mediana de experiencia
+    const experienciasOrdenadas = usuarios
+      .map(u => u.años_experiencia)
+      .sort((a, b) => a - b);
+
+    const mediana = experienciasOrdenadas.length > 0
+      ? experienciasOrdenadas.length % 2 === 0
+        ? Math.round((experienciasOrdenadas[experienciasOrdenadas.length / 2 - 1] + experienciasOrdenadas[experienciasOrdenadas.length / 2]) / 2)
+        : experienciasOrdenadas[Math.floor(experienciasOrdenadas.length / 2)]
+      : 0;
+
+    res.json({
+      ok: true,
+      distribucion: {
+        datos: distribucionExperiencia,
+        resumen: {
+          totalProfesionales: usuarios.length,
+          experienciaPromedio,
+          experienciaMediana: mediana,
+          rangoMasPopular: rangoMasPopular ? {
+            rango: rangoMasPopular.rangoExperiencia,
+            cantidad: rangoMasPopular.cantidad,
+            porcentaje: rangoMasPopular.porcentaje
+          } : null,
+          rangosConDatos: distribucionExperiencia.length
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerDistribucionExperiencia:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al obtener distribución de experiencia'
+    });
+  }
+};
+
+// Obtener relación entre experiencia y número de tecnologías dominadas
+const obtenerExperienciaVsTecnologias = async (req, res) => {
+  try {
+    // Obtener usuarios activos con experiencia y tecnologías definidas
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        años_experiencia: { [Op.not]: null },
+        tecnologias_principales: {
+          [Op.not]: null,
+          [Op.ne]: '[]',
+          [Op.ne]: ''
+        }
+      },
+      attributes: ['años_experiencia', 'tecnologias_principales']
+    });
+
+    console.log(`Usuarios encontrados para experiencia vs tecnologías: ${usuarios.length}`);
+
+    // Definir los mismos rangos de experiencia
+    const rangosExperiencia = [
+      { min: 0, max: 2, label: '0-2 años' },
+      { min: 3, max: 5, label: '3-5 años' },
+      { min: 6, max: 10, label: '6-10 años' },
+      { min: 11, max: 15, label: '11-15 años' },
+      { min: 16, max: 20, label: '16-20 años' },
+      { min: 21, max: 50, label: '21+ años' }
+    ];
+
+    // Procesar datos por rango de experiencia
+    const experienciaVsTecnologias = rangosExperiencia.map(rango => {
+      const usuariosEnRango = usuarios.filter(user =>
+        user.años_experiencia >= rango.min && user.años_experiencia <= rango.max
+      );
+
+      if (usuariosEnRango.length === 0) {
+        return {
+          rangoExperiencia: rango.label,
+          añosMinimos: rango.min,
+          añosMaximos: rango.max,
+          cantidad: 0,
+          promedioTecnologias: 0,
+          mediaTecnologias: 0,
+          maxTecnologias: 0,
+          minTecnologias: 0
+        };
+      }
+
+      // Contar tecnologías por usuario
+      const conteosTecnologias = usuariosEnRango.map(user => {
+        try {
+          const tecnologias = JSON.parse(user.tecnologias_principales || '[]');
+          return Array.isArray(tecnologias) ? tecnologias.length : 0;
+        } catch (error) {
+          console.warn('Error parseando tecnologías:', user.tecnologias_principales);
+          return 0;
+        }
+      }).filter(count => count > 0);
+
+      if (conteosTecnologias.length === 0) {
+        return {
+          rangoExperiencia: rango.label,
+          añosMinimos: rango.min,
+          añosMaximos: rango.max,
+          cantidad: usuariosEnRango.length,
+          promedioTecnologias: 0,
+          mediaTecnologias: 0,
+          maxTecnologias: 0,
+          minTecnologias: 0
+        };
+      }
+
+      const promedioTecnologias = Math.round(
+        (conteosTecnologias.reduce((sum, count) => sum + count, 0) / conteosTecnologias.length) * 10
+      ) / 10;
+
+      const maxTecnologias = Math.max(...conteosTecnologias);
+      const minTecnologias = Math.min(...conteosTecnologias);
+
+      // Calcular mediana
+      const ordenados = conteosTecnologias.sort((a, b) => a - b);
+      const mediaTecnologias = ordenados.length % 2 === 0
+        ? Math.round(((ordenados[ordenados.length / 2 - 1] + ordenados[ordenados.length / 2]) / 2) * 10) / 10
+        : ordenados[Math.floor(ordenados.length / 2)];
+
+      return {
+        rangoExperiencia: rango.label,
+        añosMinimos: rango.min,
+        añosMaximos: rango.max,
+        cantidad: usuariosEnRango.length,
+        promedioTecnologias,
+        mediaTecnologias,
+        maxTecnologias,
+        minTecnologias
+      };
+    }).filter(item => item.cantidad > 0);
+
+    console.log('Análisis experiencia vs tecnologías calculado:', experienciaVsTecnologias);
+
+    // Calcular estadísticas generales
+    const todosTecnologiasCounts = usuarios.map(user => {
+      try {
+        const tecnologias = JSON.parse(user.tecnologias_principales || '[]');
+        return Array.isArray(tecnologias) ? tecnologias.length : 0;
+      } catch (error) {
+        return 0;
+      }
+    }).filter(count => count > 0);
+
+    const promedioGeneralTecnologias = todosTecnologiasCounts.length > 0
+      ? Math.round((todosTecnologiasCounts.reduce((sum, count) => sum + count, 0) / todosTecnologiasCounts.length) * 10) / 10
+      : 0;
+
+    const experienciaPromedio = usuarios.length > 0
+      ? Math.round(usuarios.reduce((sum, u) => sum + u.años_experiencia, 0) / usuarios.length)
+      : 0;
+
+    res.json({
+      ok: true,
+      experienciaVsTecnologias: {
+        datos: experienciaVsTecnologias,
+        resumen: {
+          totalProfesionales: usuarios.length,
+          promedioGeneralTecnologias,
+          experienciaPromedio,
+          maxTecnologiasEncontradas: todosTecnologiasCounts.length > 0 ? Math.max(...todosTecnologiasCounts) : 0,
+          rangosConDatos: experienciaVsTecnologias.length
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerExperienciaVsTecnologias:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al obtener relación experiencia vs tecnologías'
+    });
+  }
+};
+
+// Obtener mapa de calor: industria vs nivel salarial
+const obtenerMapaCalorIndustriaSalarial = async (req, res) => {
+  try {
+    // Obtener usuarios activos con industria y salario definidos
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        industria: {
+          [Op.not]: null,
+          [Op.ne]: '',
+          [Op.ne]: 'Prefiero no decir'
+        },
+        rango_salarial: {
+          [Op.not]: null,
+          [Op.ne]: '',
+          [Op.ne]: 'Prefiero no decir'
+        }
+      },
+      attributes: ['industria', 'rango_salarial']
+    });
+
+    console.log(`🏭 Usuarios encontrados para mapa de calor industria-salario: ${usuarios.length}`);
+
+    // Definir rangos salariales ordenados
+    const rangosSalariales = [
+      { id: '0-500k', label: '<500k', orden: 1 },
+      { id: '500k-1M', label: '500k-1M', orden: 2 },
+      { id: '1M-1.5M', label: '1M-1.5M', orden: 3 },
+      { id: '1.5M-2M', label: '1.5M-2M', orden: 4 },
+      { id: '2M-3M', label: '2M-3M', orden: 5 },
+      { id: '3M+', label: '3M+', orden: 6 }
+    ];
+
+    // Obtener todas las industrias únicas
+    const industriasUnicas = [...new Set(usuarios.map(user => user.industria))].sort();
+
+    // Crear matriz de datos para el heatmap
+    const mapaCalorData = [];
+    let maxProfesionales = 0;
+
+    industriasUnicas.forEach(industria => {
+      const filaDatos = {
+        industria,
+        datos: [],
+        totalProfesionales: 0
+      };
+
+      rangosSalariales.forEach(rango => {
+        const profesionalesEnCelda = usuarios.filter(user =>
+          user.industria === industria && user.rango_salarial === rango.id
+        ).length;
+
+        filaDatos.datos.push({
+          rangoSalarial: rango.id,
+          rangoLabel: rango.label,
+          cantidad: profesionalesEnCelda,
+          orden: rango.orden
+        });
+
+        filaDatos.totalProfesionales += profesionalesEnCelda;
+
+        // Actualizar máximo para escala de colores
+        if (profesionalesEnCelda > maxProfesionales) {
+          maxProfesionales = profesionalesEnCelda;
+        }
+      });
+
+      // Solo incluir industrias con al menos 1 profesional
+      if (filaDatos.totalProfesionales > 0) {
+        mapaCalorData.push(filaDatos);
+      }
+    });
+
+    // Ordenar industrias por total de profesionales (descendente)
+    mapaCalorData.sort((a, b) => b.totalProfesionales - a.totalProfesionales);
+
+    console.log('🏭 Mapa de calor calculado:', {
+      industrias: mapaCalorData.length,
+      maxProfesionales,
+      totalUsuarios: usuarios.length
+    });
+
+    // Calcular estadísticas adicionales
+    const distribucionPorRango = rangosSalariales.map(rango => {
+      const totalEnRango = usuarios.filter(user => user.rango_salarial === rango.id).length;
+      const porcentaje = usuarios.length > 0 ? Math.round((totalEnRango / usuarios.length) * 100) : 0;
+
+      return {
+        rango: rango.label,
+        cantidad: totalEnRango,
+        porcentaje
+      };
+    }).filter(item => item.cantidad > 0);
+
+    const industriaMasComun = mapaCalorData.length > 0 ? mapaCalorData[0] : null;
+
+    res.json({
+      ok: true,
+      mapaCalor: {
+        datos: mapaCalorData,
+        rangosSalariales: rangosSalariales.map(r => ({ id: r.id, label: r.label, orden: r.orden })),
+        estadisticas: {
+          totalProfesionales: usuarios.length,
+          totalIndustrias: mapaCalorData.length,
+          maxProfesionalesPorCelda: maxProfesionales,
+          industriaMasComun: industriaMasComun ? {
+            nombre: industriaMasComun.industria,
+            profesionales: industriaMasComun.totalProfesionales
+          } : null,
+          distribucionPorRango
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerMapaCalorIndustriaSalarial:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al obtener mapa de calor industria-salario'
+    });
+  }
+};
+
+// Obtener distribución de disponibilidad para cambio de trabajo
+const obtenerDisponibilidadCambioTrabajo = async (req, res) => {
+  try {
+    // Obtener usuarios activos con disponibilidad definida
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        disponibilidad_cambio: {
+          [Op.not]: null,
+          [Op.ne]: ''
+        }
+      },
+      attributes: ['disponibilidad_cambio']
+    });
+
+    console.log(`💼 Usuarios encontrados para disponibilidad de cambio: ${usuarios.length}`);
+
+    // Definir las opciones de disponibilidad en orden de interés
+    const opcionesDisponibilidad = [
+      'Activamente buscando',
+      'Abierto a oportunidades',
+      'No seguro',
+      'No disponible'
+    ];
+
+    // Contar usuarios por cada opción de disponibilidad
+    const distribucionDisponibilidad = opcionesDisponibilidad.map(opcion => {
+      const usuariosConOpcion = usuarios.filter(user =>
+        user.disponibilidad_cambio === opcion
+      );
+
+      const cantidad = usuariosConOpcion.length;
+      const porcentaje = usuarios.length > 0 ? Math.round((cantidad / usuarios.length) * 100) : 0;
+
+      return {
+        disponibilidad: opcion,
+        cantidad,
+        porcentaje
+      };
+    }).filter(item => item.cantidad > 0); // Solo opciones con usuarios
+
+    console.log('💼 Distribución de disponibilidad calculada:', distribucionDisponibilidad);
+
+    // Calcular estadísticas adicionales
+    const usuariosActivos = distribucionDisponibilidad.find(item => item.disponibilidad === 'Activamente buscando')?.cantidad || 0;
+    const usuariosAbiertos = distribucionDisponibilidad.find(item => item.disponibilidad === 'Abierto a oportunidades')?.cantidad || 0;
+    const usuariosNoDisponibles = distribucionDisponibilidad.find(item => item.disponibilidad === 'No disponible')?.cantidad || 0;
+    const usuariosIndecisos = distribucionDisponibilidad.find(item => item.disponibilidad === 'No seguro')?.cantidad || 0;
+
+    // Calcular usuarios potencialmente disponibles (activos + abiertos)
+    const usuariosPotencialmenteDisponibles = usuariosActivos + usuariosAbiertos;
+    const porcentajePotencialmenteDisponibles = usuarios.length > 0
+      ? Math.round((usuariosPotencialmenteDisponibles / usuarios.length) * 100)
+      : 0;
+
+    // Encontrar la opción más común
+    const opcionMasComun = distribucionDisponibilidad.length > 0
+      ? distribucionDisponibilidad.reduce((max, current) =>
+          current.cantidad > max.cantidad ? current : max
+        )
+      : null;
+
+    res.json({
+      ok: true,
+      disponibilidadCambio: {
+        datos: distribucionDisponibilidad,
+        resumen: {
+          totalProfesionales: usuarios.length,
+          usuariosActivos,
+          usuariosAbiertos,
+          usuariosNoDisponibles,
+          usuariosIndecisos,
+          usuariosPotencialmenteDisponibles,
+          porcentajePotencialmenteDisponibles,
+          opcionMasComun: opcionMasComun ? {
+            disponibilidad: opcionMasComun.disponibilidad,
+            cantidad: opcionMasComun.cantidad,
+            porcentaje: opcionMasComun.porcentaje
+          } : null,
+          opcionesConDatos: distribucionDisponibilidad.length
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerDisponibilidadCambioTrabajo:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al obtener disponibilidad de cambio de trabajo'
+    });
+  }
+};
+
 module.exports = {
   obtenerEstadisticasMercado,
   obtenerMetricasAvanzadas,
@@ -575,5 +1136,10 @@ module.exports = {
   obtenerDistribucionSalarial,
   obtenerEmpresasQueContratanMas,
   obtenerTendenciasMercado,
-  obtenerSatisfaccionLaboral
+  obtenerSatisfaccionLaboral,
+  obtenerEvolucionSalarial,
+  obtenerDistribucionExperiencia,
+  obtenerExperienciaVsTecnologias,
+  obtenerMapaCalorIndustriaSalarial,
+  obtenerDisponibilidadCambioTrabajo
 };

@@ -136,6 +136,139 @@ export interface SatisfaccionLaboral {
   };
 }
 
+// Interfaces para evolución salarial
+export interface EvolucionSalarialItem {
+  rangoExperiencia: string;
+  añosMinimos: number;
+  añosMaximos: number;
+  salarioPromedio: number;
+  cantidad: number;
+  salarioMinimo: number;
+  salarioMaximo: number;
+}
+
+export interface EvolucionSalarial {
+  datos: EvolucionSalarialItem[];
+  resumen: {
+    salarioPromedioGeneral: number;
+    experienciaPromedio: number;
+    totalProfesionales: number;
+    rangosConDatos: number;
+  };
+}
+
+// Interfaces para distribución de experiencia
+export interface DistribucionExperienciaItem {
+  rangoExperiencia: string;
+  añosMinimos: number;
+  añosMaximos: number;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface DistribucionExperienciaData {
+  datos: DistribucionExperienciaItem[];
+  resumen: {
+    totalProfesionales: number;
+    experienciaPromedio: number;
+    experienciaMediana: number;
+    rangoMasPopular: {
+      rango: string;
+      cantidad: number;
+      porcentaje: number;
+    } | null;
+    rangosConDatos: number;
+  };
+}
+
+// Interfaces para experiencia vs tecnologías
+export interface ExperienciaVsTecnologiasItem {
+  rangoExperiencia: string;
+  añosMinimos: number;
+  añosMaximos: number;
+  cantidad: number;
+  promedioTecnologias: number;
+  mediaTecnologias: number;
+  maxTecnologias: number;
+  minTecnologias: number;
+}
+
+export interface ExperienciaVsTecnologiasData {
+  datos: ExperienciaVsTecnologiasItem[];
+  resumen: {
+    totalProfesionales: number;
+    promedioGeneralTecnologias: number;
+    experienciaPromedio: number;
+    maxTecnologiasEncontradas: number;
+    rangosConDatos: number;
+  };
+}
+
+// Interfaces para mapa de calor industria vs salario
+export interface MapaCalorCelda {
+  rangoSalarial: string;
+  rangoLabel: string;
+  cantidad: number;
+  orden: number;
+}
+
+export interface MapaCalorFila {
+  industria: string;
+  datos: MapaCalorCelda[];
+  totalProfesionales: number;
+}
+
+export interface RangoSalarial {
+  id: string;
+  label: string;
+  orden: number;
+}
+
+export interface MapaCalorData {
+  datos: MapaCalorFila[];
+  rangosSalariales: RangoSalarial[];
+  estadisticas: {
+    totalProfesionales: number;
+    totalIndustrias: number;
+    maxProfesionalesPorCelda: number;
+    industriaMasComun: {
+      nombre: string;
+      profesionales: number;
+    } | null;
+    distribucionPorRango: {
+      rango: string;
+      cantidad: number;
+      porcentaje: number;
+    }[];
+  };
+}
+
+// Interfaces para disponibilidad de cambio de trabajo
+export interface DisponibilidadCambioItem {
+  disponibilidad: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface DisponibilidadCambioData {
+  datos: DisponibilidadCambioItem[];
+  resumen: {
+    totalProfesionales: number;
+    usuariosActivos: number;
+    usuariosAbiertos: number;
+    usuariosNoDisponibles: number;
+    usuariosIndecisos: number;
+    usuariosPotencialmenteDisponibles: number;
+    porcentajePotencialmenteDisponibles: number;
+    opcionMasComun: {
+      disponibilidad: string;
+      cantidad: number;
+      porcentaje: number;
+    } | null;
+    opcionesConDatos: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -345,6 +478,61 @@ export class DashboardService {
         catchError(err => of({ 
           ok: false, 
           msj: err.error?.msj || 'Error al obtener satisfacción laboral' 
+        }))
+      );
+  }
+
+  // Obtener evolución salarial por años de experiencia
+  obtenerEvolucionSalarial(): Observable<{ ok: boolean; evolucion?: EvolucionSalarial; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/evolucion-salarial`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener evolución salarial' 
+        }))
+      );
+  }
+
+  // Obtener distribución de profesionales por años de experiencia
+  obtenerDistribucionExperiencia(): Observable<{ ok: boolean; distribucion?: DistribucionExperienciaData; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/distribucion-experiencia`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener distribución de experiencia' 
+        }))
+      );
+  }
+
+  // Obtener relación experiencia vs tecnologías
+  obtenerExperienciaVsTecnologias(): Observable<{ ok: boolean; experienciaVsTecnologias?: ExperienciaVsTecnologiasData; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/experiencia-vs-tecnologias`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener relación experiencia vs tecnologías' 
+        }))
+      );
+  }
+
+  // Obtener mapa de calor industria vs salario
+  obtenerMapaCalorIndustriaSalarial(): Observable<{ ok: boolean; mapaCalor?: MapaCalorData; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/mapa-calor-industria-salarial`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener mapa de calor industria vs salario' 
+        }))
+      );
+  }
+
+  // Obtener disponibilidad para cambio de trabajo
+  obtenerDisponibilidadCambioTrabajo(): Observable<{ ok: boolean; disponibilidadCambio?: DisponibilidadCambioData; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/disponibilidad-cambio-trabajo`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(err => of({ 
+          ok: false, 
+          msj: err.error?.msj || 'Error al obtener disponibilidad de cambio de trabajo' 
         }))
       );
   }
