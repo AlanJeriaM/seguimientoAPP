@@ -257,6 +257,7 @@ export interface DisponibilidadCambioData {
     usuariosActivos: number;
     usuariosAbiertos: number;
     usuariosNoDisponibles: number;
+    usuariosSinTrabajo: number;
     usuariosIndecisos: number;
     usuariosPotencialmenteDisponibles: number;
     porcentajePotencialmenteDisponibles: number;
