@@ -27,22 +27,40 @@
 
 <!-- Mensaje de perfil obligatorio -->
 <div *ngIf="!loading && !error && isCompletionMode" class="p-2 md:p-4 lg:p-6 max-w-screen-xl mx-auto mb-4">
-  <p-message
-    severity="info"
-    styleClass="w-full">
-    <ng-template pTemplate="content">
-      <div class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 p-2">
-        <i class="pi pi-info-circle text-2xl text-blue-500 flex-shrink-0"></i>
-        <div class="flex-1">
-          <h4 class="m-0 mb-2 font-semibold text-base md:text-lg">¡Completa tu perfil para acceder al dashboard!</h4>
-          <p class="m-0 text-sm md:text-base line-height-3">
+  <div [ngClass]="profileProgress === 100 ? 'bg-green-50 border-1 border-green-200' : 'bg-blue-50 border-1 border-blue-200'" 
+       class="border-round p-4">
+    <div class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3">
+      <div class="flex align-items-center justify-content-center border-circle text-white flex-shrink-0" 
+           [ngStyle]="{'background-color': profileProgress === 100 ? '#10b981' : '#3b82f6'}"
+           style="width: 3rem; height: 3rem;">
+        <i [ngClass]="profileProgress === 100 ? 'pi-check' : 'pi-exclamation-triangle'" class="pi text-lg"></i>
+      </div>
+      <div class="flex-1">
+        <h4 class="m-0 mb-2 font-semibold text-900 text-base md:text-lg">
+          <span *ngIf="profileProgress === 100">¡Perfil completado! Ya puedes acceder al dashboard</span>
+          <span *ngIf="profileProgress < 100">¡Completa tu perfil para acceder al dashboard!</span>
+        </h4>
+        <p class="m-0 text-700 text-sm md:text-base line-height-3">
+          <span *ngIf="profileProgress === 100">
+            Excelente trabajo. Tu perfil está completo y optimizado para generar las mejores métricas
+            del mercado laboral y brindarte una experiencia personalizada.
+          </span>
+          <span *ngIf="profileProgress < 100">
             Para generar métricas precisas del mercado laboral y brindarte la mejor experiencia,
             necesitamos que completes algunos campos adicionales de tu perfil profesional.
-          </p>
+          </span>
+        </p>
+        <div class="mt-3">
+          <p-tag 
+            [value]="getProfileStatusLabel()" 
+            [severity]="getProfileStatusSeverity()" 
+            [icon]="getProfileStatusIcon()"
+            styleClass="text-xs sm:text-sm">
+          </p-tag>
         </div>
       </div>
-    </ng-template>
-  </p-message>
+    </div>
+  </div>
 </div>
 
 <!-- Main Profile Content -->
@@ -122,6 +140,52 @@
       </ng-template>
 
       <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()" class="p-2 md:p-4">
+
+        <!-- Progreso del Perfil -->
+        <div class="mb-4 md:mb-6">
+          <div class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 mb-3">
+            <div class="flex align-items-center justify-content-center border-circle text-white flex-shrink-0"
+                 [ngStyle]="{'background-color': profileProgress === 100 ? '#10b981' : profileProgress >= 80 ? '#f59e0b' : '#ef4444'}"
+                 style="width: 2.5rem; height: 2.5rem;">
+              <i class="pi text-base md:text-lg" 
+                 [ngClass]="profileProgress === 100 ? 'pi-check' : 'pi-user-edit'"></i>
+            </div>
+            <div class="flex-1 w-full">
+              <div class="flex flex-column sm:flex-row align-items-start sm:align-items-center justify-content-between gap-2 mb-2">
+                <h3 class="text-lg md:text-xl font-semibold text-900 m-0">
+                  Progreso del Perfil
+                </h3>
+                <div class="flex align-items-center gap-2">
+                  <span class="text-base font-bold" 
+                        [ngStyle]="{'color': profileProgress === 100 ? '#10b981' : profileProgress >= 80 ? '#f59e0b' : '#ef4444'}">
+                    {{ profileProgress }}%
+                  </span>
+                  <p-tag 
+                    [value]="profileProgress === 100 ? 'Completo' : profileProgress >= 80 ? 'Casi listo' : 'En progreso'"
+                    [severity]="profileProgress === 100 ? 'success' : profileProgress >= 80 ? 'warning' : 'danger'"
+                    styleClass="text-xs sm:text-sm">
+                  </p-tag>
+                </div>
+              </div>
+              
+              <p-progressBar 
+                [value]="profileProgress" 
+                [showValue]="false"
+                styleClass="w-full h-1rem border-round overflow-hidden">
+              </p-progressBar>
+              
+              <p class="text-500 m-0 text-xs sm:text-sm mt-2">
+                <i class="pi pi-info-circle mr-1"></i>
+                <span *ngIf="profileProgress < 100">
+                  Completa todos los campos para obtener mejores oportunidades laborales
+                </span>
+                <span *ngIf="profileProgress === 100">
+                  ¡Excelente! Tu perfil está completo y optimizado para el mercado laboral
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
 
         <!-- Información Personal Section -->
         <div class="mb-4 md:mb-6 pb-4 border-bottom-1 surface-border">
@@ -236,38 +300,6 @@
           </div>
         </div>
 
-        <!-- Resumen Profesional Section -->
-        <div class="mb-4 md:mb-6 pb-4 border-bottom-1 surface-border">
-          <h3 class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 mb-4 text-lg md:text-xl font-semibold text-700">
-            <i class="pi pi-file-edit text-primary"></i>
-            <span>Resumen Profesional</span>
-          </h3>
-
-          <div class="field">
-            <label for="resumen" class="block text-900 font-medium mb-2 text-sm md:text-base">
-              Resumen
-              <span class="text-500 font-normal text-xs sm:text-sm ml-1">(Opcional)</span>
-            </label>
-            <textarea
-              pInputTextarea
-              id="resumen"
-              formControlName="resumen"
-              placeholder="Describe tu experiencia, habilidades y objetivos profesionales..."
-              rows="4"
-              [autoResize]="true"
-              [class]="'w-full ' + (isFieldInvalid('resumen') ? 'p-invalid' : '')"
-              styleClass="w-full">
-            </textarea>
-            <div class="flex flex-column sm:flex-row justify-content-between align-items-start sm:align-items-center gap-1 mt-1">
-              <small *ngIf="isFieldInvalid('resumen')" class="p-error text-xs md:text-sm">
-                {{ getFieldError('resumen') }}
-              </small>
-              <small class="text-500 text-xs md:text-sm">
-                {{ perfilForm.get('resumen')?.value?.length || 0 }}/500 caracteres
-              </small>
-            </div>
-          </div>
-        </div>
 
         <!-- Sección: Información Profesional para Métricas -->
         <div class="mb-4 md:mb-6">
@@ -306,20 +338,40 @@
             </div>
 
             <!-- Nivel de Educación -->
-            <div class="col-12 md:col-6">
+            <div class="col-12">
               <div class="field mb-3 md:mb-4">
                 <label for="nivel_educacion" class="block text-900 font-medium mb-2 text-sm md:text-base">
                   <i class="pi pi-book mr-2 text-primary"></i>
                   Nivel de Educación <span class="text-red-500 font-bold">*</span>
+                  <small class="text-500 font-normal text-xs sm:text-sm ml-1">(Puede seleccionar múltiples opciones)</small>
                 </label>
-                <p-dropdown
+                <p-multiSelect
                   id="nivel_educacion"
                   formControlName="nivel_educacion"
                   [options]="nivelesEducacion"
-                  placeholder="Seleccione su nivel de educación"
+                  placeholder="Seleccione sus niveles de educación"
                   [class]="'w-full ' + (isFieldInvalid('nivel_educacion') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full">
-                </p-dropdown>
+                  styleClass="w-full"
+                  (onChange)="onNivelEducacionChange($event.value)">
+                </p-multiSelect>
+                
+                <!-- Campo para "Otra especialización" -->
+                <div *ngIf="showNivelEducacionOtro" class="mt-3">
+                  <label for="nivel_educacion_otro" class="block text-900 font-medium mb-2 text-sm">
+                    Especifique su otra especialización <span class="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    pInputText
+                    id="nivel_educacion_otro"
+                    formControlName="nivel_educacion_otro"
+                    placeholder="Escriba su especialización"
+                    [class]="'w-full ' + (isFieldInvalid('nivel_educacion_otro') ? 'p-invalid' : '')"
+                    type="text">
+                  <small *ngIf="isFieldInvalid('nivel_educacion_otro')" class="p-error block mt-1 text-xs md:text-sm">
+                    {{ getFieldError('nivel_educacion_otro') }}
+                  </small>
+                </div>
+                
                 <small *ngIf="isFieldInvalid('nivel_educacion')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('nivel_educacion') }}
                 </small>
@@ -331,16 +383,39 @@
               <div class="field mb-3 md:mb-4">
                 <label for="especialidad_tecnica" class="block text-900 font-medium mb-2 text-sm md:text-base">
                   <i class="pi pi-code mr-2 text-primary"></i>
-                  Especialidad Técnica Principal <span class="text-red-500 font-bold">*</span>
+                  Tecnologías Dominadas <span class="text-red-500 font-bold">*</span>
+                  <small class="block text-600 font-normal mt-1">Seleccione todas las tecnologías que domina</small>
                 </label>
-                <p-dropdown
+                <p-multiSelect
                   id="especialidad_tecnica"
                   formControlName="especialidad_tecnica"
                   [options]="especialidadesTecnicas"
-                  placeholder="Seleccione su especialidad principal"
+                  placeholder="Seleccione las tecnologías que domina"
                   [class]="'w-full ' + (isFieldInvalid('especialidad_tecnica') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full">
-                </p-dropdown>
+                  styleClass="w-full"
+                  [showToggleAll]="false"
+                  [maxSelectedLabels]="3"
+                  selectedItemsLabel="{0} tecnologías seleccionadas"
+                  (onChange)="onEspecialidadChange($event.value)">
+                </p-multiSelect>
+                
+                <!-- Campo para especialidad "Otro" -->
+                <div *ngIf="showEspecialidadOtro" class="mt-3">
+                  <label for="especialidad_tecnica_otro" class="block text-900 font-medium mb-2 text-sm">
+                    Especifique otras tecnologías <span class="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    pInputText
+                    id="especialidad_tecnica_otro"
+                    formControlName="especialidad_tecnica_otro"
+                    placeholder="Escriba otras tecnologías separadas por comas"
+                    [class]="'w-full ' + (isFieldInvalid('especialidad_tecnica_otro') ? 'p-invalid' : '')"
+                    type="text">
+                  <small *ngIf="isFieldInvalid('especialidad_tecnica_otro')" class="p-error block mt-1 text-xs md:text-sm">
+                    {{ getFieldError('especialidad_tecnica_otro') }}
+                  </small>
+                </div>
+                
                 <small *ngIf="isFieldInvalid('especialidad_tecnica')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('especialidad_tecnica') }}
                 </small>
@@ -360,8 +435,27 @@
                   [options]="tiposEmpleo"
                   placeholder="Seleccione su situación laboral actual"
                   [class]="'w-full ' + (isFieldInvalid('tipo_empleo_actual') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full">
+                  styleClass="w-full"
+                  (onChange)="onTipoEmpleoChange($event.value)">
                 </p-dropdown>
+                
+                <!-- Campo para tipo de empleo "Otro" -->
+                <div *ngIf="showTipoEmpleoOtro" class="mt-3">
+                  <label for="tipo_empleo_otro" class="block text-900 font-medium mb-2 text-sm">
+                    Especifique su tipo de empleo <span class="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    pInputText
+                    id="tipo_empleo_otro"
+                    formControlName="tipo_empleo_otro"
+                    placeholder="Escriba su tipo de empleo"
+                    [class]="'w-full ' + (isFieldInvalid('tipo_empleo_otro') ? 'p-invalid' : '')"
+                    type="text">
+                  <small *ngIf="isFieldInvalid('tipo_empleo_otro')" class="p-error block mt-1 text-xs md:text-sm">
+                    {{ getFieldError('tipo_empleo_otro') }}
+                  </small>
+                </div>
+                
                 <small *ngIf="isFieldInvalid('tipo_empleo_actual')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('tipo_empleo_actual') }}
                 </small>
@@ -381,8 +475,27 @@
                   [options]="areasInteres"
                   placeholder="Seleccione su área de interés principal"
                   [class]="'w-full ' + (isFieldInvalid('area_interes') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full">
+                  styleClass="w-full"
+                  (onChange)="onAreaInteresChange($event.value)">
                 </p-dropdown>
+                
+                <!-- Campo para área de interés "Otro" -->
+                <div *ngIf="showAreaInteresOtro" class="mt-3">
+                  <label for="area_interes_otro" class="block text-900 font-medium mb-2 text-sm">
+                    Especifique su área de interés <span class="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    pInputText
+                    id="area_interes_otro"
+                    formControlName="area_interes_otro"
+                    placeholder="Escriba su área de interés"
+                    [class]="'w-full ' + (isFieldInvalid('area_interes_otro') ? 'p-invalid' : '')"
+                    type="text">
+                  <small *ngIf="isFieldInvalid('area_interes_otro')" class="p-error block mt-1 text-xs md:text-sm">
+                    {{ getFieldError('area_interes_otro') }}
+                  </small>
+                </div>
+                
                 <small *ngIf="isFieldInvalid('area_interes')" class="p-error block mt-1 text-xs md:text-sm">
                   {{ getFieldError('area_interes') }}
                 </small>
@@ -412,16 +525,16 @@
           </div>
         </div>
 
-        <!-- Sección: Información Opcional -->
+        <!-- Sección: Información Complementaria -->
         <div class="mb-4 md:mb-6">
           <div class="flex flex-column sm:flex-row align-items-start sm:align-items-center gap-3 mb-4">
-            <div class="flex align-items-center justify-content-center border-circle bg-secondary text-white flex-shrink-0"
+            <div class="flex align-items-center justify-content-center border-circle bg-orange-500 text-white flex-shrink-0"
                  style="width: 2.5rem; height: 2.5rem;">
-              <i class="pi pi-info-circle text-base md:text-lg"></i>
+              <i class="pi pi-exclamation-triangle text-base md:text-lg"></i>
             </div>
             <div class="flex-1">
-              <h3 class="text-lg md:text-xl font-semibold text-900 m-0">Información Opcional</h3>
-              <p class="text-600 m-0 text-xs sm:text-sm">Datos adicionales para análisis más detallados</p>
+              <h3 class="text-lg md:text-xl font-semibold text-900 m-0">Información Complementaria</h3>
+              <p class="text-600 m-0 text-xs sm:text-sm">Datos obligatorios para generar estadísticas precisas del mercado laboral</p>
             </div>
           </div>
 
@@ -431,15 +544,19 @@
               <div class="field mb-3 md:mb-4">
                 <label for="rango_salarial" class="block text-900 font-medium mb-2 text-sm md:text-base">
                   <i class="pi pi-dollar mr-2 text-primary"></i>
-                  Rango Salarial (CLP mensual)
+                  Rango Salarial (CLP mensual) <span class="text-red-500 font-bold">*</span>
                 </label>
                 <p-dropdown
                   id="rango_salarial"
                   formControlName="rango_salarial"
                   [options]="rangosSalariales"
-                  placeholder="Seleccione su rango salarial (opcional)"
+                  placeholder="Seleccione su rango salarial"
+                  [class]="'w-full ' + (isFieldInvalid('rango_salarial') ? 'ng-invalid ng-dirty' : '')"
                   styleClass="w-full">
                 </p-dropdown>
+                <small *ngIf="isFieldInvalid('rango_salarial')" class="p-error block mt-1 text-xs md:text-sm">
+                  {{ getFieldError('rango_salarial') }}
+                </small>
                 <small class="text-500 block mt-1 text-xs md:text-sm">
                   <i class="pi pi-shield mr-1"></i>
                   Esta información es completamente anónima y se usa solo para estadísticas generales
@@ -452,16 +569,20 @@
               <div class="field mb-3 md:mb-4">
                 <label for="satisfaccion_laboral" class="block text-900 font-medium mb-2 text-sm md:text-base">
                   <i class="pi pi-star mr-2 text-primary"></i>
-                  Satisfacción Laboral Actual
+                  Satisfacción Laboral Actual <span class="text-red-500 font-bold">*</span>
                 </label>
                 <div class="flex justify-content-center md:justify-content-start">
                   <p-rating
                     id="satisfaccion_laboral"
                     formControlName="satisfaccion_laboral"
                     [stars]="5"
-                    [cancel]="false">
+                    [cancel]="false"
+                    [class]="isFieldInvalid('satisfaccion_laboral') ? 'ng-invalid ng-dirty' : ''">
                   </p-rating>
                 </div>
+                <small *ngIf="isFieldInvalid('satisfaccion_laboral')" class="p-error block mt-1 text-xs md:text-sm text-center md:text-left">
+                  {{ getFieldError('satisfaccion_laboral') }}
+                </small>
                 <small class="text-500 block mt-1 text-xs md:text-sm text-center md:text-left">
                   <i class="pi pi-info-circle mr-1"></i>
                   Califique del 1 al 5 su nivel de satisfacción en su trabajo actual

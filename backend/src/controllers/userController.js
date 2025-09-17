@@ -224,8 +224,8 @@ const obtenerMiPerfil = async (req, res) => {
       // Nuevos campos para métricas
       perfil_completo: user.perfil_completo || false,
       años_experiencia: user.años_experiencia,
-      nivel_educacion: user.nivel_educacion,
-      especialidad_tecnica: user.especialidad_tecnica,
+      nivel_educacion: user.nivel_educacion ? (typeof user.nivel_educacion === 'string' ? JSON.parse(user.nivel_educacion) : user.nivel_educacion) : null,
+      especialidad_tecnica: user.especialidad_tecnica ? (typeof user.especialidad_tecnica === 'string' ? JSON.parse(user.especialidad_tecnica) : user.especialidad_tecnica) : null,
       tipo_empleo_actual: user.tipo_empleo_actual,
       rango_salarial: user.rango_salarial,
       disponibilidad_cambio: user.disponibilidad_cambio,
@@ -262,12 +262,16 @@ const actualizarMiPerfil = async (req, res) => {
       // Nuevos campos para métricas
       años_experiencia,
       nivel_educacion,
+      nivel_educacion_otro,
       especialidad_tecnica,
+      especialidad_tecnica_otro,
       tipo_empleo_actual,
+      tipo_empleo_otro,
       rango_salarial,
       disponibilidad_cambio,
       tecnologias_principales,
       area_interes,
+      area_interes_otro,
       satisfaccion_laboral
     } = req.body;
 
@@ -285,6 +289,33 @@ const actualizarMiPerfil = async (req, res) => {
       rango_salarial, disponibilidad_cambio, area_interes
     });
 
+    // Manejar campos "otro" personalizados
+    let especialidadFinal = especialidad_tecnica;
+    if (Array.isArray(especialidad_tecnica) && especialidad_tecnica.includes('Otro') && especialidad_tecnica_otro?.trim()) {
+      // Reemplazar "Otro" con el valor personalizado y convertir otras tecnologías separadas por comas
+      const otrasEspecialidades = especialidad_tecnica_otro.trim().split(',').map(tech => tech.trim()).filter(tech => tech);
+      especialidadFinal = especialidad_tecnica.filter(tech => tech !== 'Otro').concat(otrasEspecialidades);
+    }
+
+    let tipoEmpleoFinal = tipo_empleo_actual?.trim() || null;
+    if (tipo_empleo_actual === 'Otro' && tipo_empleo_otro?.trim()) {
+      tipoEmpleoFinal = tipo_empleo_otro.trim();
+    }
+
+    let areaInteresFinal = area_interes?.trim() || null;
+    if (area_interes === 'Otro' && area_interes_otro?.trim()) {
+      areaInteresFinal = area_interes_otro.trim();
+    }
+
+    // Manejar nivel de educación con "Otra especialización"
+    let nivelEducacionFinal = nivel_educacion;
+    if (Array.isArray(nivel_educacion) && nivel_educacion.includes('Otra especialización') && nivel_educacion_otro?.trim()) {
+      // Reemplazar "Otra especialización" con el valor personalizado
+      nivelEducacionFinal = nivel_educacion.map(nivel => 
+        nivel === 'Otra especialización' ? nivel_educacion_otro.trim() : nivel
+      );
+    }
+
     // Actualizar datos del usuario
     const datosActualizados = {
       nombre: nombre.trim(),
@@ -295,13 +326,13 @@ const actualizarMiPerfil = async (req, res) => {
       industria: industria?.trim() || null,
       // Nuevos campos para métricas
       años_experiencia: años_experiencia !== undefined ? parseInt(años_experiencia) : null,
-      nivel_educacion: nivel_educacion?.trim() || null,
-      especialidad_tecnica: especialidad_tecnica?.trim() || null,
-      tipo_empleo_actual: tipo_empleo_actual?.trim() || null,
+      nivel_educacion: Array.isArray(nivelEducacionFinal) ? JSON.stringify(nivelEducacionFinal) : (nivelEducacionFinal?.trim() || null),
+      especialidad_tecnica: Array.isArray(especialidadFinal) ? JSON.stringify(especialidadFinal) : (especialidadFinal?.trim() || null),
+      tipo_empleo_actual: tipoEmpleoFinal,
       rango_salarial: rango_salarial?.trim() || null,
       disponibilidad_cambio: disponibilidad_cambio?.trim() || null,
       tecnologias_principales: Array.isArray(tecnologias_principales) ? tecnologias_principales : null,
-      area_interes: area_interes?.trim() || null,
+      area_interes: areaInteresFinal,
       satisfaccion_laboral: satisfaccion_laboral !== undefined && satisfaccion_laboral !== '' ? parseInt(satisfaccion_laboral) : null
     };
 

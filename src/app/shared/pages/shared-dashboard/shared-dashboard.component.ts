@@ -1299,28 +1299,10 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         labels: datos.map(item => item.rangoExperiencia),
         datasets: [
           {
-            label: 'Promedio de Tecnologías',
+            label: 'Promedio de Tecnologías Dominadas',
             data: datos.map(item => item.promedioTecnologias),
             backgroundColor: '#3B82F6',
             borderColor: '#2563EB',
-            borderWidth: 2,
-            borderRadius: 6,
-            borderSkipped: false
-          },
-          {
-            label: 'Mediana de Tecnologías',
-            data: datos.map(item => item.mediaTecnologias),
-            backgroundColor: '#10B981',
-            borderColor: '#059669',
-            borderWidth: 2,
-            borderRadius: 6,
-            borderSkipped: false
-          },
-          {
-            label: 'Máximo de Tecnologías',
-            data: datos.map(item => item.maxTecnologias),
-            backgroundColor: '#F59E0B',
-            borderColor: '#D97706',
             borderWidth: 2,
             borderRadius: 6,
             borderSkipped: false
@@ -1421,17 +1403,11 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 const dataIndex = context.dataIndex;
                 const item = datos[dataIndex];
                 
-                if (context.datasetIndex === 0) {
-                  return [
-                    `Promedio: ${item.promedioTecnologias} tecnologías`,
-                    `Profesionales: ${item.cantidad}`,
-                    `Rango: ${item.minTecnologias} - ${item.maxTecnologias} tecnologías`
-                  ];
-                } else if (context.datasetIndex === 1) {
-                  return `Mediana: ${item.mediaTecnologias} tecnologías`;
-                } else {
-                  return `Máximo: ${item.maxTecnologias} tecnologías`;
-                }
+                return [
+                  `Promedio: ${item.promedioTecnologias} tecnologías`,
+                  `Profesionales: ${item.cantidad}`,
+                  `Rango de experiencia: ${item.rangoExperiencia}`
+                ];
               },
               afterBody: function(tooltipItems) {
                 const item = datos[tooltipItems[0].dataIndex];
@@ -1619,7 +1595,12 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   }
 
   private renderDisponibilidadCambioChart() {
-    if (!this.disponibilidadCambioTrabajo?.datos?.length) return;
+    if (!this.disponibilidadCambioTrabajo?.datos) {
+      console.warn('No hay datos de disponibilidad para renderizar el gráfico');
+      return;
+    }
+    
+    console.log('📊 Datos de disponibilidad recibidos para renderizar:', this.disponibilidadCambioTrabajo.datos);
 
     const canvas = document.getElementById('disponibilidadCambioChart') as HTMLCanvasElement;
     if (!canvas) return;
@@ -1639,7 +1620,8 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       'Activamente buscando': '#EF4444', // Rojo - alta urgencia
       'Abierto a oportunidades': '#10B981', // Verde - disponible
       'No seguro': '#F59E0B', // Ámbar - indeciso
-      'No disponible': '#6B7280' // Gris - no disponible
+      'No disponible': '#6B7280', // Gris - no disponible
+      'Sin trabajo': '#DC2626' // Rojo oscuro - sin empleo
     };
 
     const backgroundColors = datos.map(item => coloresDisponibilidad[item.disponibilidad as keyof typeof coloresDisponibilidad] || '#8B5CF6');

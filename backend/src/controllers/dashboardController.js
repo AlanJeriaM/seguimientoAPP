@@ -10,7 +10,7 @@ const obtenerEstadisticasMercado = async (req, res) => {
     const inicioMes = new Date();
     inicioMes.setDate(1);
     inicioMes.setHours(0, 0, 0, 0);
-
+    
     const nuevosProfesionalesEsteMes = await User.count({
       where: {
         activo: true,
@@ -56,10 +56,10 @@ const obtenerEstadisticasMercado = async (req, res) => {
       : 100;
 
     const estadisticas = {
-      totalProfesionales,
-      nuevosProfesionalesEsteMes,
-      empresasUnicas,
-      industriasUnicas,
+        totalProfesionales,
+        nuevosProfesionalesEsteMes,
+        empresasUnicas,
+        industriasUnicas,
       porcentajeCrecimiento
     };
 
@@ -133,12 +133,50 @@ const obtenerMetricasAvanzadas = async (req, res) => {
     });
 
     // 2. Distribución por nivel de educación
-    const distribucionEducacion = ['Técnico', 'Licenciatura', 'Maestría', 'Doctorado', 'Otro'].map(nivel => {
-      const cantidad = usuariosActivos.filter(user => user.nivel_educacion === nivel).length;
+    const nivelesDisponibles = [
+      'Diplomado',
+      'Postítulo', 
+      'Magíster Profesional',
+      'Magíster Académico',
+      'Doctorado',
+      'Sin especialización',
+      'Otra especialización'
+    ];
+    
+    const distribucionEducacion = nivelesDisponibles.map(nivel => {
+      const cantidad = usuariosActivos.filter(user => {
+        if (!user.nivel_educacion) return false;
+        
+        // Parsear el JSON si es string, o usar directamente si es array
+        let nivelesEducacion;
+        try {
+          if (typeof user.nivel_educacion === 'string') {
+            // Intentar parsear como JSON, si falla, tratar como string individual
+            if (user.nivel_educacion.startsWith('[') && user.nivel_educacion.endsWith(']')) {
+              nivelesEducacion = JSON.parse(user.nivel_educacion);
+            } else {
+              // Es un string individual (datos antiguos), convertir a array
+              nivelesEducacion = [user.nivel_educacion];
+            }
+          } else if (Array.isArray(user.nivel_educacion)) {
+            nivelesEducacion = user.nivel_educacion;
+          } else {
+            return false;
+          }
+        } catch (error) {
+          console.log('Error parsing nivel_educacion:', user.nivel_educacion, 'Error:', error.message);
+          // Si hay error, tratar como string individual
+          nivelesEducacion = [user.nivel_educacion];
+        }
+        
+        // Verificar si el nivel está en el array
+        return Array.isArray(nivelesEducacion) && nivelesEducacion.includes(nivel);
+      }).length;
+      
       return {
         nivel,
         cantidad,
-        porcentaje: Math.round((cantidad / totalUsuarios) * 100)
+        porcentaje: totalUsuarios > 0 ? Math.round((cantidad / totalUsuarios) * 100) : 0
       };
     }).filter(item => item.cantidad > 0);
 
@@ -186,12 +224,12 @@ const obtenerMetricasAvanzadas = async (req, res) => {
       .sort((a, b) => b.cantidad - a.cantidad);
 
     // 6. Tipos de empleo
-    const tiposEmpleo = ['Tiempo completo', 'Part-time', 'Freelance', 'Desempleado', 'Estudiante'].map(tipo => {
+    const tiposEmpleo = ['Tiempo completo', 'Part-time', 'Freelance', 'Desempleado', 'Estudiante', 'Otro'].map(tipo => {
       const cantidad = usuariosActivos.filter(user => user.tipo_empleo_actual === tipo).length;
       return {
         tipo,
         cantidad,
-        porcentaje: Math.round((cantidad / totalUsuarios) * 100)
+        porcentaje: totalUsuarios > 0 ? Math.round((cantidad / totalUsuarios) * 100) : 0
       };
     }).filter(item => item.cantidad > 0);
 
@@ -231,9 +269,33 @@ const obtenerTecnologiasMasDemandadas = async (req, res) => {
     });
 
     const tecnologiaCount = {};
+    
     tecnologias.forEach(user => {
-      const tech = user.especialidad_tecnica;
-      tecnologiaCount[tech] = (tecnologiaCount[tech] || 0) + 1;
+      let techs = user.especialidad_tecnica;
+      
+      // Si es string, intentar parsearlo como JSON
+      if (typeof techs === 'string') {
+        try {
+          techs = JSON.parse(techs);
+        } catch (e) {
+          // Si no es JSON válido, tratarlo como una sola tecnología
+          techs = [techs];
+        }
+      }
+      
+      // Si es array, procesar cada tecnología
+      if (Array.isArray(techs)) {
+        techs.forEach(tech => {
+          if (tech && tech.trim()) {
+            const techName = tech.trim();
+            tecnologiaCount[techName] = (tecnologiaCount[techName] || 0) + 1;
+          }
+        });
+      } else if (techs && techs.trim()) {
+        // Si no es array, es una sola tecnología
+        const techName = techs.trim();
+        tecnologiaCount[techName] = (tecnologiaCount[techName] || 0) + 1;
+      }
     });
 
     const tecnologiasDemandadas = Object.entries(tecnologiaCount)
@@ -290,7 +352,7 @@ const obtenerDistribucionSalarial = async (req, res) => {
 
       if (!distribuciones[industria]) {
         distribuciones[industria] = {
-          industria,
+        industria,
           cantidad: 0,
           salariosTotales: 0,
           salarios: []
@@ -422,7 +484,7 @@ const obtenerTendenciasMercado = async (req, res) => {
   try {
     const ultimosSeisMeses = [];
     const fechaActual = new Date();
-
+    
     // Calcular datos reales para los últimos 6 meses
     for (let i = 5; i >= 0; i--) {
       const fecha = new Date(fechaActual);
@@ -776,21 +838,60 @@ const obtenerDistribucionExperiencia = async (req, res) => {
 // Obtener relación entre experiencia y número de tecnologías dominadas
 const obtenerExperienciaVsTecnologias = async (req, res) => {
   try {
-    // Obtener usuarios activos con experiencia y tecnologías definidas
+    // Obtener usuarios activos con experiencia y especialidad técnica definidas
     const usuarios = await User.findAll({
       where: {
         activo: true,
         años_experiencia: { [Op.not]: null },
-        tecnologias_principales: {
+        especialidad_tecnica: {
           [Op.not]: null,
-          [Op.ne]: '[]',
           [Op.ne]: ''
         }
       },
-      attributes: ['años_experiencia', 'tecnologias_principales']
+      attributes: ['años_experiencia', 'especialidad_tecnica']
     });
 
-    console.log(`Usuarios encontrados para experiencia vs tecnologías: ${usuarios.length}`);
+    console.log(`🔍 Usuarios encontrados para experiencia vs tecnologías: ${usuarios.length}`);
+    
+    if (usuarios.length === 0) {
+      console.log('⚠️ No hay usuarios con especialidad técnica definida');
+      return res.json({
+        ok: true,
+        experienciaVsTecnologias: {
+          datos: [],
+          resumen: {
+            totalProfesionales: 0,
+            promedioGeneralTecnologias: 0,
+            maxTecnologiasEncontradas: 0,
+            rangoConMasTecnologias: null
+          }
+        }
+      });
+    }
+
+    // Función para contar tecnologías reales desde el array de especialidades
+    const contarTecnologiasReales = (especialidades) => {
+      if (!especialidades) return 0;
+      
+      // Si es string, intentar parsearlo como JSON
+      let techs = especialidades;
+      if (typeof especialidades === 'string') {
+        try {
+          techs = JSON.parse(especialidades);
+        } catch (e) {
+          // Si no es JSON válido, tratarlo como una sola tecnología
+          return 1;
+        }
+      }
+      
+      // Si es array, contar las tecnologías
+      if (Array.isArray(techs)) {
+        return techs.length;
+      }
+      
+      // Si no es array, es una sola tecnología
+      return 1;
+    };
 
     // Definir los mismos rangos de experiencia
     const rangosExperiencia = [
@@ -821,16 +922,10 @@ const obtenerExperienciaVsTecnologias = async (req, res) => {
         };
       }
 
-      // Contar tecnologías por usuario
+      // Contar tecnologías reales por usuario basándose en las especialidades seleccionadas
       const conteosTecnologias = usuariosEnRango.map(user => {
-        try {
-          const tecnologias = JSON.parse(user.tecnologias_principales || '[]');
-          return Array.isArray(tecnologias) ? tecnologias.length : 0;
-        } catch (error) {
-          console.warn('Error parseando tecnologías:', user.tecnologias_principales);
-          return 0;
-        }
-      }).filter(count => count > 0);
+        return contarTecnologiasReales(user.especialidad_tecnica);
+      });
 
       if (conteosTecnologias.length === 0) {
         return {
@@ -838,10 +933,7 @@ const obtenerExperienciaVsTecnologias = async (req, res) => {
           añosMinimos: rango.min,
           añosMaximos: rango.max,
           cantidad: usuariosEnRango.length,
-          promedioTecnologias: 0,
-          mediaTecnologias: 0,
-          maxTecnologias: 0,
-          minTecnologias: 0
+          promedioTecnologias: 0
         };
       }
 
@@ -849,37 +941,20 @@ const obtenerExperienciaVsTecnologias = async (req, res) => {
         (conteosTecnologias.reduce((sum, count) => sum + count, 0) / conteosTecnologias.length) * 10
       ) / 10;
 
-      const maxTecnologias = Math.max(...conteosTecnologias);
-      const minTecnologias = Math.min(...conteosTecnologias);
-
-      // Calcular mediana
-      const ordenados = conteosTecnologias.sort((a, b) => a - b);
-      const mediaTecnologias = ordenados.length % 2 === 0
-        ? Math.round(((ordenados[ordenados.length / 2 - 1] + ordenados[ordenados.length / 2]) / 2) * 10) / 10
-        : ordenados[Math.floor(ordenados.length / 2)];
-
       return {
         rangoExperiencia: rango.label,
         añosMinimos: rango.min,
         añosMaximos: rango.max,
         cantidad: usuariosEnRango.length,
-        promedioTecnologias,
-        mediaTecnologias,
-        maxTecnologias,
-        minTecnologias
+        promedioTecnologias
       };
     }).filter(item => item.cantidad > 0);
 
     console.log('Análisis experiencia vs tecnologías calculado:', experienciaVsTecnologias);
 
-    // Calcular estadísticas generales
+    // Calcular estadísticas generales usando especialidades reales
     const todosTecnologiasCounts = usuarios.map(user => {
-      try {
-        const tecnologias = JSON.parse(user.tecnologias_principales || '[]');
-        return Array.isArray(tecnologias) ? tecnologias.length : 0;
-      } catch (error) {
-        return 0;
-      }
+      return contarTecnologiasReales(user.especialidad_tecnica);
     }).filter(count => count > 0);
 
     const promedioGeneralTecnologias = todosTecnologiasCounts.length > 0
@@ -890,7 +965,7 @@ const obtenerExperienciaVsTecnologias = async (req, res) => {
       ? Math.round(usuarios.reduce((sum, u) => sum + u.años_experiencia, 0) / usuarios.length)
       : 0;
 
-    res.json({
+    const respuesta = {
       ok: true,
       experienciaVsTecnologias: {
         datos: experienciaVsTecnologias,
@@ -902,7 +977,12 @@ const obtenerExperienciaVsTecnologias = async (req, res) => {
           rangosConDatos: experienciaVsTecnologias.length
         }
       }
-    });
+    };
+
+    console.log('📊 Análisis experiencia vs tecnologías calculado:', experienciaVsTecnologias);
+    console.log(`📈 Respuesta completa - Rangos con datos: ${experienciaVsTecnologias.length}, Total profesionales: ${usuarios.length}`);
+
+    res.json(respuesta);
 
   } catch (error) {
     console.error('Error en obtenerExperienciaVsTecnologias:', error);
@@ -1058,7 +1138,8 @@ const obtenerDisponibilidadCambioTrabajo = async (req, res) => {
       'Activamente buscando',
       'Abierto a oportunidades',
       'No seguro',
-      'No disponible'
+      'No disponible',
+      'Sin trabajo'
     ];
 
     // Contar usuarios por cada opción de disponibilidad
@@ -1075,18 +1156,21 @@ const obtenerDisponibilidadCambioTrabajo = async (req, res) => {
         cantidad,
         porcentaje
       };
-    }).filter(item => item.cantidad > 0); // Solo opciones con usuarios
+    }); // Mostrar todas las opciones, incluso las con 0 usuarios
 
     console.log('💼 Distribución de disponibilidad calculada:', distribucionDisponibilidad);
+    console.log('🔍 Opciones disponibles (incluyendo las con 0 usuarios):', opcionesDisponibilidad);
+    console.log('📊 Total de opciones en respuesta:', distribucionDisponibilidad.length);
 
     // Calcular estadísticas adicionales
     const usuariosActivos = distribucionDisponibilidad.find(item => item.disponibilidad === 'Activamente buscando')?.cantidad || 0;
     const usuariosAbiertos = distribucionDisponibilidad.find(item => item.disponibilidad === 'Abierto a oportunidades')?.cantidad || 0;
     const usuariosNoDisponibles = distribucionDisponibilidad.find(item => item.disponibilidad === 'No disponible')?.cantidad || 0;
+    const usuariosSinTrabajo = distribucionDisponibilidad.find(item => item.disponibilidad === 'Sin trabajo')?.cantidad || 0;
     const usuariosIndecisos = distribucionDisponibilidad.find(item => item.disponibilidad === 'No seguro')?.cantidad || 0;
 
-    // Calcular usuarios potencialmente disponibles (activos + abiertos)
-    const usuariosPotencialmenteDisponibles = usuariosActivos + usuariosAbiertos;
+    // Calcular usuarios potencialmente disponibles (activos + abiertos + sin trabajo)
+    const usuariosPotencialmenteDisponibles = usuariosActivos + usuariosAbiertos + usuariosSinTrabajo;
     const porcentajePotencialmenteDisponibles = usuarios.length > 0
       ? Math.round((usuariosPotencialmenteDisponibles / usuarios.length) * 100)
       : 0;
@@ -1098,7 +1182,7 @@ const obtenerDisponibilidadCambioTrabajo = async (req, res) => {
         )
       : null;
 
-    res.json({
+    const respuesta = {
       ok: true,
       disponibilidadCambio: {
         datos: distribucionDisponibilidad,
@@ -1107,6 +1191,7 @@ const obtenerDisponibilidadCambioTrabajo = async (req, res) => {
           usuariosActivos,
           usuariosAbiertos,
           usuariosNoDisponibles,
+          usuariosSinTrabajo,
           usuariosIndecisos,
           usuariosPotencialmenteDisponibles,
           porcentajePotencialmenteDisponibles,
@@ -1118,7 +1203,10 @@ const obtenerDisponibilidadCambioTrabajo = async (req, res) => {
           opcionesConDatos: distribucionDisponibilidad.length
         }
       }
-    });
+    };
+
+    console.log('🚀 RESPUESTA FINAL enviada al frontend:', JSON.stringify(respuesta, null, 2));
+    res.json(respuesta);
 
   } catch (error) {
     console.error('Error en obtenerDisponibilidadCambioTrabajo:', error);

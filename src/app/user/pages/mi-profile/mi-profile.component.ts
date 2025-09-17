@@ -49,6 +49,15 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   imageError = false;
   isCompletionMode = false; // Indica si estamos en modo de completar perfil obligatorio
 
+  // Propiedades para campos "otro"
+  showNivelEducacionOtro = false;
+  showEspecialidadOtro = false;
+  showTipoEmpleoOtro = false;
+  showAreaInteresOtro = false;
+
+  // Progreso del perfil
+  profileProgress = 0;
+
   // Opciones para dropdowns
   industriasOpciones = [
     'Tecnología de la información y servicios',
@@ -69,11 +78,13 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   // Nuevas opciones para campos de métricas
   nivelesEducacion = [
-    'Técnico',
-    'Licenciatura',
-    'Maestría',
+    'Diplomado',
+    'Postítulo',
+    'Magíster Profesional',
+    'Magíster Académico',
     'Doctorado',
-    'Otro'
+    'Sin especialización',
+    'Otra especialización'
   ];
 
   tiposEmpleo = [
@@ -81,7 +92,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Part-time',
     'Freelance',
     'Desempleado',
-    'Estudiante'
+    'Estudiante',
+    'Otro'
   ];
 
   rangosSalariales = [
@@ -98,7 +110,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Activamente buscando',
     'Abierto a oportunidades',
     'No disponible',
-    'No seguro'
+    'No seguro',
+    'Sin trabajo'
   ];
 
   areasInteres = [
@@ -187,6 +200,180 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  // Métodos para manejar campos "otro"
+  onNivelEducacionChange(selectedValues: string[]) {
+    this.showNivelEducacionOtro = selectedValues.includes('Otra especialización');
+    const otroControl = this.perfilForm.get('nivel_educacion_otro');
+    
+    if (this.showNivelEducacionOtro) {
+      // Hacer obligatorio cuando se muestra
+      otroControl?.setValidators([Validators.required]);
+    } else {
+      // Quitar validadores y limpiar valor cuando se oculta
+      otroControl?.clearValidators();
+      otroControl?.setValue('');
+    }
+    otroControl?.updateValueAndValidity();
+  }
+
+  onEspecialidadChange(value: string[]) {
+    this.showEspecialidadOtro = value && value.includes('Otro');
+    const otroControl = this.perfilForm.get('especialidad_tecnica_otro');
+    
+    if (this.showEspecialidadOtro) {
+      // Hacer obligatorio cuando se muestra
+      otroControl?.setValidators([Validators.required]);
+    } else {
+      // Quitar validadores y limpiar valor cuando se oculta
+      otroControl?.clearValidators();
+      otroControl?.setValue('');
+    }
+    otroControl?.updateValueAndValidity();
+  }
+
+  onTipoEmpleoChange(value: string) {
+    this.showTipoEmpleoOtro = value === 'Otro';
+    const otroControl = this.perfilForm.get('tipo_empleo_otro');
+    
+    if (this.showTipoEmpleoOtro) {
+      // Hacer obligatorio cuando se muestra
+      otroControl?.setValidators([Validators.required]);
+    } else {
+      // Quitar validadores y limpiar valor cuando se oculta
+      otroControl?.clearValidators();
+      otroControl?.setValue('');
+    }
+    otroControl?.updateValueAndValidity();
+  }
+
+  onAreaInteresChange(value: string) {
+    this.showAreaInteresOtro = value === 'Otro';
+    const otroControl = this.perfilForm.get('area_interes_otro');
+    
+    if (this.showAreaInteresOtro) {
+      // Hacer obligatorio cuando se muestra
+      otroControl?.setValidators([Validators.required]);
+    } else {
+      // Quitar validadores y limpiar valor cuando se oculta
+      otroControl?.clearValidators();
+      otroControl?.setValue('');
+    }
+    otroControl?.updateValueAndValidity();
+  }
+
+  // Calcular progreso del perfil
+  calculateProfileProgress(): number {
+    if (!this.perfilForm) return 0;
+
+    const requiredFields = [
+      'nombre',
+      'años_experiencia',
+      'nivel_educacion',
+      'especialidad_tecnica',
+      'tipo_empleo_actual',
+      'disponibilidad_cambio',
+      'area_interes',
+      'rango_salarial',
+      'satisfaccion_laboral'
+    ];
+
+    const optionalFields = [
+      'posicion_actual',
+      'empresa_actual',
+      'ubicacion',
+      'industria'
+    ];
+
+
+    let completedRequired = 0;
+    let completedOptional = 0;
+
+    // Evaluar campos obligatorios (80% del progreso)
+    requiredFields.forEach(field => {
+      const value = this.perfilForm.get(field)?.value;
+      let isCompleted = false;
+      
+      if (field === 'nivel_educacion' || field === 'especialidad_tecnica') {
+        // Para campos de array, verificar que tenga al menos un elemento
+        if (Array.isArray(value) && value.length > 0) {
+          isCompleted = true;
+          completedRequired++;
+        }
+      } else {
+        // Para otros campos, verificar que no estén vacíos y que no sean 0 para satisfaccion_laboral
+        if (value !== null && value !== undefined && value !== '') {
+          if (field === 'satisfaccion_laboral') {
+            // Para satisfacción laboral, aceptar cualquier número >= 1
+            if (typeof value === 'number' && value >= 1) {
+              isCompleted = true;
+              completedRequired++;
+            }
+          } else {
+            isCompleted = true;
+            completedRequired++;
+          }
+        }
+      }
+      
+    });
+
+    // Evaluar campos opcionales (20% del progreso)
+    optionalFields.forEach(field => {
+      const value = this.perfilForm.get(field)?.value;
+      let isCompleted = false;
+      
+      if (value && value !== '') {
+        isCompleted = true;
+        completedOptional++;
+      }
+      
+    });
+
+    // Calcular progreso: 80% campos obligatorios + 20% campos opcionales
+    const requiredProgress = (completedRequired / requiredFields.length) * 80;
+    const optionalProgress = (completedOptional / optionalFields.length) * 20;
+    const finalProgress = Math.round(requiredProgress + optionalProgress);
+    
+    
+    return finalProgress;
+  }
+
+  // Actualizar progreso cuando cambie el formulario
+  updateProgress() {
+    this.profileProgress = this.calculateProfileProgress();
+  }
+
+  // Métodos para el estado dinámico del perfil
+  getProfileStatusLabel(): string {
+    if (this.profileProgress === 100) {
+      return 'Perfil Completo';
+    } else if (this.profileProgress >= 80) {
+      return 'Casi Completo';
+    } else {
+      return 'Perfil Incompleto';
+    }
+  }
+
+  getProfileStatusSeverity(): 'success' | 'warning' | 'danger' | 'info' {
+    if (this.profileProgress === 100) {
+      return 'success';
+    } else if (this.profileProgress >= 80) {
+      return 'warning';
+    } else {
+      return 'danger';
+    }
+  }
+
+  getProfileStatusIcon(): string {
+    if (this.profileProgress === 100) {
+      return 'pi pi-check-circle';
+    } else if (this.profileProgress >= 80) {
+      return 'pi pi-clock';
+    } else {
+      return 'pi pi-exclamation-triangle';
+    }
+  }
+
   private initializeForm() {
     this.perfilForm = this.fb.group({
       // Campos básicos
@@ -198,15 +385,24 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       resumen: ['', [Validators.maxLength(500)]],
       // Nuevos campos obligatorios para métricas
       años_experiencia: ['', [Validators.required, Validators.min(0), Validators.max(50)]],
-      nivel_educacion: ['', [Validators.required]],
-      especialidad_tecnica: ['', [Validators.required]],
+      nivel_educacion: [[], [Validators.required]],
+      nivel_educacion_otro: [''],
+      especialidad_tecnica: [[], [Validators.required]],
+      especialidad_tecnica_otro: [''],
       tipo_empleo_actual: ['', [Validators.required]],
+      tipo_empleo_otro: [''],
       disponibilidad_cambio: ['', [Validators.required]],
       area_interes: ['', [Validators.required]],
-      // Campos opcionales
-      rango_salarial: [''],
+      area_interes_otro: [''],
+      // Campos complementarios obligatorios
+      rango_salarial: ['', [Validators.required]],
       tecnologias_principales: [[]],
-      satisfaccion_laboral: ['']
+      satisfaccion_laboral: ['', [Validators.required]]
+    });
+
+    // Suscribirse a cambios del formulario para actualizar progreso
+    this.perfilForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateProgress();
     });
   }
 
@@ -224,6 +420,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
             this.perfil = response.usuario;
             console.log('Perfil cargado:', this.perfil);
             this.populateForm();
+            this.updateProgress();
           } else {
             this.error = response.msj || 'Error al cargar el perfil';
             console.log('Error en respuesta:', this.error);
@@ -265,7 +462,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         // Nuevos campos para métricas
         años_experiencia: this.perfil.años_experiencia || '',
         nivel_educacion: this.perfil.nivel_educacion || '',
-        especialidad_tecnica: this.perfil.especialidad_tecnica || '',
+        especialidad_tecnica: this.perfil.especialidad_tecnica || [],
         tipo_empleo_actual: this.perfil.tipo_empleo_actual || '',
         disponibilidad_cambio: this.perfil.disponibilidad_cambio || '',
         area_interes: this.perfil.area_interes || '',

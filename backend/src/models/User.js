@@ -92,17 +92,17 @@ const User = sequelize.define('User', {
     comment: 'Años totales de experiencia profesional'
   },
   nivel_educacion: {
-    type: DataTypes.ENUM('Técnico', 'Licenciatura', 'Maestría', 'Doctorado', 'Otro'),
+    type: DataTypes.TEXT,
     allowNull: true,
-    comment: 'Nivel más alto de educación completado'
+    comment: 'Niveles de educación completados (JSON array)'
   },
   especialidad_tecnica: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
-    comment: 'Especialidad técnica principal (JavaScript, Python, Java, etc.)'
+    comment: 'Tecnologías dominadas por el usuario (JSON array)'
   },
   tipo_empleo_actual: {
-    type: DataTypes.ENUM('Tiempo completo', 'Part-time', 'Freelance', 'Desempleado', 'Estudiante'),
+    type: DataTypes.ENUM('Tiempo completo', 'Part-time', 'Freelance', 'Desempleado', 'Estudiante', 'Otro'),
     allowNull: true,
     comment: 'Tipo de empleo actual'
   },
@@ -112,7 +112,7 @@ const User = sequelize.define('User', {
     comment: 'Rango salarial mensual en CLP para análisis estadístico'
   },
   disponibilidad_cambio: {
-    type: DataTypes.ENUM('Activamente buscando', 'Abierto a oportunidades', 'No disponible', 'No seguro'),
+    type: DataTypes.ENUM('Activamente buscando', 'Abierto a oportunidades', 'No disponible', 'No seguro', 'Sin trabajo'),
     allowNull: true,
     comment: 'Disponibilidad para cambio de trabajo'
   },
