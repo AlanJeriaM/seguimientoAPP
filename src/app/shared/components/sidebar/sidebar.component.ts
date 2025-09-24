@@ -11,10 +11,12 @@ export class SidebarComponent {
 
   @Input() nameUser!: string; //Propiedad que recibe un valor del componente padre, en este caso el nombre del usuario.
   @Input() isAdmin: boolean = false; //Propiedad que indica si el usuario es administrador (true) o no (false). Por defecto, es false.
+  @Input() perfilImagenUrl?: string; //Propiedad que recibe la URL de la imagen de perfil de LinkedIn
 
 
   visibleSidebar: boolean = true; //Propiedad que controla la visibilidad del sidebar. Inicialmente, es true, lo que significa que el sidebar está visible.
   itemsPanelMenu: MenuItem[] = []; //Array que almacena los ítems del menú que se mostrarán en el sidebar.
+  imageError: boolean = false; //Propiedad para manejar errores de carga de imagen
 
   constructor(private primengConfig: PrimeNGConfig) {}
 
@@ -26,6 +28,21 @@ export class SidebarComponent {
   //Método que invierte el valor de visibleSidebar para alternar la visibilidad del sidebar.
   toggleSidebar() {
     this.visibleSidebar = !this.visibleSidebar;
+  }
+
+  //Método para manejar errores de carga de imagen
+  handleImageError(event: any) {
+    this.imageError = true;
+  }
+
+  //Método para obtener las iniciales del usuario
+  getUserInitials(): string {
+    if (!this.nameUser) return 'U';
+    const names = this.nameUser.trim().split(' ');
+    if (names.length === 1) {
+      return names[0].charAt(0).toUpperCase();
+    }
+    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
   }
 
 

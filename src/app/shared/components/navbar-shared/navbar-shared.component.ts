@@ -15,6 +15,7 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
   @ViewChild('notificationPanel') notificationPanel!: OverlayPanel;
 
   userName: string = '';
+  perfilImagenUrl: string = '';
   menuItems: MenuItem[] = [];
 
   // Propiedades para notificaciones
@@ -51,6 +52,7 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
       // Solo inicializar notificaciones para usuarios autenticados
       if (this.isUser()) {
         this.inicializarNotificaciones();
+        this.obtenerPerfilUsuario();
       }
     } else {
       // Usuario no autenticado - mostrar solo opciones básicas
@@ -79,6 +81,25 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
 
     // Inicializar el servicio
     this.notificacionService.inicializar();
+  }
+
+  private obtenerPerfilUsuario(): void {
+    this.authService.obtenerMiPerfil()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.usuario) {
+            this.perfilImagenUrl = response.usuario.perfil_imagen_url || '';
+            console.log('Perfil obtenido para sidebar:', {
+              nombre: response.usuario.nombre,
+              perfil_imagen_url: response.usuario.perfil_imagen_url
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener perfil para sidebar:', error);
+        }
+      });
   }
 
   // Método auxiliar para obtener la ruta de inicio
