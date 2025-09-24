@@ -4,7 +4,11 @@
     <div class="navbar-start">
       <!-- Sidebar solo cuando no es auth -->
       <div *ngIf="!isAuth()" class="sidebar-wrapper">
-        <app-sidebar [nameUser]="userName" [isAdmin]="isAdmin()"></app-sidebar>
+        <app-sidebar 
+          [nameUser]="userName" 
+          [isAdmin]="isAdmin()"
+          [perfilImagenUrl]="perfilImagenUrl">
+        </app-sidebar>
       </div>
 
       <!-- Logo y título -->

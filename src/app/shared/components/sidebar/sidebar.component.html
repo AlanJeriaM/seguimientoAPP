@@ -19,7 +19,29 @@
 
         <hr class="sidebar-divider" />
 
-        <img class="sidebar-image" [src]="isAdmin ? 'assets/icons/admin4.png' : 'assets/icons/egresado.png'" alt="sidebar image" width="96" height="96" />
+        <!-- Imagen de perfil con fallback -->
+        <div class="sidebar-image-container">
+          <img 
+            *ngIf="!isAdmin && perfilImagenUrl && !imageError"
+            [src]="perfilImagenUrl"
+            alt="Perfil de usuario"
+            class="sidebar-image"
+            (error)="handleImageError($event)"
+            width="96" 
+            height="96" />
+          <div 
+            *ngIf="!isAdmin && (!perfilImagenUrl || imageError)"
+            class="sidebar-image-fallback">
+            {{ getUserInitials() }}
+          </div>
+          <img 
+            *ngIf="isAdmin"
+            class="sidebar-image" 
+            [src]="'assets/icons/admin4.png'" 
+            alt="Administrador" 
+            width="96" 
+            height="96" />
+        </div>
         <h4 class="sidebar-username flex justify-content-center">
             {{ nameUser }}
         </h4>

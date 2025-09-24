@@ -46,14 +46,34 @@
   text-align: center;
 }
 
+.sidebar-image-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 8%;
+}
+
 .sidebar-image {
   display: block;
   margin: 0 auto;
-  border-radius: 30%;
-  border: 2px solid #2e2476;
-  margin-top: 8%;
+  border-radius: 50%;
   max-width: 100%;
   height: auto;
+  object-fit: cover;
+}
+
+.sidebar-image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 30%;
+  border: 2px solid #2e2476;
+  background-color: #376b9f;
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
 }
 
 /* @media (max-width: 768px) {
