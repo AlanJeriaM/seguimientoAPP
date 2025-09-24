@@ -148,6 +148,26 @@
   <div class="charts-section">
     <div class="grid">
 
+            <!-- Tendencias del Mercado -->
+            <div class="col-12">
+              <p-card styleClass="chart-card">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+                    <h3>Tendencias del Mercado Laboral</h3>
+              <p-tag
+                      value="Últimos 6 meses"
+                      severity="success"
+                styleClass="info-tag">
+              </p-tag>
+            </div>
+          </ng-template>
+
+                <div class="chart-container large-chart">
+                  <canvas id="tendenciasMercadoChart"></canvas>
+          </div>
+        </p-card>
+      </div>
+
 
       <!-- Distribución Salarial por Industria -->
       <div class="col-12 lg:col-12">
@@ -204,25 +224,6 @@
         </p-card>
       </div>
 
-      <!-- Tendencias del Mercado -->
-      <div class="col-12">
-        <p-card styleClass="chart-card">
-          <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Tendencias del Mercado Laboral</h3>
-              <p-tag
-                value="Últimos 6 meses"
-                severity="success"
-                styleClass="info-tag">
-              </p-tag>
-            </div>
-          </ng-template>
-
-          <div class="chart-container large-chart">
-            <canvas id="tendenciasMercadoChart"></canvas>
-          </div>
-        </p-card>
-      </div>
 
     </div>
   </div>
@@ -316,7 +317,7 @@
                     <div class="salary-range">
                       <span class="range-label">Rango salarial:</span>
                       <span class="range-value">
-                        {{ dist.salarioMinimo | currency:'CLP':'symbol':'1.0-0' }} -
+                        {{ dist.salarioMinimo | currency:'CLP':'symbol':'1.0-0' }} - 
                         {{ dist.salarioMaximo | currency:'CLP':'symbol':'1.0-0' }}
                       </span>
                     </div>
@@ -435,11 +436,11 @@
       <!-- Estadísticas de Experiencia -->
       <div class="col-12" *ngIf="distribucionExperienciaProfesionales">
         <p-card styleClass="info-card">
-          <ng-template pTemplate="header">
+      <ng-template pTemplate="header">
             <h3>Estadísticas del Mercado Laboral</h3>
-          </ng-template>
+      </ng-template>
 
-          <div class="grid">
+        <div class="grid">
             <div class="col-12 md:col-6 lg:col-4">
               <div class="metric-item">
                 <div class="metric-icon">
@@ -711,10 +712,10 @@
                 <div class="text-right">
                   <p class="text-2xl font-bold" style="color: #6B7280;">{{ disponibilidadCambioTrabajo.resumen.usuariosNoDisponibles }}</p>
                   <small class="text-500">profesionales</small>
-                </div>
               </div>
             </div>
-
+          </div>
+          
             <!-- Usuarios Sin Trabajo -->
             <div class="metric-item border-round p-3 mb-3" style="background: rgba(220, 38, 38, 0.1); border-left: 4px solid #DC2626;">
               <div class="flex align-items-center justify-content-between">
@@ -850,29 +851,33 @@
             </div>
           </ng-template>
           <div class="grid">
-            <div class="col-6 md:col-3">
+            <div class="col-12 sm:col-6 lg:col-4">
               <div class="metric-summary">
                 <h4>Total Profesionales</h4>
                 <p class="metric-value">{{ getTotalProfesionales() }}</p>
                 <small>Con perfil completo</small>
               </div>
             </div>
-            <div class="col-6 md:col-3" *ngIf="metricasAvanzadas.tecnologiasPopulares.length > 0">
+            <div class="col-12 sm:col-6 lg:col-4" *ngIf="metricasAvanzadas.tecnologiasPopulares.length > 0">
               <div class="metric-summary">
                 <h4>Top Tecnología</h4>
-                <p class="metric-value">{{ metricasAvanzadas.tecnologiasPopulares[0].tecnologia }}</p>
+                <p class="metric-value text-truncate" [title]="metricasAvanzadas.tecnologiasPopulares[0].tecnologia">
+                  {{ metricasAvanzadas.tecnologiasPopulares[0].tecnologia }}
+                </p>
                 <small>{{ metricasAvanzadas.tecnologiasPopulares[0].cantidad }} profesionales</small>
               </div>
             </div>
-            <div class="col-6 md:col-3" *ngIf="metricasAvanzadas.distribucionAreas.length > 0">
+            <div class="col-12 sm:col-6 lg:col-4" *ngIf="metricasAvanzadas.distribucionAreas.length > 0">
               <div class="metric-summary">
                 <h4>Área Principal</h4>
-                <p class="metric-value">{{ metricasAvanzadas.distribucionAreas[0].area }}</p>
+                <p class="metric-value text-truncate" [title]="metricasAvanzadas.distribucionAreas[0].area">
+                  {{ metricasAvanzadas.distribucionAreas[0].area }}
+                </p>
                 <small>{{ metricasAvanzadas.distribucionAreas[0].cantidad }} profesionales</small>
               </div>
-            </div>
-          </div>
-        </p-card>
+        </div>
+      </div>
+    </p-card>
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth/auth.service';
@@ -30,6 +30,7 @@ export interface PerfilUsuario {
   tecnologias_principales?: string[];
   area_interes?: string;
   satisfaccion_laboral?: number;
+  opciones_personalizadas_educacion?: string[];
 }
 
 @Component({
@@ -54,6 +55,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   showEspecialidadOtro = false;
   showTipoEmpleoOtro = false;
   showAreaInteresOtro = false;
+  
+  // Variables para agregar opciones personalizadas
+  showAddNivelEducacionDialog = false;
+  nuevaNivelEducacion: string = '';
+  opcionesPersonalizadasEducacion: string[] = []; // Opciones personalizadas del usuario
 
   // Progreso del perfil
   profileProgress = 0;
@@ -83,8 +89,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Magíster Profesional',
     'Magíster Académico',
     'Doctorado',
-    'Sin especialización',
-    'Otra especialización'
+    'Sin especialización'
   ];
 
   tiposEmpleo = [
@@ -170,7 +175,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private route: ActivatedRoute,
     private router: Router,
-    private profileGuard: ProfileCompletionGuard
+    private profileGuard: ProfileCompletionGuard,
+    private cdr: ChangeDetectorRef
   ) {
     this.initializeForm();
   }
@@ -202,18 +208,18 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   // Métodos para manejar campos "otro"
   onNivelEducacionChange(selectedValues: string[]) {
-    this.showNivelEducacionOtro = selectedValues.includes('Otra especialización');
-    const otroControl = this.perfilForm.get('nivel_educacion_otro');
-    
-    if (this.showNivelEducacionOtro) {
-      // Hacer obligatorio cuando se muestra
-      otroControl?.setValidators([Validators.required]);
-    } else {
-      // Quitar validadores y limpiar valor cuando se oculta
-      otroControl?.clearValidators();
-      otroControl?.setValue('');
+    // Si se selecciona "Sin especialización", deseleccionar todas las demás opciones
+    if (selectedValues.includes('Sin especialización')) {
+      this.perfilForm.get('nivel_educacion')?.setValue(['Sin especialización']);
     }
-    otroControl?.updateValueAndValidity();
+    
+    // Limpiar el campo "otro" ya que no existe más
+    const otroControl = this.perfilForm.get('nivel_educacion_otro');
+    if (otroControl) {
+      otroControl.clearValidators();
+      otroControl.setValue('');
+      otroControl.updateValueAndValidity();
+    }
   }
 
   onEspecialidadChange(value: string[]) {
@@ -259,6 +265,61 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       otroControl?.setValue('');
     }
     otroControl?.updateValueAndValidity();
+  }
+
+  // Métodos para agregar opciones personalizadas
+  agregarNivelEducacion() {
+    if (this.nuevaNivelEducacion?.trim()) {
+      const nuevaOpcion = this.nuevaNivelEducacion.trim();
+      
+      // Verificar que no exista ya en las opciones base ni personalizadas
+      if (!this.nivelesEducacion.includes(nuevaOpcion) && !this.opcionesPersonalizadasEducacion.includes(nuevaOpcion)) {
+        // Agregar a opciones personalizadas
+        this.opcionesPersonalizadasEducacion.push(nuevaOpcion);
+        
+        // Agregar a la lista completa para el dropdown
+        this.nivelesEducacion.push(nuevaOpcion);
+        
+        // Agregar la nueva opción a la selección actual
+        const valoresActuales = this.perfilForm.get('nivel_educacion')?.value || [];
+        this.perfilForm.get('nivel_educacion')?.setValue([...valoresActuales, nuevaOpcion]);
+        
+        // Limpiar y cerrar el diálogo
+        this.cancelarAgregarNivelEducacion();
+        
+        // Guardar las opciones personalizadas en el perfil
+        this.guardarOpcionesPersonalizadas();
+      } else {
+        // Mostrar mensaje de que ya existe
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Opción existente',
+          detail: 'Esta opción ya existe en la lista'
+        });
+      }
+    }
+  }
+
+  cancelarAgregarNivelEducacion() {
+    this.nuevaNivelEducacion = '';
+    this.showAddNivelEducacionDialog = false;
+  }
+
+  onNuevaNivelEducacionChange(event: any) {
+    this.nuevaNivelEducacion = event.target.value;
+    this.cdr.detectChanges(); // Forzar detección de cambios
+  }
+
+  get isNuevaNivelEducacionValid(): boolean {
+    return this.nuevaNivelEducacion.trim() !== '';
+  }
+
+  // Guardar opciones personalizadas en el perfil
+  private guardarOpcionesPersonalizadas() {
+    if (this.perfil) {
+      // Agregar las opciones personalizadas al perfil para persistencia
+      this.perfil.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
+    }
   }
 
   // Calcular progreso del perfil
@@ -451,6 +512,17 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       console.log('Fecha formateada:', this.getFormattedDate(this.perfil.fecha_registro));
       console.log('Último acceso:', this.perfil.ultimo_acceso);
 
+      // Cargar opciones personalizadas si existen
+      if (this.perfil.opciones_personalizadas_educacion) {
+        this.opcionesPersonalizadasEducacion = this.perfil.opciones_personalizadas_educacion;
+        // Agregar opciones personalizadas a la lista de niveles
+        this.opcionesPersonalizadasEducacion.forEach(opcion => {
+          if (!this.nivelesEducacion.includes(opcion)) {
+            this.nivelesEducacion.push(opcion);
+          }
+        });
+      }
+
       this.perfilForm.patchValue({
         // Campos básicos
         nombre: this.perfil.nombre || '',
@@ -489,8 +561,12 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   private guardarPerfil() {
     this.saving = true;
     const datosActualizados = this.perfilForm.value;
+    
+    // Agregar las opciones personalizadas de educación
+    datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
 
     console.log('Datos que se van a guardar:', datosActualizados);
+    console.log('Opciones personalizadas de educación:', this.opcionesPersonalizadasEducacion);
     console.log('Campos básicos a guardar:', {
       posicion_actual: datosActualizados.posicion_actual,
       empresa_actual: datosActualizados.empresa_actual,

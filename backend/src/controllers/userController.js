@@ -231,7 +231,8 @@ const obtenerMiPerfil = async (req, res) => {
       disponibilidad_cambio: user.disponibilidad_cambio,
       tecnologias_principales: user.tecnologias_principales,
       area_interes: user.area_interes,
-      satisfaccion_laboral: user.satisfaccion_laboral
+      satisfaccion_laboral: user.satisfaccion_laboral,
+      opciones_personalizadas_educacion: user.opciones_personalizadas_educacion ? (typeof user.opciones_personalizadas_educacion === 'string' ? JSON.parse(user.opciones_personalizadas_educacion) : user.opciones_personalizadas_educacion) : []
     };
 
     res.json({
@@ -272,7 +273,8 @@ const actualizarMiPerfil = async (req, res) => {
       tecnologias_principales,
       area_interes,
       area_interes_otro,
-      satisfaccion_laboral
+      satisfaccion_laboral,
+      opciones_personalizadas_educacion
     } = req.body;
 
     // Validaciones básicas
@@ -333,7 +335,8 @@ const actualizarMiPerfil = async (req, res) => {
       disponibilidad_cambio: disponibilidad_cambio?.trim() || null,
       tecnologias_principales: Array.isArray(tecnologias_principales) ? tecnologias_principales : null,
       area_interes: areaInteresFinal,
-      satisfaccion_laboral: satisfaccion_laboral !== undefined && satisfaccion_laboral !== '' ? parseInt(satisfaccion_laboral) : null
+      satisfaccion_laboral: satisfaccion_laboral !== undefined && satisfaccion_laboral !== '' ? parseInt(satisfaccion_laboral) : null,
+      opciones_personalizadas_educacion: Array.isArray(opciones_personalizadas_educacion) ? JSON.stringify(opciones_personalizadas_educacion) : null
     };
 
     // Verificar si todos los campos obligatorios están completos
@@ -387,7 +390,8 @@ const actualizarMiPerfil = async (req, res) => {
       disponibilidad_cambio: usuarioActualizado.disponibilidad_cambio,
       tecnologias_principales: usuarioActualizado.tecnologias_principales,
       area_interes: usuarioActualizado.area_interes,
-      satisfaccion_laboral: usuarioActualizado.satisfaccion_laboral
+      satisfaccion_laboral: usuarioActualizado.satisfaccion_laboral,
+      opciones_personalizadas_educacion: usuarioActualizado.opciones_personalizadas_educacion ? (typeof usuarioActualizado.opciones_personalizadas_educacion === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_educacion) : usuarioActualizado.opciones_personalizadas_educacion) : []
     };
 
     console.log(`Perfil actualizado para usuario ${usuarioActualizado.nombre} (ID: ${user.id})`);
@@ -784,6 +788,30 @@ const eliminarUsuarioPermanentemente = async (req, res) => {
       fecha_registro: user.created_at,
       fecha_eliminacion: user.updated_at
     };
+
+    // IMPORTANTE: Eliminar primero todas las entidades asociadas
+    // para evitar errores de restricción de clave foránea
+    const Notificacion = require('../models/Notificacion');
+    const Respuesta = require('../models/Respuesta');
+    const SesionEncuesta = require('../models/SesionEncuesta');
+
+    // Eliminar notificaciones
+    await Notificacion.destroy({
+      where: { usuario_id: id }
+    });
+    console.log(`Notificaciones eliminadas para usuario ID: ${id}`);
+
+    // Eliminar respuestas (aunque pueden ser anónimas, eliminamos las del usuario)
+    await Respuesta.destroy({
+      where: { usuario_id: id }
+    });
+    console.log(`Respuestas eliminadas para usuario ID: ${id}`);
+
+    // Eliminar sesiones de encuesta
+    await SesionEncuesta.destroy({
+      where: { usuario_id: id }
+    });
+    console.log(`Sesiones de encuesta eliminadas para usuario ID: ${id}`);
 
     // Eliminar permanentemente de la base de datos
     await user.destroy();

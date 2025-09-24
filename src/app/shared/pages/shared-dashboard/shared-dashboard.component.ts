@@ -1875,32 +1875,125 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       this.charts['areasInteres'].destroy();
     }
 
-    const data = this.metricasAvanzadas.distribucionAreas.slice(0, 8); // Top 8
+    // Ordenar por cantidad y tomar los top 10
+    const data = this.metricasAvanzadas.distribucionAreas
+      .sort((a, b) => b.cantidad - a.cantidad)
+      .slice(0, 10);
+
+    // Paleta de colores profesional y elegante
+    const colors = [
+      '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+      '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+    ];
 
     this.charts['areasInteres'] = new Chart(ctx, {
-      type: 'radar',
+      type: 'bar',
       data: {
         labels: data.map(item => item.area),
         datasets: [{
-          label: 'Profesionales',
+          label: 'Profesionales Interesados',
           data: data.map(item => item.cantidad),
-          backgroundColor: 'rgba(153, 102, 255, 0.2)',
-          borderColor: 'rgba(153, 102, 255, 1)',
-          borderWidth: 2
+          backgroundColor: data.map((_, index) => colors[index % colors.length]),
+          borderColor: data.map((_, index) => colors[index % colors.length]),
+          borderWidth: 1,
+          borderRadius: 4,
+          borderSkipped: false
         }]
       },
       options: {
-        ...this.chartOptions,
+        indexAxis: 'y', // Barras horizontales
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-          ...this.chartOptions.plugins,
+          legend: {
+            display: false // Ocultar leyenda para look más limpio
+          },
           title: {
             display: true,
-            text: 'Áreas de Interés Profesional'
+            text: 'Áreas de Interés Profesional',
+            font: {
+              size: 16,
+              weight: 'bold'
+            },
+            color: '#374151'
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: '#e5e7eb',
+            borderWidth: 1,
+            callbacks: {
+              label: function(context) {
+                const total = data.reduce((sum, item) => sum + item.cantidad, 0);
+                const percentage = total > 0 ? Math.round((context.parsed.x / total) * 100) : 0;
+                return [
+                  `Profesionales: ${context.parsed.x}`,
+                  `Porcentaje: ${percentage}%`
+                ];
+              }
+            }
           }
         },
         scales: {
-          r: {
-            beginAtZero: true
+          x: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Número de Profesionales',
+              font: {
+                size: 12,
+                weight: 'bold'
+              },
+              color: '#6b7280'
+            },
+            ticks: {
+              stepSize: 1,
+              font: {
+                size: 11
+              },
+              color: '#6b7280'
+            },
+            grid: {
+              color: 'rgba(156, 163, 175, 0.2)'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Áreas de Interés',
+              font: {
+                size: 12,
+                weight: 'bold'
+              },
+              color: '#6b7280'
+            },
+            ticks: {
+              font: {
+                size: 10
+              },
+              color: '#374151',
+              maxRotation: 0,
+              callback: function(value, index) {
+                const label = data[index]?.area || '';
+                // Truncar etiquetas largas en móvil
+                if (window.innerWidth < 768 && label.length > 20) {
+                  return label.substring(0, 17) + '...';
+                }
+                return label;
+              }
+            },
+            grid: {
+              display: false
+            }
+          }
+        },
+        layout: {
+          padding: {
+            top: 10,
+            bottom: 10,
+            left: 10,
+            right: 10
           }
         }
       }

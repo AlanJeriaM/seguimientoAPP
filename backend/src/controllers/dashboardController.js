@@ -133,15 +133,48 @@ const obtenerMetricasAvanzadas = async (req, res) => {
     });
 
     // 2. Distribución por nivel de educación
-    const nivelesDisponibles = [
+    const nivelesBase = [
       'Diplomado',
-      'Postítulo', 
+      'Postítulo',
       'Magíster Profesional',
       'Magíster Académico',
       'Doctorado',
-      'Sin especialización',
-      'Otra especialización'
+      'Sin especialización'
     ];
+    
+    // Recopilar todos los niveles únicos de los usuarios (incluyendo opciones personalizadas)
+    const nivelesUnicos = new Set();
+    usuariosActivos.forEach(user => {
+      if (user.nivel_educacion) {
+        let nivelesEducacion;
+        try {
+          if (typeof user.nivel_educacion === 'string') {
+            if (user.nivel_educacion.startsWith('[') && user.nivel_educacion.endsWith(']')) {
+              nivelesEducacion = JSON.parse(user.nivel_educacion);
+            } else {
+              nivelesEducacion = [user.nivel_educacion];
+            }
+          } else if (Array.isArray(user.nivel_educacion)) {
+            nivelesEducacion = user.nivel_educacion;
+          } else {
+            return;
+          }
+        } catch (error) {
+          nivelesEducacion = [user.nivel_educacion];
+        }
+        
+        if (Array.isArray(nivelesEducacion)) {
+          nivelesEducacion.forEach(nivel => {
+            if (nivel && nivel.trim()) {
+              nivelesUnicos.add(nivel.trim());
+            }
+          });
+        }
+      }
+    });
+    
+    // Combinar niveles base con opciones personalizadas
+    const nivelesDisponibles = [...nivelesBase, ...Array.from(nivelesUnicos).filter(nivel => !nivelesBase.includes(nivel))];
     
     const distribucionEducacion = nivelesDisponibles.map(nivel => {
       const cantidad = usuariosActivos.filter(user => {
@@ -180,11 +213,35 @@ const obtenerMetricasAvanzadas = async (req, res) => {
       };
     }).filter(item => item.cantidad > 0);
 
-    // 3. Tecnologías más populares (desde especialidad_tecnica)
+    // 3. Tecnologías más populares (desde especialidad_tecnica - ahora es array JSON)
     const tecnologiaCount = {};
     usuariosActivos.forEach(user => {
       if (user.especialidad_tecnica) {
-        tecnologiaCount[user.especialidad_tecnica] = (tecnologiaCount[user.especialidad_tecnica] || 0) + 1;
+        let tecnologias = user.especialidad_tecnica;
+        
+        // Si es string, intentar parsearlo como JSON
+        if (typeof tecnologias === 'string') {
+          try {
+            tecnologias = JSON.parse(tecnologias);
+          } catch (e) {
+            // Si no es JSON válido, tratarlo como una sola tecnología
+            tecnologias = [tecnologias];
+          }
+        }
+        
+        // Si es array, procesar cada tecnología
+        if (Array.isArray(tecnologias)) {
+          tecnologias.forEach(tech => {
+            if (tech && tech.trim()) {
+              const techName = tech.trim();
+              tecnologiaCount[techName] = (tecnologiaCount[techName] || 0) + 1;
+            }
+          });
+        } else if (tecnologias && tecnologias.trim()) {
+          // Si no es array, es una sola tecnología
+          const techName = tecnologias.trim();
+          tecnologiaCount[techName] = (tecnologiaCount[techName] || 0) + 1;
+        }
       }
     });
 

@@ -134,6 +134,11 @@ const User = sequelize.define('User', {
       max: 5
     },
     comment: 'Nivel de satisfacción laboral actual (1-5 estrellas)'
+  },
+  opciones_personalizadas_educacion: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Opciones personalizadas de educación agregadas por el usuario (JSON array)'
   }
 }, {
   tableName: 'users',
