@@ -308,16 +308,81 @@
           <!-- Industria -->
           <div class="col-12">
             <div class="field">
-              <label for="industria" class="block text-900 font-semibold mb-2"><span class="text-red-500 mr-1">*</span>Industria</label>
-              <p-dropdown
-                id="industria"
-                formControlName="industria"
-                [options]="industriasOpciones"
-                placeholder="Seleccione su industria"
-                [class]="'w-full ' + (isFieldInvalid('industria') ? 'p-invalid' : '')"
-                [showClear]="true"
-                styleClass="w-full p-dropdown-lg">
-              </p-dropdown>
+              <label for="industria" class="text-900 font-semibold mb-2 flex items-center gap-2">
+                <span class="text-red-500 mr-1">*</span>Industria
+                <span class="text-600 text-sm">(Puedes agregar una opción personalizada)</span>
+              </label>
+
+              <div class="flex gap-2">
+                <p-dropdown
+                  id="industria"
+                  formControlName="industria"
+                  [options]="industriasOpciones"
+                  placeholder="Seleccione su industria"
+                  [class]="'w-full ' + (isFieldInvalid('industria') ? 'ng-invalid ng-dirty' : '')"
+                  [showClear]="true"
+                  styleClass="w-full p-dropdown-lg">
+
+                  <ng-template pTemplate="item" let-option>
+                    <div class="industria-item" (click)="$event.stopPropagation()">
+                      <span>{{ option }}</span>
+                      <p-button
+                        *ngIf="esOpcionPersonalizadaIndustria(option)"
+                        icon="pi pi-times"
+                        severity="danger"
+                        [rounded]="true"
+                        size="small"
+                        styleClass="btn-eliminar-opcion"
+                        (click)="eliminarOpcionPersonalizadaIndustria(option, $event)"
+                        (mousedown)="$event.stopPropagation()"
+                        (mouseup)="$event.stopPropagation()"
+                        pTooltip="Eliminar opción personalizada"
+                        tooltipPosition="top">
+                      </p-button>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+
+                <p-button
+                  [icon]="showAddIndustriaDialog ? 'pi pi-minus' : 'pi pi-plus'"
+                  [styleClass]="showAddIndustriaDialog ? 'p-button-danger' : 'p-button-success'"
+                  [style]="{'min-height': '36px', 'width': '36px'}"
+                  (onClick)="toggleAddIndustria()"
+                  [pTooltip]="showAddIndustriaDialog ? 'Cerrar' : 'Agregar opción personalizada'"
+                  tooltipPosition="top">
+                </p-button>
+              </div>
+
+              <!-- Dialog para agregar nueva industria -->
+              <div *ngIf="showAddIndustriaDialog" class="surface-100 border-1 surface-border border-round-lg p-3 mt-3">
+                <label for="nueva_industria" class="block text-900 font-semibold mb-2">
+                  <span class="text-red-500 mr-1">*</span>Nueva industria
+                </label>
+                <input
+                  pInputText
+                  id="nueva_industria"
+                  [value]="nuevaIndustria"
+                  (input)="onNuevaIndustriaChange($event)"
+                  placeholder="Escriba el nombre de la industria"
+                  class="w-full mb-3">
+
+                <div class="flex gap-2">
+                  <p-button
+                    label="Agregar"
+                    icon="pi pi-plus"
+                    (onClick)="agregarIndustria()"
+                    [disabled]="!isNuevaIndustriaValid"
+                    styleClass="p-button-success">
+                  </p-button>
+                  <p-button
+                    label="Cancelar"
+                    icon="pi pi-times"
+                    (onClick)="cancelarAgregarIndustria()"
+                    styleClass="p-button-text p-button-danger">
+                  </p-button>
+                </div>
+              </div>
+
               <small *ngIf="isFieldInvalid('industria')" class="p-error block mt-2">
                 <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('industria') }}
               </small>
@@ -424,10 +489,6 @@
                 </small>
               </div>
             </div>
-
-
-
-
 
             <!-- Especialidad Técnica -->
             <div class="col-12 lg:col-6">

@@ -80,7 +80,8 @@
 /* Estilos para opciones personalizadas en multiselect */
 .nivel-educacion-item,
 .tecnologia-item,
-.area-interes-item {
+.area-interes-item,
+.industria-item {
   display: flex;
   justify-content: space-between;
   align-items: center;

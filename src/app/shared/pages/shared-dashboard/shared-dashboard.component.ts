@@ -1636,7 +1636,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       'Abierto a oportunidades': '#10B981', // Verde - disponible
       'No seguro': '#F59E0B', // Ámbar - indeciso
       'No disponible': '#6B7280', // Gris - no disponible
-      'Sin trabajo': '#DC2626' // Rojo oscuro - sin empleo
+      'Sin trabajo': '#8B5CF6' // café - sin empleo
     };
 
     const backgroundColors = datos.map(item => coloresDisponibilidad[item.disponibilidad as keyof typeof coloresDisponibilidad] || '#8B5CF6');

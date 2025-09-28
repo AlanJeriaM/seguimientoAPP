@@ -34,6 +34,7 @@ export interface PerfilUsuario {
   opciones_personalizadas_educacion?: string[];
   opciones_personalizadas_tecnologias?: string[];
   opciones_personalizadas_area_interes?: string[];
+  opciones_personalizadas_industria?: string[];
 }
 
 @Component({
@@ -74,6 +75,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   nuevaAreaInteres: string = '';
   opcionesPersonalizadasAreaInteres: string[] = [];
 
+  // Variables para agregar opciones personalizadas de industria
+  showAddIndustriaDialog = false;
+  nuevaIndustria: string = '';
+  opcionesPersonalizadasIndustria: string[] = [];
+
   // Variables para control de cambios en el formulario
   private formInitialValue: any = null;
   hasFormChanges = false; // Opciones personalizadas del usuario
@@ -82,7 +88,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   profileProgress = 0;
 
   // Opciones para dropdowns
-  industriasOpciones = [
+  industriasBase = [
     'Tecnología de la información y servicios',
     'Servicios financieros',
     'Consultoría de gestión',
@@ -95,9 +101,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Energía y servicios públicos',
     'Construcción',
     'Turismo y hostelería',
-    'Transporte y logística',
-    'Otros'
+    'Transporte y logística'
   ];
+
+  // Opciones completas para el dropdown (base + personalizadas)
+  industriasOpciones: string[] = [];
 
   // Nuevas opciones para campos de métricas
   // Opciones base para dropdowns (sin opciones personalizadas)
@@ -210,6 +218,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.reconstruirListaNivelesEducacion();
     this.reconstruirListaTecnologias();
     this.reconstruirListaAreasInteres();
+    this.reconstruirListaIndustrias();
 
     // Verificar si estamos en modo de completar perfil
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -251,7 +260,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         ...this.perfilForm.value,
         opciones_personalizadas_educacion: [...this.opcionesPersonalizadasEducacion],
         opciones_personalizadas_tecnologias: [...this.opcionesPersonalizadasTecnologias],
-        opciones_personalizadas_area_interes: [...this.opcionesPersonalizadasAreaInteres]
+        opciones_personalizadas_area_interes: [...this.opcionesPersonalizadasAreaInteres],
+        opciones_personalizadas_industria: [...this.opcionesPersonalizadasIndustria]
       };
       this.hasFormChanges = false;
     }
@@ -339,6 +349,20 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Comparar opciones personalizadas de industria
+    const initialOpcionesIndustria = initial.opciones_personalizadas_industria || [];
+    const currentOpcionesIndustria = this.opcionesPersonalizadasIndustria || [];
+    
+    if (initialOpcionesIndustria.length !== currentOpcionesIndustria.length) {
+      return true;
+    }
+    
+    for (let i = 0; i < initialOpcionesIndustria.length; i++) {
+      if (initialOpcionesIndustria[i] !== currentOpcionesIndustria[i]) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -369,6 +393,16 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     });
     this.areasInteres = [...this.areasInteresBase, ...this.opcionesPersonalizadasAreaInteres];
     console.log('Lista final de áreas de interés:', this.areasInteres);
+  }
+
+  reconstruirListaIndustrias() {
+    // Combinar opciones base con opciones personalizadas
+    console.log('Reconstruyendo lista de industrias:', {
+      industriasBase: this.industriasBase,
+      opcionesPersonalizadasIndustria: this.opcionesPersonalizadasIndustria
+    });
+    this.industriasOpciones = [...this.industriasBase, ...this.opcionesPersonalizadasIndustria];
+    console.log('Lista final de industrias:', this.industriasOpciones);
   }
 
   eliminarOpcionPersonalizada(option: string, event: Event) {
@@ -789,6 +823,127 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Métodos para industria personalizada
+  esOpcionPersonalizadaIndustria(option: string): boolean {
+    return this.opcionesPersonalizadasIndustria.includes(option);
+  }
+
+  eliminarOpcionPersonalizadaIndustria(option: string, event: Event) {
+    // Prevenir todos los eventos de propagación
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    console.log('Eliminando opción personalizada de industria:', option);
+    
+    // Verificar que la opción existe antes de eliminar
+    if (!this.opcionesPersonalizadasIndustria.includes(option)) {
+      console.log('Opción no encontrada en opciones personalizadas de industria');
+      return;
+    }
+    
+    // Remover de opciones personalizadas
+    const index = this.opcionesPersonalizadasIndustria.indexOf(option);
+    if (index > -1) {
+      this.opcionesPersonalizadasIndustria.splice(index, 1);
+      console.log('Opción removida de opciones personalizadas de industria');
+    }
+    
+    // Reconstruir la lista completa sin la opción eliminada
+    this.reconstruirListaIndustrias();
+    console.log('Lista de industrias reconstruida:', this.industriasOpciones);
+    
+    // Deseleccionar si estaba seleccionada
+    const valorActual = this.perfilForm.get('industria')?.value || '';
+    if (valorActual === option) {
+      this.perfilForm.get('industria')?.setValue('');
+    }
+
+    // Guardar cambios
+    this.guardarOpcionesPersonalizadasIndustria();
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Opción eliminada',
+      detail: `"${option}" ha sido eliminada de las opciones personalizadas`,
+      life: 3000
+    });
+  }
+
+  agregarIndustria() {
+    const nuevaOpcion = this.nuevaIndustria.trim();
+    
+    if (!nuevaOpcion) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Campo vacío',
+        detail: 'Por favor ingrese el nombre de la industria',
+        life: 3000
+      });
+      return;
+    }
+
+    // Verificar que no existe ya
+    if (!this.industriasBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasIndustria.includes(nuevaOpcion)) {
+      // Agregar a opciones personalizadas
+      this.opcionesPersonalizadasIndustria.push(nuevaOpcion);
+
+      // Reconstruir la lista completa
+      this.reconstruirListaIndustrias();
+
+      // Seleccionar la nueva opción
+      this.perfilForm.get('industria')?.setValue(nuevaOpcion);
+
+      // Limpiar el campo y cerrar el diálogo
+      this.nuevaIndustria = '';
+      this.showAddIndustriaDialog = false;
+
+      // Guardar cambios
+      this.guardarOpcionesPersonalizadasIndustria();
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Opción agregada',
+        detail: `"${nuevaOpcion}" ha sido agregada y seleccionada`,
+        life: 3000
+      });
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Opción duplicada',
+        detail: 'Esta industria ya existe en las opciones disponibles',
+        life: 3000
+      });
+    }
+  }
+
+  toggleAddIndustria() {
+    this.showAddIndustriaDialog = !this.showAddIndustriaDialog;
+    if (!this.showAddIndustriaDialog) {
+      this.nuevaIndustria = '';
+    }
+  }
+
+  onNuevaIndustriaChange(event: any) {
+    this.nuevaIndustria = event.target.value;
+    this.cdr.detectChanges();
+  }
+
+  get isNuevaIndustriaValid(): boolean {
+    return this.nuevaIndustria.trim().length > 0;
+  }
+
+  cancelarAgregarIndustria() {
+    this.nuevaIndustria = '';
+    this.showAddIndustriaDialog = false;
+  }
+
+  private guardarOpcionesPersonalizadasIndustria() {
+    if (this.perfil) {
+      this.perfil.opciones_personalizadas_industria = [...this.opcionesPersonalizadasIndustria];
+    }
+  }
+
   // Calcular progreso del perfil
   calculateProfileProgress(): number {
     if (!this.perfilForm) return 0;
@@ -986,15 +1141,26 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         this.opcionesPersonalizadasAreaInteres = [];
       }
 
+      if (this.perfil.opciones_personalizadas_industria) {
+        this.opcionesPersonalizadasIndustria = this.perfil.opciones_personalizadas_industria;
+        console.log('Opciones personalizadas de industria cargadas:', this.opcionesPersonalizadasIndustria);
+      } else {
+        console.log('No hay opciones personalizadas de industria en el perfil');
+        this.opcionesPersonalizadasIndustria = [];
+      }
+
       console.log('Estado después de cargar opciones personalizadas:', {
         opcionesPersonalizadasAreaInteres: this.opcionesPersonalizadasAreaInteres,
-        areasInteres: this.areasInteres
+        areasInteres: this.areasInteres,
+        opcionesPersonalizadasIndustria: this.opcionesPersonalizadasIndustria,
+        industriasOpciones: this.industriasOpciones
       });
 
       // Reconstruir las listas completas
       this.reconstruirListaNivelesEducacion();
       this.reconstruirListaTecnologias();
       this.reconstruirListaAreasInteres();
+      this.reconstruirListaIndustrias();
 
       this.perfilForm.patchValue({
         // Campos básicos
@@ -1042,6 +1208,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
     datosActualizados.opciones_personalizadas_tecnologias = this.opcionesPersonalizadasTecnologias;
     datosActualizados.opciones_personalizadas_area_interes = this.opcionesPersonalizadasAreaInteres;
+    datosActualizados.opciones_personalizadas_industria = this.opcionesPersonalizadasIndustria;
 
     console.log('Datos que se van a guardar:', datosActualizados);
     console.log('Opciones personalizadas de educación:', this.opcionesPersonalizadasEducacion);
