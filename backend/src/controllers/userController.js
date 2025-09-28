@@ -242,7 +242,8 @@ const obtenerMiPerfil = async (req, res) => {
       area_interes: user.area_interes,
       satisfaccion_laboral: user.satisfaccion_laboral,
       opciones_personalizadas_educacion: user.opciones_personalizadas_educacion ? (typeof user.opciones_personalizadas_educacion === 'string' ? JSON.parse(user.opciones_personalizadas_educacion) : user.opciones_personalizadas_educacion) : [],
-      opciones_personalizadas_tecnologias: user.opciones_personalizadas_tecnologias ? (typeof user.opciones_personalizadas_tecnologias === 'string' ? JSON.parse(user.opciones_personalizadas_tecnologias) : user.opciones_personalizadas_tecnologias) : []
+      opciones_personalizadas_tecnologias: user.opciones_personalizadas_tecnologias ? (typeof user.opciones_personalizadas_tecnologias === 'string' ? JSON.parse(user.opciones_personalizadas_tecnologias) : user.opciones_personalizadas_tecnologias) : [],
+      opciones_personalizadas_area_interes: user.opciones_personalizadas_area_interes ? (typeof user.opciones_personalizadas_area_interes === 'string' ? JSON.parse(user.opciones_personalizadas_area_interes) : user.opciones_personalizadas_area_interes) : []
     };
 
     res.json({
@@ -285,7 +286,8 @@ const actualizarMiPerfil = async (req, res) => {
       area_interes_otro,
       satisfaccion_laboral,
       opciones_personalizadas_educacion,
-      opciones_personalizadas_tecnologias
+      opciones_personalizadas_tecnologias,
+      opciones_personalizadas_area_interes
     } = req.body;
 
     // Validaciones básicas
@@ -348,7 +350,8 @@ const actualizarMiPerfil = async (req, res) => {
       area_interes: areaInteresFinal,
       satisfaccion_laboral: satisfaccion_laboral !== undefined && satisfaccion_laboral !== '' ? parseInt(satisfaccion_laboral) : null,
       opciones_personalizadas_educacion: Array.isArray(opciones_personalizadas_educacion) ? JSON.stringify(opciones_personalizadas_educacion) : null,
-      opciones_personalizadas_tecnologias: Array.isArray(opciones_personalizadas_tecnologias) ? JSON.stringify(opciones_personalizadas_tecnologias) : null
+      opciones_personalizadas_tecnologias: Array.isArray(opciones_personalizadas_tecnologias) ? JSON.stringify(opciones_personalizadas_tecnologias) : null,
+      opciones_personalizadas_area_interes: Array.isArray(opciones_personalizadas_area_interes) ? JSON.stringify(opciones_personalizadas_area_interes) : null
     };
 
     // Verificar si todos los campos obligatorios están completos
@@ -404,7 +407,8 @@ const actualizarMiPerfil = async (req, res) => {
       area_interes: usuarioActualizado.area_interes,
       satisfaccion_laboral: usuarioActualizado.satisfaccion_laboral,
       opciones_personalizadas_educacion: usuarioActualizado.opciones_personalizadas_educacion ? (typeof usuarioActualizado.opciones_personalizadas_educacion === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_educacion) : usuarioActualizado.opciones_personalizadas_educacion) : [],
-      opciones_personalizadas_tecnologias: usuarioActualizado.opciones_personalizadas_tecnologias ? (typeof usuarioActualizado.opciones_personalizadas_tecnologias === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_tecnologias) : usuarioActualizado.opciones_personalizadas_tecnologias) : []
+      opciones_personalizadas_tecnologias: usuarioActualizado.opciones_personalizadas_tecnologias ? (typeof usuarioActualizado.opciones_personalizadas_tecnologias === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_tecnologias) : usuarioActualizado.opciones_personalizadas_tecnologias) : [],
+      opciones_personalizadas_area_interes: usuarioActualizado.opciones_personalizadas_area_interes ? (typeof usuarioActualizado.opciones_personalizadas_area_interes === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_area_interes) : usuarioActualizado.opciones_personalizadas_area_interes) : []
     };
 
     console.log(`Perfil actualizado para usuario ${usuarioActualizado.nombre} (ID: ${user.id})`);

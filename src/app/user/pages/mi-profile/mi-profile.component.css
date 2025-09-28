@@ -79,12 +79,13 @@
 
 /* Estilos para opciones personalizadas en multiselect */
 .nivel-educacion-item,
-.tecnologia-item {
+.tecnologia-item,
+.area-interes-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0.5rem 0;
+  padding: 0.125rem 0.25rem;
   position: relative;
 }
 
@@ -93,15 +94,15 @@
   color: white;
   border: none;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: bold;
   cursor: pointer;
-  margin-left: 0.5rem;
+  margin-left: 0.25rem;
   transition: all 0.15s ease;
   position: relative;
   z-index: 10;

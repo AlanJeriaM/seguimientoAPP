@@ -144,6 +144,11 @@ const User = sequelize.define('User', {
       type: DataTypes.TEXT,
       allowNull: true,
       comment: 'Opciones personalizadas de tecnologías agregadas por el usuario (JSON array)'
+    },
+    opciones_personalizadas_area_interes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: 'Opciones personalizadas de área de interés agregadas por el usuario (JSON array)'
     }
 }, {
   tableName: 'users',

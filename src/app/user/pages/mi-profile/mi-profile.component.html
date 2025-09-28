@@ -411,6 +411,7 @@
                       [disabled]="!isNuevaNivelEducacionValid">
                     </p-button>
                     <p-button
+                    label="Cancelar"
                       icon="pi pi-times"
                       styleClass="p-button-text p-button-danger"
                       (onClick)="cancelarAgregarNivelEducacion()">
@@ -544,26 +545,8 @@
                   [options]="tiposEmpleo"
                   placeholder="Seleccione su situación laboral actual"
                   [class]="'w-full ' + (isFieldInvalid('tipo_empleo_actual') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full p-dropdown-lg"
-                  (onChange)="onTipoEmpleoChange($event.value)">
+                  styleClass="w-full p-dropdown-lg">
                 </p-dropdown>
-
-                <!-- Custom Employment Field -->
-                <div *ngIf="showTipoEmpleoOtro" class="surface-100 border-1 surface-border border-round-lg p-3 mt-3">
-                  <label for="tipo_empleo_otro" class="block text-900 font-semibold mb-2">
-                    <span class="text-red-500 mr-1">*</span>Especifique su tipo de empleo
-                  </label>
-                  <input
-                    pInputText
-                    id="tipo_empleo_otro"
-                    formControlName="tipo_empleo_otro"
-                    placeholder="Escriba su tipo de empleo"
-                    [class]="'w-full ' + (isFieldInvalid('tipo_empleo_otro') ? 'p-invalid' : '')"
-                    type="text">
-                  <small *ngIf="isFieldInvalid('tipo_empleo_otro')" class="p-error block mt-2">
-                    <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('tipo_empleo_otro') }}
-                  </small>
-                </div>
 
                 <small *ngIf="isFieldInvalid('tipo_empleo_actual')" class="p-error block mt-2">
                   <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('tipo_empleo_actual') }}
@@ -574,34 +557,78 @@
             <!-- Área de Interés -->
             <div class="col-12 lg:col-6">
               <div class="field">
-                <label for="area_interes" class="block text-900 font-semibold mb-2">
+                <label for="area_interes" class="text-900 font-semibold mb-2 flex items-center gap-2">
                   <span class="text-red-500 mr-1">*</span>Área de Interés Principal
+                  <span class="text-600 text-sm">(Puedes agregar una opción personalizada)</span>
                 </label>
-                <p-dropdown
-                  id="area_interes"
-                  formControlName="area_interes"
-                  [options]="areasInteres"
-                  placeholder="Seleccione su área de interés principal"
-                  [class]="'w-full ' + (isFieldInvalid('area_interes') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full p-dropdown-lg"
-                  (onChange)="onAreaInteresChange($event.value)">
-                </p-dropdown>
 
-                <!-- Custom Interest Field -->
-                <div *ngIf="showAreaInteresOtro" class="surface-100 border-1 surface-border border-round-lg p-3 mt-3">
-                  <label for="area_interes_otro" class="block text-900 font-semibold mb-2">
-                    <span class="text-red-500 mr-1">*</span>Especifique su área de interés
+                <div class="flex gap-2">
+                  <p-dropdown
+                    id="area_interes"
+                    formControlName="area_interes"
+                    [options]="areasInteres"
+                    placeholder="Seleccione su área de interés principal"
+                    [class]="'w-full ' + (isFieldInvalid('area_interes') ? 'ng-invalid ng-dirty' : '')"
+                    styleClass="w-full p-dropdown-lg">
+
+                    <ng-template pTemplate="item" let-option>
+                      <div class="area-interes-item" (click)="$event.stopPropagation()">
+                        <span>{{ option }}</span>
+                        <p-button
+                          *ngIf="esOpcionPersonalizadaAreaInteres(option)"
+                          icon="pi pi-times"
+                          severity="danger"
+                          [rounded]="true"
+                          size="small"
+                          styleClass="btn-eliminar-opcion"
+                          (click)="eliminarOpcionPersonalizadaAreaInteres(option, $event)"
+                          (mousedown)="$event.stopPropagation()"
+                          (mouseup)="$event.stopPropagation()"
+                          pTooltip="Eliminar opción personalizada"
+                          tooltipPosition="top">
+                        </p-button>
+                      </div>
+                    </ng-template>
+                  </p-dropdown>
+
+                  <p-button
+                    [icon]="showAddAreaInteresDialog ? 'pi pi-minus' : 'pi pi-plus'"
+                    [styleClass]="showAddAreaInteresDialog ? 'p-button-danger' : 'p-button-success'"
+                    [style]="{'min-height': '36px', 'width': '36px'}"
+                    (onClick)="toggleAddAreaInteres()"
+                    [pTooltip]="showAddAreaInteresDialog ? 'Cerrar' : 'Agregar opción personalizada'"
+                    tooltipPosition="top">
+                  </p-button>
+                </div>
+
+                <!-- Dialog para agregar nueva área de interés -->
+                <div *ngIf="showAddAreaInteresDialog" class="surface-100 border-1 surface-border border-round-lg p-3 mt-3">
+                  <label for="nueva_area_interes" class="block text-900 font-semibold mb-2">
+                    <span class="text-red-500 mr-1">*</span>Nueva área de interés
                   </label>
                   <input
                     pInputText
-                    id="area_interes_otro"
-                    formControlName="area_interes_otro"
-                    placeholder="Escriba su área de interés"
-                    [class]="'w-full ' + (isFieldInvalid('area_interes_otro') ? 'p-invalid' : '')"
-                    type="text">
-                  <small *ngIf="isFieldInvalid('area_interes_otro')" class="p-error block mt-2">
-                    <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('area_interes_otro') }}
-                  </small>
+                    id="nueva_area_interes"
+                    [value]="nuevaAreaInteres"
+                    (input)="onNuevaAreaInteresChange($event)"
+                    placeholder="Escriba el nombre del área de interés"
+                    class="w-full mb-3">
+
+                  <div class="flex gap-2">
+                    <p-button
+                      label="Agregar"
+                      icon="pi pi-plus"
+                      (onClick)="agregarAreaInteres()"
+                      [disabled]="!isNuevaAreaInteresValid"
+                      styleClass="p-button-success">
+                    </p-button>
+                    <p-button
+                      label="Cancelar"
+                      icon="pi pi-times"
+                      (onClick)="cancelarAgregarAreaInteres()"
+                      styleClass="p-button-text p-button-danger">
+                    </p-button>
+                  </div>
                 </div>
 
                 <small *ngIf="isFieldInvalid('area_interes')" class="p-error block mt-2">
