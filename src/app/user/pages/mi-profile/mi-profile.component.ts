@@ -60,7 +60,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   // Variables para agregar opciones personalizadas
   showAddNivelEducacionDialog = false;
   nuevaNivelEducacion: string = '';
-  opcionesPersonalizadasEducacion: string[] = []; // Opciones personalizadas del usuario
+  opcionesPersonalizadasEducacion: string[] = [];
+
+  // Variables para control de cambios en el formulario
+  private formInitialValue: any = null;
+  hasFormChanges = false; // Opciones personalizadas del usuario
 
   // Progreso del perfil
   profileProgress = 0;
@@ -210,9 +214,86 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
+  ngAfterViewInit() {
+    // Configurar listener para detectar cambios en el formulario
+    if (this.perfilForm) {
+      this.perfilForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+        this.detectFormChanges();
+      });
+    }
+  }
+
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // Métodos para control de cambios en el formulario
+  private saveInitialFormState() {
+    if (this.perfilForm) {
+      this.formInitialValue = {
+        ...this.perfilForm.value,
+        opciones_personalizadas_educacion: [...this.opcionesPersonalizadasEducacion]
+      };
+      this.hasFormChanges = false;
+    }
+  }
+
+  private detectFormChanges() {
+    if (!this.formInitialValue || !this.perfilForm) {
+      this.hasFormChanges = false;
+      return;
+    }
+
+    const currentValue = this.perfilForm.value;
+    this.hasFormChanges = this.hasRealChanges(this.formInitialValue, currentValue);
+  }
+
+  private hasRealChanges(initial: any, current: any): boolean {
+    // Comparar campos principales
+    const fieldsToCompare = [
+      'nombre', 'posicion_actual', 'empresa_actual', 'ubicacion', 'industria',
+      'años_experiencia', 'nivel_educacion', 'especialidad_tecnica', 'tipo_empleo_actual',
+      'disponibilidad_cambio', 'area_interes', 'rango_salarial', 'satisfaccion_laboral'
+    ];
+
+    for (const field of fieldsToCompare) {
+      const initialValue = initial[field];
+      const currentValue = current[field];
+
+      // Para arrays (nivel_educacion, especialidad_tecnica)
+      if (Array.isArray(initialValue) && Array.isArray(currentValue)) {
+        if (initialValue.length !== currentValue.length) {
+          return true;
+        }
+        // Comparar elementos del array
+        for (let i = 0; i < initialValue.length; i++) {
+          if (initialValue[i] !== currentValue[i]) {
+            return true;
+          }
+        }
+      }
+      // Para otros campos
+      else if (initialValue !== currentValue) {
+        return true;
+      }
+    }
+
+    // Comparar opciones personalizadas de educación
+    const initialOpciones = initial.opciones_personalizadas_educacion || [];
+    const currentOpciones = this.opcionesPersonalizadasEducacion || [];
+    
+    if (initialOpciones.length !== currentOpciones.length) {
+      return true;
+    }
+    
+    for (let i = 0; i < initialOpciones.length; i++) {
+      if (initialOpciones[i] !== currentOpciones[i]) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   // Métodos para manejar opciones personalizadas
@@ -261,6 +342,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
     // Guardar cambios
     this.guardarOpcionesPersonalizadas();
+
+    // Detectar cambios después de eliminar opción
+    this.detectFormChanges();
 
     // Mostrar mensaje de confirmación
     this.messageService.add({
@@ -377,6 +461,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
         // Guardar las opciones personalizadas en el perfil
         this.guardarOpcionesPersonalizadas();
+
+        // Detectar cambios después de agregar opción
+        this.detectFormChanges();
       } else {
         // Mostrar mensaje de que ya existe
         this.messageService.add({
@@ -621,6 +708,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         tecnologias_principales: this.perfil.tecnologias_principales || [],
         satisfaccion_laboral: this.perfil.satisfaccion_laboral || ''
       });
+
+      // Guardar el estado inicial del formulario para detectar cambios
+      this.saveInitialFormState();
     }
   }
 
@@ -699,6 +789,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
                 satisfaccion_laboral: this.perfil.satisfaccion_laboral || null
               });
             }
+
+            // Resetear el estado de cambios después de guardar exitosamente
+            this.saveInitialFormState();
             
             // Si estábamos en modo de completar perfil, verificar si ahora está completo
             if (this.isCompletionMode) {
@@ -799,6 +892,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   resetForm() {
     this.populateForm();
+    this.hasFormChanges = false;
     this.messageService.add({
       severity: 'info',
       summary: 'Formulario restablecido',

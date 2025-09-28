@@ -661,22 +661,22 @@
         <div class="flex flex-column sm:flex-row gap-3 justify-content-center">
           <p-button
             type="button"
-            label="Descartar Cambios"
+            label="Descartar"
             icon="pi pi-refresh"
             severity="secondary"
-            styleClass="flex-1 sm:flex-initial px-4 py-3 font-semibold"
+            styleClass="flex-1 sm:flex-initial px-6 py-3 font-semibold"
             (onClick)="resetForm()"
-            [disabled]="saving">
+            [disabled]="!hasFormChanges || saving">
           </p-button>
 
           <p-button
             type="submit"
-            label="Guardar Cambios"
+            label="Guardar"
             icon="pi pi-save"
             severity="primary"
             styleClass="flex-1 sm:flex-initial px-6 py-3 font-bold text-lg shadow-3"
             [loading]="saving"
-            [disabled]="perfilForm.invalid || saving"
+            [disabled]="!hasFormChanges || perfilForm.invalid || saving"
             [style]="{'min-width': '200px'}">
           </p-button>
         </div>
