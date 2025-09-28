@@ -208,6 +208,15 @@ const obtenerMiPerfil = async (req, res) => {
       dataValues: user.dataValues ? Object.keys(user.dataValues) : 'No dataValues'
     });
 
+    // Debug de fecha de registro
+    const fechaRegistro = user.created_at || user.createdAt || new Date();
+    console.log('🗓️ Fecha de registro calculada:', {
+      created_at: user.created_at,
+      createdAt: user.createdAt,
+      fechaRegistro: fechaRegistro,
+      tipo: typeof fechaRegistro
+    });
+
     const miPerfil = {
       id: user.id,
       nombre: user.nombre || 'Sin nombre',
@@ -219,7 +228,7 @@ const obtenerMiPerfil = async (req, res) => {
       resumen: user.resumen || 'Sin resumen',
       industria: user.industria || 'No especificada',
       ultimo_acceso: user.ultimo_acceso,
-      fecha_registro: user.created_at,
+      fecha_registro: fechaRegistro,
       rol: user.rol,
       // Nuevos campos para métricas
       perfil_completo: user.perfil_completo || false,

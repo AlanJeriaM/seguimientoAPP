@@ -54,12 +54,20 @@
 
 .sidebar-image {
   display: block;
+  cursor: pointer;
   margin: 0 auto;
   border-radius: 50%;
   max-width: 100%;
   height: auto;
   object-fit: cover;
+
 }
+
+.sidebar-image:hover {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
 
 .sidebar-image-fallback {
   display: flex;

@@ -55,7 +55,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   showEspecialidadOtro = false;
   showTipoEmpleoOtro = false;
   showAreaInteresOtro = false;
-  
+
+
   // Variables para agregar opciones personalizadas
   showAddNivelEducacionDialog = false;
   nuevaNivelEducacion: string = '';
@@ -83,14 +84,20 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   ];
 
   // Nuevas opciones para campos de métricas
-  nivelesEducacion = [
+  // Opciones base para dropdowns (sin opciones personalizadas)
+  nivelesEducacionBase: string[] = [
+    'Sin especialización',
+    'Técnico',
+    'Profesional',
     'Diplomado',
     'Postítulo',
     'Magíster Profesional',
     'Magíster Académico',
-    'Doctorado',
-    'Sin especialización'
+    'Doctorado'
   ];
+
+  // Opciones completas para el dropdown (base + personalizadas)
+  nivelesEducacion: string[] = [];
 
   tiposEmpleo = [
     'Tiempo completo',
@@ -108,7 +115,6 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     '1.5M-2M',
     '2M-3M',
     '3M+',
-    'Prefiero no decir'
   ];
 
   disponibilidadOpciones = [
@@ -182,6 +188,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // Inicializar la lista de niveles de educación
+    this.reconstruirListaNivelesEducacion();
+
     // Verificar si estamos en modo de completar perfil
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.isCompletionMode = params['completar'] === 'true';
@@ -206,13 +215,89 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  // Métodos para manejar opciones personalizadas
+  esOpcionPersonalizada(option: string): boolean {
+    return this.opcionesPersonalizadasEducacion.includes(option);
+  }
+
+  reconstruirListaNivelesEducacion() {
+    // Combinar opciones base con opciones personalizadas
+    this.nivelesEducacion = [...this.nivelesEducacionBase, ...this.opcionesPersonalizadasEducacion];
+  }
+
+  eliminarOpcionPersonalizada(option: string, event: Event) {
+    // Prevenir todos los eventos de propagación
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    console.log('Eliminando opción personalizada:', option);
+
+    // Verificar que la opción existe antes de eliminar
+    if (!this.opcionesPersonalizadasEducacion.includes(option)) {
+      console.log('Opción no encontrada en opciones personalizadas');
+      return;
+    }
+
+    // Remover de opciones personalizadas
+    const index = this.opcionesPersonalizadasEducacion.indexOf(option);
+    if (index > -1) {
+      this.opcionesPersonalizadasEducacion.splice(index, 1);
+      console.log('Opción removida de opciones personalizadas');
+    }
+
+    // Reconstruir la lista completa sin la opción eliminada
+    this.reconstruirListaNivelesEducacion();
+    console.log('Lista reconstruida:', this.nivelesEducacion);
+
+    // Deseleccionar si estaba seleccionada
+    const valoresActuales = this.perfilForm.get('nivel_educacion')?.value || [];
+    const valoresSinEliminada = valoresActuales.filter((valor: string) => valor !== option);
+    this.perfilForm.get('nivel_educacion')?.setValue(valoresSinEliminada);
+    console.log('Valores actualizados:', valoresSinEliminada);
+
+    // Forzar detección de cambios
+    this.cdr.detectChanges();
+
+    // Guardar cambios
+    this.guardarOpcionesPersonalizadas();
+
+    // Mostrar mensaje de confirmación
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Opción eliminada',
+      detail: `"${option}" ha sido eliminada de tus opciones personalizadas`
+    });
+  }
+
   // Métodos para manejar campos "otro"
   onNivelEducacionChange(selectedValues: string[]) {
-    // Si se selecciona "Sin especialización", deseleccionar todas las demás opciones
-    if (selectedValues.includes('Sin especialización')) {
-      this.perfilForm.get('nivel_educacion')?.setValue(['Sin especialización']);
-    }
-    
+    console.log('Valores seleccionados:', selectedValues);
+
+    // Usar setTimeout para asegurar que el cambio se aplique después del procesamiento del multiselect
+    setTimeout(() => {
+      const currentValues = this.perfilForm.get('nivel_educacion')?.value || [];
+      console.log('Valores actuales después del timeout:', currentValues);
+
+      // Si "Sin especialización" está seleccionada junto con otras opciones, limpiar
+      if (currentValues.includes('Sin especialización') && currentValues.length > 1) {
+        console.log('Detección: Sin especialización con otras opciones, limpiando...');
+        // Si se está intentando seleccionar otra opción, mantener solo esa opción
+        const ultimaOpcion = selectedValues[selectedValues.length - 1];
+        if (ultimaOpcion && ultimaOpcion !== 'Sin especialización') {
+          this.perfilForm.get('nivel_educacion')?.setValue([ultimaOpcion]);
+        } else {
+          // Si se está deseleccionando, mantener solo "Sin especialización"
+          this.perfilForm.get('nivel_educacion')?.setValue(['Sin especialización']);
+        }
+      }
+      // Si se selecciona "Sin especialización" sola, deseleccionar todas las demás
+      else if (selectedValues.includes('Sin especialización') && selectedValues.length === 1) {
+        console.log('Detección: Solo Sin especialización seleccionada');
+        this.perfilForm.get('nivel_educacion')?.setValue(['Sin especialización']);
+      }
+    }, 0);
+
     // Limpiar el campo "otro" ya que no existe más
     const otroControl = this.perfilForm.get('nivel_educacion_otro');
     if (otroControl) {
@@ -225,7 +310,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   onEspecialidadChange(value: string[]) {
     this.showEspecialidadOtro = value && value.includes('Otro');
     const otroControl = this.perfilForm.get('especialidad_tecnica_otro');
-    
+
     if (this.showEspecialidadOtro) {
       // Hacer obligatorio cuando se muestra
       otroControl?.setValidators([Validators.required]);
@@ -240,7 +325,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   onTipoEmpleoChange(value: string) {
     this.showTipoEmpleoOtro = value === 'Otro';
     const otroControl = this.perfilForm.get('tipo_empleo_otro');
-    
+
     if (this.showTipoEmpleoOtro) {
       // Hacer obligatorio cuando se muestra
       otroControl?.setValidators([Validators.required]);
@@ -255,7 +340,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   onAreaInteresChange(value: string) {
     this.showAreaInteresOtro = value === 'Otro';
     const otroControl = this.perfilForm.get('area_interes_otro');
-    
+
     if (this.showAreaInteresOtro) {
       // Hacer obligatorio cuando se muestra
       otroControl?.setValidators([Validators.required]);
@@ -271,22 +356,25 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   agregarNivelEducacion() {
     if (this.nuevaNivelEducacion?.trim()) {
       const nuevaOpcion = this.nuevaNivelEducacion.trim();
-      
+
       // Verificar que no exista ya en las opciones base ni personalizadas
-      if (!this.nivelesEducacion.includes(nuevaOpcion) && !this.opcionesPersonalizadasEducacion.includes(nuevaOpcion)) {
+      if (!this.nivelesEducacionBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasEducacion.includes(nuevaOpcion)) {
         // Agregar a opciones personalizadas
         this.opcionesPersonalizadasEducacion.push(nuevaOpcion);
-        
-        // Agregar a la lista completa para el dropdown
-        this.nivelesEducacion.push(nuevaOpcion);
-        
+
+        // Reconstruir la lista completa
+        this.reconstruirListaNivelesEducacion();
+
         // Agregar la nueva opción a la selección actual
         const valoresActuales = this.perfilForm.get('nivel_educacion')?.value || [];
-        this.perfilForm.get('nivel_educacion')?.setValue([...valoresActuales, nuevaOpcion]);
-        
+
+        // Si "Sin especialización" está seleccionada, deseleccionarla antes de agregar la nueva opción
+        const valoresSinEspecializacion = valoresActuales.filter((valor: string) => valor !== 'Sin especialización');
+        this.perfilForm.get('nivel_educacion')?.setValue([...valoresSinEspecializacion, nuevaOpcion]);
+
         // Limpiar y cerrar el diálogo
         this.cancelarAgregarNivelEducacion();
-        
+
         // Guardar las opciones personalizadas en el perfil
         this.guardarOpcionesPersonalizadas();
       } else {
@@ -299,6 +387,14 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  toggleAddNivelEducacion() {
+    this.showAddNivelEducacionDialog = !this.showAddNivelEducacionDialog;
+  }
+
+  // goToPerfil() {
+  //     this.router.navigate(['/user/mi-perfil']);
+  // }
 
   cancelarAgregarNivelEducacion() {
     this.nuevaNivelEducacion = '';
@@ -353,7 +449,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     requiredFields.forEach(field => {
       const value = this.perfilForm.get(field)?.value;
       let isCompleted = false;
-      
+
       if (field === 'nivel_educacion' || field === 'especialidad_tecnica') {
         // Para campos de array, verificar que tenga al menos un elemento
         if (Array.isArray(value) && value.length > 0) {
@@ -375,27 +471,27 @@ export class MiProfileComponent implements OnInit, OnDestroy {
           }
         }
       }
-      
+
     });
 
     // Evaluar campos opcionales (20% del progreso)
     optionalFields.forEach(field => {
       const value = this.perfilForm.get(field)?.value;
       let isCompleted = false;
-      
+
       if (value && value !== '') {
         isCompleted = true;
         completedOptional++;
       }
-      
+
     });
 
     // Calcular progreso: 80% campos obligatorios + 20% campos opcionales
     const requiredProgress = (completedRequired / requiredFields.length) * 80;
     const optionalProgress = (completedOptional / optionalFields.length) * 20;
     const finalProgress = Math.round(requiredProgress + optionalProgress);
-    
-    
+
+
     return finalProgress;
   }
 
@@ -439,11 +535,10 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.perfilForm = this.fb.group({
       // Campos básicos
       nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      posicion_actual: ['', [Validators.maxLength(150)]],
-      empresa_actual: ['', [Validators.maxLength(150)]],
-      ubicacion: ['', [Validators.maxLength(100)]],
-      industria: ['', [Validators.maxLength(100)]],
-      resumen: ['', [Validators.maxLength(500)]],
+      posicion_actual: ['', [Validators.required, Validators.maxLength(150)]],
+      empresa_actual: ['', [Validators.required, Validators.maxLength(150)]],
+      ubicacion: ['', [Validators.required, Validators.maxLength(100)]],
+      industria: ['', [Validators.required, Validators.maxLength(100)]],
       // Nuevos campos obligatorios para métricas
       años_experiencia: ['', [Validators.required, Validators.min(0), Validators.max(50)]],
       nivel_educacion: [[], [Validators.required]],
@@ -515,13 +610,10 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       // Cargar opciones personalizadas si existen
       if (this.perfil.opciones_personalizadas_educacion) {
         this.opcionesPersonalizadasEducacion = this.perfil.opciones_personalizadas_educacion;
-        // Agregar opciones personalizadas a la lista de niveles
-        this.opcionesPersonalizadasEducacion.forEach(opcion => {
-          if (!this.nivelesEducacion.includes(opcion)) {
-            this.nivelesEducacion.push(opcion);
-          }
-        });
       }
+
+      // Reconstruir la lista completa de niveles de educación
+      this.reconstruirListaNivelesEducacion();
 
       this.perfilForm.patchValue({
         // Campos básicos
@@ -532,7 +624,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         industria: this.perfil.industria === 'No especificada' ? '' : this.perfil.industria,
         resumen: this.perfil.resumen === 'Sin resumen' ? '' : this.perfil.resumen,
         // Nuevos campos para métricas
-        años_experiencia: this.perfil.años_experiencia || '',
+        años_experiencia: this.perfil.años_experiencia != null ? this.perfil.años_experiencia : null,
         nivel_educacion: this.perfil.nivel_educacion || '',
         especialidad_tecnica: this.perfil.especialidad_tecnica || [],
         tipo_empleo_actual: this.perfil.tipo_empleo_actual || '',
@@ -561,7 +653,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   private guardarPerfil() {
     this.saving = true;
     const datosActualizados = this.perfilForm.value;
-    
+
     // Agregar las opciones personalizadas de educación
     datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
 
