@@ -424,6 +424,10 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
     const requiredFields = [
       'nombre',
+      'posicion_actual',
+      'empresa_actual',
+      'ubicacion',
+      'industria',
       'años_experiencia',
       'nivel_educacion',
       'especialidad_tecnica',
@@ -435,17 +439,14 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     ];
 
     const optionalFields = [
-      'posicion_actual',
-      'empresa_actual',
-      'ubicacion',
-      'industria'
+      // Ya no hay campos opcionales, todos son requeridos
     ];
 
 
     let completedRequired = 0;
     let completedOptional = 0;
 
-    // Evaluar campos obligatorios (80% del progreso)
+    // Evaluar todos los campos como obligatorios (100% del progreso)
     requiredFields.forEach(field => {
       const value = this.perfilForm.get(field)?.value;
       let isCompleted = false;
@@ -474,23 +475,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
     });
 
-    // Evaluar campos opcionales (20% del progreso)
-    optionalFields.forEach(field => {
-      const value = this.perfilForm.get(field)?.value;
-      let isCompleted = false;
-
-      if (value && value !== '') {
-        isCompleted = true;
-        completedOptional++;
-      }
-
-    });
-
-    // Calcular progreso: 80% campos obligatorios + 20% campos opcionales
-    const requiredProgress = (completedRequired / requiredFields.length) * 80;
-    const optionalProgress = (completedOptional / optionalFields.length) * 20;
-    const finalProgress = Math.round(requiredProgress + optionalProgress);
-
+    // Ya no hay campos opcionales, todos son requeridos
+    // Calcular progreso basado en campos requeridos completados (100%)
+    const finalProgress = Math.round((completedRequired / requiredFields.length) * 100);
 
     return finalProgress;
   }
@@ -672,13 +659,23 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         next: (response) => {
           console.log('Respuesta del servidor después de guardar:', response);
           if (response.ok) {
+            // Preservar fecha_registro del perfil anterior si no viene en la respuesta
+            const fechaRegistroAnterior = this.perfil?.fecha_registro;
+            
             this.perfil = response.usuario;
             if (this.perfil) {
+              // Si la fecha_registro no viene en la respuesta o es null, usar la anterior
+              if (!this.perfil.fecha_registro && fechaRegistroAnterior) {
+                this.perfil.fecha_registro = fechaRegistroAnterior;
+                console.log('Fecha de registro preservada:', this.perfil.fecha_registro);
+              }
+              
               console.log('Perfil actualizado recibido:', {
                 posicion_actual: this.perfil.posicion_actual,
                 empresa_actual: this.perfil.empresa_actual,
                 ubicacion: this.perfil.ubicacion,
-                industria: this.perfil.industria
+                industria: this.perfil.industria,
+                fecha_registro: this.perfil.fecha_registro
               });
             }
             this.messageService.add({
@@ -687,6 +684,22 @@ export class MiProfileComponent implements OnInit, OnDestroy {
               detail: 'Perfil actualizado correctamente'
             });
 
+            // Actualizar solo los campos específicos que pueden haber cambiado
+            if (this.perfil) {
+              this.perfilForm.patchValue({
+                posicion_actual: this.perfil.posicion_actual === 'No especificada' ? '' : this.perfil.posicion_actual,
+                empresa_actual: this.perfil.empresa_actual === 'No especificada' ? '' : this.perfil.empresa_actual,
+                ubicacion: this.perfil.ubicacion === 'No especificada' ? '' : this.perfil.ubicacion,
+                industria: this.perfil.industria === 'No especificada' ? '' : this.perfil.industria,
+                años_experiencia: this.perfil.años_experiencia != null ? this.perfil.años_experiencia : null,
+                tipo_empleo_actual: this.perfil.tipo_empleo_actual || '',
+                disponibilidad_cambio: this.perfil.disponibilidad_cambio || '',
+                area_interes: this.perfil.area_interes || '',
+                rango_salarial: this.perfil.rango_salarial || '',
+                satisfaccion_laboral: this.perfil.satisfaccion_laboral || null
+              });
+            }
+            
             // Si estábamos en modo de completar perfil, verificar si ahora está completo
             if (this.isCompletionMode) {
               this.verificarPerfilYRedirigir();
@@ -802,7 +815,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
   }
 
-  getFormattedDate(date: Date | null): string {
+  getFormattedDate(date: Date | null | undefined): string {
     if (!date) return 'No disponible';
 
     const fechaObj = new Date(date);
