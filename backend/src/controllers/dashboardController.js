@@ -255,7 +255,7 @@ const obtenerMetricasAvanzadas = async (req, res) => {
       .slice(0, 10);
 
     // 4. Estadísticas salariales
-    const estadisticasSalariales = ['0-500k', '500k-1M', '1M-1.5M', '1.5M-2M', '2M-3M', '3M+', 'Prefiero no decir'].map(rango => {
+    const estadisticasSalariales = ['$0 - $500.000', '$500.001 - $1.000.000', '$1.000.001 - $2.000.000', '$2.000.001 - $3.000.000', '$3.000.001+', 'Prefiero no decir'].map(rango => {
       const cantidad = usuariosActivos.filter(user => user.rango_salarial === rango).length;
       return {
         rango,
@@ -392,12 +392,11 @@ const obtenerDistribucionSalarial = async (req, res) => {
     // Función para convertir rango salarial a valor promedio
     const convertirRangoASalario = (rango) => {
       switch(rango) {
-        case '0-500k': return 400000;
-        case '500k-1M': return 750000;
-        case '1M-1.5M': return 1250000;
-        case '1.5M-2M': return 1750000;
-        case '2M-3M': return 2500000;
-        case '3M+': return 3500000;
+        case '$0 - $500.000': return 250000;
+        case '$500.001 - $1.000.000': return 750000;
+        case '$1.000.001 - $2.000.000': return 1500000;
+        case '$2.000.001 - $3.000.000': return 2500000;
+        case '$3.000.001+': return 4000000;
         default: return 1000000; // Valor por defecto
       }
     };
@@ -457,12 +456,11 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
     // Función para convertir rango salarial a valor promedio
     const convertirRangoASalario = (rango) => {
       switch(rango) {
-        case '0-500k': return 400000;
-        case '500k-1M': return 750000;
-        case '1M-1.5M': return 1250000;
-        case '1.5M-2M': return 1750000;
-        case '2M-3M': return 2500000;
-        case '3M+': return 3500000;
+        case '$0 - $500.000': return 250000;
+        case '$500.001 - $1.000.000': return 750000;
+        case '$1.000.001 - $2.000.000': return 1500000;
+        case '$2.000.001 - $3.000.000': return 2500000;
+        case '$3.000.001+': return 4000000;
         default: return 1000000; // Valor por defecto
       }
     };
@@ -1075,12 +1073,11 @@ const obtenerMapaCalorIndustriaSalarial = async (req, res) => {
 
     // Definir rangos salariales ordenados
     const rangosSalariales = [
-      { id: '0-500k', label: '<500k', orden: 1 },
-      { id: '500k-1M', label: '500k-1M', orden: 2 },
-      { id: '1M-1.5M', label: '1M-1.5M', orden: 3 },
-      { id: '1.5M-2M', label: '1.5M-2M', orden: 4 },
-      { id: '2M-3M', label: '2M-3M', orden: 5 },
-      { id: '3M+', label: '3M+', orden: 6 }
+      { id: '$0 - $500.000', label: '$0 - $500k', orden: 1 },
+      { id: '$500.001 - $1.000.000', label: '$500k - $1M', orden: 2 },
+      { id: '$1.000.001 - $2.000.000', label: '$1M - $2M', orden: 3 },
+      { id: '$2.000.001 - $3.000.000', label: '$2M - $3M', orden: 4 },
+      { id: '$3.000.001+', label: '$3M+', orden: 5 }
     ];
 
     // Obtener todas las industrias únicas

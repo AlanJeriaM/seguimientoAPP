@@ -120,12 +120,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   ];
 
   rangosSalariales = [
-    '0-500k',
-    '500k-1M',
-    '1M-1.5M',
-    '1.5M-2M',
-    '2M-3M',
-    '3M+',
+    '$0 - $500.000',
+    '$500.001 - $1.000.000',
+    '$1.000.001 - $2.000.000',
+    '$2.000.001 - $3.000.000',
+    '$3.000.001+',
   ];
 
   disponibilidadOpciones = [
