@@ -245,7 +245,7 @@
               class="technology-item">
               <div class="technology-header">
                 <h4 class="technology-name">{{ tech.nombre }}</h4>
-                <span class="technology-demand">{{ tech.demanda }} puestos</span>
+                <span class="technology-demand">{{ getSeleccionesText(tech.demanda) }}</span>
               </div>
               <div class="technology-progress">
                 <p-progressBar
@@ -317,7 +317,7 @@
                     <div class="salary-range">
                       <span class="range-label">Rango salarial:</span>
                       <span class="range-value">
-                        {{ dist.salarioMinimo | currency:'CLP':'symbol':'1.0-0' }} -
+                        {{ dist.salarioMinimo | currency:'CLP':'symbol':'1.0-0' }} - 
                         {{ dist.salarioMaximo | currency:'CLP':'symbol':'1.0-0' }}
                       </span>
                     </div>
@@ -715,7 +715,7 @@
               </div>
             </div>
           </div>
-
+          
             <!-- Usuarios Sin Trabajo -->
             <div class="metric-item border-round p-3 mb-3" style="background: rgba(220, 38, 38, 0.1); border-left: 4px solid #DC2626;">
               <div class="flex align-items-center justify-content-between">
@@ -874,7 +874,7 @@
                   {{ metricasAvanzadas.distribucionAreas[0].area }}
                 </p>
                 <small>{{ metricasAvanzadas.distribucionAreas[0].cantidad }} profesionales</small>
-              </div>
+          </div>
         </div>
       </div>
     </p-card>

@@ -825,6 +825,10 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     return (demanda / maxDemanda) * 100;
   }
 
+  getSeleccionesText(cantidad: number): string {
+    return cantidad === 1 ? '1 selección' : `${cantidad} selecciones`;
+  }
+
   handleImageError(event: any): void {
     console.log('Error cargando imagen de perfil, usando iniciales');
     this.imageError = true;
