@@ -1,6 +1,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -18,7 +19,7 @@ export class SidebarComponent {
   itemsPanelMenu: MenuItem[] = []; //Array que almacena los ítems del menú que se mostrarán en el sidebar.
   imageError: boolean = false; //Propiedad para manejar errores de carga de imagen
 
-  constructor(private primengConfig: PrimeNGConfig) {}
+  constructor(private primengConfig: PrimeNGConfig, private router: Router) {}
 
   ngOnInit(): void {
     this.primengConfig.ripple = true;
@@ -28,6 +29,15 @@ export class SidebarComponent {
   //Método que invierte el valor de visibleSidebar para alternar la visibilidad del sidebar.
   toggleSidebar() {
     this.visibleSidebar = !this.visibleSidebar;
+  }
+
+  goToPerfil() {
+    if (this.isAdmin) {
+      this.router.navigate(['/admin/mi-perfil']);
+    } else {
+      this.router.navigate(['/user/mi-perfil']);
+    }
+    this.visibleSidebar = false; // cerrar el sidebar al navegar
   }
 
   //Método para manejar errores de carga de imagen

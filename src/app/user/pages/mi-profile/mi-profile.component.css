@@ -76,3 +76,52 @@
 .p-invalid.p-component:focus {
   box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.2);
 }
+
+/* Estilos para opciones personalizadas en multiselect */
+.nivel-educacion-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.btn-eliminar-opcion {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: all 0.15s ease;
+  position: relative;
+  z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.btn-eliminar-opcion:hover {
+  background: #c82333;
+  transform: scale(1.15);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-eliminar-opcion:active {
+  transform: scale(0.9);
+  background: #a71e2a;
+}
+
+.btn-eliminar-opcion:focus {
+  outline: 2px solid #dc3545;
+  outline-offset: 2px;
+}

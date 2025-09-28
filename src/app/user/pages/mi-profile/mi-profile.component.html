@@ -86,7 +86,7 @@
                 *ngIf="perfil.perfil_imagen_url && !imageError"
                 [src]="perfil.perfil_imagen_url"
                 alt="Perfil"
-                class="border-circle  shadow-3 profile-image"
+                class="border-circle  shadow-3 profile-image "
                 (error)="handleImageError($event)"
                 style="width: 100px; height: 100px; object-fit: cover;"
               >
@@ -120,7 +120,7 @@
 
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-calendar text-primary"></i>
-                <span>Miembro desde {{ getFormattedDate(perfil.fecha_registro) }}</span>
+                <span>Miembro desde el {{ getFormattedDate(perfil.fecha_registro) }}</span>
               </div>
             </div>
           </div>
@@ -364,9 +364,10 @@
             <!-- Nivel de Educación -->
             <div class="col-12 lg:col-6">
               <div class="field">
-                <label for="nivel_educacion" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Nivel de Educación
-                  <small class="text-600 font-normal block mt-1">Puede seleccionar múltiples opciones</small>
+                <label for="nivel_educacion" class="flex items-center gap-2 text-900 font-semibold mb-2">
+                  <span class="text-red-500 mr-1">*</span>
+                  <span>Nivel de Educación</span>
+                  <small class="text-600 font-normal">(Puedes seleccionar múltiples opciones)</small>
                 </label>
                 <div class="flex gap-2">
                   <p-multiSelect
@@ -378,16 +379,32 @@
                     [class]="'flex-1 ' + (isFieldInvalid('nivel_educacion') ? 'ng-invalid ng-dirty' : '')"
                     styleClass="w-full"
                     (onChange)="onNivelEducacionChange($event.value)">
+                    <ng-template let-option pTemplate="item">
+                      <div class="nivel-educacion-item" (click)="$event.stopPropagation()">
+                        <span>{{ option }}</span>
+                        <p-button
+                        *ngIf="esOpcionPersonalizada(option)"
+                        (click)="eliminarOpcionPersonalizada(option, $event)"
+                        (mousedown)="$event.stopPropagation()"
+                        (mouseup)="$event.stopPropagation()"
+                        icon="pi pi-times"
+                        [rounded]="true"
+                        severity="danger"
+                        [styleClass]="'btn-eliminar-opcion'">
+                      </p-button>
+
+                      </div>
+                    </ng-template>
                   </p-multiSelect>
 
                   <p-button
-                    icon="pi pi-plus"
-                    styleClass="p-button-success p-button-outlined flex-shrink-0"
-                    [style]="{'width': '3rem', 'height': '3rem'}"
-                    (onClick)="showAddNivelEducacionDialog = true"
-                    pTooltip="Agregar opción personalizada"
+                    [icon]="showAddNivelEducacionDialog ? 'pi pi-minus' : 'pi pi-plus'"
+                    [styleClass]="showAddNivelEducacionDialog ? 'p-button-danger flex-shrink-0' : 'p-button-success flex-shrink-0'"
+                    [style]="{'min-height': '36px', 'width': '36px'}"
+                    (onClick)="toggleAddNivelEducacion()"
+                    [pTooltip]="showAddNivelEducacionDialog ? 'Cerrar opción personalizada' : 'Agregar opción personalizada'"
                     tooltipPosition="top">
-                  </p-button>
+                </p-button>
                 </div>
 
                 <!-- Custom Option Dialog -->
@@ -415,7 +432,7 @@
                     </p-button>
                     <p-button
                       icon="pi pi-times"
-                      styleClass="p-button-text p-button-secondary"
+                      styleClass="p-button-text p-button-danger"
                       (onClick)="cancelarAgregarNivelEducacion()">
                     </p-button>
                   </div>
@@ -430,9 +447,10 @@
             <!-- Especialidad Técnica -->
             <div class="col-12 lg:col-6">
               <div class="field">
-                <label for="especialidad_tecnica" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Tecnologías Dominadas
-                  <small class="text-600 font-normal block mt-1">Seleccione todas las tecnologías que domina</small>
+                <label for="especialidad_tecnica" class="flex items-center gap-2 text-900 font-semibold mb-2">
+                  <span class="text-red-500 mr-1">*</span>
+                  <span>Tecnologías Dominadas</span>
+                  <small class="text-600 font-normal">(Seleccione todas las tecnologías que domina)</small>
                 </label>
                 <p-multiSelect
                   id="especialidad_tecnica"

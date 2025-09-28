@@ -22,6 +22,7 @@ import {
   MapaCalorData,
   DisponibilidadCambioData
 } from '../../../core/services/dashboard/dashboard.service';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
 
@@ -113,7 +114,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     }
   };
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService, private router: Router) {}
 
   ngOnInit() {
     this.loadDashboardData();
@@ -174,22 +175,22 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
             // Cargar métricas avanzadas
             this.loadMetricasAvanzadas();
-            
+
             // Cargar datos de satisfacción laboral
             this.loadSatisfaccionLaboral();
-            
+
             // Cargar datos de evolución salarial
             this.loadEvolucionSalarial();
-            
+
             // Cargar datos de distribución de experiencia
             this.loadDistribucionExperiencia();
-            
+
             // Cargar datos de experiencia vs tecnologías
             this.loadExperienciaVsTecnologias();
-            
+
             // Cargar datos de mapa de calor industria vs salario
             this.loadMapaCalorIndustriaSalarial();
-            
+
             // Cargar datos de disponibilidad para cambio de trabajo
             this.loadDisponibilidadCambioTrabajo();
 
@@ -240,7 +241,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           if (response.ok && response.satisfaccion) {
             this.satisfaccionLaboral = response.satisfaccion;
             console.log('Datos de satisfacción laboral cargados:', this.satisfaccionLaboral);
-            
+
             // Renderizar gráfico de satisfacción
             setTimeout(() => {
               this.renderSatisfaccionLaboralChart();
@@ -263,7 +264,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           if (response.ok && response.evolucion) {
             this.evolucionSalarial = response.evolucion;
             console.log('Datos de evolución salarial cargados:', this.evolucionSalarial);
-            
+
             // Renderizar gráfico de evolución salarial
             setTimeout(() => {
               this.renderEvolucionSalarialChart();
@@ -286,7 +287,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           if (response.ok && response.distribucion) {
             this.distribucionExperienciaProfesionales = response.distribucion;
             console.log('Datos de distribución de experiencia cargados:', this.distribucionExperienciaProfesionales);
-            
+
             // Renderizar gráfico de distribución de experiencia
             setTimeout(() => {
               this.renderDistribucionExperienciaChart();
@@ -309,7 +310,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           if (response.ok && response.experienciaVsTecnologias) {
             this.experienciaVsTecnologias = response.experienciaVsTecnologias;
             console.log('Datos de experiencia vs tecnologías cargados:', this.experienciaVsTecnologias);
-            
+
             // Renderizar gráfico de experiencia vs tecnologías
             setTimeout(() => {
               this.renderExperienciaVsTecnologiasChart();
@@ -332,7 +333,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           if (response.ok && response.mapaCalor) {
             this.mapaCalorIndustriaSalarial = response.mapaCalor;
             console.log('Datos de mapa de calor industria vs salario cargados:', this.mapaCalorIndustriaSalarial);
-            
+
             // Renderizar mapa de calor industria vs salario
             setTimeout(() => {
               this.renderMapaCalorIndustriaSalarialChart();
@@ -355,7 +356,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           if (response.ok && response.disponibilidadCambio) {
             this.disponibilidadCambioTrabajo = response.disponibilidadCambio;
             console.log('Datos de disponibilidad de cambio cargados:', this.disponibilidadCambioTrabajo);
-            
+
             // Renderizar gráfico de disponibilidad de cambio
             setTimeout(() => {
               this.renderDisponibilidadCambioChart();
@@ -375,6 +376,16 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     this.renderEmpresasContratantesChart();
     this.renderTendenciasMercadoChart();
     this.renderEstadisticasGeneralesChart();
+  }
+
+  navigateToProfile(): void {
+    if (!this.isAdmin()) {
+      this.router.navigate(['/user/mi-perfil']);
+    }
+  }
+
+  isAdmin(): boolean {
+    return this.router.url.startsWith('/admin/dashboard');
   }
 
 
@@ -582,7 +593,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 const formatCurrency = (value: number): string => {
                   return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
                 };
-                
+
                 // Función para crear estrellitas
                 const formatStars = (rating: number | null): string => {
                   if (rating === null || rating === undefined) return 'Sin datos';
@@ -592,16 +603,16 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                   const emptyStars = '☆'.repeat(5 - Math.floor(rating) - (hasHalfStar ? 1 : 0));
                   return `${fullStars}${halfStar}${emptyStars} (${rating}/5)`;
                 };
-                
+
                 const tooltipLines = [
                   `Empleados: ${emp.totalEmpleados}`,
                   `Salario Promedio: ${formatCurrency(emp.promedioSalario)}`
                 ];
-                
+
                 if (emp.satisfaccionPromedio !== null && emp.satisfaccionPromedio !== undefined) {
                   tooltipLines.push(`Satisfacción: ${formatStars(emp.satisfaccionPromedio)}`);
                 }
-                
+
                 return tooltipLines;
               }
             }
@@ -921,7 +932,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             callbacks: {
               label: (context: any) => {
                 const empresa = topEmpresas[context.dataIndex];
-                const stars = '★'.repeat(Math.floor(empresa.satisfaccionPromedio)) + 
+                const stars = '★'.repeat(Math.floor(empresa.satisfaccionPromedio)) +
                             '☆'.repeat(5 - Math.floor(empresa.satisfaccionPromedio));
                 return [
                   `Satisfacción: ${empresa.satisfaccionPromedio}/5`,
@@ -1101,7 +1112,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               label: function(context) {
                 const dataIndex = context.dataIndex;
                 const item = datos[dataIndex];
-                
+
                 if (context.datasetIndex === 0) {
                   return [
                     `Salario Promedio: ${formatCurrency(item.salarioPromedio)}`,
@@ -1255,7 +1266,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               label: function(context) {
                 const dataIndex = context.dataIndex;
                 const item = datosOrdenados[dataIndex];
-                
+
                 return [
                   `Profesionales: ${item.cantidad}`,
                   `Porcentaje: ${item.porcentaje}% del total`,
@@ -1402,7 +1413,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               label: function(context) {
                 const dataIndex = context.dataIndex;
                 const item = datos[dataIndex];
-                
+
                 return [
                   `Promedio: ${item.promedioTecnologias} tecnologías`,
                   `Profesionales: ${item.cantidad}`,
@@ -1441,7 +1452,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     const datos = this.mapaCalorIndustriaSalarial;
     const industriasLabels = datos.datos.map(fila => fila.industria);
     const rangosSalariales = datos.rangosSalariales.sort((a, b) => a.orden - b.orden);
-    
+
     // Crear datasets para cada rango salarial
     const datasets = rangosSalariales.map((rango, index) => {
       const colores = [
@@ -1452,7 +1463,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         '#8B5CF6', // Púrpura para 2M-3M
         '#6366F1'  // Índigo para 3M+
       ];
-      
+
       return {
         label: rango.label,
         data: datos.datos.map(fila => {
@@ -1569,11 +1580,11 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 const rangoSalarial = context.dataset.label;
                 // Para gráficos stacked, obtenemos el valor crudo del dataset
                 const cantidad = (context.raw as number) || 0;
-                
+
                 const filaIndustria = datos.datos.find(fila => fila.industria === industria);
                 const totalIndustria = filaIndustria ? filaIndustria.totalProfesionales : 0;
                 const porcentaje = totalIndustria > 0 ? Math.round((cantidad / totalIndustria) * 100) : 0;
-                
+
                 return [
                   `${rangoSalarial}: ${cantidad} profesionales`,
                   `${porcentaje}% de ${industria}`,
@@ -1599,7 +1610,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       console.warn('No hay datos de disponibilidad para renderizar el gráfico');
       return;
     }
-    
+
     console.log('📊 Datos de disponibilidad recibidos para renderizar:', this.disponibilidadCambioTrabajo.datos);
 
     const canvas = document.getElementById('disponibilidadCambioChart') as HTMLCanvasElement;
@@ -1659,13 +1670,13 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               generateLabels: function(chart) {
                 const original = Chart.defaults.plugins.legend.labels.generateLabels;
                 const labels = original.call(this, chart);
-                
+
                 // Agregar porcentajes a las etiquetas
                 labels.forEach((label, index) => {
                   const item = datos[index];
                   label.text = `${item.disponibilidad} (${item.porcentaje}%)`;
                 });
-                
+
                 return labels;
               }
             }
@@ -1696,7 +1707,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               label: function(context) {
                 const item = datos[context.dataIndex];
                 const total = datos.reduce((sum, d) => sum + d.cantidad, 0);
-                
+
                 return [
                   `Profesionales: ${item.cantidad}`,
                   `Porcentaje: ${item.porcentaje}%`,
@@ -1705,7 +1716,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               },
               afterBody: function(tooltipItems) {
                 const item = datos[tooltipItems[0].dataIndex];
-                
+
                 // Agregar contexto específico según la disponibilidad
                 switch (item.disponibilidad) {
                   case 'Activamente buscando':

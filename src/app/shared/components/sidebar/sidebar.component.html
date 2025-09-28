@@ -21,26 +21,29 @@
 
         <!-- Imagen de perfil con fallback -->
         <div class="sidebar-image-container">
-          <img 
+          <img
             *ngIf="!isAdmin && perfilImagenUrl && !imageError"
             [src]="perfilImagenUrl"
+            (click)="goToPerfil()"
             alt="Perfil de usuario"
             class="sidebar-image"
             (error)="handleImageError($event)"
-            width="96" 
+            width="96"
             height="96" />
-          <div 
+          <div
             *ngIf="!isAdmin && (!perfilImagenUrl || imageError)"
+            (click)="goToPerfil()"
             class="sidebar-image-fallback">
             {{ getUserInitials() }}
           </div>
-          <img 
+          <img
             *ngIf="isAdmin"
-            class="sidebar-image" 
-            [src]="'assets/icons/admin4.png'" 
-            alt="Administrador" 
-            width="96" 
-            height="96" />
+            class="sidebar-image"
+            [src]="'assets/icons/admin4.png'"
+            alt="Administrador"
+            width="96"
+            height="96"
+            (click)="goToPerfil()"/>
         </div>
         <h4 class="sidebar-username flex justify-content-center">
             {{ nameUser }}

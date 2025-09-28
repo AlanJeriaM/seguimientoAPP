@@ -1,18 +1,3 @@
-/* CSS Mínimo para el Dashboard - Solo lo esencial */
-
-/* Variables CSS básicas */
-:root {
-  --linkedin-blue: #0077b5;
-  --linkedin-blue-light: #00a0b0;
-  --success-color: #00d084;
-  --warning-color: #ff6b35;
-  --purple-color: #7b68ee;
-  --border-radius: 8px;
-  --border-radius-sm: 4px;
-  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.15);
-  --transition: all 0.3s ease;
-}
 
 /* Estilos básicos del contenedor */
 .dashboard-container {
@@ -20,6 +5,15 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.clickable-profile {
+  cursor: pointer;
+}
+
+.clickable-profile:hover {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
 }
 
 /* Loading State */
@@ -333,7 +327,7 @@
   .metric-summary .metric-value {
     font-size: 1.2rem;
   }
-  
+
   .metric-summary .text-truncate {
     font-size: 1.1rem;
   }
@@ -344,15 +338,15 @@
     padding: 0.75rem 0.5rem;
     margin: 0.25rem 0;
   }
-  
+
   .metric-summary .metric-value {
     font-size: 1.1rem;
   }
-  
+
   .metric-summary .text-truncate {
     font-size: 1rem;
   }
-  
+
   .metric-summary h4 {
     font-size: 0.8rem;
   }
@@ -362,15 +356,15 @@
   .metric-summary .metric-value {
     font-size: 1rem;
   }
-  
+
   .metric-summary .text-truncate {
     font-size: 0.9rem;
   }
-  
+
   .metric-summary h4 {
     font-size: 0.75rem;
   }
-  
+
   .metric-summary small {
     font-size: 0.7rem;
   }
@@ -382,25 +376,25 @@
     font-size: 1.5rem;
     text-align: center;
   }
-  
+
   .chart-container {
     height: 250px !important;
     padding: 0.5rem;
   }
-  
+
   .chart-card .card-header {
     padding: 0.75rem;
   }
-  
+
   .chart-card .card-header h3 {
     font-size: 1rem;
   }
-  
+
   .metric-summary {
     padding: 0.75rem;
     margin: 0.25rem 0;
   }
-  
+
   .metric-summary .metric-value {
     font-size: 1.25rem;
   }
@@ -411,11 +405,11 @@
     height: 220px !important;
     padding: 0.25rem;
   }
-  
+
   .metric-summary .metric-value {
     font-size: 1.1rem;
   }
-  
+
   .metric-summary h4 {
     font-size: 0.8rem;
   }
@@ -821,16 +815,16 @@
   .dashboard-container {
     padding: 1rem;
   }
-  
+
   .profile-header {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .profile-name {
     font-size: 2rem;
   }
-  
+
   .stat-card {
     padding: 1.5rem;
   }
@@ -988,7 +982,7 @@
   .metric-summary .metric-value {
     font-size: 1.2rem;
   }
-  
+
   .metric-summary .text-truncate {
     font-size: 1.1rem;
   }
@@ -999,15 +993,15 @@
     padding: 0.75rem 0.5rem;
     margin: 0.25rem 0;
   }
-  
+
   .metric-summary .metric-value {
     font-size: 1.1rem;
   }
-  
+
   .metric-summary .text-truncate {
     font-size: 1rem;
   }
-  
+
   .metric-summary h4 {
     font-size: 0.8rem;
   }
@@ -1017,15 +1011,15 @@
   .metric-summary .metric-value {
     font-size: 1rem;
   }
-  
+
   .metric-summary .text-truncate {
     font-size: 0.9rem;
   }
-  
+
   .metric-summary h4 {
     font-size: 0.75rem;
   }
-  
+
   .metric-summary small {
     font-size: 0.7rem;
   }
@@ -1037,25 +1031,25 @@
     font-size: 1.5rem;
     text-align: center;
   }
-  
+
   .chart-container {
     height: 250px !important;
     padding: 0.5rem;
   }
-  
+
   .chart-card .card-header {
     padding: 0.75rem;
   }
-  
+
   .chart-card .card-header h3 {
     font-size: 1rem;
   }
-  
+
   .metric-summary {
     padding: 0.75rem;
     margin: 0.25rem 0;
   }
-  
+
   .metric-summary .metric-value {
     font-size: 1.25rem;
   }
@@ -1066,11 +1060,11 @@
     height: 220px !important;
     padding: 0.25rem;
   }
-  
+
   .metric-summary .metric-value {
     font-size: 1.1rem;
   }
-  
+
   .metric-summary h4 {
     font-size: 0.8rem;
   }
