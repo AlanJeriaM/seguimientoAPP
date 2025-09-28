@@ -33,6 +33,7 @@ export interface PerfilUsuario {
   satisfaccion_laboral?: number;
   opciones_personalizadas_educacion?: string[];
   opciones_personalizadas_tecnologias?: string[];
+  opciones_personalizadas_area_interes?: string[];
 }
 
 @Component({
@@ -55,7 +56,6 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   // Propiedades para campos "otro"
   showNivelEducacionOtro = false;
   showEspecialidadOtro = false;
-  showTipoEmpleoOtro = false;
   showAreaInteresOtro = false;
 
 
@@ -68,6 +68,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   showAddTecnologiaDialog = false;
   nuevaTecnologia: string = '';
   opcionesPersonalizadasTecnologias: string[] = [];
+
+  // Variables para área de interés personalizada
+  showAddAreaInteresDialog = false;
+  nuevaAreaInteres: string = '';
+  opcionesPersonalizadasAreaInteres: string[] = [];
 
   // Variables para control de cambios en el formulario
   private formInitialValue: any = null;
@@ -115,8 +120,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Part-time',
     'Freelance',
     'Desempleado',
-    'Estudiante',
-    'Otro'
+    'Estudiante'
   ];
 
   rangosSalariales = [
@@ -135,7 +139,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Sin trabajo'
   ];
 
-  areasInteres = [
+  // Opciones base para área de interés (sin opciones personalizadas)
+  areasInteresBase = [
     'Frontend Development',
     'Backend Development',
     'Full Stack Development',
@@ -148,9 +153,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Product Management',
     'Project Management',
     'Cybersecurity',
-    'Cloud Computing',
-    'Otro'
+    'Cloud Computing'
   ];
+
+  // Array dinámico que combina opciones base + personalizadas
+  areasInteres: string[] = [];
 
   // Opciones base para tecnologías (sin opciones personalizadas)
   especialidadesTecnicasBase = [
@@ -202,6 +209,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Inicializar las listas
     this.reconstruirListaNivelesEducacion();
     this.reconstruirListaTecnologias();
+    this.reconstruirListaAreasInteres();
 
     // Verificar si estamos en modo de completar perfil
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -242,7 +250,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       this.formInitialValue = {
         ...this.perfilForm.value,
         opciones_personalizadas_educacion: [...this.opcionesPersonalizadasEducacion],
-        opciones_personalizadas_tecnologias: [...this.opcionesPersonalizadasTecnologias]
+        opciones_personalizadas_tecnologias: [...this.opcionesPersonalizadasTecnologias],
+        opciones_personalizadas_area_interes: [...this.opcionesPersonalizadasAreaInteres]
       };
       this.hasFormChanges = false;
     }
@@ -316,6 +325,20 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Comparar opciones personalizadas de área de interés
+    const initialOpcionesAreaInteres = initial.opciones_personalizadas_area_interes || [];
+    const currentOpcionesAreaInteres = this.opcionesPersonalizadasAreaInteres || [];
+    
+    if (initialOpcionesAreaInteres.length !== currentOpcionesAreaInteres.length) {
+      return true;
+    }
+    
+    for (let i = 0; i < initialOpcionesAreaInteres.length; i++) {
+      if (initialOpcionesAreaInteres[i] !== currentOpcionesAreaInteres[i]) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -336,6 +359,16 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   reconstruirListaTecnologias() {
     // Combinar opciones base con opciones personalizadas
     this.especialidadesTecnicas = [...this.especialidadesTecnicasBase, ...this.opcionesPersonalizadasTecnologias];
+  }
+
+  reconstruirListaAreasInteres() {
+    // Combinar opciones base con opciones personalizadas
+    console.log('Reconstruyendo lista de áreas de interés:', {
+      areasInteresBase: this.areasInteresBase,
+      opcionesPersonalizadasAreaInteres: this.opcionesPersonalizadasAreaInteres
+    });
+    this.areasInteres = [...this.areasInteresBase, ...this.opcionesPersonalizadasAreaInteres];
+    console.log('Lista final de áreas de interés:', this.areasInteres);
   }
 
   eliminarOpcionPersonalizada(option: string, event: Event) {
@@ -486,20 +519,6 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     otroControl?.updateValueAndValidity();
   }
 
-  onTipoEmpleoChange(value: string) {
-    this.showTipoEmpleoOtro = value === 'Otro';
-    const otroControl = this.perfilForm.get('tipo_empleo_otro');
-
-    if (this.showTipoEmpleoOtro) {
-      // Hacer obligatorio cuando se muestra
-      otroControl?.setValidators([Validators.required]);
-    } else {
-      // Quitar validadores y limpiar valor cuando se oculta
-      otroControl?.clearValidators();
-      otroControl?.setValue('');
-    }
-    otroControl?.updateValueAndValidity();
-  }
 
   onAreaInteresChange(value: string) {
     this.showAreaInteresOtro = value === 'Otro';
@@ -622,6 +641,125 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.nuevaTecnologia = '';
   }
 
+  // Métodos para área de interés personalizada
+  esOpcionPersonalizadaAreaInteres(option: string): boolean {
+    return this.opcionesPersonalizadasAreaInteres.includes(option);
+  }
+
+  eliminarOpcionPersonalizadaAreaInteres(option: string, event: Event) {
+    // Prevenir todos los eventos de propagación
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    
+    console.log('Eliminando opción personalizada de área de interés:', option);
+    
+    // Verificar que la opción existe antes de eliminar
+    if (!this.opcionesPersonalizadasAreaInteres.includes(option)) {
+      console.log('Opción no encontrada en opciones personalizadas de área de interés');
+      return;
+    }
+    
+    // Remover de opciones personalizadas
+    const index = this.opcionesPersonalizadasAreaInteres.indexOf(option);
+    if (index > -1) {
+      this.opcionesPersonalizadasAreaInteres.splice(index, 1);
+      console.log('Opción removida de opciones personalizadas de área de interés');
+    }
+    
+    // Reconstruir la lista completa sin la opción eliminada
+    this.reconstruirListaAreasInteres();
+    console.log('Lista de áreas de interés reconstruida:', this.areasInteres);
+    
+    // Deseleccionar si estaba seleccionada
+    const valorActual = this.perfilForm.get('area_interes')?.value || '';
+    if (valorActual === option) {
+      this.perfilForm.get('area_interes')?.setValue('');
+      console.log('Área de interés deseleccionada');
+    }
+    
+    // Forzar detección de cambios
+    this.cdr.detectChanges();
+    
+    // Guardar cambios
+    this.guardarOpcionesPersonalizadasAreaInteres();
+    
+    // Mostrar mensaje de confirmación
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Opción eliminada',
+      detail: `"${option}" ha sido eliminada de tus opciones personalizadas`
+    });
+  }
+
+  agregarAreaInteres() {
+    const nuevaOpcion = this.nuevaAreaInteres.trim();
+    
+    if (!nuevaOpcion) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Campo vacío',
+        detail: 'Por favor ingresa un área de interés'
+      });
+      return;
+    }
+
+    // Verificar que no existe ya
+    if (!this.areasInteresBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasAreaInteres.includes(nuevaOpcion)) {
+      // Agregar a opciones personalizadas
+      this.opcionesPersonalizadasAreaInteres.push(nuevaOpcion);
+
+      // Reconstruir la lista completa
+      this.reconstruirListaAreasInteres();
+
+      // Seleccionar la nueva opción
+      this.perfilForm.get('area_interes')?.setValue(nuevaOpcion);
+
+      // Limpiar el campo y cerrar el diálogo
+      this.nuevaAreaInteres = '';
+      this.showAddAreaInteresDialog = false;
+
+      // Guardar cambios
+      this.guardarOpcionesPersonalizadasAreaInteres();
+
+      // Detectar cambios
+      this.detectFormChanges();
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Opción agregada',
+        detail: `"${nuevaOpcion}" ha sido agregada a tus opciones personalizadas`
+      });
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Opción duplicada',
+        detail: 'Esta área de interés ya existe'
+      });
+    }
+  }
+
+  toggleAddAreaInteres() {
+    this.showAddAreaInteresDialog = !this.showAddAreaInteresDialog;
+    if (!this.showAddAreaInteresDialog) {
+      this.nuevaAreaInteres = '';
+    }
+  }
+
+  onNuevaAreaInteresChange(event: any) {
+    this.nuevaAreaInteres = event.target.value;
+    this.cdr.detectChanges();
+  }
+
+  get isNuevaAreaInteresValid(): boolean {
+    return this.nuevaAreaInteres.trim() !== '';
+  }
+
+  cancelarAgregarAreaInteres() {
+    this.nuevaAreaInteres = '';
+    this.showAddAreaInteresDialog = false;
+  }
+
   onNuevaNivelEducacionChange(event: any) {
     this.nuevaNivelEducacion = event.target.value;
     this.cdr.detectChanges(); // Forzar detección de cambios
@@ -642,6 +780,12 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   private guardarOpcionesPersonalizadasTecnologias() {
     if (this.perfil) {
       this.perfil.opciones_personalizadas_tecnologias = [...this.opcionesPersonalizadasTecnologias];
+    }
+  }
+
+  private guardarOpcionesPersonalizadasAreaInteres() {
+    if (this.perfil) {
+      this.perfil.opciones_personalizadas_area_interes = [...this.opcionesPersonalizadasAreaInteres];
     }
   }
 
@@ -760,7 +904,6 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       especialidad_tecnica: [[], [Validators.required]],
       especialidad_tecnica_otro: [''],
       tipo_empleo_actual: ['', [Validators.required]],
-      tipo_empleo_otro: [''],
       disponibilidad_cambio: ['', [Validators.required]],
       area_interes: ['', [Validators.required]],
       area_interes_otro: [''],
@@ -835,9 +978,23 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         this.opcionesPersonalizadasTecnologias = [];
       }
 
+      if (this.perfil.opciones_personalizadas_area_interes) {
+        this.opcionesPersonalizadasAreaInteres = this.perfil.opciones_personalizadas_area_interes;
+        console.log('Opciones personalizadas de área de interés cargadas:', this.opcionesPersonalizadasAreaInteres);
+      } else {
+        console.log('No hay opciones personalizadas de área de interés en el perfil');
+        this.opcionesPersonalizadasAreaInteres = [];
+      }
+
+      console.log('Estado después de cargar opciones personalizadas:', {
+        opcionesPersonalizadasAreaInteres: this.opcionesPersonalizadasAreaInteres,
+        areasInteres: this.areasInteres
+      });
+
       // Reconstruir las listas completas
       this.reconstruirListaNivelesEducacion();
       this.reconstruirListaTecnologias();
+      this.reconstruirListaAreasInteres();
 
       this.perfilForm.patchValue({
         // Campos básicos
@@ -884,6 +1041,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Agregar las opciones personalizadas
     datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
     datosActualizados.opciones_personalizadas_tecnologias = this.opcionesPersonalizadasTecnologias;
+    datosActualizados.opciones_personalizadas_area_interes = this.opcionesPersonalizadasAreaInteres;
 
     console.log('Datos que se van a guardar:', datosActualizados);
     console.log('Opciones personalizadas de educación:', this.opcionesPersonalizadasEducacion);
