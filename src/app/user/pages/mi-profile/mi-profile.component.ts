@@ -32,6 +32,7 @@ export interface PerfilUsuario {
   area_interes?: string;
   satisfaccion_laboral?: number;
   opciones_personalizadas_educacion?: string[];
+  opciones_personalizadas_tecnologias?: string[];
 }
 
 @Component({
@@ -62,6 +63,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   showAddNivelEducacionDialog = false;
   nuevaNivelEducacion: string = '';
   opcionesPersonalizadasEducacion: string[] = [];
+
+  // Variables para agregar opciones personalizadas de tecnologías
+  showAddTecnologiaDialog = false;
+  nuevaTecnologia: string = '';
+  opcionesPersonalizadasTecnologias: string[] = [];
 
   // Variables para control de cambios en el formulario
   private formInitialValue: any = null;
@@ -147,7 +153,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Otro'
   ];
 
-  especialidadesTecnicas = [
+  // Opciones base para tecnologías (sin opciones personalizadas)
+  especialidadesTecnicasBase = [
     'JavaScript',
     'Python',
     'Java',
@@ -168,9 +175,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Kotlin',
     'Swift',
     'Flutter',
-    'React Native',
-    'Otro'
+    'React Native'
   ];
+  especialidadesTecnicas: string[] = [];
 
   tecnologiasPrincipales = [
     'JavaScript', 'TypeScript', 'Python', 'Java', 'C#', 'PHP', 'Go', 'Rust',
@@ -193,8 +200,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Inicializar la lista de niveles de educación
+    // Inicializar las listas
     this.reconstruirListaNivelesEducacion();
+    this.reconstruirListaTecnologias();
 
     // Verificar si estamos en modo de completar perfil
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -234,7 +242,8 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     if (this.perfilForm) {
       this.formInitialValue = {
         ...this.perfilForm.value,
-        opciones_personalizadas_educacion: [...this.opcionesPersonalizadasEducacion]
+        opciones_personalizadas_educacion: [...this.opcionesPersonalizadasEducacion],
+        opciones_personalizadas_tecnologias: [...this.opcionesPersonalizadasTecnologias]
       };
       this.hasFormChanges = false;
     }
@@ -281,15 +290,29 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     }
 
     // Comparar opciones personalizadas de educación
-    const initialOpciones = initial.opciones_personalizadas_educacion || [];
-    const currentOpciones = this.opcionesPersonalizadasEducacion || [];
+    const initialOpcionesEducacion = initial.opciones_personalizadas_educacion || [];
+    const currentOpcionesEducacion = this.opcionesPersonalizadasEducacion || [];
     
-    if (initialOpciones.length !== currentOpciones.length) {
+    if (initialOpcionesEducacion.length !== currentOpcionesEducacion.length) {
       return true;
     }
     
-    for (let i = 0; i < initialOpciones.length; i++) {
-      if (initialOpciones[i] !== currentOpciones[i]) {
+    for (let i = 0; i < initialOpcionesEducacion.length; i++) {
+      if (initialOpcionesEducacion[i] !== currentOpcionesEducacion[i]) {
+        return true;
+      }
+    }
+
+    // Comparar opciones personalizadas de tecnologías
+    const initialOpcionesTecnologias = initial.opciones_personalizadas_tecnologias || [];
+    const currentOpcionesTecnologias = this.opcionesPersonalizadasTecnologias || [];
+    
+    if (initialOpcionesTecnologias.length !== currentOpcionesTecnologias.length) {
+      return true;
+    }
+    
+    for (let i = 0; i < initialOpcionesTecnologias.length; i++) {
+      if (initialOpcionesTecnologias[i] !== currentOpcionesTecnologias[i]) {
         return true;
       }
     }
@@ -302,9 +325,18 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     return this.opcionesPersonalizadasEducacion.includes(option);
   }
 
+  esOpcionPersonalizadaTecnologia(option: string): boolean {
+    return this.opcionesPersonalizadasTecnologias.includes(option);
+  }
+
   reconstruirListaNivelesEducacion() {
     // Combinar opciones base con opciones personalizadas
     this.nivelesEducacion = [...this.nivelesEducacionBase, ...this.opcionesPersonalizadasEducacion];
+  }
+
+  reconstruirListaTecnologias() {
+    // Combinar opciones base con opciones personalizadas
+    this.especialidadesTecnicas = [...this.especialidadesTecnicasBase, ...this.opcionesPersonalizadasTecnologias];
   }
 
   eliminarOpcionPersonalizada(option: string, event: Event) {
@@ -347,6 +379,54 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Detectar cambios después de eliminar opción
     this.detectFormChanges();
 
+    // Mostrar mensaje de confirmación
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Opción eliminada',
+      detail: `"${option}" ha sido eliminada de tus opciones personalizadas`
+    });
+  }
+
+  eliminarOpcionPersonalizadaTecnologia(option: string, event: Event) {
+    // Prevenir todos los eventos de propagación
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    
+    console.log('Eliminando opción personalizada de tecnología:', option);
+    
+    // Verificar que la opción existe antes de eliminar
+    if (!this.opcionesPersonalizadasTecnologias.includes(option)) {
+      console.log('Opción no encontrada en opciones personalizadas de tecnologías');
+      return;
+    }
+    
+    // Remover de opciones personalizadas
+    const index = this.opcionesPersonalizadasTecnologias.indexOf(option);
+    if (index > -1) {
+      this.opcionesPersonalizadasTecnologias.splice(index, 1);
+      console.log('Opción removida de opciones personalizadas de tecnologías');
+    }
+    
+    // Reconstruir la lista completa sin la opción eliminada
+    this.reconstruirListaTecnologias();
+    console.log('Lista de tecnologías reconstruida:', this.especialidadesTecnicas);
+    
+    // Deseleccionar si estaba seleccionada
+    const valoresActuales = this.perfilForm.get('especialidad_tecnica')?.value || [];
+    const valoresSinEliminada = valoresActuales.filter((valor: string) => valor !== option);
+    this.perfilForm.get('especialidad_tecnica')?.setValue(valoresSinEliminada);
+    console.log('Valores de tecnologías actualizados:', valoresSinEliminada);
+    
+    // Forzar detección de cambios
+    this.cdr.detectChanges();
+    
+    // Guardar cambios
+    this.guardarOpcionesPersonalizadasTecnologias();
+    
+    // Detectar cambios después de eliminar opción
+    this.detectFormChanges();
+    
     // Mostrar mensaje de confirmación
     this.messageService.add({
       severity: 'success',
@@ -489,6 +569,60 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.showAddNivelEducacionDialog = false;
   }
 
+  // Métodos para agregar opciones personalizadas de tecnologías
+  agregarTecnologia() {
+    if (this.nuevaTecnologia?.trim()) {
+      const nuevaOpcion = this.nuevaTecnologia.trim();
+
+      // Verificar que no exista ya en las opciones base ni personalizadas
+      if (!this.especialidadesTecnicasBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasTecnologias.includes(nuevaOpcion)) {
+        // Agregar a opciones personalizadas
+        this.opcionesPersonalizadasTecnologias.push(nuevaOpcion);
+
+        // Reconstruir la lista completa
+        this.reconstruirListaTecnologias();
+
+        // Agregar la nueva opción a la selección actual
+        const valoresActuales = this.perfilForm.get('especialidad_tecnica')?.value || [];
+        this.perfilForm.get('especialidad_tecnica')?.setValue([...valoresActuales, nuevaOpcion]);
+
+        // Limpiar y cerrar el diálogo
+        this.cancelarAgregarTecnologia();
+
+        // Guardar las opciones personalizadas en el perfil
+        this.guardarOpcionesPersonalizadasTecnologias();
+
+        // Detectar cambios después de agregar opción
+        this.detectFormChanges();
+      } else {
+        // Mostrar mensaje de que ya existe
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Opción existente',
+          detail: 'Esta tecnología ya existe en la lista'
+        });
+      }
+    }
+  }
+
+  toggleAddTecnologia() {
+    this.showAddTecnologiaDialog = !this.showAddTecnologiaDialog;
+  }
+
+  onNuevaTecnologiaChange(event: any) {
+    this.nuevaTecnologia = event.target.value;
+    this.cdr.detectChanges();
+  }
+
+  get isNuevaTecnologiaValid(): boolean {
+    return this.nuevaTecnologia.trim() !== '';
+  }
+
+  cancelarAgregarTecnologia() {
+    this.showAddTecnologiaDialog = false;
+    this.nuevaTecnologia = '';
+  }
+
   onNuevaNivelEducacionChange(event: any) {
     this.nuevaNivelEducacion = event.target.value;
     this.cdr.detectChanges(); // Forzar detección de cambios
@@ -503,6 +637,12 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     if (this.perfil) {
       // Agregar las opciones personalizadas al perfil para persistencia
       this.perfil.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
+    }
+  }
+
+  private guardarOpcionesPersonalizadasTecnologias() {
+    if (this.perfil) {
+      this.perfil.opciones_personalizadas_tecnologias = [...this.opcionesPersonalizadasTecnologias];
     }
   }
 
@@ -650,6 +790,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
           if (response.ok) {
             this.perfil = response.usuario;
             console.log('Perfil cargado:', this.perfil);
+            console.log('Opciones personalizadas de tecnologías en respuesta:', this.perfil?.opciones_personalizadas_tecnologias);
             this.populateForm();
             this.updateProgress();
           } else {
@@ -687,8 +828,17 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         this.opcionesPersonalizadasEducacion = this.perfil.opciones_personalizadas_educacion;
       }
 
-      // Reconstruir la lista completa de niveles de educación
+      if (this.perfil.opciones_personalizadas_tecnologias) {
+        this.opcionesPersonalizadasTecnologias = this.perfil.opciones_personalizadas_tecnologias;
+        console.log('Opciones personalizadas de tecnologías cargadas:', this.opcionesPersonalizadasTecnologias);
+      } else {
+        console.log('No hay opciones personalizadas de tecnologías en el perfil');
+        this.opcionesPersonalizadasTecnologias = [];
+      }
+
+      // Reconstruir las listas completas
       this.reconstruirListaNivelesEducacion();
+      this.reconstruirListaTecnologias();
 
       this.perfilForm.patchValue({
         // Campos básicos
@@ -732,11 +882,13 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.saving = true;
     const datosActualizados = this.perfilForm.value;
 
-    // Agregar las opciones personalizadas de educación
+    // Agregar las opciones personalizadas
     datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
+    datosActualizados.opciones_personalizadas_tecnologias = this.opcionesPersonalizadasTecnologias;
 
     console.log('Datos que se van a guardar:', datosActualizados);
     console.log('Opciones personalizadas de educación:', this.opcionesPersonalizadasEducacion);
+    console.log('Opciones personalizadas de tecnologías:', this.opcionesPersonalizadasTecnologias);
     console.log('Campos básicos a guardar:', {
       posicion_actual: datosActualizados.posicion_actual,
       empresa_actual: datosActualizados.empresa_actual,

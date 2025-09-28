@@ -340,26 +340,6 @@
           </div>
 
           <div class="grid">
-            <!-- Años de Experiencia -->
-            <div class="col-12 lg:col-6">
-              <div class="field">
-                <label for="años_experiencia" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Años de Experiencia
-                </label>
-                <p-inputNumber
-                  id="años_experiencia"
-                  formControlName="años_experiencia"
-                  placeholder="Ej: 5"
-                  [min]="0"
-                  [max]="60"
-                  [class]="'w-full ' + (isFieldInvalid('años_experiencia') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full">
-                </p-inputNumber>
-                <small *ngIf="isFieldInvalid('años_experiencia')" class="p-error block mt-2">
-                  <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('años_experiencia') }}
-                </small>
-              </div>
-            </div>
 
             <!-- Nivel de Educación -->
             <div class="col-12 lg:col-6">
@@ -444,42 +424,85 @@
               </div>
             </div>
 
+
+
+
+
             <!-- Especialidad Técnica -->
             <div class="col-12 lg:col-6">
               <div class="field">
                 <label for="especialidad_tecnica" class="flex items-center gap-2 text-900 font-semibold mb-2">
                   <span class="text-red-500 mr-1">*</span>
                   <span>Tecnologías Dominadas</span>
-                  <small class="text-600 font-normal">(Seleccione todas las tecnologías que domina)</small>
+                  <small class="text-600 font-normal">(Puedes seleccionar múltiples opciones)</small>
                 </label>
-                <p-multiSelect
-                  id="especialidad_tecnica"
-                  formControlName="especialidad_tecnica"
-                  [options]="especialidadesTecnicas"
-                  placeholder="Seleccione las tecnologías que domina"
-                  [class]="'w-full ' + (isFieldInvalid('especialidad_tecnica') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full"
-                  [showToggleAll]="false"
-                  [maxSelectedLabels]="3"
-                  selectedItemsLabel="{0} tecnologías seleccionadas"
-                  (onChange)="onEspecialidadChange($event.value)">
-                </p-multiSelect>
+                <div class="flex gap-2">
+                  <p-multiSelect
+                    id="especialidad_tecnica"
+                    formControlName="especialidad_tecnica"
+                    [options]="especialidadesTecnicas"
+                    placeholder="Seleccione las tecnologías que domina"
+                    selectedItemsLabel="{0} tecnologías seleccionadas"
+                    [class]="'flex-1 ' + (isFieldInvalid('especialidad_tecnica') ? 'ng-invalid ng-dirty' : '')"
+                    styleClass="w-full"
+                    (onChange)="onEspecialidadChange($event.value)">
+                    <ng-template let-option pTemplate="item">
+                      <div class="tecnologia-item" (click)="$event.stopPropagation()">
+                        <span>{{ option }}</span>
+                        <p-button
+                        *ngIf="esOpcionPersonalizadaTecnologia(option)"
+                        (click)="eliminarOpcionPersonalizadaTecnologia(option, $event)"
+                        (mousedown)="$event.stopPropagation()"
+                        (mouseup)="$event.stopPropagation()"
+                        icon="pi pi-times"
+                        [rounded]="true"
+                        severity="danger"
+                        [styleClass]="'btn-eliminar-opcion'">
+                      </p-button>
+                      </div>
+                    </ng-template>
+                  </p-multiSelect>
 
-                <!-- Custom Tech Field -->
-                <div *ngIf="showEspecialidadOtro" class="surface-100 border-1 surface-border border-round-lg p-3 mt-3">
-                  <label for="especialidad_tecnica_otro" class="block text-900 font-semibold mb-2">
-                    <span class="text-red-500 mr-1">*</span>Especifique otras tecnologías
-                  </label>
-                  <input
-                    pInputText
-                    id="especialidad_tecnica_otro"
-                    formControlName="especialidad_tecnica_otro"
-                    placeholder="Escriba otras tecnologías separadas por comas"
-                    [class]="'w-full ' + (isFieldInvalid('especialidad_tecnica_otro') ? 'p-invalid' : '')"
-                    type="text">
-                  <small *ngIf="isFieldInvalid('especialidad_tecnica_otro')" class="p-error block mt-2">
-                    <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('especialidad_tecnica_otro') }}
-                  </small>
+                  <p-button
+                    [icon]="showAddTecnologiaDialog ? 'pi pi-minus' : 'pi pi-plus'"
+                    [styleClass]="showAddTecnologiaDialog ? 'p-button-danger flex-shrink-0' : 'p-button-success flex-shrink-0'"
+                    [style]="{'min-height': '36px', 'width': '36px'}"
+                    (onClick)="toggleAddTecnologia()"
+                    [pTooltip]="showAddTecnologiaDialog ? 'Cerrar opción personalizada' : 'Agregar opción personalizada'"
+                    tooltipPosition="top">
+                </p-button>
+                </div>
+
+                <!-- Custom Option Dialog -->
+                <div *ngIf="showAddTecnologiaDialog" class="surface-100 border-1 surface-border border-round-lg p-4 mt-3">
+                  <div class="flex align-items-center gap-2 mb-3">
+                    <i class="pi pi-plus-circle text-primary"></i>
+                    <h5 class="font-semibold text-900 mb-0">Agregar opción personalizada</h5>
+                  </div>
+
+                  <div class="flex gap-2">
+                    <input
+                      pInputText
+                      id="nueva_tecnologia"
+                      [value]="nuevaTecnologia"
+                      (input)="onNuevaTecnologiaChange($event)"
+                      placeholder="Escriba la nueva tecnología"
+                      class="flex-1"
+                      type="text">
+                    <p-button
+                      label="Agregar"
+                      icon="pi pi-check"
+                      styleClass="p-button-success"
+                      (onClick)="agregarTecnologia()"
+                      [disabled]="!isNuevaTecnologiaValid">
+                    </p-button>
+                    <p-button
+                      label="Cancelar"
+                      icon="pi pi-times"
+                      styleClass="p-button-text p-button-danger"
+                      (onClick)="cancelarAgregarTecnologia()">
+                    </p-button>
+                  </div>
                 </div>
 
                 <small *ngIf="isFieldInvalid('especialidad_tecnica')" class="p-error block mt-2">
@@ -487,6 +510,27 @@
                 </small>
               </div>
             </div>
+
+              <!-- Años de Experiencia -->
+              <div class="col-12 lg:col-6">
+                <div class="field">
+                  <label for="años_experiencia" class="block text-900 font-semibold mb-2">
+                    <span class="text-red-500 mr-1">*</span>Años de Experiencia
+                  </label>
+                  <p-inputNumber
+                    id="años_experiencia"
+                    formControlName="años_experiencia"
+                    placeholder="Ej: 5"
+                    [min]="0"
+                    [max]="60"
+                    [class]="'w-full ' + (isFieldInvalid('años_experiencia') ? 'ng-invalid ng-dirty' : '')"
+                    styleClass="w-full">
+                  </p-inputNumber>
+                  <small *ngIf="isFieldInvalid('años_experiencia')" class="p-error block mt-2">
+                    <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('años_experiencia') }}
+                  </small>
+                </div>
+              </div>
 
             <!-- Tipo de Empleo -->
             <div class="col-12 lg:col-6">
