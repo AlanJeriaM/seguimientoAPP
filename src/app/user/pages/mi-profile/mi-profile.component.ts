@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileCompletionGuard } from '../../../core/guards/profile-completion.guard';
+import Swal from 'sweetalert2';
 
 export interface PerfilUsuario {
   id: number;
@@ -716,7 +717,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.perfilForm.valid) {
-      this.guardarPerfil();
+      this.confirmSaveChanges();
     } else {
       this.markFormGroupTouched();
       this.messageService.add({
@@ -891,12 +892,55 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   }
 
   resetForm() {
-    this.populateForm();
-    this.hasFormChanges = false;
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Formulario restablecido',
-      detail: 'Los cambios han sido descartados'
+    // Mostrar modal de confirmación antes de descartar
+    this.confirmDiscardChanges();
+  }
+
+  private confirmDiscardChanges() {
+    Swal.fire({
+      title: '¿Desea descartar los cambios realizados?',
+      text: 'Los cambios no guardados se perderán permanentemente',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981', // Verde
+      cancelButtonColor: '#ef4444',  // Rojo
+      confirmButtonText: 'Sí, descartar',
+      cancelButtonText: 'No, mantener',
+      reverseButtons: true,
+      customClass: {
+        actions: 'my-swal-actions'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.populateForm();
+        this.hasFormChanges = false;
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Formulario restablecido',
+          detail: 'Los cambios han sido descartados'
+        });
+      }
+    });
+  }
+
+  private confirmSaveChanges() {
+    Swal.fire({
+      title: '¿Desea realizar estos cambios?',
+      text: 'Los cambios se guardarán en su perfil',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981', // Verde
+      cancelButtonColor: '#ef4444',  // Rojo
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'No, cancelar',
+      reverseButtons: true,
+      customClass: {
+        actions: 'my-swal-actions'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.guardarPerfil();
+      }
     });
   }
 

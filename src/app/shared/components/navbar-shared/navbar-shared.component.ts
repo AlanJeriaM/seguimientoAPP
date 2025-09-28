@@ -5,6 +5,7 @@ import { NotificacionService, Notificacion } from '../../../core/services/notifi
 import { MenuItem } from 'primeng/api';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { Subject, takeUntil } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-navbar-shared',
@@ -124,8 +125,29 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
   }
 
   logOut() {
-    this.authService.logOut();
-    this.router.navigate(['auth']);
+    this.confirmLogout();
+  }
+
+  private confirmLogout() {
+    Swal.fire({
+      title: '¿Estás seguro que quieres cerrar sesión?',
+      text: 'Serás redirigido a la página de inicio de sesión',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981', // Verde
+      cancelButtonColor: '#ef4444',  // Rojo
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'No, mantener sesión',
+      reverseButtons: true,
+      customClass: {
+        actions: 'my-swal-actions'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.authService.logOut();
+        this.router.navigate(['auth']);
+      }
+    });
   }
 
   // Métodos para notificaciones
