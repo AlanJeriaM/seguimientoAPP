@@ -85,7 +85,7 @@ export class SidebarComponent {
     return [
       { label: 'Reporte Egresado LinkedIn', icon: 'pi pi-linkedin', routerLink: '/user/dashboard' },
       { label: 'Encuestas', icon: 'pi pi-users', items: [
-          { label: 'Encuesta nueva', icon: 'pi pi-file-edit', routerLink: '/user/view-encuestas' },
+          { label: 'Encuestas nuevas', icon: 'pi pi-file-edit', routerLink: '/user/view-encuestas' },
           { label: 'Encuestas completadas', icon: 'pi pi-check', routerLink: '/user/encuesta-completada' }
         ]
       }

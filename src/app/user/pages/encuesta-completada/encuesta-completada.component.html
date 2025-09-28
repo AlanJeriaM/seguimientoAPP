@@ -12,8 +12,8 @@
           <p class="page-subtitle">Revisa las encuestas que has completado y accede a tus resultados</p>
         </div>
         <div class="action-section">
-          <p-button 
-            label="Ver Encuestas Disponibles" 
+          <p-button
+            label="Ver Encuestas Disponibles"
             icon="pi pi-arrow-left"
             [outlined]="true"
             (click)="navegarAEncuestas()"
@@ -31,12 +31,13 @@
           <div class="search-section">
             <span class="p-input-icon-left">
               <i class="pi pi-search"></i>
-              <input 
-                type="text" 
-                pInputText 
-                placeholder="Buscar encuestas completadas..." 
+              <input
+                type="text"
+                pInputText
+                placeholder="Buscar"
                 [(ngModel)]="searchText"
                 class="search-input"
+                [disabled]="encuestasCompletadas.length === 0"
               />
             </span>
             <p-button
@@ -171,9 +172,9 @@
                   <h4>No hay encuestas completadas</h4>
                   <p *ngIf="searchText">No se encontraron encuestas que coincidan con tu búsqueda.</p>
                   <p *ngIf="!searchText">Aún no has completado ninguna encuesta.</p>
-                  <p-button 
+                  <p-button
                     *ngIf="!searchText"
-                    label="Ver Encuestas Disponibles" 
+                    label="Ver Encuestas Disponibles"
                     icon="pi pi-arrow-right"
                     (click)="navegarAEncuestas()"
                   ></p-button>
@@ -198,8 +199,8 @@
           <p class="page-subtitle">Detalles de encuesta completada</p>
         </div>
         <div class="action-section">
-          <p-button 
-            label="Volver a la lista" 
+          <p-button
+            label="Volver a la lista"
             icon="pi pi-arrow-left"
             [outlined]="true"
             (click)="volverALista()"
@@ -234,7 +235,7 @@
             <div class="info-row">
               <span class="label">Período de la encuesta:</span>
               <span class="value">
-                {{ encuestaSeleccionada.fecha_inicio_encuesta | date:'dd/MM/yyyy' }} - 
+                {{ encuestaSeleccionada.fecha_inicio_encuesta | date:'dd/MM/yyyy' }} -
                 {{ encuestaSeleccionada.fecha_fin_encuesta | date:'dd/MM/yyyy' }}
               </span>
             </div>
