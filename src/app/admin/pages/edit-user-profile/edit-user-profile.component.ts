@@ -81,6 +81,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
   // Variables para control de cambios en el formulario
   private formInitialValue: any = null;
   hasFormChanges = false;
+  private initialFormStateSaved = false;
 
   private destroy$ = new Subject<void>();
 
@@ -194,6 +195,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {
     console.log('🔧 EditUserProfileComponent constructor llamado');
+    console.log('🔧 hasFormChanges inicial:', this.hasFormChanges);
     this.initializeForm();
   }
 
@@ -416,8 +418,10 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     // Forzar actualización de la vista
     this.cdr.detectChanges();
     
-    // Guardar estado inicial del formulario
-    this.saveInitialFormState();
+    // Guardar estado inicial del formulario DESPUÉS de que todos los valores estén establecidos
+    setTimeout(() => {
+      this.saveInitialFormState();
+    }, 200);
   }
 
   private saveInitialFormState() {
@@ -430,11 +434,19 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
         opciones_personalizadas_industria: [...this.opcionesPersonalizadasIndustria]
       };
       this.hasFormChanges = false;
+      this.initialFormStateSaved = true;
+      
+      // Debug: Log del estado inicial guardado
+      console.log('🔧 Estado inicial guardado:', {
+        formInitialValue: this.formInitialValue,
+        hasFormChanges: this.hasFormChanges,
+        initialFormStateSaved: this.initialFormStateSaved
+      });
     }
   }
 
   private detectFormChanges() {
-    if (!this.formInitialValue || !this.perfilForm) {
+    if (!this.formInitialValue || !this.perfilForm || !this.initialFormStateSaved) {
       this.hasFormChanges = false;
       return;
     }
@@ -447,7 +459,15 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       opciones_personalizadas_industria: [...this.opcionesPersonalizadasIndustria]
     };
 
-    this.hasFormChanges = this.hasRealChanges(this.formInitialValue, currentValue);
+    const hasChanges = this.hasRealChanges(this.formInitialValue, currentValue);
+    this.hasFormChanges = hasChanges;
+    
+    // Debug: Log de detección de cambios
+    console.log('🔧 Detección de cambios:', {
+      hasChanges: hasChanges,
+      initialValue: this.formInitialValue,
+      currentValue: currentValue
+    });
   }
 
   private parseArrayField(field: any): any[] {
@@ -499,9 +519,11 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
       if (Array.isArray(initialValue) && Array.isArray(currentValue)) {
         if (initialValue.length !== currentValue.length || !initialValue.every((val: any, index: number) => val === currentValue[index])) {
+          console.log(`🔧 Campo ${field} cambió (array):`, { initial: initialValue, current: currentValue });
           return true;
         }
       } else if (initialValue !== currentValue) {
+        console.log(`🔧 Campo ${field} cambió:`, { initial: initialValue, current: currentValue });
         return true;
       }
     }
@@ -510,24 +532,28 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     const initialOpcionesEducacion = initial.opciones_personalizadas_educacion || [];
     const currentOpcionesEducacion = current.opciones_personalizadas_educacion || [];
     if (initialOpcionesEducacion.length !== currentOpcionesEducacion.length || !initialOpcionesEducacion.every((val: any, index: number) => val === currentOpcionesEducacion[index])) {
+      console.log('🔧 Opciones personalizadas educación cambió:', { initial: initialOpcionesEducacion, current: currentOpcionesEducacion });
       return true;
     }
 
     const initialOpcionesTecnologias = initial.opciones_personalizadas_tecnologias || [];
     const currentOpcionesTecnologias = current.opciones_personalizadas_tecnologias || [];
     if (initialOpcionesTecnologias.length !== currentOpcionesTecnologias.length || !initialOpcionesTecnologias.every((val: any, index: number) => val === currentOpcionesTecnologias[index])) {
+      console.log('🔧 Opciones personalizadas tecnologías cambió:', { initial: initialOpcionesTecnologias, current: currentOpcionesTecnologias });
       return true;
     }
 
     const initialOpcionesAreaInteres = initial.opciones_personalizadas_area_interes || [];
     const currentOpcionesAreaInteres = current.opciones_personalizadas_area_interes || [];
     if (initialOpcionesAreaInteres.length !== currentOpcionesAreaInteres.length || !initialOpcionesAreaInteres.every((val: any, index: number) => val === currentOpcionesAreaInteres[index])) {
+      console.log('🔧 Opciones personalizadas área interés cambió:', { initial: initialOpcionesAreaInteres, current: currentOpcionesAreaInteres });
       return true;
     }
 
     const initialOpcionesIndustria = initial.opciones_personalizadas_industria || [];
     const currentOpcionesIndustria = current.opciones_personalizadas_industria || [];
     if (initialOpcionesIndustria.length !== currentOpcionesIndustria.length || !initialOpcionesIndustria.every((val: any, index: number) => val === currentOpcionesIndustria[index])) {
+      console.log('🔧 Opciones personalizadas industria cambió:', { initial: initialOpcionesIndustria, current: currentOpcionesIndustria });
       return true;
     }
 
@@ -1022,6 +1048,8 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     this.visibleChange.emit(false);
     this.perfilForm.reset();
     this.perfil = null;
+    this.initialFormStateSaved = false;
+    this.hasFormChanges = false;
   }
 
   cancelar() {
