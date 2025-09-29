@@ -1,3 +1,6 @@
+<!-- Toast para notificaciones -->
+<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
+
 <div class="grid">
   <div class="col-12">
     <p-card class="text-center" header="Administradores del Sistema">
@@ -436,6 +439,99 @@
         icon="pi pi-times"
         (click)="cerrarViewDialog()"
         styleClass="p-button-text">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal para eliminar administrador -->
+<p-dialog
+  [(visible)]="displayDeleteDialog"
+  header="Eliminar Administrador"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarEliminacion()"
+>
+  <div *ngIf="adminParaEliminar" class="p-4">
+    <!-- Warning Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-red-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-exclamation-triangle text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Confirmar Eliminación</h3>
+            <p class="text-600 mb-0 text-sm">Esta acción no se puede deshacer</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <!-- Información del Administrador -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Administrador a Eliminar</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ adminParaEliminar.nombre_completo || 'No especificado' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Correo Electrónico</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ adminParaEliminar.email_usuario || 'No especificado' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje de advertencia -->
+          <div class="col-12">
+            <div class="p-3 surface-100 border-round border-1 border-red-300 bg-red-50">
+              <div class="flex align-items-start gap-2">
+                <i class="pi pi-info-circle text-red-500 mt-1"></i>
+                <div>
+                  <p class="text-red-700 font-semibold mb-1">Advertencia</p>
+                  <p class="text-red-600 text-sm mb-0">
+                    Al eliminar este administrador, se desactivará su cuenta y perderá acceso al sistema.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cancelarEliminacion()"
+        styleClass="p-button-text w-full sm:w-auto"
+        [disabled]="deleting">
+      </p-button>
+      <p-button
+        label="Eliminar Administrador"
+        icon="pi pi-trash"
+        (click)="confirmarEliminacion()"
+        styleClass="p-button-danger w-full sm:w-auto"
+        [loading]="deleting"
+        [disabled]="deleting">
       </p-button>
     </div>
   </ng-template>
