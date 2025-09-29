@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AdminService } from '../../../core/services/admin/admin.service';
-import Swal from 'sweetalert2';
 import { TableLazyLoadEvent } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-view-deleted-admin',
@@ -19,10 +19,24 @@ export class ViewDeletedAdminComponent implements OnInit, OnDestroy {
   pageSize: number = 10;
   searchText: string = '';
 
+  // Variables para el modal de reactivar administrador
+  displayReactivateDialog: boolean = false;
+  adminParaReactivar: any = null;
+  reactivating: boolean = false;
+
+  // Variables para el modal de eliminar permanentemente
+  displayDeleteDialog: boolean = false;
+  adminParaEliminar: any = null;
+  deleting: boolean = false;
+  confirmText: string = '';
+
   // Subject para manejar el debounce de búsqueda
   private searchSubject = new Subject<string>();
 
-  constructor(private adminService: AdminService) {
+  constructor(
+    private adminService: AdminService,
+    private messageService: MessageService
+  ) {
     // Configurar el debounce para la búsqueda
     this.searchSubject.pipe(
       debounceTime(500), // Esperar 500ms después de que el usuario deje de escribir
@@ -69,11 +83,6 @@ export class ViewDeletedAdminComponent implements OnInit, OnDestroy {
           console.error('Error:', resp.msj);
           this.administradoresEliminados = [];
           this.totalRecords = 0;
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: resp.msj || 'Error al cargar administradores eliminados'
-          });
         }
       },
       error: (error) => {
@@ -81,11 +90,6 @@ export class ViewDeletedAdminComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.administradoresEliminados = [];
         this.totalRecords = 0;
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error de conexión con el servidor'
-        });
       }
     });
   }
@@ -113,157 +117,125 @@ export class ViewDeletedAdminComponent implements OnInit, OnDestroy {
   }
 
   reactivarAdministrador(admin: any) {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: `¿Deseas reactivar al administrador ${admin.nombre_completo}?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#28a745',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Sí, reactivar',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.adminService.reactivarAdministrador(admin.id).subscribe({
-          next: (resp) => {
-            if (resp.ok) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Administrador reactivado',
-                text: 'El administrador ha sido reactivado correctamente',
-                timer: 2000,
-                showConfirmButton: false
-              });
-              this.cargarAdministradoresEliminados(this.currentPage, this.searchText);
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: resp.msj || 'Error al reactivar administrador'
-              });
-            }
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Error de conexión con el servidor'
-            });
-          }
-        });
-      }
-    });
+    this.adminParaReactivar = admin;
+    this.displayReactivateDialog = true;
   }
 
-  eliminarPermanentemente(admin: any) {
-    Swal.fire({
-      title: '¡ELIMINACIÓN PERMANENTE!',
-      html: `
-        <div style="text-align: center; margin: 20px 0;">
-          <p><strong>¿Estás seguro que deseas eliminar permanentemente al administrador?</strong></p>
-          <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
-            <p><strong>Nombre:</strong> ${admin.nombre_completo}</p>
-            <p><strong>Correo:</strong> ${admin.email_usuario}</p>
-            <p><strong>Rol:</strong> ${admin.rol === 'ADMIN-USER' ? 'Administrador' : admin.rol}</p>
-          </div>
-          <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px;">
-            <p style="margin: 0; color: #856404;"><strong>ADVERTENCIA:</strong> Esta acción no se puede deshacer</p>
-          </div>
-        </div>
-      `,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Segundo diálogo de confirmación
-        Swal.fire({
-          title: 'Confirmación Final',
-          text: '¿Realmente deseas eliminar? Escribe "ELIMINAR" para confirmar.',
-          input: 'text',
-          inputPlaceholder: 'Escribe ELIMINAR',
-          showCancelButton: true,
-          confirmButtonColor: '#dc3545',
-          cancelButtonColor: '#6c757d',
-          confirmButtonText: 'Eliminar',
-          cancelButtonText: 'Cancelar',
-          inputValidator: (value) => {
-            if (value !== 'ELIMINAR') {
-              return 'Debes escribir exactamente "ELIMINAR" para confirmar'
-            }
-            return null;
-          }
-        }).then((secondResult) => {
-          if (secondResult.isConfirmed) {
-            this.realizarEliminacionPermanente(admin);
-          }
-        });
-      }
-    });
-  }
-
-  private realizarEliminacionPermanente(admin: any) {
-    // Mostrar loading
-    Swal.fire({
-      title: 'Eliminando administrador...',
-      text: 'Por favor espera mientras se procesa la eliminación',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-
-    this.adminService.eliminarAdministradorPermanentemente(admin.id).subscribe({
+  confirmarReactivacion() {
+    if (!this.adminParaReactivar) return;
+    
+    this.reactivating = true;
+    this.adminService.reactivarAdministrador(this.adminParaReactivar.id).subscribe({
       next: (resp) => {
+        this.reactivating = false;
         if (resp.ok) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Administrador eliminado permanentemente',
-            html: `
-              <div style="text-align: left;">
-                <p><strong>${admin.nombre_completo}</strong> ha sido eliminado correctamente del sistema</p>
-              </div>
-            `,
-            timer: 3000,
-            showConfirmButton: true
-          });
-
-          // Recargar la lista de administradores eliminados
+          this.displayReactivateDialog = false;
+          this.adminParaReactivar = null;
           this.cargarAdministradoresEliminados(this.currentPage, this.searchText);
+          
+          // Mostrar toast de éxito
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Administrador reactivado correctamente',
+            life: 3000
+          });
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al eliminar',
-            text: resp.msj || 'Error al eliminar administrador permanentemente'
+          console.error('Error al reactivar administrador:', resp.msj);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: resp.msj || 'Error al reactivar administrador',
+            life: 5000
           });
         }
       },
       error: (error) => {
-        console.error('Error:', error);
-        // Manejar diferentes tipos de errores
-        let mensajeError = 'Error de conexión con el servidor';
-
-        if (error.status === 400) {
-          mensajeError = error.error?.msj || 'Datos inválidos';
-        } else if (error.status === 404) {
-          mensajeError = error.error?.msj || 'Administrador no encontrado';
-        } else if (error.status === 500) {
-          mensajeError = error.error?.msj || 'Error interno del servidor';
-        }
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Error de conexión',
-          text: mensajeError,
-          confirmButtonText: 'Entendido'
+        this.reactivating = false;
+        console.error('Error de conexión:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error de conexión con el servidor',
+          life: 5000
         });
       }
     });
   }
+
+  cancelarReactivacion() {
+    this.displayReactivateDialog = false;
+    this.adminParaReactivar = null;
+    this.reactivating = false;
+  }
+
+  eliminarPermanentemente(admin: any) {
+    this.adminParaEliminar = admin;
+    this.confirmText = '';
+    this.displayDeleteDialog = true;
+  }
+
+  confirmarEliminacionPermanente() {
+    if (!this.adminParaEliminar) return;
+    
+    // Validar que se escribió "ELIMINAR"
+    if (this.confirmText !== 'ELIMINAR') {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validación requerida',
+        detail: 'Debes escribir exactamente "ELIMINAR" para confirmar',
+        life: 4000
+      });
+      return;
+    }
+    
+    this.deleting = true;
+    this.adminService.eliminarAdministradorPermanentemente(this.adminParaEliminar.id).subscribe({
+      next: (resp) => {
+        this.deleting = false;
+        if (resp.ok) {
+          this.displayDeleteDialog = false;
+          this.adminParaEliminar = null;
+          this.confirmText = '';
+          this.cargarAdministradoresEliminados(this.currentPage, this.searchText);
+          
+          // Mostrar toast de éxito
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Administrador eliminado permanentemente',
+            life: 3000
+          });
+        } else {
+          console.error('Error al eliminar administrador:', resp.msj);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: resp.msj || 'Error al eliminar administrador',
+            life: 5000
+          });
+        }
+      },
+      error: (error) => {
+        this.deleting = false;
+        console.error('Error de conexión:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error de conexión con el servidor',
+          life: 5000
+        });
+      }
+    });
+  }
+
+  cancelarEliminacionPermanente() {
+    this.displayDeleteDialog = false;
+    this.adminParaEliminar = null;
+    this.confirmText = '';
+    this.deleting = false;
+  }
+
 
   // Manejo de paginación actualizado igual que en view-admin
   onPageChange(event: TableLazyLoadEvent) {
