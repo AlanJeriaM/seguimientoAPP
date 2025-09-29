@@ -158,8 +158,8 @@
   [(visible)]="displayDialog"
   [header]="editMode ? 'Editar Administrador' : 'Nuevo Administrador'"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '600px'}"
-  [contentStyle]="{'padding': '1rem', 'overflow-y': 'auto', 'max-height': '80vh'}"
+  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
   [appendTo]="'body'"
@@ -167,113 +167,159 @@
   [closable]="true"
   [closeOnEscape]="true"
   [responsive]="true"
-  [breakpoints]="{'960px': '90vw', '640px': '95vw'}"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
   [dismissableMask]="true"
+  (onHide)="cerrarDialog()"
 >
-  <form [formGroup]="adminForm" (ngSubmit)="guardarAdministrador()">
-    <div class="grid">
-      <div class="col-12 sm:col-6">
-        <label for="nombre" class="block text-900 font-medium mb-2">
-          Nombre*
-        </label>
-        <input
-          id="nombre"
-          pInputText
-          type="text"
-          formControlName="nombre_usuario"
-          placeholder="Ingrese el nombre"
-          class="w-full"
-          [class.ng-invalid]="isFieldInvalid('nombre_usuario')"
-          [class.ng-dirty]="isFieldInvalid('nombre_usuario')"
-        />
-        <span
-          *ngIf="isFieldInvalid('nombre_usuario')"
-          class="error-message text-red-500 text-sm mt-1 block">
-          {{ getFieldError('nombre_usuario') }}
-        </span>
+  <div class="p-4">
+    <form [formGroup]="adminForm" (ngSubmit)="guardarAdministrador()">
+      <!-- Basic Information Section -->
+      <div class="mb-6">
+        <div class="surface-50 p-4 border-round-lg">
+          <div class="flex align-items-center gap-3 mb-4">
+            <div class="bg-blue-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+              <i class="pi pi-user text-base"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-xl font-semibold text-900 mb-1">Información Básica</h3>
+              <p class="text-600 mb-0 text-sm">Datos personales del administrador</p>
+            </div>
+          </div>
+
+          <div class="grid">
+            <!-- Nombre -->
+            <div class="col-12 lg:col-6">
+              <div class="field">
+                <label for="nombre" class="block text-900 font-semibold mb-2">
+                  <span class="text-red-500 mr-1">*</span>Nombre
+                </label>
+                <input
+                  id="nombre"
+                  pInputText
+                  type="text"
+                  formControlName="nombre_usuario"
+                  placeholder="Ingrese el nombre"
+                  class="w-full p-inputtext-lg"
+                  [class]="'w-full ' + (isFieldInvalid('nombre_usuario') ? 'ng-invalid ng-dirty' : '')"
+                />
+                <span
+                  *ngIf="isFieldInvalid('nombre_usuario')"
+                  class="p-error text-sm mt-1 block">
+                  {{ getFieldError('nombre_usuario') }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Apellido -->
+            <div class="col-12 lg:col-6">
+              <div class="field">
+                <label for="apellido" class="block text-900 font-semibold mb-2">
+                  <span class="text-red-500 mr-1">*</span>Apellido
+                </label>
+                <input
+                  id="apellido"
+                  pInputText
+                  type="text"
+                  formControlName="apellido"
+                  placeholder="Ingrese el apellido"
+                  class="w-full p-inputtext-lg"
+                  [class]="'w-full ' + (isFieldInvalid('apellido') ? 'ng-invalid ng-dirty' : '')"
+                />
+                <span *ngIf="isFieldInvalid('apellido')"
+                  class="p-error text-sm mt-1 block">
+                  {{ getFieldError('apellido') }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-12">
+              <div class="field">
+                <label for="email" class="block text-900 font-semibold mb-2">
+                  <span class="text-red-500 mr-1">*</span>Correo Electrónico
+                </label>
+                <input
+                  id="email"
+                  pInputText
+                  type="email"
+                  formControlName="email_usuario"
+                  placeholder="admin@ejemplo.com"
+                  class="w-full p-inputtext-lg"
+                  [class]="'w-full ' + (isFieldInvalid('email_usuario') ? 'ng-invalid ng-dirty' : '')"
+                />
+                <span *ngIf="isFieldInvalid('email_usuario')"
+                  class="p-error text-sm mt-1 block">
+                  {{ getFieldError('email_usuario') }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="col-12 sm:col-6">
-        <label for="apellido" class="block text-900 font-medium mb-2">
-          Apellido*
-        </label>
-        <input
-          id="apellido"
-          pInputText
-          type="text"
-          formControlName="apellido"
-          placeholder="Ingrese el apellido"
-          class="w-full"
-          [class.ng-invalid]="isFieldInvalid('apellido')"
-          [class.ng-dirty]="isFieldInvalid('apellido')"
-        />
-        <span *ngIf="isFieldInvalid('apellido')"
-          class="error-message text-red-500 text-sm mt-1 block">
-          {{ getFieldError('apellido') }}
-        </span>
-      </div>
+      <!-- Security Information Section -->
+      <div class="mb-6">
+        <div class="surface-50 p-4 border-round-lg">
+          <div class="flex align-items-center gap-3 mb-4">
+            <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+              <i class="pi pi-lock text-base"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-xl font-semibold text-900 mb-1">Información de Seguridad</h3>
+              <p class="text-600 mb-0 text-sm">{{ editMode ? 'Actualizar contraseña del administrador' : 'Configurar contraseña del administrador' }}</p>
+            </div>
+          </div>
 
-      <div class="col-12">
-        <label for="email" class="block text-900 font-medium mb-2">
-          Correo Electrónico*
-        </label>
-        <input
-          id="email"
-          pInputText
-          type="email"
-          formControlName="email_usuario"
-          placeholder="admin@ejemplo.com"
-          class="w-full"
-          [class.ng-invalid]="isFieldInvalid('email_usuario')"
-          [class.ng-dirty]="isFieldInvalid('email_usuario')"
-        />
-        <span *ngIf="isFieldInvalid('email_usuario')"
-          class="error-message text-red-500 text-sm mt-1 block">
-          {{ getFieldError('email_usuario') }}
-        </span>
-      </div>
+          <div class="grid">
+            <!-- Contraseña -->
+            <div class="col-12">
+              <div class="field">
+                <label for="contrasenia" class="block text-900 font-semibold mb-2">
+                  <span *ngIf="!editMode" class="text-red-500 mr-1">*</span>{{ editMode ? 'Nueva Contraseña' : 'Contraseña' }}
+                  <span *ngIf="editMode" class="text-600 text-sm ml-2">(dejar en blanco para mantener la actual)</span>
+                </label>
+                <input
+                  id="contrasenia"
+                  pInputText
+                  type="password"
+                  formControlName="contrasenia"
+                  [placeholder]="editMode ? 'Dejar en blanco para mantener' : 'Mínimo 6 caracteres'"
+                  class="w-full p-inputtext-lg"
+                  [class]="'w-full ' + (isFieldInvalid('contrasenia') ? 'ng-invalid ng-dirty' : '')"
+                />
+                <span *ngIf="isFieldInvalid('contrasenia')"
+                  class="p-error text-sm mt-1 block">
+                  {{ getFieldError('contrasenia') }}
+                </span>
+              </div>
+            </div>
 
-      <div class="col-12">
-        <label for="contrasenia" class="block text-900 font-medium mb-2">
-          {{ editMode ? 'Nueva Contraseña (dejar en blanco para mantener la actual)' : 'Contraseña*' }}
-        </label>
-        <input
-          id="contrasenia"
-          pInputText
-          type="password"
-          formControlName="contrasenia"
-          [placeholder]="editMode ? 'Dejar en blanco para mantener' : 'Mínimo 6 caracteres'"
-          class="w-full"
-          [class.ng-invalid]="isFieldInvalid('contrasenia')"
-          [class.ng-dirty]="isFieldInvalid('contrasenia')"
-        />
-        <span *ngIf="isFieldInvalid('contrasenia')"
-          class="error-message text-red-500 text-sm mt-1 block">
-          {{ getFieldError('contrasenia') }}
-        </span>
+            <!-- Confirmar Contraseña -->
+            <div class="col-12" *ngIf="!editMode || adminForm.get('contrasenia')?.value">
+              <div class="field">
+                <label for="confirmarContrasenia" class="block text-900 font-semibold mb-2">
+                  <span *ngIf="!editMode" class="text-red-500 mr-1">*</span>{{ editMode ? 'Confirmar Nueva Contraseña' : 'Confirmar Contraseña' }}
+                </label>
+                <input
+                  id="confirmarContrasenia"
+                  pInputText
+                  type="password"
+                  formControlName="confirmarContrasenia"
+                  [placeholder]="editMode ? 'Confirmar nueva contraseña' : 'Repetir contraseña'"
+                  class="w-full p-inputtext-lg"
+                  [class]="'w-full ' + (isFieldInvalid('confirmarContrasenia') ? 'ng-invalid ng-dirty' : '')"
+                />
+                <span *ngIf="isFieldInvalid('confirmarContrasenia')"
+                  class="p-error text-sm mt-1 block">
+                  {{ getFieldError('confirmarContrasenia') }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div class="col-12" *ngIf="!editMode || adminForm.get('contrasenia')?.value">
-        <label for="confirmarContrasenia" class="block text-900 font-medium mb-2">
-          Confirmar Contraseña{{ editMode ? '' : '*' }}
-        </label>
-        <input
-          id="confirmarContrasenia"
-          pInputText
-          type="password"
-          formControlName="confirmarContrasenia"
-          placeholder="Repite la contraseña"
-          class="w-full"
-          [class.ng-invalid]="isFieldInvalid('confirmarContrasenia')"
-          [class.ng-dirty]="isFieldInvalid('confirmarContrasenia')"
-        />
-        <span *ngIf="isFieldInvalid('confirmarContrasenia')"
-          class="error-message text-red-500 text-sm mt-1 block">
-          {{ getFieldError('confirmarContrasenia') }}
-        </span>
-      </div>
-    </div>
-  </form>
+    </form>
+  </div>
 
 
   <ng-template pTemplate="footer">
@@ -287,10 +333,110 @@
       <p-button
       [label]="editMode ? 'Actualizar' : 'Crear'"
       icon="pi pi-check"
-      [disabled]="adminForm.invalid"
+      [disabled]="adminForm.invalid || (editMode && !hasFormChanges)"
       (click)="guardarAdministrador()"
       [styleClass]="(editMode ? 'p-button-warning' : 'p-button-success') + ' w-full sm:w-auto'"
     ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal para ver administrador (solo lectura) -->
+<p-dialog
+  [(visible)]="displayViewDialog"
+  header="Ver Administrador"
+  [modal]="true"
+  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cerrarViewDialog()"
+>
+  <div *ngIf="adminParaVer" class="p-4">
+    <!-- Basic Information Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-blue-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-user text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Información Básica</h3>
+            <p class="text-600 mb-0 text-sm">Datos personales del administrador</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <!-- Nombre Completo -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Nombre Completo</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ adminParaVer.nombre_completo || 'No especificado' }}</div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Correo Electrónico</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ adminParaVer.email_usuario || 'No especificado' }}</div>
+            </div>
+          </div>
+
+          <!-- Rol -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Rol</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ adminParaVer.rol === 'ADMIN-USER' ? 'Administrador' : adminParaVer.rol || 'No especificado' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Sistema Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-info-circle text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Información del Sistema</h3>
+            <p class="text-600 mb-0 text-sm">Datos de registro y actividad del administrador</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <!-- Fecha de Registro -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Fecha de Registro</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ adminParaVer.fecha_registro ? (adminParaVer.fecha_registro | date:'dd/MM/yyyy HH:mm') : 'No disponible' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button
+        label="Cerrar"
+        icon="pi pi-times"
+        (click)="cerrarViewDialog()"
+        styleClass="p-button-text">
+      </p-button>
     </div>
   </ng-template>
 </p-dialog>
