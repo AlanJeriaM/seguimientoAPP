@@ -20,8 +20,9 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
   pageSize: number = 10;
   searchText: string = '';
   displayDialog: boolean = false;
-  editMode: boolean = false;
+  displayEditDialog: boolean = false;
   selectedUser?: any;
+  usuarioParaEditar?: any;
   userForm!: FormGroup;
 
   private destroy$ = new Subject<void>();
@@ -161,82 +162,39 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
 
   verUsuario(usuario: any): void {
     this.selectedUser = { ...usuario };
-    this.editMode = false;
-    this.cargarDatosEnFormulario();
     this.displayDialog = true;
   }
 
   editarUsuario(usuario: any): void {
-    this.selectedUser = { ...usuario };
-    this.editMode = true;
-    this.cargarDatosEnFormulario();
-    this.displayDialog = true;
+    this.usuarioParaEditar = { ...usuario };
+    this.displayEditDialog = true;
   }
 
-  cargarDatosEnFormulario(): void {
-    if (this.selectedUser) {
-      this.userForm.patchValue({
-        nombre: this.selectedUser.nombre || '',
-        correo: this.selectedUser.correo || '',
-        empresa_actual: this.selectedUser.empresa_actual || '',
-        posicion_actual: this.selectedUser.posicion_actual || '',
-        ubicacion: this.selectedUser.ubicacion || '',
-        industria: this.selectedUser.industria || ''
-      });
-
-      if (!this.editMode) {
-        this.userForm.disable();
-      } else {
-        this.userForm.enable();
-      }
-    }
-  }
-
-  guardarUsuario(): void {
-    if (this.userForm.valid && this.selectedUser && this.editMode) {
-      const datosActualizados = {
-        ...this.userForm.value,
-        id: this.selectedUser.id
-      };
-
-      this.authService.actualizarUsuario(this.selectedUser.id, datosActualizados).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: (response) => {
-          if (response.ok) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Usuario actualizado correctamente'
-            });
-            this.displayDialog = false;
-            this.cargarUsuarios(this.currentPage, this.searchText);
-          } else {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: response.msj || 'Error al actualizar el usuario'
-            });
-          }
-        },
-        error: (error) => {
-          console.error('Error al actualizar usuario:', error);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Error del servidor al actualizar el usuario'
-          });
-        }
-      });
-    }
-  }
 
   cancelarDialog(): void {
     this.displayDialog = false;
-    this.editMode = false;
     this.selectedUser = undefined;
     this.userForm.reset();
     this.inicializarFormulario();
+  }
+
+  onUsuarioActualizado(usuarioActualizado: any) {
+    // Actualizar el usuario en la lista local
+    const index = this.usuarios.findIndex(u => u.id === usuarioActualizado.id);
+    if (index !== -1) {
+      this.usuarios[index] = { ...this.usuarios[index], ...usuarioActualizado };
+    }
+    
+    // Cerrar el diálogo de edición
+    this.displayEditDialog = false;
+    this.usuarioParaEditar = undefined;
+    
+    // Mostrar mensaje de éxito
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Usuario actualizado',
+      detail: 'El usuario ha sido actualizado correctamente'
+    });
   }
 
   isFieldInvalid(fieldName: string): boolean {

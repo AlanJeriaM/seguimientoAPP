@@ -40,28 +40,69 @@ const obtenerUsuarios = async (req, res) => {
         'industria',
         'ultimo_acceso',
         'created_at',
-        'updated_at'
+        'updated_at',
+        // Campos de métricas
+        'años_experiencia',
+        'nivel_educacion',
+        'especialidad_tecnica',
+        'tipo_empleo_actual',
+        'rango_salarial',
+        'disponibilidad_cambio',
+        'tecnologias_principales',
+        'area_interes',
+        'satisfaccion_laboral',
+        'perfil_completo',
+        'opciones_personalizadas_educacion',
+        'opciones_personalizadas_tecnologias',
+        'opciones_personalizadas_area_interes',
+        'opciones_personalizadas_industria'
       ]
     });
 
     // Formatear datos para mejor visualización
-    const usuariosFormateados = users.rows.map(user => ({
-      id: user.id,
-      linkedin_id: user.linkedin_id,
-      nombre: user.nombre || 'Sin nombre',
-      correo: user.correo || 'Sin correo',
-      perfil_imagen_url: user.perfil_imagen_url,
-      posicion_actual: user.posicion_actual || 'No especificada',
-      empresa_actual: user.empresa_actual || 'No especificada',
-      ubicacion: user.ubicacion || 'No especificada',
-      industria: user.industria || 'No especificada',
-      ultimo_acceso: user.ultimo_acceso,
-      created_at: user.created_at,
-      updated_at: user.updated_at,
-      // Campos adicionales para mejor visualización
-      fecha_registro: user.created_at ? new Date(user.created_at).toLocaleDateString('es-ES') : 'No disponible',
-      ultimo_acceso_formateado: user.ultimo_acceso ? new Date(user.ultimo_acceso).toLocaleDateString('es-ES') : 'Nunca'
-    }));
+    const usuariosFormateados = users.rows.map(user => {
+      // Debug: Log de datos antes del formateo
+      console.log('🔍 Usuario antes del formateo:', {
+        id: user.id,
+        nombre: user.nombre,
+        nivel_educacion: user.nivel_educacion,
+        especialidad_tecnica: user.especialidad_tecnica,
+        tecnologias_principales: user.tecnologias_principales
+      });
+
+      return {
+        id: user.id,
+        linkedin_id: user.linkedin_id,
+        nombre: user.nombre || 'Sin nombre',
+        correo: user.correo || 'Sin correo',
+        perfil_imagen_url: user.perfil_imagen_url,
+        posicion_actual: user.posicion_actual || 'No especificada',
+        empresa_actual: user.empresa_actual || 'No especificada',
+        ubicacion: user.ubicacion || 'No especificada',
+        industria: user.industria || 'No especificada',
+        ultimo_acceso: user.ultimo_acceso,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+        // Campos de métricas
+        años_experiencia: user.años_experiencia,
+        nivel_educacion: user.nivel_educacion ? (typeof user.nivel_educacion === 'string' ? JSON.parse(user.nivel_educacion) : user.nivel_educacion) : [],
+        especialidad_tecnica: user.especialidad_tecnica ? (typeof user.especialidad_tecnica === 'string' ? JSON.parse(user.especialidad_tecnica) : user.especialidad_tecnica) : [],
+      tipo_empleo_actual: user.tipo_empleo_actual,
+      rango_salarial: user.rango_salarial,
+      disponibilidad_cambio: user.disponibilidad_cambio,
+      tecnologias_principales: user.tecnologias_principales ? (typeof user.tecnologias_principales === 'string' ? JSON.parse(user.tecnologias_principales) : user.tecnologias_principales) : [],
+      area_interes: user.area_interes,
+      satisfaccion_laboral: user.satisfaccion_laboral,
+      perfil_completo: user.perfil_completo,
+      opciones_personalizadas_educacion: user.opciones_personalizadas_educacion ? (typeof user.opciones_personalizadas_educacion === 'string' ? JSON.parse(user.opciones_personalizadas_educacion) : user.opciones_personalizadas_educacion) : [],
+      opciones_personalizadas_tecnologias: user.opciones_personalizadas_tecnologias ? (typeof user.opciones_personalizadas_tecnologias === 'string' ? JSON.parse(user.opciones_personalizadas_tecnologias) : user.opciones_personalizadas_tecnologias) : [],
+      opciones_personalizadas_area_interes: user.opciones_personalizadas_area_interes ? (typeof user.opciones_personalizadas_area_interes === 'string' ? JSON.parse(user.opciones_personalizadas_area_interes) : user.opciones_personalizadas_area_interes) : [],
+      opciones_personalizadas_industria: user.opciones_personalizadas_industria ? (typeof user.opciones_personalizadas_industria === 'string' ? JSON.parse(user.opciones_personalizadas_industria) : user.opciones_personalizadas_industria) : [],
+        // Campos adicionales para mejor visualización
+        fecha_registro: user.created_at ? new Date(user.created_at).toLocaleDateString('es-ES') : 'No disponible',
+        ultimo_acceso_formateado: user.ultimo_acceso ? new Date(user.ultimo_acceso).toLocaleDateString('es-ES') : 'Nunca'
+      };
+    });
 
     res.json({
       ok: true,
@@ -233,12 +274,12 @@ const obtenerMiPerfil = async (req, res) => {
       // Nuevos campos para métricas
       perfil_completo: user.perfil_completo || false,
       años_experiencia: user.años_experiencia,
-      nivel_educacion: user.nivel_educacion ? (typeof user.nivel_educacion === 'string' ? JSON.parse(user.nivel_educacion) : user.nivel_educacion) : null,
-      especialidad_tecnica: user.especialidad_tecnica ? (typeof user.especialidad_tecnica === 'string' ? JSON.parse(user.especialidad_tecnica) : user.especialidad_tecnica) : null,
+      nivel_educacion: user.nivel_educacion ? (typeof user.nivel_educacion === 'string' ? JSON.parse(user.nivel_educacion) : user.nivel_educacion) : [],
+      especialidad_tecnica: user.especialidad_tecnica ? (typeof user.especialidad_tecnica === 'string' ? JSON.parse(user.especialidad_tecnica) : user.especialidad_tecnica) : [],
       tipo_empleo_actual: user.tipo_empleo_actual,
       rango_salarial: user.rango_salarial,
       disponibilidad_cambio: user.disponibilidad_cambio,
-      tecnologias_principales: user.tecnologias_principales,
+      tecnologias_principales: user.tecnologias_principales ? (typeof user.tecnologias_principales === 'string' ? JSON.parse(user.tecnologias_principales) : user.tecnologias_principales) : [],
       area_interes: user.area_interes,
       satisfaccion_laboral: user.satisfaccion_laboral,
       opciones_personalizadas_educacion: user.opciones_personalizadas_educacion ? (typeof user.opciones_personalizadas_educacion === 'string' ? JSON.parse(user.opciones_personalizadas_educacion) : user.opciones_personalizadas_educacion) : [],
@@ -439,11 +480,23 @@ const actualizarUsuario = async (req, res) => {
     const { id } = req.params;
     const {
       nombre,
-      correo,
       posicion_actual,
       empresa_actual,
       ubicacion,
-      industria
+      industria,
+      años_experiencia,
+      nivel_educacion,
+      especialidad_tecnica,
+      tipo_empleo_actual,
+      rango_salarial,
+      disponibilidad_cambio,
+      tecnologias_principales,
+      area_interes,
+      satisfaccion_laboral,
+      opciones_personalizadas_educacion,
+      opciones_personalizadas_tecnologias,
+      opciones_personalizadas_area_interes,
+      opciones_personalizadas_industria
     } = req.body;
 
     // Validaciones básicas
@@ -461,13 +514,6 @@ const actualizarUsuario = async (req, res) => {
       });
     }
 
-    if (!correo || correo.trim() === '') {
-      return res.status(400).json({
-        ok: false,
-        msj: 'El correo es requerido'
-      });
-    }
-
     // Verificar que el usuario existe
     const user = await User.findOne({
       where: { id, activo: true }
@@ -480,32 +526,26 @@ const actualizarUsuario = async (req, res) => {
       });
     }
 
-    // Verificar si el correo ya existe en otro usuario
-    if (correo.toLowerCase() !== user.correo.toLowerCase()) {
-      const correoExistente = await User.findOne({
-        where: {
-          correo: correo.toLowerCase(),
-          id: { [require('sequelize').Op.ne]: id },
-          activo: true
-        }
-      });
-
-      if (correoExistente) {
-        return res.status(400).json({
-          ok: false,
-          msj: 'Ya existe un usuario con ese correo electrónico'
-        });
-      }
-    }
-
     // Actualizar datos del usuario
     const datosActualizados = {
       nombre: nombre.trim(),
-      correo: correo.toLowerCase().trim(),
       posicion_actual: posicion_actual?.trim() || null,
       empresa_actual: empresa_actual?.trim() || null,
       ubicacion: ubicacion?.trim() || null,
-      industria: industria?.trim() || null
+      industria: industria?.trim() || null,
+      años_experiencia: años_experiencia || null,
+      nivel_educacion: Array.isArray(nivel_educacion) ? JSON.stringify(nivel_educacion) : null,
+      especialidad_tecnica: Array.isArray(especialidad_tecnica) ? JSON.stringify(especialidad_tecnica) : null,
+      tipo_empleo_actual: tipo_empleo_actual?.trim() || null,
+      rango_salarial: rango_salarial?.trim() || null,
+      disponibilidad_cambio: disponibilidad_cambio?.trim() || null,
+      tecnologias_principales: Array.isArray(tecnologias_principales) ? JSON.stringify(tecnologias_principales) : null,
+      area_interes: area_interes?.trim() || null,
+      satisfaccion_laboral: satisfaccion_laboral || null,
+      opciones_personalizadas_educacion: Array.isArray(opciones_personalizadas_educacion) ? JSON.stringify(opciones_personalizadas_educacion) : null,
+      opciones_personalizadas_tecnologias: Array.isArray(opciones_personalizadas_tecnologias) ? JSON.stringify(opciones_personalizadas_tecnologias) : null,
+      opciones_personalizadas_area_interes: Array.isArray(opciones_personalizadas_area_interes) ? JSON.stringify(opciones_personalizadas_area_interes) : null,
+      opciones_personalizadas_industria: Array.isArray(opciones_personalizadas_industria) ? JSON.stringify(opciones_personalizadas_industria) : null
     };
 
     await user.update(datosActualizados);
@@ -524,6 +564,19 @@ const actualizarUsuario = async (req, res) => {
       empresa_actual: usuarioActualizado.empresa_actual || 'No especificada',
       ubicacion: usuarioActualizado.ubicacion || 'No especificada',
       industria: usuarioActualizado.industria || 'No especificada',
+      años_experiencia: usuarioActualizado.años_experiencia,
+      nivel_educacion: usuarioActualizado.nivel_educacion ? (typeof usuarioActualizado.nivel_educacion === 'string' ? JSON.parse(usuarioActualizado.nivel_educacion) : usuarioActualizado.nivel_educacion) : [],
+      especialidad_tecnica: usuarioActualizado.especialidad_tecnica ? (typeof usuarioActualizado.especialidad_tecnica === 'string' ? JSON.parse(usuarioActualizado.especialidad_tecnica) : usuarioActualizado.especialidad_tecnica) : [],
+      tipo_empleo_actual: usuarioActualizado.tipo_empleo_actual,
+      rango_salarial: usuarioActualizado.rango_salarial,
+      disponibilidad_cambio: usuarioActualizado.disponibilidad_cambio,
+      tecnologias_principales: usuarioActualizado.tecnologias_principales ? (typeof usuarioActualizado.tecnologias_principales === 'string' ? JSON.parse(usuarioActualizado.tecnologias_principales) : usuarioActualizado.tecnologias_principales) : [],
+      area_interes: usuarioActualizado.area_interes,
+      satisfaccion_laboral: usuarioActualizado.satisfaccion_laboral,
+      opciones_personalizadas_educacion: usuarioActualizado.opciones_personalizadas_educacion ? (typeof usuarioActualizado.opciones_personalizadas_educacion === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_educacion) : usuarioActualizado.opciones_personalizadas_educacion) : [],
+      opciones_personalizadas_tecnologias: usuarioActualizado.opciones_personalizadas_tecnologias ? (typeof usuarioActualizado.opciones_personalizadas_tecnologias === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_tecnologias) : usuarioActualizado.opciones_personalizadas_tecnologias) : [],
+      opciones_personalizadas_area_interes: usuarioActualizado.opciones_personalizadas_area_interes ? (typeof usuarioActualizado.opciones_personalizadas_area_interes === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_area_interes) : usuarioActualizado.opciones_personalizadas_area_interes) : [],
+      opciones_personalizadas_industria: usuarioActualizado.opciones_personalizadas_industria ? (typeof usuarioActualizado.opciones_personalizadas_industria === 'string' ? JSON.parse(usuarioActualizado.opciones_personalizadas_industria) : usuarioActualizado.opciones_personalizadas_industria) : [],
       ultimo_acceso: usuarioActualizado.ultimo_acceso,
       fecha_registro: usuarioActualizado.created_at,
       rol: usuarioActualizado.rol,
