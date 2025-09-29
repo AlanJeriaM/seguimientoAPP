@@ -27,6 +27,15 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
   adminForm!: FormGroup;
   selectedAdmin: any = null;
 
+  // Variables para el modal de ver administrador
+  displayViewDialog: boolean = false;
+  adminParaVer: any = null;
+
+  // Variables para control de cambios en el formulario de editar
+  private formInitialValue: any = null;
+  hasFormChanges = false;
+  private initialFormStateSaved = false;
+
   private passwordSubscription?: Subscription;
 
   constructor(
@@ -34,6 +43,11 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder
   ) {
     this.initializeForm();
+    
+    // Suscribirse a cambios en el formulario para detección de cambios
+    this.adminForm.valueChanges.subscribe(() => {
+      this.detectFormChanges();
+    });
   }
 
   ngOnInit() {
@@ -135,6 +149,10 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
     if (this.passwordSubscription) {
       this.passwordSubscription.unsubscribe();
     }
+
+    // Resetear estado de cambios
+    this.initialFormStateSaved = false;
+    this.hasFormChanges = false;
 
     // Reset del formulario
     this.adminForm.reset();
@@ -325,7 +343,17 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
     });
 
     this.adminForm.updateValueAndValidity();
+    
+    // Resetear estado de cambios
+    this.initialFormStateSaved = false;
+    this.hasFormChanges = false;
+    
     this.displayDialog = true;
+
+    // Guardar estado inicial después de que el formulario esté configurado
+    setTimeout(() => {
+      this.saveInitialFormState();
+    }, 100);
   }
 
   // Método para verificar si el formulario está válido según el modo
@@ -414,6 +442,8 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
             });
             this.displayDialog = false;
             this.cargarAdministradores(this.currentPage, this.searchText);
+            // Resetear estado de cambios después de actualizar exitosamente
+            this.saveInitialFormState();
           } else {
             Swal.fire({
               icon: 'error',
@@ -445,6 +475,8 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
             });
             this.displayDialog = false;
             this.cargarAdministradores(this.currentPage, this.searchText);
+            // Resetear estado de cambios después de crear exitosamente
+            this.saveInitialFormState();
           } else {
             Swal.fire({
               icon: 'error',
@@ -528,20 +560,70 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
   }
 
   verAdministrador(admin: any) {
-    Swal.fire({
-      title: 'Información del Administrador',
-      html: `
-        <div style="text-align: left;">
-          <p><strong>Nombre:</strong> ${admin.nombre_completo}</p>
-          <p><strong>Correo:</strong> ${admin.email_usuario}</p>
-          <p><strong>Rol:</strong> ${admin.rol === 'ADMIN-USER' ? 'Administrador' : admin.rol}</p>
-          <p><strong>Fecha de registro:</strong> ${new Date(admin.fecha_registro).toLocaleDateString('es-ES')}</p>
-        </div>
-      `,
-      icon: 'info',
-      confirmButtonColor: '#17a2b8',
-      confirmButtonText: 'Cerrar'
+    this.adminParaVer = admin;
+    this.displayViewDialog = true;
+  }
+
+  cerrarViewDialog() {
+    this.displayViewDialog = false;
+    this.adminParaVer = null;
+  }
+
+  cerrarDialog() {
+    this.displayDialog = false;
+    this.selectedAdmin = null;
+    this.initialFormStateSaved = false;
+    this.hasFormChanges = false;
+  }
+
+  // Métodos para detección de cambios en el formulario de editar
+  private saveInitialFormState() {
+    if (this.adminForm) {
+      this.formInitialValue = { ...this.adminForm.value };
+      this.hasFormChanges = false;
+      this.initialFormStateSaved = true;
+      
+      console.log('🔧 Estado inicial del formulario guardado:', this.formInitialValue);
+    }
+  }
+
+  private detectFormChanges() {
+    if (!this.formInitialValue || !this.adminForm || !this.initialFormStateSaved) {
+      this.hasFormChanges = false;
+      return;
+    }
+
+    const currentValue = { ...this.adminForm.value };
+    const hasChanges = this.hasRealChanges(this.formInitialValue, currentValue);
+    this.hasFormChanges = hasChanges;
+    
+    console.log('🔧 Detección de cambios:', {
+      hasChanges: hasChanges,
+      initialValue: this.formInitialValue,
+      currentValue: currentValue
     });
+  }
+
+  private hasRealChanges(initial: any, current: any): boolean {
+    const fieldsToCompare = ['nombre_usuario', 'apellido', 'email_usuario', 'contrasenia'];
+    
+    for (const field of fieldsToCompare) {
+      const initialValue = initial[field];
+      const currentValue = current[field];
+      
+      if (field === 'contrasenia') {
+        // Para contraseña, solo considerar cambio si hay valor nuevo
+        if (currentValue && currentValue.trim() !== '') {
+          console.log(`🔧 Campo ${field} cambió (contraseña):`, { initial: '***', current: '***' });
+          return true;
+        }
+      } else if (initialValue !== currentValue) {
+        console.log(`🔧 Campo ${field} cambió:`, { initial: initialValue, current: currentValue });
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   onPageChange(event: TableLazyLoadEvent) {
