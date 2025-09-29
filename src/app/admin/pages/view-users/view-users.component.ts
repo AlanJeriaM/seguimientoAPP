@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
-import Swal from 'sweetalert2';
 import { TableLazyLoadEvent } from 'primeng/table';
 
 @Component({
@@ -24,6 +23,11 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
   selectedUser?: any;
   usuarioParaEditar?: any;
   userForm!: FormGroup;
+
+  // Variables para el modal de eliminar usuario
+  displayDeleteDialog: boolean = false;
+  usuarioParaEliminar: any = null;
+  deleting: boolean = false;
 
   private destroy$ = new Subject<void>();
 
@@ -73,11 +77,6 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
           console.error('Error:', resp.msj);
           this.usuarios = [];
           this.totalRecords = 0;
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: resp.msj || 'Error al cargar usuarios'
-          });
         }
       },
       error: (error) => {
@@ -85,11 +84,6 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.usuarios = [];
         this.totalRecords = 0;
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error de conexión con el servidor'
-        });
       }
     });
   }
@@ -113,51 +107,56 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
   }
 
   eliminarUsuario(usuario: any) {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: `¿Deseas desactivar al usuario ${usuario.nombre}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true,
-      customClass: {
-        actions: 'my-swal-actions'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.authService.desactivarUsuario(usuario.id).subscribe({
-          next: (resp) => {
-            if (resp.ok) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Usuario eliminado',
-                text: 'El usuario ha sido eliminado correctamente',
-                timer: 2000,
-                showConfirmButton: false
-              });
-              this.cargarUsuarios(this.currentPage, this.searchText);
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: resp.msj || 'Error al eliminar usuario'
-              });
-            }
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Error de conexión con el servidor'
-            });
-          }
+    this.usuarioParaEliminar = usuario;
+    this.displayDeleteDialog = true;
+  }
+
+  confirmarEliminacion() {
+    if (!this.usuarioParaEliminar) return;
+    
+    this.deleting = true;
+    this.authService.desactivarUsuario(this.usuarioParaEliminar.id).subscribe({
+      next: (resp) => {
+        this.deleting = false;
+        if (resp.ok) {
+          this.displayDeleteDialog = false;
+          this.usuarioParaEliminar = null;
+          this.cargarUsuarios(this.currentPage, this.searchText);
+          
+          // Mostrar toast de éxito
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Usuario eliminado correctamente',
+            life: 3000
+          });
+        } else {
+          console.error('Error al eliminar usuario:', resp.msj);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: resp.msj || 'Error al eliminar usuario',
+            life: 5000
+          });
+        }
+      },
+      error: (error) => {
+        this.deleting = false;
+        console.error('Error de conexión:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error de conexión con el servidor',
+          life: 5000
         });
       }
     });
+  }
+
+  cancelarEliminacion() {
+    this.displayDeleteDialog = false;
+    this.usuarioParaEliminar = null;
+    this.deleting = false;
   }
 
   verUsuario(usuario: any): void {
