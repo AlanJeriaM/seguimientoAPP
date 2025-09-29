@@ -15,6 +15,7 @@ import { MiProfileComponent } from './pages/mi-profile/mi-profile.component';
 import { ViewAdminComponent } from './pages/view-admin/view-admin.component';
 import { ViewDeletedAdminComponent } from './pages/view-deleted-admin/view-deleted-admin.component';
 import { ViewEncuestasResultadosComponent } from './pages/view-encuestas-resultados/view-encuestas-resultados.component';
+import { EditUserProfileComponent } from './pages/edit-user-profile/edit-user-profile.component';
 import { ToastModule } from 'primeng/toast';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -30,6 +31,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ViewAdminComponent,
     ViewDeletedAdminComponent,
     ViewEncuestasResultadosComponent,
+    EditUserProfileComponent,
   ],
   imports: [
     CommonModule,

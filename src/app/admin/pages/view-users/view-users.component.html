@@ -161,12 +161,12 @@
   </div>
 </div>
 
-<!-- Modal para ver/editar usuario -->
+<!-- Modal para ver usuario (solo lectura) -->
 <p-dialog
   [(visible)]="displayDialog"
-  [header]="editMode ? 'Editar Usuario' : 'Ver Usuario'"
+  header="Ver Usuario"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '600px'}"
+  [style]="{width: '95vw', maxWidth: '800px'}"
   [contentStyle]="{'padding': '1rem', 'overflow-y': 'auto', 'max-height': '80vh'}"
   [draggable]="false"
   [resizable]="false"
@@ -178,128 +178,185 @@
   [breakpoints]="{'960px': '90vw', '640px': '95vw'}"
   [dismissableMask]="true"
 >
-  <form [formGroup]="userForm" (ngSubmit)="guardarUsuario()" *ngIf="selectedUser">
+  <div *ngIf="selectedUser" class="p-4">
     <div class="grid">
-      <div class="col-12 sm:col-6">
-        <label for="nombre" class="block text-900 font-medium mb-2">
-          Nombre*
-        </label>
-        <input
-          id="nombre"
-          pInputText
-          type="text"
-          formControlName="nombre"
-          placeholder="Ingrese el nombre"
-          class="w-full"
-          [class.ng-invalid]="isFieldInvalid('nombre')"
-          [class.ng-dirty]="isFieldInvalid('nombre')"
-          [readonly]="!editMode"
-        />
-        <span
-          *ngIf="isFieldInvalid('nombre') && editMode"
-          class="error-message text-red-500 text-sm mt-1 block">
-          {{ getFieldError('nombre') }}
-        </span>
+      <!-- Información Básica -->
+      <div class="col-12">
+        <h3 class="text-xl font-semibold text-900 mb-4 flex align-items-center gap-2">
+          <i class="pi pi-user text-blue-500"></i>
+          Información Básica
+        </h3>
+        <div class="grid">
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Nombre Completo</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.nombre || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Correo Electrónico</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.correo || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Empresa Actual</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.empresa_actual || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Posición Actual</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.posicion_actual || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Ubicación</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.ubicacion || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Industria</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.industria || 'No especificado' }}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="col-12 sm:col-6">
-        <label for="correo" class="block text-900 font-medium mb-2">
-          Correo Electrónico*
-        </label>
-        <input
-          id="correo"
-          pInputText
-          type="email"
-          formControlName="correo"
-          placeholder="usuario@ejemplo.com"
-          class="w-full"
-          [class.ng-invalid]="isFieldInvalid('correo')"
-          [class.ng-dirty]="isFieldInvalid('correo')"
-          [readonly]="!editMode"
-        />
-        <span *ngIf="isFieldInvalid('correo') && editMode"
-          class="error-message text-red-500 text-sm mt-1 block">
-          {{ getFieldError('correo') }}
-        </span>
+      <!-- Información Complementaria -->
+      <div class="col-12">
+        <h3 class="text-xl font-semibold text-900 mb-4 flex align-items-center gap-2">
+          <i class="pi pi-chart-bar text-orange-500"></i>
+          Información Complementaria
+        </h3>
+        <div class="grid">
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Años de Experiencia</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser['años_experiencia'] || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Rango Salarial</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.rango_salarial || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Situación Laboral</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.tipo_empleo_actual || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Disponibilidad para Cambio</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.disponibilidad_cambio || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Área de Interés</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.area_interes || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Satisfacción Laboral</label>
+              <div class="p-3 surface-100 border-round">{{ selectedUser.satisfaccion_laboral || 'No especificado' }}</div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Nivel de Educación</label>
+              <div class="p-3 surface-100 border-round">
+                <span *ngIf="selectedUser.nivel_educacion && selectedUser.nivel_educacion.length > 0; else noEducacion">
+                  {{ selectedUser.nivel_educacion | json }}
+                </span>
+                <ng-template #noEducacion>No especificado</ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Especialidad Técnica</label>
+              <div class="p-3 surface-100 border-round">
+                <span *ngIf="selectedUser.especialidad_tecnica && selectedUser.especialidad_tecnica.length > 0; else noEspecialidad">
+                  {{ selectedUser.especialidad_tecnica | json }}
+                </span>
+                <ng-template #noEspecialidad>No especificado</ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Tecnologías Principales</label>
+              <div class="p-3 surface-100 border-round">
+                <span *ngIf="selectedUser.tecnologias_principales && selectedUser.tecnologias_principales.length > 0; else noTecnologias">
+                  {{ selectedUser.tecnologias_principales | json }}
+                </span>
+                <ng-template #noTecnologias>No especificado</ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Opciones Personalizadas</label>
+              <div class="p-3 surface-100 border-round">
+                <div *ngIf="selectedUser.opciones_personalizadas_educacion && selectedUser.opciones_personalizadas_educacion.length > 0" class="mb-2">
+                  <strong>Educación:</strong> {{ selectedUser.opciones_personalizadas_educacion | json }}
+                </div>
+                <div *ngIf="selectedUser.opciones_personalizadas_tecnologias && selectedUser.opciones_personalizadas_tecnologias.length > 0" class="mb-2">
+                  <strong>Tecnologías:</strong> {{ selectedUser.opciones_personalizadas_tecnologias | json }}
+                </div>
+                <div *ngIf="selectedUser.opciones_personalizadas_area_interes && selectedUser.opciones_personalizadas_area_interes.length > 0" class="mb-2">
+                  <strong>Área de Interés:</strong> {{ selectedUser.opciones_personalizadas_area_interes | json }}
+                </div>
+                <div *ngIf="selectedUser.opciones_personalizadas_industria && selectedUser.opciones_personalizadas_industria.length > 0" class="mb-2">
+                  <strong>Industria:</strong> {{ selectedUser.opciones_personalizadas_industria | json }}
+                </div>
+                <span *ngIf="!selectedUser.opciones_personalizadas_educacion?.length && !selectedUser.opciones_personalizadas_tecnologias?.length && !selectedUser.opciones_personalizadas_area_interes?.length && !selectedUser.opciones_personalizadas_industria?.length">
+                  No hay opciones personalizadas
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="col-12 sm:col-6">
-        <label for="empresa" class="block text-900 font-medium mb-2">
-          Empresa Actual
-        </label>
-        <input
-          id="empresa"
-          pInputText
-          type="text"
-          formControlName="empresa_actual"
-          placeholder="Nombre de la empresa"
-          class="w-full"
-          [readonly]="!editMode"
-        />
-      </div>
-
-      <div class="col-12 sm:col-6">
-        <label for="posicion" class="block text-900 font-medium mb-2">
-          Posición Actual
-        </label>
-        <input
-          id="posicion"
-          pInputText
-          type="text"
-          formControlName="posicion_actual"
-          placeholder="Cargo o posición"
-          class="w-full"
-          [readonly]="!editMode"
-        />
-      </div>
-
-      <div class="col-12 sm:col-6">
-        <label for="ubicacion" class="block text-900 font-medium mb-2">
-          Ubicación
-        </label>
-        <input
-          id="ubicacion"
-          pInputText
-          type="text"
-          formControlName="ubicacion"
-          placeholder="Ciudad, País"
-          class="w-full"
-          [readonly]="!editMode"
-        />
-      </div>
-
-      <div class="col-12 sm:col-6">
-        <label for="industria" class="block text-900 font-medium mb-2">
-          Industria
-        </label>
-        <input
-          id="industria"
-          pInputText
-          type="text"
-          formControlName="industria"
-          placeholder="Sector industrial"
-          class="w-full"
-          [readonly]="!editMode"
-        />
-      </div>
-
-      <div class="col-12 sm:col-6" *ngIf="!editMode">
-        <label for="ultimo_acceso" class="block text-900 font-medium mb-2">
-          Último Acceso
-        </label>
-        <input
-          id="ultimo_acceso"
-          pInputText
-          type="text"
-          [value]="selectedUser.ultimo_acceso | date:'dd/MM/yyyy HH:mm'"
-          placeholder="Sin acceso registrado"
-          class="w-full readonly-field"
-          readonly
-          tabindex="-1"
-        />
+      <!-- Información del Sistema -->
+      <div class="col-12">
+        <h3 class="text-xl font-semibold text-900 mb-4 flex align-items-center gap-2">
+          <i class="pi pi-info-circle text-green-500"></i>
+          Información del Sistema
+        </h3>
+        <div class="grid">
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Último Acceso</label>
+              <div class="p-3 surface-100 border-round">
+                {{ selectedUser.ultimo_acceso | date:'dd/MM/yyyy HH:mm' || 'Sin acceso registrado' }}
+              </div>
+            </div>
+          </div>
+          <div class="col-12 sm:col-6">
+            <div class="field">
+              <label class="block text-900 font-medium mb-2">Perfil Completo</label>
+              <div class="p-3 surface-100 border-round">
+                <p-tag 
+                  [value]="selectedUser.perfil_completo ? 'Completo' : 'Incompleto'"
+                  [severity]="selectedUser.perfil_completo ? 'success' : 'warning'">
+                </p-tag>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </form>
+  </div>
 
   <ng-template pTemplate="footer">
     <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
@@ -307,16 +364,15 @@
         label="Cerrar"
         icon="pi pi-times"
         (click)="cancelarDialog()"
-        styleClass="p-button-danger w-full sm:w-auto"
-      ></p-button>
-      <p-button
-        *ngIf="editMode"
-        label="Actualizar"
-        icon="pi pi-check"
-        [disabled]="userForm.invalid"
-        (click)="guardarUsuario()"
-        styleClass="p-button-warning w-full sm:w-auto"
-      ></p-button>
+        styleClass="p-button-text p-button-secondary">
+      </p-button>
     </div>
   </ng-template>
 </p-dialog>
+
+<!-- Componente para editar usuario -->
+<app-edit-user-profile
+  [usuario]="usuarioParaEditar"
+  [(visible)]="displayEditDialog"
+  (usuarioActualizado)="onUsuarioActualizado($event)">
+</app-edit-user-profile>

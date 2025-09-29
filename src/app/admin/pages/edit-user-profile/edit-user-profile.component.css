@@ -1,0 +1,110 @@
+/* Estilos para opciones personalizadas en multiselect */
+.industria-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.125rem 0.25rem;
+  position: relative;
+}
+
+.nivel-educacion-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.125rem 0.25rem;
+  position: relative;
+}
+
+.tecnologia-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.125rem 0.25rem;
+  position: relative;
+}
+
+.btn-eliminar-opcion {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: all 0.15s ease;
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.btn-eliminar-opcion:hover {
+  background: #c82333;
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-eliminar-opcion:active {
+  transform: translateY(-50%) scale(0.9);
+  background: #a71e2a;
+}
+
+.btn-eliminar-opcion:focus {
+  outline: 2px solid #dc3545;
+  outline-offset: 2px;
+}
+
+/* Estilos para campos de error */
+.p-error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.ng-invalid.ng-dirty {
+  border-color: #dc3545;
+}
+
+.ng-invalid.ng-dirty:focus {
+  box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.2);
+}
+
+/* Estilos para el diálogo */
+::ng-deep .p-dialog .p-dialog-content {
+  padding: 0;
+}
+
+::ng-deep .p-dialog .p-dialog-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+::ng-deep .p-dialog .p-dialog-footer {
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .btn-eliminar-opcion {
+    width: 12px;
+    height: 12px;
+    font-size: 6px;
+    right: 2px;
+  }
+}
