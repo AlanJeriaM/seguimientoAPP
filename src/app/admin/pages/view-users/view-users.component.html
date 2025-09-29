@@ -166,8 +166,8 @@
   [(visible)]="displayDialog"
   header="Ver Usuario"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '800px'}"
-  [contentStyle]="{'padding': '1rem', 'overflow-y': 'auto', 'max-height': '80vh'}"
+  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
   [appendTo]="'body'"
@@ -175,196 +175,180 @@
   [closable]="true"
   [closeOnEscape]="true"
   [responsive]="true"
-  [breakpoints]="{'960px': '90vw', '640px': '95vw'}"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
   [dismissableMask]="true"
+  (onHide)="cerrarDialog()"
 >
   <div *ngIf="selectedUser" class="p-4">
-    <div class="grid">
-      <!-- Información Básica -->
-      <div class="col-12">
-        <h3 class="text-xl font-semibold text-900 mb-4 flex align-items-center gap-2">
-          <i class="pi pi-user text-blue-500"></i>
-          Información Básica
-        </h3>
+    <!-- Basic Information Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-blue-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-user text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Información Básica</h3>
+            <p class="text-600 mb-0 text-sm">Datos personales y profesionales del usuario</p>
+          </div>
+        </div>
+
         <div class="grid">
-          <div class="col-12 sm:col-6">
+          <!-- Nombre -->
+          <div class="col-12 lg:col-6">
             <div class="field">
-              <label class="block text-900 font-medium mb-2">Nombre Completo</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.nombre || 'No especificado' }}</div>
+              <label class="block text-900 font-semibold mb-2">Nombre Completo</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.nombre || 'No especificado' }}</div>
             </div>
           </div>
-          <div class="col-12 sm:col-6">
+
+          <!-- Correo -->
+          <div class="col-12 lg:col-6">
             <div class="field">
-              <label class="block text-900 font-medium mb-2">Correo Electrónico</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.correo || 'No especificado' }}</div>
+              <label class="block text-900 font-semibold mb-2">Correo Electrónico</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.correo || 'No especificado' }}</div>
             </div>
           </div>
-          <div class="col-12 sm:col-6">
+
+          <!-- Empresa Actual -->
+          <div class="col-12 lg:col-6">
             <div class="field">
-              <label class="block text-900 font-medium mb-2">Empresa Actual</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.empresa_actual || 'No especificado' }}</div>
+              <label class="block text-900 font-semibold mb-2">Empresa Actual</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.empresa_actual || 'No especificado' }}</div>
             </div>
           </div>
-          <div class="col-12 sm:col-6">
+
+          <!-- Posición Actual -->
+          <div class="col-12 lg:col-6">
             <div class="field">
-              <label class="block text-900 font-medium mb-2">Posición Actual</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.posicion_actual || 'No especificado' }}</div>
+              <label class="block text-900 font-semibold mb-2">Posición Actual</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.posicion_actual || 'No especificado' }}</div>
             </div>
           </div>
-          <div class="col-12 sm:col-6">
+
+          <!-- Ubicación -->
+          <div class="col-12 lg:col-6">
             <div class="field">
-              <label class="block text-900 font-medium mb-2">Ubicación</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.ubicacion || 'No especificado' }}</div>
+              <label class="block text-900 font-semibold mb-2">Ubicación</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.ubicacion || 'No especificado' }}</div>
             </div>
           </div>
-          <div class="col-12 sm:col-6">
+
+          <!-- Industria -->
+          <div class="col-12 lg:col-6">
             <div class="field">
-              <label class="block text-900 font-medium mb-2">Industria</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.industria || 'No especificado' }}</div>
+              <label class="block text-900 font-semibold mb-2">Industria</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.industria || 'No especificado' }}</div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Información Complementaria -->
-      <div class="col-12">
-        <h3 class="text-xl font-semibold text-900 mb-4 flex align-items-center gap-2">
-          <i class="pi pi-chart-bar text-orange-500"></i>
-          Información Complementaria
-        </h3>
-        <div class="grid">
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Años de Experiencia</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser['años_experiencia'] || 'No especificado' }}</div>
-            </div>
+    <!-- Información para Métricas Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-chart-bar text-base"></i>
           </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Rango Salarial</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.rango_salarial || 'No especificado' }}</div>
-            </div>
-          </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Situación Laboral</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.tipo_empleo_actual || 'No especificado' }}</div>
-            </div>
-          </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Disponibilidad para Cambio</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.disponibilidad_cambio || 'No especificado' }}</div>
-            </div>
-          </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Área de Interés</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.area_interes || 'No especificado' }}</div>
-            </div>
-          </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Satisfacción Laboral</label>
-              <div class="p-3 surface-100 border-round">{{ selectedUser.satisfaccion_laboral || 'No especificado' }}</div>
-            </div>
-          </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Nivel de Educación</label>
-              <div class="p-3 surface-100 border-round">
-                <span *ngIf="selectedUser.nivel_educacion && selectedUser.nivel_educacion.length > 0; else noEducacion">
-                  {{ selectedUser.nivel_educacion | json }}
-                </span>
-                <ng-template #noEducacion>No especificado</ng-template>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Especialidad Técnica</label>
-              <div class="p-3 surface-100 border-round">
-                <span *ngIf="selectedUser.especialidad_tecnica && selectedUser.especialidad_tecnica.length > 0; else noEspecialidad">
-                  {{ selectedUser.especialidad_tecnica | json }}
-                </span>
-                <ng-template #noEspecialidad>No especificado</ng-template>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Tecnologías Principales</label>
-              <div class="p-3 surface-100 border-round">
-                <span *ngIf="selectedUser.tecnologias_principales && selectedUser.tecnologias_principales.length > 0; else noTecnologias">
-                  {{ selectedUser.tecnologias_principales | json }}
-                </span>
-                <ng-template #noTecnologias>No especificado</ng-template>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 sm:col-6">
-            <div class="field">
-              <label class="block text-900 font-medium mb-2">Opciones Personalizadas</label>
-              <div class="p-3 surface-100 border-round">
-                <div *ngIf="selectedUser.opciones_personalizadas_educacion && selectedUser.opciones_personalizadas_educacion.length > 0" class="mb-2">
-                  <strong>Educación:</strong> {{ selectedUser.opciones_personalizadas_educacion | json }}
-                </div>
-                <div *ngIf="selectedUser.opciones_personalizadas_tecnologias && selectedUser.opciones_personalizadas_tecnologias.length > 0" class="mb-2">
-                  <strong>Tecnologías:</strong> {{ selectedUser.opciones_personalizadas_tecnologias | json }}
-                </div>
-                <div *ngIf="selectedUser.opciones_personalizadas_area_interes && selectedUser.opciones_personalizadas_area_interes.length > 0" class="mb-2">
-                  <strong>Área de Interés:</strong> {{ selectedUser.opciones_personalizadas_area_interes | json }}
-                </div>
-                <div *ngIf="selectedUser.opciones_personalizadas_industria && selectedUser.opciones_personalizadas_industria.length > 0" class="mb-2">
-                  <strong>Industria:</strong> {{ selectedUser.opciones_personalizadas_industria | json }}
-                </div>
-                <span *ngIf="!selectedUser.opciones_personalizadas_educacion?.length && !selectedUser.opciones_personalizadas_tecnologias?.length && !selectedUser.opciones_personalizadas_area_interes?.length && !selectedUser.opciones_personalizadas_industria?.length">
-                  No hay opciones personalizadas
-                </span>
-              </div>
-            </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Información para Métricas</h3>
+            <p class="text-600 mb-0 text-sm">Datos utilizados para análisis y reportes</p>
           </div>
         </div>
-      </div>
 
-      <!-- Información del Sistema -->
-      <div class="col-12">
-        <h3 class="text-xl font-semibold text-900 mb-4 flex align-items-center gap-2">
-          <i class="pi pi-info-circle text-green-500"></i>
-          Información del Sistema
-        </h3>
         <div class="grid">
-          <div class="col-12 sm:col-6">
+          <!-- Años de Experiencia -->
+          <div class="col-12 lg:col-6">
             <div class="field">
-              <label class="block text-900 font-medium mb-2">Último Acceso</label>
+              <label class="block text-900 font-semibold mb-2">Años de Experiencia</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser['años_experiencia'] || 'No especificado' }}</div>
+            </div>
+          </div>
+
+          <!-- Rango Salarial -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Rango Salarial (CLP mensual)</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.rango_salarial || 'No especificado' }}</div>
+            </div>
+          </div>
+
+          <!-- Situación Laboral Actual -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Situación Laboral Actual</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.tipo_empleo_actual || 'No especificado' }}</div>
+            </div>
+          </div>
+
+          <!-- Disponibilidad para Cambio -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Disponibilidad para Cambio</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.disponibilidad_cambio || 'No especificado' }}</div>
+            </div>
+          </div>
+
+          <!-- Área de Interés Principal -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Área de Interés Principal</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.area_interes || 'No especificado' }}</div>
+            </div>
+          </div>
+
+          <!-- Satisfacción Laboral -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Satisfacción Laboral</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.satisfaccion_laboral || 'No especificado' }}</div>
+            </div>
+          </div>
+
+          <!-- Nivel de Educación -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Nivel de Educación</label>
               <div class="p-3 surface-100 border-round">
-                {{ selectedUser.ultimo_acceso | date:'dd/MM/yyyy HH:mm' || 'Sin acceso registrado' }}
+                <div *ngIf="selectedUser.nivel_educacion && selectedUser.nivel_educacion.length > 0; else noEducacion" class="flex flex-wrap gap-2">
+                  <p-tag *ngFor="let nivel of selectedUser.nivel_educacion" [value]="nivel" severity="info"></p-tag>
+                </div>
+                <ng-template #noEducacion>
+                  <span class="text-600">No especificado</span>
+                </ng-template>
               </div>
             </div>
           </div>
-          <div class="col-12 sm:col-6">
+
+          <!-- Tecnologías Dominadas -->
+          <div class="col-12">
             <div class="field">
-              <label class="block text-900 font-medium mb-2">Perfil Completo</label>
+              <label class="block text-900 font-semibold mb-2">Tecnologías Dominadas</label>
               <div class="p-3 surface-100 border-round">
-                <p-tag 
-                  [value]="selectedUser.perfil_completo ? 'Completo' : 'Incompleto'"
-                  [severity]="selectedUser.perfil_completo ? 'success' : 'warning'">
-                </p-tag>
+                <div *ngIf="selectedUser.especialidad_tecnica && selectedUser.especialidad_tecnica.length > 0; else noTecnologias" class="flex flex-wrap gap-2">
+                  <p-tag *ngFor="let tecnologia of selectedUser.especialidad_tecnica" [value]="tecnologia" severity="success"></p-tag>
+                </div>
+                <ng-template #noTecnologias>
+                  <span class="text-600">No especificado</span>
+                </ng-template>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex justify-content-end gap-2">
       <p-button
         label="Cerrar"
         icon="pi pi-times"
-        (click)="cancelarDialog()"
-        styleClass="p-button-text p-button-secondary">
+        (click)="cerrarDialog()"
+        styleClass="p-button-text">
       </p-button>
     </div>
   </ng-template>

@@ -228,4 +228,16 @@ export class ViewUsersComponent implements OnInit, OnDestroy {
     console.log('Error cargando imagen:', event.target.src);
     event.target.src = 'assets/icons/user-default.png';
   }
+
+  hasPersonalizedOptions(user: any): boolean {
+    return !!(user.opciones_personalizadas_educacion?.length || 
+              user.opciones_personalizadas_tecnologias?.length || 
+              user.opciones_personalizadas_area_interes?.length || 
+              user.opciones_personalizadas_industria?.length);
+  }
+
+  cerrarDialog() {
+    this.displayDialog = false;
+    this.selectedUser = undefined;
+  }
 }
