@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin/admin.service';
-import Swal from 'sweetalert2';
 import { TableLazyLoadEvent } from 'primeng/table';
 import { CustomValidators } from '../../../core/validations/contrasenia-validator.service.ts/validator-contrasenia';
 import { Subscription } from 'rxjs';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-view-admin',
@@ -31,6 +31,11 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
   displayViewDialog: boolean = false;
   adminParaVer: any = null;
 
+  // Variables para el modal de eliminar administrador
+  displayDeleteDialog: boolean = false;
+  adminParaEliminar: any = null;
+  deleting: boolean = false;
+
   // Variables para control de cambios en el formulario de editar
   private formInitialValue: any = null;
   hasFormChanges = false;
@@ -40,7 +45,8 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminService: AdminService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private messageService: MessageService
   ) {
     this.initializeForm();
     
@@ -101,11 +107,6 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
           console.error('Error:', resp.msj);
           this.administradores = [];
           this.totalRecords = 0;
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: resp.msj || 'Error al cargar administradores'
-          });
         }
       },
       error: (error) => {
@@ -113,11 +114,6 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.administradores = [];
         this.totalRecords = 0;
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error de conexión con el servidor'
-        });
       }
     });
   }
@@ -410,10 +406,11 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
 
     // Validación del formulario
     if (!this.isFormValid()) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Formulario inválido',
-        text: 'Por favor, complete todos los campos requeridos correctamente'
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Formulario inválido',
+        detail: 'Por favor, complete todos los campos requeridos correctamente',
+        life: 4000
       });
       return;
     }
@@ -433,31 +430,35 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
       this.adminService.actualizarAdministrador(this.selectedAdmin.id, adminData).subscribe({
         next: (resp) => {
           if (resp.ok) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Administrador actualizado',
-              text: 'Los datos han sido actualizados correctamente',
-              timer: 2000,
-              showConfirmButton: false,
-            });
             this.displayDialog = false;
             this.cargarAdministradores(this.currentPage, this.searchText);
             // Resetear estado de cambios después de actualizar exitosamente
             this.saveInitialFormState();
+            
+            // Mostrar toast de éxito
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Administrador actualizado correctamente',
+              life: 3000
+            });
           } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: resp.msj || 'Error al actualizar administrador'
+            console.error('Error al actualizar administrador:', resp.msj);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: resp.msj || 'Error al actualizar administrador',
+              life: 5000
             });
           }
         },
         error: (error) => {
-          console.error('Error:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Error de conexión con el servidor'
+          console.error('Error de conexión:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error de conexión con el servidor',
+            life: 5000
           });
         }
       });
@@ -466,23 +467,25 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
       this.adminService.crearAdministrador(adminData).subscribe({
         next: (resp) => {
           if (resp.ok) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Administrador creado',
-              text: 'El nuevo administrador ha sido creado correctamente',
-              timer: 2000,
-              showConfirmButton: false,
-            });
             this.displayDialog = false;
             this.cargarAdministradores(this.currentPage, this.searchText);
             // Resetear estado de cambios después de crear exitosamente
             this.saveInitialFormState();
+            
+            // Mostrar toast de éxito
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Administrador creado correctamente',
+              life: 3000
+            });
           } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error al crear administrador',
-              text: resp.msj || 'Error al crear administrador',
-              confirmButtonText: 'Entendido'
+            console.error('Error al crear administrador:', resp.msj);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: resp.msj || 'Error al crear administrador',
+              life: 5000
             });
           }
         },
@@ -500,11 +503,12 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
             mensajeError = error.error?.msj || 'Error interno del servidor';
           }
 
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: mensajeError,
-            confirmButtonText: 'Entendido'
+          console.error('Error al crear administrador:', mensajeError);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: mensajeError,
+            life: 5000
           });
         }
       });
@@ -512,51 +516,56 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
   }
 
   eliminarAdministrador(admin: any) {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: `¿Deseas eliminar al administrador ${admin.nombre_completo}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true,
-      customClass: {
-        actions: 'my-swal-actions' // clase personalizada para manejar orden
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.adminService.desactivarAdministrador(admin.id).subscribe({
-          next: (resp) => {
-            if (resp.ok) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Administrador eliminado',
-                text: 'El administrador ha sido eliminado correctamente',
-                timer: 2000,
-                showConfirmButton: false
-              });
-              this.cargarAdministradores(this.currentPage, this.searchText);
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: resp.msj || 'Error al eliminar administrador'
-              });
-            }
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Error de conexión con el servidor'
-            });
-          }
+    this.adminParaEliminar = admin;
+    this.displayDeleteDialog = true;
+  }
+
+  confirmarEliminacion() {
+    if (!this.adminParaEliminar) return;
+    
+    this.deleting = true;
+    this.adminService.desactivarAdministrador(this.adminParaEliminar.id).subscribe({
+      next: (resp) => {
+        this.deleting = false;
+        if (resp.ok) {
+          this.displayDeleteDialog = false;
+          this.adminParaEliminar = null;
+          this.cargarAdministradores(this.currentPage, this.searchText);
+          
+          // Mostrar toast de éxito
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Administrador eliminado correctamente',
+            life: 3000
+          });
+        } else {
+          console.error('Error al eliminar administrador:', resp.msj);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: resp.msj || 'Error al eliminar administrador',
+            life: 5000
+          });
+        }
+      },
+      error: (error) => {
+        this.deleting = false;
+        console.error('Error de conexión:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error de conexión con el servidor',
+          life: 5000
         });
       }
     });
+  }
+
+  cancelarEliminacion() {
+    this.displayDeleteDialog = false;
+    this.adminParaEliminar = null;
+    this.deleting = false;
   }
 
   verAdministrador(admin: any) {
