@@ -1,3 +1,6 @@
+<!-- Toast para notificaciones -->
+<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
+
 <div class="grid">
   <div class="col-12">
     <p-card class="text-center" header="Usuarios Eliminados">
@@ -148,3 +151,250 @@
     </p-card>
   </div>
 </div>
+
+<!-- Modal para reactivar usuario -->
+<p-dialog
+  [(visible)]="displayReactivateDialog"
+  header="Reactivar Usuario"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarReactivacion()"
+>
+  <div *ngIf="usuarioParaReactivar" class="p-4">
+    <!-- Information Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-refresh text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Confirmar reactivación</h3>
+            <p class="text-600 mb-0 text-sm">Restaurar acceso del usuario</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <!-- Información del Usuario -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Usuario a reactivar</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ usuarioParaReactivar.nombre || 'No especificado' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ usuarioParaReactivar.correo || 'No especificado' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Empresa -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Empresa actual</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ usuarioParaReactivar.empresa_actual || 'Sin empresa' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Fecha de Eliminación -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Fecha de eliminación</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ usuarioParaReactivar.fecha_eliminacion ? (usuarioParaReactivar.fecha_eliminacion | date:'dd/MM/yyyy HH:mm') : 'No disponible' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje informativo -->
+          <div class="col-12">
+            <div class="p-3 surface-100 border-round border-1 border-green-300 bg-green-50">
+              <div class="flex align-items-start gap-2">
+                <i class="pi pi-info-circle text-green-500 mt-1"></i>
+                <div>
+                  <p class="text-green-700 font-semibold mb-1">Información</p>
+                  <p class="text-green-600 text-sm mb-0">
+                    Al reactivar este usuario, recuperará su acceso al sistema y podrá iniciar sesión nuevamente.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cancelarReactivacion()"
+        styleClass="p-button-text w-full sm:w-auto"
+        [disabled]="reactivating">
+      </p-button>
+      <p-button
+        label="Reactivar Usuario"
+        icon="pi pi-refresh"
+        (click)="confirmarReactivacion()"
+        styleClass="p-button-success w-full sm:w-auto"
+        [loading]="reactivating"
+        [disabled]="reactivating">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal para eliminar permanentemente -->
+<p-dialog
+  [(visible)]="displayDeleteDialog"
+  header="Eliminar permanentemente"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '600px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarEliminacionPermanente()"
+>
+  <div *ngIf="usuarioParaEliminar" class="p-4">
+    <!-- Warning Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-red-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-exclamation-triangle text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Eliminación permanente</h3>
+            <p class="text-600 mb-0 text-sm">Esta acción no se puede deshacer</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <!-- Información del Usuario -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Usuario a eliminar</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ usuarioParaEliminar.nombre || 'No especificado' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ usuarioParaEliminar.correo || 'No especificado' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Empresa -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Empresa actual</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ usuarioParaEliminar.empresa_actual || 'Sin empresa' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Fecha de Eliminación -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Fecha de eliminación</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ usuarioParaEliminar.fecha_eliminacion ? (usuarioParaEliminar.fecha_eliminacion | date:'dd/MM/yyyy HH:mm') : 'No disponible' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Campo de confirmación -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">
+                <span class="text-red-500 mr-1">*</span>Confirmación
+              </label>
+              <input
+                pInputText
+                type="text"
+                [(ngModel)]="confirmText"
+                placeholder="Escribe 'ELIMINAR' para confirmar"
+                class="w-full p-inputtext-lg"
+                [class]="'w-full ' + (confirmText && confirmText !== 'ELIMINAR' ? 'ng-invalid ng-dirty' : '')"
+              />
+              <small class="text-600 mt-1 block">
+                Debes escribir exactamente "ELIMINAR" para proceder con la eliminación permanente.
+              </small>
+            </div>
+          </div>
+
+          <!-- Mensaje de advertencia -->
+          <div class="col-12">
+            <div class="p-3 surface-100 border-round border-1 border-red-300 bg-red-50">
+              <div class="flex align-items-start gap-2">
+                <i class="pi pi-info-circle text-red-500 mt-1"></i>
+                <div>
+                  <p class="text-red-700 font-semibold mb-1">Advertencia crítica</p>
+                  <p class="text-red-600 text-sm mb-0">
+                    Esta acción eliminará permanentemente al usuario del sistema. 
+                    Todos los datos asociados serán eliminados y no se podrán recuperar.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cancelarEliminacionPermanente()"
+        styleClass="p-button-text w-full sm:w-auto"
+        [disabled]="deleting">
+      </p-button>
+      <p-button
+        label="Eliminar permanentemente"
+        icon="pi pi-trash"
+        (click)="confirmarEliminacionPermanente()"
+        styleClass="p-button-danger w-full sm:w-auto"
+        [loading]="deleting"
+        [disabled]="deleting || confirmText !== 'ELIMINAR'">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
