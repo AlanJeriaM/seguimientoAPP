@@ -471,3 +471,40 @@
     display: none;
   }
 }
+
+/* Estilos para formulario deshabilitado */
+.form-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.form-disabled .modern-input,
+.form-disabled ::ng-deep .modern-password-input {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+}
+
+.form-disabled .forgot-link.disabled-link {
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  text-decoration: none !important;
+}
+
+.form-disabled .forgot-link.disabled-link:hover {
+  color: #6c757d !important;
+  text-decoration: none !important;
+}
+
+/* Estilos para botones deshabilitados */
+::ng-deep .p-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Estilos para toggle button deshabilitado */
+.toggle-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
