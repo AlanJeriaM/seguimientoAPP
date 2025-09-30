@@ -5,6 +5,7 @@
     <button pButton
             (click)="esAdmin = !esAdmin; resetForm()"
             [label]="esAdmin ? 'Egresados' : 'Administrador'"
+            [disabled]="isLoggingIn"
             class="toggle-button p-button-outlined p-button-sm"
             icon="">
     </button>
@@ -23,7 +24,7 @@
     </div>
 
     <!-- Form Section -->
-    <form [formGroup]="formularioLogin" (ngSubmit)="login()" class="login-form">
+    <form [formGroup]="formularioLogin" (ngSubmit)="login()" class="login-form" [class.form-disabled]="isLoggingIn">
 
       <!-- Admin Form -->
       <div *ngIf="esAdmin" class="form-section">
@@ -38,7 +39,8 @@
                    pInputText
                    formControlName="emailUsuario"
                    placeholder="Ingrese su correo"
-                   class="modern-input">
+                   class="modern-input"
+                   [disabled]="isLoggingIn">
             <span *ngIf="campoInvalido('emailUsuario')" class="error-message">
               <i class="pi pi-exclamation-triangle"></i>
               El correo electrónico es inválido
@@ -58,6 +60,7 @@
               placeholder="Ingrese su contraseña"
               [feedback]="false"
               [toggleMask]="true"
+              [disabled]="isLoggingIn"
               styleClass="modern-password"
               inputStyleClass="modern-password-input">
             </p-password>
@@ -69,7 +72,10 @@
         </div>
 
         <div class="forgot-password-section">
-          <a routerLink="/auth/reset-password" class="forgot-link">
+          <a routerLink="/auth/reset-password" 
+             class="forgot-link" 
+             [class.disabled-link]="isLoggingIn"
+             [style.pointer-events]="isLoggingIn ? 'none' : 'auto'">
             <i class="pi pi-question-circle"></i>
             ¿Olvidaste tu contraseña?
           </a>
@@ -79,8 +85,8 @@
           <p-button type="submit"
                     icon="pi pi-sign-in"
                     label="Iniciar Sesión"
-                    [disabled]="formularioLogin.invalid"
-                    [loading]="false"
+                    [disabled]="formularioLogin.invalid || isLoggingIn"
+                    [loading]="isLoggingIn"
                     styleClass="login-button admin-button">
           </p-button>
         </div>

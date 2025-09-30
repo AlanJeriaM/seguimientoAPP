@@ -70,18 +70,21 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.formularioLogin.value).subscribe({
       next: (ok) => {
         this.displayLoadingDialog = false;
-        this.isLoggingIn = false;
 
         if (ok === true) {
           this.successMessage = 'Accediendo al sistema...';
           this.displaySuccessDialog = true;
 
           // Cerrar modal de éxito y navegar después de un breve delay
+          // NO re-habilitar el formulario hasta que se complete la navegación
           setTimeout(() => {
             this.displaySuccessDialog = false;
             this.router.navigate([this.esAdmin ? '/admin' : '/user']);
+            // El formulario se mantendrá deshabilitado hasta que se complete la navegación
           }, 1000);
         } else {
+          // Solo re-habilitar el formulario si hay error
+          this.isLoggingIn = false;
           this.errorTitle = 'Error de autenticación';
           this.errorMessage = ok;
           this.displayErrorDialog = true;
