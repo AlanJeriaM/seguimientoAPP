@@ -2,10 +2,9 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { NotificacionService, Notificacion } from '../../../core/services/notificacion/notificacion.service';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { Subject, takeUntil } from 'rxjs';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-navbar-shared',
@@ -24,12 +23,17 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
   contadorNoLeidas: number = 0;
   cargandoNotificaciones: boolean = false;
 
+  // Variables para modal de cerrar sesión
+  displayLogoutDialog: boolean = false;
+  loggingOut: boolean = false;
+
   private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
     private authService: AuthService,
-    private notificacionService: NotificacionService
+    private notificacionService: NotificacionService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
@@ -125,29 +129,40 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
   }
 
   logOut() {
-    this.confirmLogout();
+    this.displayLogoutDialog = true;
   }
 
-  private confirmLogout() {
-    Swal.fire({
-      title: '¿Estás seguro que quieres cerrar sesión?',
-      text: 'Serás redirigido a la página de inicio de sesión',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#10b981', // Verde
-      cancelButtonColor: '#ef4444',  // Rojo
-      confirmButtonText: 'Sí, cerrar sesión',
-      cancelButtonText: 'No, mantener sesión',
-      reverseButtons: true,
-      customClass: {
-        actions: 'my-swal-actions'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.authService.logOut();
-        this.router.navigate(['auth']);
-      }
-    });
+  // Confirmar cerrar sesión
+  confirmarCerrarSesion() {
+    this.loggingOut = true;
+    
+    try {
+      this.authService.logOut();
+      this.router.navigate(['auth']);
+      
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sesión cerrada',
+        detail: 'Has cerrado sesión correctamente',
+        life: 3000
+      });
+    } catch (error) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al cerrar sesión',
+        life: 5000
+      });
+    } finally {
+      this.loggingOut = false;
+      this.displayLogoutDialog = false;
+    }
+  }
+
+  // Cancelar cerrar sesión
+  cancelarCerrarSesion() {
+    this.displayLogoutDialog = false;
+    this.loggingOut = false;
   }
 
   // Métodos para notificaciones
