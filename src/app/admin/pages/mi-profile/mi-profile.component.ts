@@ -16,6 +16,13 @@ export class MiProfileComponent implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
 
+  // Variables para detección de cambios y modal de confirmación
+  private formInitialValue: any = null;
+  hasFormChanges = false;
+  private initialFormStateSaved = false;
+  displayUpdateDialog: boolean = false;
+  updating: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private adminService: AdminService,
@@ -28,6 +35,11 @@ export class MiProfileComponent implements OnInit {
       contrasenia: ['', [Validators.minLength(6)]],
       confirmarContrasenia: ['']
     }, { validators: this.passwordMatchValidator });
+
+    // Suscribirse a cambios en el formulario para detección de cambios
+    this.perfilForm.valueChanges.subscribe(() => {
+      this.detectFormChanges();
+    });
   }
 
   ngOnInit(): void {
@@ -76,31 +88,159 @@ export class MiProfileComponent implements OnInit {
         contrasenia: '',
         confirmarContrasenia: ''
       });
+
+      // Guardar estado inicial después de cargar los datos
+      setTimeout(() => {
+        this.saveInitialFormState();
+      }, 100);
     }
   }
 
-  // Enviar formulario
-  async onSubmit() {
+  // Guardar estado inicial del formulario
+  private saveInitialFormState() {
+    if (this.perfilForm) {
+      this.formInitialValue = { ...this.perfilForm.value };
+      this.hasFormChanges = false;
+      this.initialFormStateSaved = true;
+    }
+  }
+
+  // Detectar cambios en el formulario
+  private detectFormChanges() {
+    if (!this.formInitialValue || !this.perfilForm || !this.initialFormStateSaved) {
+      this.hasFormChanges = false;
+      return;
+    }
+
+    const currentValue = { ...this.perfilForm.value };
+    const hasChanges = this.hasRealChanges(this.formInitialValue, currentValue);
+    const passwordFieldsValid = this.arePasswordFieldsValid();
+    
+    // Solo considerar que hay cambios si hay cambios reales Y los campos de contraseña son válidos
+    this.hasFormChanges = hasChanges && passwordFieldsValid;
+  }
+
+  // Verificar si hay cambios reales
+  private hasRealChanges(initial: any, current: any): boolean {
+    const fieldsToCompare = ['nombre_usuario', 'apellido', 'email_usuario', 'contrasenia'];
+    
+    for (const field of fieldsToCompare) {
+      const initialValue = initial[field];
+      const currentValue = current[field];
+      
+      if (field === 'contrasenia') {
+        // Para contraseña, solo considerar cambio si hay valor nuevo
+        if (currentValue && currentValue.trim() !== '') {
+          return true;
+        }
+      } else if (initialValue !== currentValue) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  // Verificar si los campos de contraseña son válidos
+  private arePasswordFieldsValid(): boolean {
+    const contrasenia = this.perfilForm.get('contrasenia')?.value;
+    const confirmarContrasenia = this.perfilForm.get('confirmarContrasenia')?.value;
+    
+    // Si no hay contraseña, es válido
+    if (!contrasenia || contrasenia.trim() === '') {
+      return true;
+    }
+    
+    // Si hay contraseña, debe haber confirmación y deben coincidir
+    return confirmarContrasenia && 
+           confirmarContrasenia.trim() !== '' && 
+           contrasenia === confirmarContrasenia;
+  }
+
+  // Descartar cambios
+  descartarCambios() {
+    if (this.perfil) {
+      // Restaurar valores originales
+      this.perfilForm.patchValue({
+        nombre_usuario: this.perfil.nombre_usuario || '',
+        apellido: this.perfil.apellido || '',
+        email_usuario: this.perfil.email_usuario || '',
+        contrasenia: '',
+        confirmarContrasenia: ''
+      });
+      
+      // Marcar el formulario como no tocado
+      this.perfilForm.markAsUntouched();
+      this.perfilForm.markAsPristine();
+      
+      // Guardar el nuevo estado inicial
+      this.saveInitialFormState();
+      
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Cambios descartados',
+        detail: 'Se han restaurado los valores originales',
+        life: 3000
+      });
+    }
+  }
+
+  // Abrir modal de confirmación
+  onUpdateClick() {
+    // Validar formulario
+    this.perfilForm.markAllAsTouched();
+    
     if (this.perfilForm.invalid) {
       this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Por favor, completa todos los campos requeridos correctamente'
+        severity: 'warn',
+        summary: 'Formulario inválido',
+        detail: 'Por favor, completa todos los campos requeridos correctamente',
+        life: 4000
       });
       return;
     }
 
-    this.loading = true;
+    if (!this.hasFormChanges) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Sin cambios',
+        detail: 'No hay cambios para actualizar',
+        life: 3000
+      });
+      return;
+    }
+
+    this.displayUpdateDialog = true;
+  }
+
+  // Confirmar actualización
+  async confirmarActualizacion() {
+    // Validar formulario
+    this.perfilForm.markAllAsTouched();
+    
+    if (this.perfilForm.invalid) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Por favor, completa todos los campos requeridos correctamente',
+        life: 4000
+      });
+      return;
+    }
+
+    this.updating = true;
     const formData = this.perfilForm.value;
 
     try {
       const response = await this.adminService.actualizarMiPerfil(formData).toPromise();
       
       if (response.ok) {
+        this.displayUpdateDialog = false;
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Perfil actualizado correctamente'
+          detail: 'Perfil actualizado correctamente',
+          life: 3000
         });
         
         // Recargar perfil para obtener datos actualizados
@@ -115,18 +255,31 @@ export class MiProfileComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: response.msj || 'Error al actualizar el perfil'
+          detail: response.msj || 'Error al actualizar el perfil',
+          life: 5000
         });
       }
     } catch (error) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Error de conexión. Intenta nuevamente.'
+        detail: 'Error de conexión. Intenta nuevamente.',
+        life: 5000
       });
     } finally {
-      this.loading = false;
+      this.updating = false;
     }
+  }
+
+  // Cancelar actualización
+  cancelarActualizacion() {
+    this.displayUpdateDialog = false;
+    this.updating = false;
+  }
+
+  // Método legacy para compatibilidad (ahora redirige al modal)
+  async onSubmit() {
+    this.onUpdateClick();
   }
 
   // Validaciones de campos
