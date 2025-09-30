@@ -242,15 +242,25 @@
           </div>
         </div>
 
-        <!-- Submit Button -->
-        <div class="flex justify-content-center">
+        <!-- Submit Buttons -->
+        <div class="flex justify-content-center gap-3">
           <p-button
-            type="submit"
-            label="Actualizar Perfil"
-            icon="pi pi-check"
-            [loading]="loading"
-            [disabled]="perfilForm.invalid"
-            styleClass="p-button-lg">
+            type="button"
+            label="Descartar"
+            icon="pi pi-refresh"
+            severity="secondary"
+            [disabled]="!hasFormChanges"
+            (click)="descartarCambios()"
+            styleClass="flex-1 sm:flex-initial px-6 py-3 font-semibold">
+          </p-button>
+          <p-button
+            type="button"
+            label="Actualizar"
+            icon="pi pi-save"
+            [loading]="updating"
+            [disabled]="perfilForm.invalid || !hasFormChanges"
+            (click)="onUpdateClick()"
+            styleClass="flex-1 sm:flex-initial px-6 py-3 font-semibold">
           </p-button>
         </div>
       </form>
@@ -260,3 +270,107 @@
 
 <!-- Toast para mensajes -->
 <p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
+
+<!-- Modal para confirmar actualización de perfil -->
+<p-dialog
+  [(visible)]="displayUpdateDialog"
+  header="Confirmar actualización"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarActualizacion()"
+>
+  <div class="p-4">
+    <!-- Information Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-blue-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-user-edit text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Confirmar actualización</h3>
+            <p class="text-600 mb-0 text-sm">Se actualizará la información de tu perfil</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <!-- Información del Perfil -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Nombre completo</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ perfilForm.get('nombre_usuario')?.value }} {{ perfilForm.get('apellido')?.value }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ perfilForm.get('email_usuario')?.value }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Contraseña (si se está cambiando) -->
+          <div class="col-12" *ngIf="perfilForm.get('contrasenia')?.value">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Nueva contraseña</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                ••••••••
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje informativo -->
+          <div class="col-12">
+            <div class="p-3 surface-100 border-round border-1 border-blue-300 bg-blue-50">
+              <div class="flex align-items-start gap-2">
+                <i class="pi pi-info-circle text-blue-500 mt-1"></i>
+                <div>
+                  <p class="text-blue-700 font-semibold mb-1">Información</p>
+                  <p class="text-blue-600 text-sm mb-0">
+                    Se actualizará la información de tu perfil con los cambios realizados.
+                    Si cambiaste la contraseña, asegúrate de recordar la nueva.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cancelarActualizacion()"
+        styleClass="p-button-text w-full sm:w-auto"
+        [disabled]="updating">
+      </p-button>
+      <p-button
+        label="Actualizar Perfil"
+        icon="pi pi-check"
+        (click)="confirmarActualizacion()"
+        styleClass="p-button-success w-full sm:w-auto"
+        [loading]="updating"
+        [disabled]="updating">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

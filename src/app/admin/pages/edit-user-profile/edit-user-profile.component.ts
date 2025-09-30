@@ -1010,12 +1010,6 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           if (response.ok) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Usuario actualizado correctamente'
-            });
-            
             // Resetear estado de cambios después de guardar exitosamente
             this.saveInitialFormState();
             
