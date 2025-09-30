@@ -831,3 +831,108 @@
   preventOpenDuplicates="true"
   styleClass="w-full sm:w-25rem max-w-screen">
 </p-toast>
+
+<!-- Modal para confirmar guardar cambios -->
+<p-dialog
+  [(visible)]="displaySaveDialog"
+  header="Guardar cambios"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarGuardar()"
+>
+  <div class="p-4">
+    <div class="text-center">
+      <div class="flex justify-content-center mb-4">
+        <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+          <i class="pi pi-save text-xl"></i>
+        </div>
+      </div>
+      
+      <h3 class="text-xl font-semibold text-900 mb-2">Guardar cambios</h3>
+      <p class="text-600 text-lg mb-0">
+        ¿Estás seguro que quieres guardar los cambios realizados?
+      </p>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cancelarGuardar()"
+        styleClass="p-button-text w-full sm:w-auto"
+        [disabled]="savingChanges">
+      </p-button>
+      <p-button
+        label="Guardar"
+        icon="pi pi-save"
+        (click)="confirmarGuardar()"
+        styleClass="p-button-success w-full sm:w-auto"
+        [loading]="savingChanges"
+        [disabled]="savingChanges">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal para confirmar descartar cambios -->
+<p-dialog
+  [(visible)]="displayDiscardDialog"
+  header="Descartar cambios"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarDescartar()"
+>
+  <div class="p-4">
+    <div class="text-center">
+      <div class="flex justify-content-center mb-4">
+        <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+          <i class="pi pi-times text-xl"></i>
+        </div>
+      </div>
+      
+      <h3 class="text-xl font-semibold text-900 mb-2">Descartar cambios</h3>
+      <p class="text-600 text-lg mb-0">
+        ¿Estás seguro que quieres descartar los cambios realizados?
+      </p>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cancelarDescartar()"
+        styleClass="p-button-text w-full sm:w-auto">
+      </p-button>
+      <p-button
+        label="Descartar"
+        icon="pi pi-times"
+        (click)="confirmarDescartar()"
+        styleClass="p-button-warning w-full sm:w-auto">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

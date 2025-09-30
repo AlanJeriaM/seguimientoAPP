@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { PrimeNGConfig } from 'primeng/api';
-import Swal from 'sweetalert2';
+import { PrimeNGConfig, MessageService } from 'primeng/api';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -17,12 +16,23 @@ export class LoginComponent implements OnInit {
   formularioLogin: FormGroup;
   isProduction: boolean = environment.production;
 
+  // Variables para modales
+  displayLoadingDialog: boolean = false;
+  displaySuccessDialog: boolean = false;
+  displayErrorDialog: boolean = false;
+  loadingMessage: string = '';
+  successMessage: string = '';
+  errorMessage: string = '';
+  errorTitle: string = '';
+  isLoggingIn: boolean = false;
+
   constructor(
     private fb: FormBuilder, 
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private primengConfig: PrimeNGConfig
+    private primengConfig: PrimeNGConfig,
+    private messageService: MessageService
   ) {
     this.formularioLogin = this.fb.group({
       emailUsuario: ['', [Validators.required, Validators.pattern(this.emailPattern)]],
@@ -40,11 +50,9 @@ export class LoginComponent implements OnInit {
       }
       if (params['error']) {
         console.error('Error en callback de LinkedIn:', params['error']);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error de LinkedIn',
-          text: params['error_description'] || 'Error en la autenticación'
-        });
+        this.errorTitle = 'Error de LinkedIn';
+        this.errorMessage = params['error_description'] || 'Error en la autenticación';
+        this.displayErrorDialog = true;
       }
     });
   }
@@ -55,46 +63,37 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    Swal.fire({
-      title: 'Iniciando sesión...',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
+    this.isLoggingIn = true;
+    this.loadingMessage = 'Iniciando sesión...';
+    this.displayLoadingDialog = true;
 
     this.authService.login(this.formularioLogin.value).subscribe({
       next: (ok) => {
-        Swal.close();
+        this.displayLoadingDialog = false;
+        this.isLoggingIn = false;
 
         if (ok === true) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Accediendo',
-            showConfirmButton: false,
-            timer: 1000,
-          });
+          this.successMessage = 'Accediendo al sistema...';
+          this.displaySuccessDialog = true;
 
-          this.router.navigate([this.esAdmin ? '/admin' : '/user']);
+          // Cerrar modal de éxito y navegar después de un breve delay
+          setTimeout(() => {
+            this.displaySuccessDialog = false;
+            this.router.navigate([this.esAdmin ? '/admin' : '/user']);
+          }, 1000);
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: ok,
-            showConfirmButton: true,
-          });
-
+          this.errorTitle = 'Error de autenticación';
+          this.errorMessage = ok;
+          this.displayErrorDialog = true;
           this.formularioLogin.get('contrasenia')?.reset();
         }
       },
       error: () => {
-        Swal.close();
-        Swal.fire({
-          icon: 'error',
-          title: 'Error de conexión',
-          text: 'No se pudo conectar con el servidor',
-          showConfirmButton: true,
-        });
+        this.displayLoadingDialog = false;
+        this.isLoggingIn = false;
+        this.errorTitle = 'Error de conexión';
+        this.errorMessage = 'No se pudo conectar con el servidor';
+        this.displayErrorDialog = true;
       }
     });
   }
@@ -108,6 +107,18 @@ export class LoginComponent implements OnInit {
     this.formularioLogin.markAsUntouched();
   }
 
+  // Métodos para cerrar modales
+  cerrarErrorDialog() {
+    this.displayErrorDialog = false;
+    this.errorMessage = '';
+    this.errorTitle = '';
+  }
+
+  cerrarSuccessDialog() {
+    this.displaySuccessDialog = false;
+    this.successMessage = '';
+  }
+
   loginWithLinkedIn() {
     if (environment.useRealLinkedIn) {
       this.loginWithLinkedInReal();
@@ -119,38 +130,31 @@ export class LoginComponent implements OnInit {
   private loginWithLinkedInReal() {
     console.log('Iniciando login real con LinkedIn...');
 
-    Swal.fire({
-      title: 'Conectando con LinkedIn...',
-      text: 'Te redirigiremos a LinkedIn para autorizar el acceso',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
+    this.isLoggingIn = true;
+    this.loadingMessage = 'Conectando con LinkedIn...';
+    this.displayLoadingDialog = true;
 
     this.authService.getLinkedInAuthUrl().subscribe({
       next: (resp) => {
-        Swal.close();
+        this.displayLoadingDialog = false;
+        this.isLoggingIn = false;
 
         if (resp.ok) {
           console.log('URL de LinkedIn obtenida, redirigiendo...');
           window.location.href = resp.authUrl;
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: resp.msj || 'Error al conectar con LinkedIn'
-          });
+          this.errorTitle = 'Error de LinkedIn';
+          this.errorMessage = resp.msj || 'Error al conectar con LinkedIn';
+          this.displayErrorDialog = true;
         }
       },
       error: (error) => {
-        Swal.close();
+        this.displayLoadingDialog = false;
+        this.isLoggingIn = false;
         console.error('Error obteniendo URL de LinkedIn:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error de conexión con el servidor'
-        });
+        this.errorTitle = 'Error de conexión';
+        this.errorMessage = 'Error de conexión con el servidor';
+        this.displayErrorDialog = true;
       }
     });
   }
@@ -170,48 +174,37 @@ export class LoginComponent implements OnInit {
       industria: 'Tecnología de la información'
     };
 
-    Swal.fire({
-      title: 'Conectando con LinkedIn...',
-      text: 'Modo desarrollo activado',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
+    this.isLoggingIn = true;
+    this.loadingMessage = 'Conectando con LinkedIn... (Modo desarrollo)';
+    this.displayLoadingDialog = true;
 
     setTimeout(() => {
       this.authService.loginLinkedIn(linkedinDataSimulado).subscribe({
         next: (ok) => {
-          Swal.close();
+          this.displayLoadingDialog = false;
+          this.isLoggingIn = false;
 
           if (ok === true) {
-            Swal.fire({
-              icon: 'success',
-              title: '¡Bienvenido!',
-              text: 'Login con LinkedIn exitoso (Modo desarrollo)',
-              showConfirmButton: false,
-              timer: 1500,
-            });
+            this.successMessage = 'Login con LinkedIn exitoso (Modo desarrollo)';
+            this.displaySuccessDialog = true;
 
-            this.router.navigate(['/user']);
+            setTimeout(() => {
+              this.displaySuccessDialog = false;
+              this.router.navigate(['/user']);
+            }, 1500);
           } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: ok || 'Error al conectar con LinkedIn',
-              showConfirmButton: true,
-            });
+            this.errorTitle = 'Error de LinkedIn';
+            this.errorMessage = ok || 'Error al conectar con LinkedIn';
+            this.displayErrorDialog = true;
           }
         },
         error: (error) => {
-          Swal.close();
+          this.displayLoadingDialog = false;
+          this.isLoggingIn = false;
           console.error('Error en login simulado:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Error en el login simulado',
-            showConfirmButton: true,
-          });
+          this.errorTitle = 'Error de desarrollo';
+          this.errorMessage = 'Error en el login simulado';
+          this.displayErrorDialog = true;
         }
       });
     }, 2000);
@@ -220,49 +213,44 @@ export class LoginComponent implements OnInit {
   private processLinkedInCallback(code: string, state: string) {
     console.log('Procesando callback de LinkedIn...');
 
-    Swal.fire({
-      title: 'Procesando autenticación...',
-      text: 'Validando credenciales con LinkedIn',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
+    this.isLoggingIn = true;
+    this.loadingMessage = 'Procesando autenticación...';
+    this.displayLoadingDialog = true;
 
     this.authService.processLinkedInCallback(code, state).subscribe({
       next: (ok) => {
-        Swal.close();
+        this.displayLoadingDialog = false;
+        this.isLoggingIn = false;
 
         if (ok === true) {
-          Swal.fire({
-            icon: 'success',
-            title: '¡Bienvenido!',
-            text: 'Autenticación exitosa',
-            showConfirmButton: false,
-            timer: 1500,
-          });
+          this.successMessage = 'Autenticación exitosa';
+          this.displaySuccessDialog = true;
 
-          this.router.navigate(['/user']);
+          setTimeout(() => {
+            this.displaySuccessDialog = false;
+            this.router.navigate(['/user']);
+          }, 1500);
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error de autenticación',
-            text: ok || 'Error al procesar la autenticación',
-          });
+          this.errorTitle = 'Error de autenticación';
+          this.errorMessage = ok || 'Error al procesar la autenticación';
+          this.displayErrorDialog = true;
 
-          this.router.navigate(['/auth/login']);
+          setTimeout(() => {
+            this.router.navigate(['/auth/login']);
+          }, 2000);
         }
       },
       error: (error) => {
-        Swal.close();
+        this.displayLoadingDialog = false;
+        this.isLoggingIn = false;
         console.error('Error procesando callback:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error procesando la autenticación',
-        });
+        this.errorTitle = 'Error de procesamiento';
+        this.errorMessage = 'Error procesando la autenticación';
+        this.displayErrorDialog = true;
 
-        this.router.navigate(['/auth/login']);
+        setTimeout(() => {
+          this.router.navigate(['/auth/login']);
+        }, 2000);
       }
     });
   }

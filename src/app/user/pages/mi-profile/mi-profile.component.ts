@@ -5,7 +5,6 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileCompletionGuard } from '../../../core/guards/profile-completion.guard';
-import Swal from 'sweetalert2';
 
 export interface PerfilUsuario {
   id: number;
@@ -79,6 +78,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   showAddIndustriaDialog = false;
   nuevaIndustria: string = '';
   opcionesPersonalizadasIndustria: string[] = [];
+
+  // Variables para modales de confirmación
+  displaySaveDialog: boolean = false;
+  displayDiscardDialog: boolean = false;
+  savingChanges: boolean = false;
 
   // Variables para control de cambios en el formulario
   private formInitialValue: any = null;
@@ -1373,51 +1377,41 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   }
 
   private confirmDiscardChanges() {
-    Swal.fire({
-      title: '¿Desea descartar los cambios realizados?',
-      text: 'Los cambios no guardados se perderán permanentemente',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#10b981', // Verde
-      cancelButtonColor: '#ef4444',  // Rojo
-      confirmButtonText: 'Sí, descartar',
-      cancelButtonText: 'No, mantener',
-      reverseButtons: true,
-      customClass: {
-        actions: 'my-swal-actions'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.populateForm();
-        this.hasFormChanges = false;
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Formulario restablecido',
-          detail: 'Los cambios han sido descartados'
-        });
-      }
+    this.displayDiscardDialog = true;
+  }
+
+  // Confirmar descartar cambios
+  confirmarDescartar() {
+    this.populateForm();
+    this.hasFormChanges = false;
+    this.displayDiscardDialog = false;
+    
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Cambios descartados',
+      detail: 'Se han restaurado los valores originales',
+      life: 3000
     });
   }
 
+  // Cancelar descartar cambios
+  cancelarDescartar() {
+    this.displayDiscardDialog = false;
+  }
+
   private confirmSaveChanges() {
-    Swal.fire({
-      title: '¿Desea realizar estos cambios?',
-      text: 'Los cambios se guardarán en su perfil',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#10b981', // Verde
-      cancelButtonColor: '#ef4444',  // Rojo
-      confirmButtonText: 'Sí, guardar',
-      cancelButtonText: 'No, cancelar',
-      reverseButtons: true,
-      customClass: {
-        actions: 'my-swal-actions'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.guardarPerfil();
-      }
-    });
+    this.displaySaveDialog = true;
+  }
+
+  // Confirmar guardar cambios
+  confirmarGuardar() {
+    this.displaySaveDialog = false;
+    this.guardarPerfil();
+  }
+
+  // Cancelar guardar cambios
+  cancelarGuardar() {
+    this.displaySaveDialog = false;
   }
 
   getUserInitials(): string {
