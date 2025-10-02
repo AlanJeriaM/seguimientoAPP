@@ -127,92 +127,47 @@
 <!-- Toast para mensajes -->
 <p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
 
-<!-- Modal de carga -->
+<!-- Modal dinámico unificado -->
 <p-dialog
-  [(visible)]="displayLoadingDialog"
+  [(visible)]="displayModal"
   [modal]="true"
-  [closable]="false"
+  [closable]="modalType === 'error'"
   [draggable]="false"
   [resizable]="false"
   [style]="{width: '90vw', maxWidth: '400px'}"
   [contentStyle]="{'padding': '0'}"
   [appendTo]="'body'"
   [baseZIndex]="1000"
+  (onHide)="cerrarModal()"
 >
   <div class="p-4">
     <div class="text-center">
       <div class="flex justify-content-center mb-4">
-        <div class="bg-blue-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
-          <i class="pi pi-spin pi-spinner text-xl"></i>
+        <div [ngClass]="{
+          'bg-blue-500': modalType === 'loading',
+          'bg-green-500': modalType === 'success',
+          'bg-red-500': modalType === 'error'
+        }" class="text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+          <i [ngClass]="modalIcon" class="text-xl"></i>
         </div>
       </div>
       
-      <h3 class="text-xl font-semibold text-900 mb-2">Procesando</h3>
-      <p class="text-600 text-lg mb-0">{{ loadingMessage }}</p>
-    </div>
-  </div>
-</p-dialog>
-
-<!-- Modal de éxito -->
-<p-dialog
-  [(visible)]="displaySuccessDialog"
-  [modal]="true"
-  [closable]="false"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{width: '90vw', maxWidth: '400px'}"
-  [contentStyle]="{'padding': '0'}"
-  [appendTo]="'body'"
-  [baseZIndex]="1000"
->
-  <div class="p-4">
-    <div class="text-center">
-      <div class="flex justify-content-center mb-4">
-        <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
-          <i class="pi pi-check text-xl"></i>
-        </div>
-      </div>
-      
-      <h3 class="text-xl font-semibold text-900 mb-2">¡Éxito!</h3>
-      <p class="text-600 text-lg mb-0">{{ successMessage }}</p>
-    </div>
-  </div>
-</p-dialog>
-
-<!-- Modal de error -->
-<p-dialog
-  [(visible)]="displayErrorDialog"
-  [modal]="true"
-  [closable]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{width: '90vw', maxWidth: '500px'}"
-  [contentStyle]="{'padding': '0'}"
-  [appendTo]="'body'"
-  [baseZIndex]="1000"
-  (onHide)="cerrarErrorDialog()"
->
-  <div class="p-4">
-    <div class="text-center">
-      <div class="flex justify-content-center mb-4">
-        <div class="bg-red-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
-          <i class="pi pi-times text-xl"></i>
-        </div>
-      </div>
-      
-      <h3 class="text-xl font-semibold text-900 mb-2">{{ errorTitle }}</h3>
-      <p class="text-600 text-lg mb-0">{{ errorMessage }}</p>
+      <h3 class="text-xl font-semibold text-900 mb-2">{{ modalTitle }}</h3>
+      <p class="text-600 text-lg mb-0">{{ modalMessage }}</p>
     </div>
   </div>
 
-  <ng-template pTemplate="footer">
+  <!-- Footer solo para errores -->
+  <ng-template pTemplate="footer" *ngIf="modalType === 'error'">
     <div class="flex justify-content-end">
       <p-button
         label="Entendido"
         icon="pi pi-check"
-        (click)="cerrarErrorDialog()"
+        (click)="cerrarModal()"
         styleClass="p-button-primary">
       </p-button>
     </div>
   </ng-template>
 </p-dialog>
+
+

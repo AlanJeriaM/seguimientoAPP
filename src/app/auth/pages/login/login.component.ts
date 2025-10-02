@@ -16,18 +16,19 @@ export class LoginComponent implements OnInit {
   formularioLogin: FormGroup;
   isProduction: boolean = environment.production;
 
-  // Variables para modales
-  displayLoadingDialog: boolean = false;
-  displaySuccessDialog: boolean = false;
-  displayErrorDialog: boolean = false;
-  loadingMessage: string = '';
-  successMessage: string = '';
-  errorMessage: string = '';
-  errorTitle: string = '';
+  // Variables para el modal dinámico unificado
+  displayModal: boolean = false;
   isLoggingIn: boolean = false;
+  
+  // Variables para el modal dinámico
+  modalIcon: string = 'pi pi-spin pi-spinner';
+  modalTitle: string = 'Procesando';
+  modalMessage: string = '';
+  modalType: 'loading' | 'success' | 'error' = 'loading';
+  isProcessingComplete: boolean = false;
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
@@ -48,12 +49,11 @@ export class LoginComponent implements OnInit {
         console.log('LinkedIn callback detectado');
         this.processLinkedInCallback(params['code'], params['state']);
       }
-      if (params['error']) {
-        console.error('Error en callback de LinkedIn:', params['error']);
-        this.errorTitle = 'Error de LinkedIn';
-        this.errorMessage = params['error_description'] || 'Error en la autenticación';
-        this.displayErrorDialog = true;
-      }
+        if (params['error']) {
+          console.error('Error en callback de LinkedIn:', params['error']);
+          this.changeModalState('error', 'pi pi-times', 'Error de LinkedIn', params['error_description'] || 'Error en la autenticación');
+          this.displayModal = true;
+        }
     });
   }
 
@@ -64,39 +64,29 @@ export class LoginComponent implements OnInit {
     }
 
     this.isLoggingIn = true;
-    this.loadingMessage = 'Iniciando sesión...';
-    this.displayLoadingDialog = true;
+    this.changeModalState('loading', 'pi pi-spin pi-spinner', 'Procesando', 'Iniciando sesión...');
+    this.displayModal = true;
 
     this.authService.login(this.formularioLogin.value).subscribe({
       next: (ok) => {
-        this.displayLoadingDialog = false;
-
         if (ok === true) {
-          this.successMessage = 'Accediendo al sistema...';
-          this.displaySuccessDialog = true;
+          // Cambiar a estado de éxito sin cerrar el modal
+          this.changeModalState('success', 'pi pi-check', '¡Éxito!', 'Accediendo al sistema...', true);
 
-          // Cerrar modal de éxito y navegar después de un breve delay
-          // NO re-habilitar el formulario hasta que se complete la navegación
           setTimeout(() => {
-            this.displaySuccessDialog = false;
             this.router.navigate([this.esAdmin ? '/admin' : '/user']);
-            // El formulario se mantendrá deshabilitado hasta que se complete la navegación
-          }, 1000);
+            // El modal se cerrará automáticamente al cambiar de ruta
+          }, 800);
         } else {
-          // Solo re-habilitar el formulario si hay error
+          // Cambiar a estado de error
+          this.changeModalState('error', 'pi pi-times', 'Error de autenticación', ok);
           this.isLoggingIn = false;
-          this.errorTitle = 'Error de autenticación';
-          this.errorMessage = ok;
-          this.displayErrorDialog = true;
           this.formularioLogin.get('contrasenia')?.reset();
         }
       },
       error: () => {
-        this.displayLoadingDialog = false;
+        this.changeModalState('error', 'pi pi-times', 'Error de conexión', 'No se pudo conectar con el servidor');
         this.isLoggingIn = false;
-        this.errorTitle = 'Error de conexión';
-        this.errorMessage = 'No se pudo conectar con el servidor';
-        this.displayErrorDialog = true;
       }
     });
   }
@@ -110,16 +100,21 @@ export class LoginComponent implements OnInit {
     this.formularioLogin.markAsUntouched();
   }
 
-  // Métodos para cerrar modales
-  cerrarErrorDialog() {
-    this.displayErrorDialog = false;
-    this.errorMessage = '';
-    this.errorTitle = '';
+  cerrarModal() {
+    this.displayModal = false;
+    this.modalMessage = '';
+    this.modalTitle = 'Procesando';
+    this.modalType = 'loading';
+    this.isProcessingComplete = false;
   }
 
-  cerrarSuccessDialog() {
-    this.displaySuccessDialog = false;
-    this.successMessage = '';
+  // Método para cambiar el estado del modal dinámico
+  private changeModalState(type: 'loading' | 'success' | 'error', icon: string, title: string, message: string, isComplete: boolean = false) {
+    this.modalType = type;
+    this.modalIcon = icon;
+    this.modalTitle = title;
+    this.modalMessage = message;
+    this.isProcessingComplete = isComplete;
   }
 
   loginWithLinkedIn() {
@@ -133,31 +128,32 @@ export class LoginComponent implements OnInit {
   private loginWithLinkedInReal() {
     console.log('Iniciando login real con LinkedIn...');
 
+    // Activar loading INMEDIATAMENTE antes de cualquier operación
     this.isLoggingIn = true;
-    this.loadingMessage = 'Conectando con LinkedIn...';
-    this.displayLoadingDialog = true;
+    this.changeModalState('loading', 'pi pi-spin pi-spinner', 'Procesando', 'Conectando con LinkedIn...');
+    this.displayModal = true;
 
     this.authService.getLinkedInAuthUrl().subscribe({
       next: (resp) => {
-        this.displayLoadingDialog = false;
-        this.isLoggingIn = false;
-
         if (resp.ok) {
           console.log('URL de LinkedIn obtenida, redirigiendo...');
-          window.location.href = resp.authUrl;
+          // Cambiar a estado de redirección
+          this.changeModalState('loading', 'pi pi-external-link', 'Redirigiendo', 'Redirigiendo a LinkedIn...');
+
+          // Dar un momento para que el usuario vea el modal antes de redireccionar
+          setTimeout(() => {
+            window.location.href = resp.authUrl;
+            // NO cerrar el loading aquí - se mantendrá visible durante la redirección
+          }, 500);
         } else {
-          this.errorTitle = 'Error de LinkedIn';
-          this.errorMessage = resp.msj || 'Error al conectar con LinkedIn';
-          this.displayErrorDialog = true;
+          this.changeModalState('error', 'pi pi-times', 'Error de LinkedIn', resp.msj || 'Error al conectar con LinkedIn');
+          this.isLoggingIn = false;
         }
       },
       error: (error) => {
-        this.displayLoadingDialog = false;
-        this.isLoggingIn = false;
         console.error('Error obteniendo URL de LinkedIn:', error);
-        this.errorTitle = 'Error de conexión';
-        this.errorMessage = 'Error de conexión con el servidor';
-        this.displayErrorDialog = true;
+        this.changeModalState('error', 'pi pi-times', 'Error de conexión', 'Error de conexión con el servidor');
+        this.isLoggingIn = false;
       }
     });
   }
@@ -178,65 +174,56 @@ export class LoginComponent implements OnInit {
     };
 
     this.isLoggingIn = true;
-    this.loadingMessage = 'Conectando con LinkedIn... (Modo desarrollo)';
-    this.displayLoadingDialog = true;
+    this.changeModalState('loading', 'pi pi-spin pi-spinner', 'Procesando', 'Conectando con LinkedIn...');
+    this.displayModal = true;
 
     setTimeout(() => {
       this.authService.loginLinkedIn(linkedinDataSimulado).subscribe({
         next: (ok) => {
-          this.displayLoadingDialog = false;
-          this.isLoggingIn = false;
-
           if (ok === true) {
-            this.successMessage = 'Login con LinkedIn exitoso (Modo desarrollo)';
-            this.displaySuccessDialog = true;
+            // Cambiar a estado de éxito
+            this.changeModalState('success', 'pi pi-check', '¡Éxito!', 'Accediendo al portal...', true);
 
             setTimeout(() => {
-              this.displaySuccessDialog = false;
               this.router.navigate(['/user']);
-            }, 1500);
+              // El modal se cerrará automáticamente al cambiar de ruta
+            }, 800);
           } else {
-            this.errorTitle = 'Error de LinkedIn';
-            this.errorMessage = ok || 'Error al conectar con LinkedIn';
-            this.displayErrorDialog = true;
+            // Cambiar a estado de error
+            this.changeModalState('error', 'pi pi-times', 'Error de LinkedIn', ok || 'Error al conectar con LinkedIn');
+            this.isLoggingIn = false;
           }
         },
         error: (error) => {
-          this.displayLoadingDialog = false;
-          this.isLoggingIn = false;
           console.error('Error en login simulado:', error);
-          this.errorTitle = 'Error de desarrollo';
-          this.errorMessage = 'Error en el login simulado';
-          this.displayErrorDialog = true;
+          this.changeModalState('error', 'pi pi-times', 'Error de desarrollo', 'Error en el login simulado');
+          this.isLoggingIn = false;
         }
       });
-    }, 2000);
+    }, 1000);
   }
 
   private processLinkedInCallback(code: string, state: string) {
     console.log('Procesando callback de LinkedIn...');
 
     this.isLoggingIn = true;
-    this.loadingMessage = 'Procesando autenticación...';
-    this.displayLoadingDialog = true;
+    this.changeModalState('loading', 'pi pi-spin pi-spinner', 'Procesando', 'Procesando autenticación...');
+    this.displayModal = true;
 
     this.authService.processLinkedInCallback(code, state).subscribe({
       next: (ok) => {
-        this.displayLoadingDialog = false;
-        this.isLoggingIn = false;
-
         if (ok === true) {
-          this.successMessage = 'Autenticación exitosa';
-          this.displaySuccessDialog = true;
+          // Cambiar a estado de éxito
+          this.changeModalState('success', 'pi pi-check', '¡Éxito!', 'Accediendo al portal...', true);
 
           setTimeout(() => {
-            this.displaySuccessDialog = false;
             this.router.navigate(['/user']);
-          }, 1500);
+            // El modal se cerrará automáticamente al cambiar de ruta
+          }, 800);
         } else {
-          this.errorTitle = 'Error de autenticación';
-          this.errorMessage = ok || 'Error al procesar la autenticación';
-          this.displayErrorDialog = true;
+          // Cambiar a estado de error
+          this.changeModalState('error', 'pi pi-times', 'Error de autenticación', ok || 'Error al procesar la autenticación');
+          this.isLoggingIn = false;
 
           setTimeout(() => {
             this.router.navigate(['/auth/login']);
@@ -244,12 +231,9 @@ export class LoginComponent implements OnInit {
         }
       },
       error: (error) => {
-        this.displayLoadingDialog = false;
-        this.isLoggingIn = false;
         console.error('Error procesando callback:', error);
-        this.errorTitle = 'Error de procesamiento';
-        this.errorMessage = 'Error procesando la autenticación';
-        this.displayErrorDialog = true;
+        this.changeModalState('error', 'pi pi-times', 'Error de procesamiento', 'Error procesando la autenticación');
+        this.isLoggingIn = false;
 
         setTimeout(() => {
           this.router.navigate(['/auth/login']);
