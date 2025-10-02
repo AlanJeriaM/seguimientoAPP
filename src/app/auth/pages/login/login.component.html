@@ -72,8 +72,8 @@
         </div>
 
         <div class="forgot-password-section">
-          <a routerLink="/auth/reset-password" 
-             class="forgot-link" 
+          <a routerLink="/auth/reset-password"
+             class="forgot-link"
              [class.disabled-link]="isLoggingIn"
              [style.pointer-events]="isLoggingIn ? 'none' : 'auto'">
             <i class="pi pi-question-circle"></i>
@@ -101,7 +101,7 @@
         </div>
 
         <div class="button-section">
-          <p-button label="Continuar con LinkedIn"
+          <p-button label="Ingresar con LinkedIn"
                     icon="pi pi-linkedin"
                     (click)="loginWithLinkedIn()"
                     styleClass="linkedin-button">
@@ -151,7 +151,7 @@
           <i [ngClass]="modalIcon" class="text-xl"></i>
         </div>
       </div>
-      
+
       <h3 class="text-xl font-semibold text-900 mb-2">{{ modalTitle }}</h3>
       <p class="text-600 text-lg mb-0">{{ modalMessage }}</p>
     </div>
