@@ -25,19 +25,14 @@
 .admin-card { background: linear-gradient(135deg, rgba(102,126,234,0.05), rgba(118,75,162,0.05)), rgba(255,255,255,0.95); }
 .graduate-card { background: linear-gradient(135deg, rgba(0,119,181,0.05), rgba(0,160,220,0.05)), rgba(255,255,255,0.95); }
 
-/* Decoraciones */
+/* Decoraciones - DESHABILITADAS en móvil para mejorar rendimiento */
 .bg-decoration { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .decoration-circle {
   position: absolute;
   border-radius: 50%;
   background: linear-gradient(45deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1));
-  animation: float 6s ease-in-out infinite;
+  display: none; /* Ocultar por defecto en móvil */
 }
-.circle-1 { width: 300px; height: 300px; top: -150px; right: -150px; }
-.circle-2 { width: 200px; height: 200px; bottom: -100px; left: -100px; animation-delay: 2s; }
-.circle-3 { width: 150px; height: 150px; top: 50%; right: -75px; animation-delay: 4s; }
-
-@keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(180deg); } }
 
 /* Toggle Button */
 .toggle-button {
@@ -67,6 +62,7 @@
   z-index: 2;
 }
 
+/* Logo glow - SIMPLIFICADO para móvil */
 .logo-glow {
   position: absolute;
   top: 50%;
@@ -76,11 +72,9 @@
   height: 100px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(99,102,241,0.3), transparent 70%);
-  animation: pulse 2s infinite;
   z-index: 1;
+  display: none; /* Ocultar por defecto en móvil */
 }
-
-@keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.4; } }
 
 .login-title {
   font-size: 2rem;
@@ -110,7 +104,7 @@
   border: 2px solid #e5e7eb !important;
   border-radius: 12px !important;
   font-size: 1rem !important;
-  transition: var(--transition) !important;
+  transition: border-color 0.2s ease !important; /* Transición simplificada */
   background: rgba(255,255,255,0.9) !important;
 }
 
@@ -118,7 +112,6 @@
   outline: none !important;
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
-  transform: translateY(-1px) !important;
 }
 
 /* Password Field */
@@ -130,7 +123,7 @@
   border: 2px solid #e5e7eb !important;
   border-radius: 12px !important;
   font-size: 1rem !important;
-  transition: var(--transition) !important;
+  transition: border-color 0.2s ease !important; /* Transición simplificada */
   background: rgba(255,255,255,0.9) !important;
   box-sizing: border-box !important;
 }
@@ -139,13 +132,12 @@
   outline: none !important;
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
-  transform: translateY(-1px) !important;
 }
 
 ::ng-deep .modern-password .p-password-toggle {
   right: 1rem !important;
   color: var(--secondary) !important;
-  transition: var(--transition) !important;
+  transition: color 0.2s ease !important;
 }
 ::ng-deep .modern-password .p-password-toggle:hover { color: var(--primary) !important; }
 
@@ -174,15 +166,19 @@
   text-decoration: none;
   font-weight: 500;
   font-size: 0.9rem;
-  transition: var(--transition);
+  transition: color 0.2s ease;
   padding: 0.5rem;
   border-radius: 8px;
 }
-.forgot-link:hover { background: rgba(37,99,235,0.1); transform: translateY(-1px); }
+.forgot-link:hover { background: rgba(37,99,235,0.1); }
 
 .graduate-section { text-align: center; }
 .linkedin-info { margin-bottom: 2rem; }
-.linkedin-icon { font-size: 3rem; color: #0077b5; margin-bottom: 1rem; animation: bounce 2s infinite; }
+.linkedin-icon {
+  font-size: 3rem;
+  color: #0077b5;
+  margin-bottom: 1rem;
+}
 .linkedin-info h3 { font-size: 1.25rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0; }
 .linkedin-info p { color: var(--secondary); font-size: 0.95rem; margin: 0; line-height: 1.5; }
 
@@ -208,7 +204,7 @@
   font-size: 1rem !important;
   font-weight: 600 !important;
   border-radius: 12px !important;
-  transition: var(--transition) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important; /* Transición simplificada */
   border: none !important;
 }
 
@@ -224,10 +220,61 @@
 
 ::ng-deep .linkedin-button:hover { box-shadow: 0 12px 35px -8px rgba(0,119,181,0.5) !important; }
 
+/* Estilos para formulario deshabilitado */
+.form-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.form-disabled .modern-input,
+.form-disabled ::ng-deep .modern-password-input {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+}
+
+.form-disabled .forgot-link.disabled-link {
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  text-decoration: none !important;
+}
+
+/* Estilos para botones deshabilitados */
+::ng-deep .p-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.toggle-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
 /* Responsive Design - Optimizado para S, M, L */
 
-/* Dispositivos L (Desktop - 1024px+) */
+/* Dispositivos L (Desktop - 1024px+) - Habilitar animaciones */
 @media (min-width: 1024px) {
+  /* Habilitar decoraciones solo en desktop */
+  .decoration-circle {
+    display: block;
+    animation: float 6s ease-in-out infinite;
+  }
+  .circle-1 { width: 300px; height: 300px; top: -150px; right: -150px; }
+  .circle-2 { width: 200px; height: 200px; bottom: -100px; left: -100px; animation-delay: 2s; }
+  .circle-3 { width: 150px; height: 150px; top: 50%; right: -75px; animation-delay: 4s; }
+
+  /* Habilitar logo glow */
+  .logo-glow {
+    display: block;
+    animation: pulse 2s infinite;
+  }
+
+  /* Habilitar animación de LinkedIn icon */
+  .linkedin-icon {
+    animation: bounce 2s infinite;
+  }
+
   .login-card {
     max-width: 520px;
     padding: 3.5rem;
@@ -271,7 +318,23 @@
   }
 }
 
-/* Dispositivos M (Tablet - 768px a 1023px) */
+/* Animaciones (solo para desktop) */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.4; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Dispositivos M (Tablet - 768px a 1023px) - SIN animaciones pesadas */
 @media (min-width: 768px) and (max-width: 1023px) {
   .login-container {
     padding: 1.5rem;
@@ -283,10 +346,6 @@
   .logo {
     width: 75px;
     height: 75px;
-  }
-  .logo-glow {
-    width: 95px;
-    height: 95px;
   }
   .login-title {
     font-size: 1.875rem;
@@ -321,26 +380,9 @@
   .forgot-link {
     font-size: 0.9375rem;
   }
-  .circle-1 {
-    width: 250px;
-    height: 250px;
-    top: -125px;
-    right: -125px;
-  }
-  .circle-2 {
-    width: 175px;
-    height: 175px;
-    bottom: -87px;
-    left: -87px;
-  }
-  .circle-3 {
-    width: 125px;
-    height: 125px;
-    right: -62px;
-  }
 }
 
-/* Dispositivos S (Mobile - hasta 767px) */
+/* Dispositivos S (Mobile - hasta 767px) - SIN animaciones */
 @media (max-width: 767px) {
   .login-container {
     padding: 1rem;
@@ -359,10 +401,6 @@
   .logo {
     width: 65px;
     height: 65px;
-  }
-  .logo-glow {
-    width: 85px;
-    height: 85px;
   }
   .login-title {
     font-size: 1.5rem;
@@ -396,23 +434,6 @@
   .error-message {
     font-size: 0.8125rem;
   }
-  .circle-1 {
-    width: 180px;
-    height: 180px;
-    top: -90px;
-    right: -90px;
-  }
-  .circle-2 {
-    width: 130px;
-    height: 130px;
-    bottom: -65px;
-    left: -65px;
-  }
-  .circle-3 {
-    width: 100px;
-    height: 100px;
-    right: -50px;
-  }
 }
 
 /* Dispositivos XS (Mobile pequeño - hasta 480px) */
@@ -430,10 +451,6 @@
   .logo {
     width: 55px;
     height: 55px;
-  }
-  .logo-glow {
-    width: 75px;
-    height: 75px;
   }
   .login-title {
     font-size: 1.25rem;
@@ -467,44 +484,4 @@
   .error-message {
     font-size: 0.75rem;
   }
-  .circle-3 {
-    display: none;
-  }
-}
-
-/* Estilos para formulario deshabilitado */
-.form-disabled {
-  pointer-events: none;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
-}
-
-.form-disabled .modern-input,
-.form-disabled ::ng-deep .modern-password-input {
-  background-color: #f8f9fa !important;
-  color: #6c757d !important;
-  cursor: not-allowed !important;
-}
-
-.form-disabled .forgot-link.disabled-link {
-  color: #6c757d !important;
-  cursor: not-allowed !important;
-  text-decoration: none !important;
-}
-
-.form-disabled .forgot-link.disabled-link:hover {
-  color: #6c757d !important;
-  text-decoration: none !important;
-}
-
-/* Estilos para botones deshabilitados */
-::ng-deep .p-button:disabled {
-  opacity: 0.6 !important;
-  cursor: not-allowed !important;
-}
-
-/* Estilos para toggle button deshabilitado */
-.toggle-button:disabled {
-  opacity: 0.6 !important;
-  cursor: not-allowed !important;
 }
