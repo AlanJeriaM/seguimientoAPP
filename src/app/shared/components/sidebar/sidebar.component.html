@@ -1,55 +1,95 @@
-<button type="button"
-        pButton
-        icon="pi pi-bars"
-        class="custom-btn"
-        (click)="toggleSidebar()">
+<!-- Botón para abrir el sidebar -->
+<button
+  type="button"
+  pButton
+  icon="pi pi-bars"
+  class="sidebar-toggle-btn"
+  (click)="toggleSidebar()">
 </button>
 
-<p-sidebar [(visible)]="visibleSidebar" [position]="'left'" [modal]="true" [showCloseIcon]="false">
-    <div class="p-sidebar-header">
-        <button type="button" pButton icon="pi pi-times" class="custom-close-btn" (click)="toggleSidebar()"></button>
+<!-- Sidebar -->
+<p-sidebar
+  [(visible)]="visibleSidebar"
+  [position]="'left'"
+  [modal]="true"
+  [showCloseIcon]="false"
+  [style]="{'width': '320px'}"
+  styleClass="custom-sidebar">
+
+  <!-- Header con diseño mejorado -->
+  <ng-template pTemplate="header">
+    <div class="sidebar-header-content">
+      <div class="header-text">
+        <i class="pi" [ngClass]="isAdmin ? 'pi-shield' : 'pi-user'" style="font-size: 1.2rem; margin-right: 0.5rem;"></i>
+        <span class="header-title">{{ isAdmin ? 'Administrador' : 'Panel usuario' }}</span>
+      </div>
+      <button
+        type="button"
+        pButton
+        icon="pi pi-times"
+        class="p-button-rounded p-button-text header-close-btn"
+        (click)="toggleSidebar()">
+      </button>
     </div>
+  </ng-template>
 
-    <div class="p-sidebar-content">
-        <div class="sidebar-title-container">
-            <h3 class="sidebar-title">
-                <strong>{{ isAdmin ? 'Administrador' : 'Menú Egresado' }}</strong>
-            </h3>
-        </div>
+  <!-- Contenido principal -->
+  <div class="sidebar-main-content">
 
-        <hr class="sidebar-divider" />
+    <!-- Card de perfil -->
+    <div class="profile-card" (click)="goToPerfil()">
+      <div class="profile-background"></div>
 
-        <!-- Imagen de perfil con fallback -->
-        <div class="sidebar-image-container">
+      <div class="profile-content">
+        <!-- Avatar -->
+        <div class="avatar-container">
           <img
             *ngIf="!isAdmin && perfilImagenUrl && !imageError"
             [src]="perfilImagenUrl"
-            (click)="goToPerfil()"
-            alt="Perfil de usuario"
-            class="sidebar-image"
-            (error)="handleImageError($event)"
-            width="96"
-            height="96" />
+            alt="Perfil"
+            class="avatar-image"
+            (error)="handleImageError($event)" />
+
           <div
             *ngIf="!isAdmin && (!perfilImagenUrl || imageError)"
-            (click)="goToPerfil()"
-            class="sidebar-image-fallback">
-            {{ getUserInitials() }}
+            class="avatar-fallback">
+            <span>{{ getUserInitials() }}</span>
           </div>
+
           <img
             *ngIf="isAdmin"
-            class="sidebar-image"
+            class="avatar-image"
             [src]="'assets/icons/admin4.png'"
-            alt="Administrador"
-            width="96"
-            height="96"
-            (click)="goToPerfil()"/>
-        </div>
-        <h4 class="sidebar-username flex justify-content-center">
-            {{ nameUser }}
-        </h4>
+            alt="Admin" />
 
-        <hr class="sidebar-divider" />
-        <p-panelMenu [model]="itemsPanelMenu" class="custom-menubar"></p-panelMenu>
+          <div class="avatar-status"></div>
+        </div>
+
+        <!-- Nombre y rol -->
+        <div class="profile-info">
+          <h3 class="profile-username">{{ nameUser }}</h3>
+          <span class="profile-role">
+            <i class="pi pi-circle-fill" style="font-size: 0.4rem; margin-right: 0.4rem;"></i>
+            {{ isAdmin ? 'Administrador' : 'Egresado' }}
+          </span>
+        </div>
+      </div>
     </div>
+
+    <!-- Navegación -->
+    <nav class="sidebar-navigation">
+      <p-panelMenu
+        [model]="itemsPanelMenu"
+        styleClass="custom-panel-menu">
+      </p-panelMenu>
+    </nav>
+
+    <!-- Footer info -->
+    <div class="sidebar-footer">
+      <div class="footer-item">
+        <i class="pi pi-shield"></i>
+        <span>Seguimiento de egresados</span>
+      </div>
+    </div>
+  </div>
 </p-sidebar>

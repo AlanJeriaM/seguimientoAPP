@@ -60,7 +60,7 @@ export class SidebarComponent {
 
   private getAdminMenuItems(): MenuItem[] {
     return [
-      { label: 'Reporte Egresado LinkedIn', icon: 'pi pi-linkedin', routerLink: '/admin/dashboard' },
+      { label: 'Reporte Egresados', icon: 'pi pi-linkedin', iconStyle: {'color': '#0A66C2'}, routerLink: '/admin/dashboard' },
       { label: 'Administradores', icon: 'pi pi-user-edit', items: [
         { label: 'Administradores activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-admin' },
         { label: 'Administradores eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-admin' }
@@ -83,7 +83,7 @@ export class SidebarComponent {
 
   private getUserMenuItems(): MenuItem[] {
     return [
-      { label: 'Reporte Egresado LinkedIn', icon: 'pi pi-linkedin', routerLink: '/user/dashboard' },
+      { label: 'Reporte Egresados', icon: 'pi pi-linkedin', iconStyle: {'color': '#0A66C2'}, routerLink: '/user/dashboard' },
       { label: 'Encuestas', icon: 'pi pi-users', items: [
           { label: 'Encuestas nuevas', icon: 'pi pi-file-edit', routerLink: '/user/view-encuestas' },
           { label: 'Encuestas completadas', icon: 'pi pi-check', routerLink: '/user/encuesta-completada' }
