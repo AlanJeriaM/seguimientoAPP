@@ -10,6 +10,13 @@
   </div>
 </div>
 
+<!-- Scroll to Top Button -->
+<p-scrollTop 
+  [threshold]="100" 
+  icon="pi pi-arrow-up" 
+  styleClass="custom-scrolltop">
+</p-scrollTop>
+
 <!-- Error State -->
 <div *ngIf="error && !loading" class="error-container">
   <p-message
@@ -29,10 +36,10 @@
 <div *ngIf="!loading && !error" class="dashboard-container">
 
   <!-- Header Section -->
-  <div class="header-section mb-6">
-    <div class="flex align-items-center justify-content-between flex-wrap gap-4">
+  <div class="dashboard-header mb-6">
+    <div class="header-content">
       <!-- Perfil Personal del Usuario -->
-      <div class="profile-header" *ngIf="perfilUsuario">
+      <div class="profile-section" *ngIf="perfilUsuario">
         <div class="profile-avatar" [class.clickable-profile]="!isAdmin()" (click)="navigateToProfile()">
           <img
             *ngIf="perfilUsuario?.perfil_imagen_url && !imageError"
@@ -50,19 +57,19 @@
             [style]="{'background-color': '#0077b5', 'color': '#ffffff'}">
           </p-avatar>
         </div>
-        <div class="profile-info ml-4">
+        <div class="profile-info">
           <h1 class="profile-name" [class.clickable-profile]="!isAdmin()" (click)="navigateToProfile()">{{ getFullName() }}</h1>
           <p class="profile-headline">{{ getCurrentPosition() }}</p>
           <div class="profile-meta">
-            <span class="location">
+            <span class="meta-item">
               <i class="pi pi-map-marker"></i>
               {{ getLocation() }}
             </span>
-            <span class="company ml-3">
+            <span class="meta-item">
               <i class="pi pi-building"></i>
               {{ getCurrentCompany() }}
             </span>
-            <span class="industry ml-3">
+            <span class="meta-item">
               <i class="pi pi-briefcase"></i>
               {{ getIndustry() }}
             </span>
@@ -70,29 +77,30 @@
         </div>
       </div>
 
-      <!-- Placeholder si no hay perfil -->
-      <div class="profile-header" *ngIf="!perfilUsuario">
-        <div class="profile-info">
-          <h1 class="profile-name">Dashboard del Mercado Laboral</h1>
-          <p class="profile-headline">Información y estadísticas del mercado tecnológico</p>
-        </div>
-      </div>
 
-      <!-- Market Growth Badge -->
-      <div class="market-growth">
-        <div class="growth-card">
-          <span class="growth-label">Crecimiento del mercado</span>
-          <div class="growth-value">
-            <span class="growth-percentage">+{{ (estadisticasMercado?.porcentajeCrecimiento || 0) }}%</span>
-            <span class="growth-text">este mes</span>
-          </div>
+
+    <!-- Placeholder si no hay perfil -->
+    <div class="profile-section" *ngIf="!perfilUsuario">
+      <div class="profile-info">
+        <h1 class="profile-name">Dashboard del Mercado Laboral</h1>
+        <p class="profile-headline">Información y estadísticas del mercado tecnológico</p>
+      </div>
+    </div>
+
+    <!-- Market Growth Badge -->
+    <div class="growth-indicator">
+      <div class="growth-card">
+        <span class="growth-label">Crecimiento del mercado</span>
+        <div class="growth-value">
+          <span class="growth-percentage">+{{ (estadisticasMercado?.porcentajeCrecimiento || 0) }}%</span>
+          <span class="growth-text">este mes</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Market Stats Cards -->
-  <div class="stats-grid mb-6">
+  <!-- Market Stats Cards - Separadas del header -->
+  <div class="stats-overview mb-6" id="resumen-general">
     <div class="grid">
       <div class="col-12 md:col-6 xl:col-3">
         <div class="stat-card stat-card-blue">
@@ -144,45 +152,55 @@
     </div>
   </div>
 
-  <!-- Charts Section -->
-  <div class="charts-section">
-    <div class="grid">
 
-            <!-- Tendencias del Mercado -->
-            <div class="col-12">
-              <p-card styleClass="chart-card">
+
+  <!-- Análisis de Tendencias del Mercado -->
+  <div class="chart-section mb-6" id="tendencias-mercado">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-chart-line"></i>
+        Tendencias del Mercado Laboral
+      </h2>
+      <p class="section-subtitle">Evolución y crecimiento del mercado en los últimos 6 meses</p>
+    </div>
+
+    <div class="grid">
+      <div class="col-12">
+        <p-card styleClass="chart-card">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
-                    <h3>Tendencias del Mercado Laboral</h3>
-              <p-tag
-                      value="Últimos 6 meses"
-                      severity="success"
-                styleClass="info-tag">
-              </p-tag>
+              <h3>Evolución Temporal del Mercado</h3>
+              <p-tag value="Últimos 6 meses" severity="success" styleClass="info-tag"></p-tag>
             </div>
           </ng-template>
-
-                <div class="chart-container large-chart">
-                  <canvas id="tendenciasMercadoChart"></canvas>
+          <div class="chart-container large-chart">
+            <canvas id="tendenciasMercadoChart"></canvas>
           </div>
         </p-card>
       </div>
+    </div>
+  </div>
 
+  <!-- Análisis Salarial y Empresarial -->
+  <div class="chart-section mb-6">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-dollar"></i>
+        Análisis Salarial y Empresarial
+      </h2>
+      <p class="section-subtitle">Distribución salarial por industria y principales empleadores</p>
+    </div>
 
+    <div class="grid">
       <!-- Distribución Salarial por Industria -->
-      <div class="col-12 lg:col-12">
+      <div class="col-12 lg:col-8" id="distribucion-salarial">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
               <h3>Distribución Salarial por Industria</h3>
-              <p-tag
-                value="Promedios del mercado"
-                severity="success"
-                styleClass="info-tag">
-              </p-tag>
+              <p-tag value="Promedios del mercado" severity="success" styleClass="info-tag"></p-tag>
             </div>
           </ng-template>
-
           <div class="chart-container">
             <canvas id="distribucionSalarialChart"></canvas>
           </div>
@@ -190,59 +208,58 @@
       </div>
 
       <!-- Empresas que Más Contratan -->
-      <div class="col-12 lg:col-6">
+      <div class="col-12 lg:col-4" id="empresas-contratantes">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
-              <h3>Empresas que Más Contratan</h3>
-              <p-tag
-                value="Top empleadores"
-                severity="warning"
-                styleClass="info-tag">
-              </p-tag>
+              <h3>Top Empleadores</h3>
+              <p-tag value="Principales contratadores" severity="warning" styleClass="info-tag"></p-tag>
             </div>
           </ng-template>
-
           <div class="chart-container">
             <canvas id="empresasContratantesChart"></canvas>
           </div>
         </p-card>
       </div>
+    </div>
+  </div>
 
-      <!-- Estadísticas Generales -->
+  <!-- Estadísticas Generales del Mercado -->
+  <div class="chart-section mb-6" id="estadisticas-generales">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-chart-pie"></i>
+        Distribución General del Mercado
+      </h2>
+      <p class="section-subtitle">Visión general de la composición del mercado laboral</p>
+    </div>
+
+    <div class="grid">
       <div class="col-12 lg:col-6">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
-              <h3>Distribución del Mercado</h3>
+              <h3>Composición del Mercado</h3>
+              <p-tag value="Métricas clave" severity="info" styleClass="info-tag"></p-tag>
             </div>
           </ng-template>
-
           <div class="chart-container">
             <canvas id="estadisticasGeneralesChart"></canvas>
           </div>
         </p-card>
       </div>
 
-
-    </div>
-  </div>
-
-  <!-- Detailed Info Section -->
-  <div class="details-section mt-6">
-    <div class="grid">
-
-      <!-- Top Tecnologías -->
-      <div class="col-12 lg:col-6">
-        <p-card styleClass="info-card">
+      <!-- Tecnologías Más Demandadas -->
+      <div class="col-12 lg:col-6" id="tecnologias-demandadas">
+        <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
-            <h3>Tecnologías Más Demandadas</h3>
+            <div class="card-header-custom">
+              <h3>Tecnologías Más Demandadas</h3>
+              <p-tag value="Skills más populares" severity="info" styleClass="info-tag"></p-tag>
+            </div>
           </ng-template>
-
           <div class="technology-list">
-            <div
-              *ngFor="let tech of tecnologiasDemandadas | slice:0:8"
-              class="technology-item">
+            <div *ngFor="let tech of tecnologiasDemandadas | slice:0:8" class="technology-item">
               <div class="technology-header">
                 <h4 class="technology-name">{{ tech.nombre }}</h4>
                 <span class="technology-demand">{{ getSeleccionesText(tech.demanda) }}</span>
@@ -258,18 +275,31 @@
           </div>
         </p-card>
       </div>
+    </div>
+  </div>
 
+  <!-- Información Detallada de Empresas -->
+  <div class="chart-section mb-6">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-building"></i>
+        Información Detallada de Empresas
+      </h2>
+      <p class="section-subtitle">Análisis detallado de las principales empresas y sus métricas</p>
+    </div>
+
+    <div class="grid">
       <!-- Top Empresas -->
-      <div class="col-12 lg:col-6">
-        <p-card styleClass="info-card">
+      <div class="col-12 lg:col-8">
+        <p-card styleClass="info-card h-full">
           <ng-template pTemplate="header">
-            <h3>Empresas que Más Contratan</h3>
+            <div class="card-header-custom">
+              <h3>Principales Empleadores del Mercado</h3>
+              <p-tag value="Top empresas" severity="info" styleClass="info-tag"></p-tag>
+            </div>
           </ng-template>
-
           <div class="companies-list">
-            <div
-              *ngFor="let empresa of empresasContratantes | slice:0:6"
-              class="company-item">
+            <div *ngFor="let empresa of empresasContratantes | slice:0:8" class="company-item">
               <div class="company-header">
                 <span class="company-name">{{ empresa.empresa }}</span>
                 <span class="company-employees">{{ empresa.totalEmpleados }} empleados</span>
@@ -289,72 +319,56 @@
         </p-card>
       </div>
 
-      <!-- Distribución Salarial Detallada -->
-      <div class="col-12">
-        <p-card styleClass="info-card">
+      <!-- Distribución Salarial por Industria -->
+      <div class="col-12 lg:col-4">
+        <p-card styleClass="info-card h-full">
           <ng-template pTemplate="header">
-            <div class="flex justify-content-between align-items-center">
-              <h3>Distribución Salarial por Industria</h3>
-              <p-tag
-                value="Promedios del mercado"
-                severity="info"
-                styleClass="info-tag">
-              </p-tag>
+            <div class="card-header-custom">
+              <h3>Salarios por Industria</h3>
+              <p-tag value="Promedios del mercado" severity="success" styleClass="info-tag"></p-tag>
             </div>
           </ng-template>
-
           <div class="salary-distribution-grid">
-            <div class="grid">
-              <div
-                *ngFor="let dist of distribucionSalarial"
-                class="col-12 md:col-6 lg:col-3">
-                <div class="salary-card">
-                  <div class="salary-header">
-                    <h4 class="industry-name">{{ dist.industria }}</h4>
-                    <span class="professionals-count">{{ dist.cantidad }} profesionales</span>
-                  </div>
-                  <div class="salary-details">
-                    <div class="salary-range">
-                      <span class="range-label">Rango salarial:</span>
-                      <span class="range-value">
-                        {{ dist.salarioMinimo | currency:'CLP':'symbol':'1.0-0' }} -
-                        {{ dist.salarioMaximo | currency:'CLP':'symbol':'1.0-0' }}
-                      </span>
-                    </div>
-                    <div class="salary-average">
-                      <span class="average-label">Promedio:</span>
-                      <span class="average-value">{{ dist.salarioPromedio | currency:'CLP':'symbol':'1.0-0' }}</span>
-                    </div>
-                    <div class="salary-variation" [ngClass]="{
-                      'positive': dist.variacionMensual > 0,
-                      'negative': dist.variacionMensual < 0,
-                      'neutral': dist.variacionMensual === 0
-                    }">
-                      <i class="pi" [ngClass]="{
-                        'pi-arrow-up': dist.variacionMensual > 0,
-                        'pi-arrow-down': dist.variacionMensual < 0,
-                        'pi-minus': dist.variacionMensual === 0
-                      }"></i>
-                      <span>{{ dist.variacionMensual }}% este mes</span>
-                    </div>
-                  </div>
+            <div *ngFor="let dist of distribucionSalarial | slice:0:6" class="salary-card-compact">
+              <div class="salary-header">
+                <h4 class="industry-name">{{ dist.industria }}</h4>
+                <span class="professionals-count">{{ dist.cantidad }} profesionales</span>
+              </div>
+              <div class="salary-details">
+                <div class="salary-average">
+                  <span class="average-label">Promedio:</span>
+                  <span class="average-value">{{ dist.salarioPromedio | currency:'CLP':'symbol':'1.0-0' }}</span>
+                </div>
+                <div class="salary-variation" [ngClass]="{
+                  'positive': dist.variacionMensual > 0,
+                  'negative': dist.variacionMensual < 0,
+                  'neutral': dist.variacionMensual === 0
+                }">
+                  <i class="pi" [ngClass]="{
+                    'pi-arrow-up': dist.variacionMensual > 0,
+                    'pi-arrow-down': dist.variacionMensual < 0,
+                    'pi-minus': dist.variacionMensual === 0
+                  }"></i>
+                  <span>{{ dist.variacionMensual }}% este mes</span>
                 </div>
               </div>
             </div>
           </div>
         </p-card>
       </div>
-
     </div>
   </div>
 
 
-  <!-- Satisfacción Laboral -->
-  <div class="satisfaction-section mt-6" *ngIf="satisfaccionLaboral && satisfaccionLaboral.empresas.length > 0">
-    <h2 class="section-title mb-4">
-      <i class="pi pi-star mr-2"></i>
-      Satisfacción Laboral por Empresa
-    </h2>
+  <!-- Análisis de Satisfacción Laboral -->
+  <div class="chart-section mb-6" id="satisfaccion-laboral" *ngIf="satisfaccionLaboral && satisfaccionLaboral.empresas.length > 0">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-star"></i>
+        Satisfacción Laboral por Empresa
+      </h2>
+      <p class="section-subtitle">Análisis de satisfacción y bienestar en el entorno laboral</p>
+    </div>
 
     <div class="grid">
       <div class="col-12">
@@ -369,7 +383,6 @@
               </p-tag>
             </div>
           </ng-template>
-
           <div class="chart-container large-chart">
             <canvas id="satisfaccionLaboralChart"></canvas>
           </div>
@@ -379,19 +392,22 @@
   </div>
 
   <!-- Análisis de Experiencia Profesional -->
-  <div class="experience-analysis-section mt-6" *ngIf="(evolucionSalarial && evolucionSalarial.datos.length > 0) || (distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0)">
-    <h2 class="section-title mb-4">
-      <i class="pi pi-users mr-2"></i>
-      Análisis de Experiencia Profesional
-    </h2>
+  <div class="chart-section mb-6" *ngIf="(evolucionSalarial && evolucionSalarial.datos.length > 0) || (distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0)">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-users"></i>
+        Análisis de Experiencia Profesional
+      </h2>
+      <p class="section-subtitle">Evolución salarial y distribución de profesionales por experiencia</p>
+    </div>
 
     <div class="grid">
       <!-- Evolución Salarial por Experiencia -->
-      <div class="col-12 lg:col-6" *ngIf="evolucionSalarial && evolucionSalarial.datos.length > 0">
+      <div class="col-12 lg:col-6" id="evolucion-salarial" *ngIf="evolucionSalarial && evolucionSalarial.datos.length > 0">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
-              <h3>Evolución del Salario</h3>
+              <h3>Evolución del Salario por Experiencia</h3>
               <p-tag
                 [value]="'Salario promedio: $' + (evolucionSalarial.resumen.salarioPromedioGeneral | number:'1.0-0')"
                 severity="success"
@@ -399,7 +415,6 @@
               </p-tag>
             </div>
           </ng-template>
-
           <div class="chart-container" style="height: 400px;">
             <canvas id="evolucionSalarialChart"></canvas>
           </div>
@@ -407,11 +422,11 @@
       </div>
 
       <!-- Distribución de Profesionales por Experiencia -->
-      <div class="col-12 lg:col-6" *ngIf="distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0">
+      <div class="col-12 lg:col-6" id="distribucion-experiencia" *ngIf="distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
-              <h3>Distribución de Profesionales</h3>
+              <h3>Distribución de Profesionales por Experiencia</h3>
               <div class="flex gap-2" *ngIf="distribucionExperienciaProfesionales.resumen.rangoMasPopular">
                 <p-tag
                   [value]="'Más común: ' + distribucionExperienciaProfesionales.resumen.rangoMasPopular.rango"
@@ -426,7 +441,6 @@
               </div>
             </div>
           </ng-template>
-
           <div class="chart-container" style="height: 400px;">
             <canvas id="distribucionExperienciaChart"></canvas>
           </div>
@@ -436,11 +450,13 @@
       <!-- Estadísticas de Experiencia -->
       <div class="col-12" *ngIf="distribucionExperienciaProfesionales">
         <p-card styleClass="info-card">
-      <ng-template pTemplate="header">
-            <h3>Estadísticas del Mercado Laboral</h3>
-      </ng-template>
-
-        <div class="grid">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Estadísticas del Mercado Laboral</h3>
+              <p-tag value="Métricas clave de experiencia" severity="info" styleClass="info-tag"></p-tag>
+            </div>
+          </ng-template>
+          <div class="grid">
             <div class="col-12 md:col-6 lg:col-4">
               <div class="metric-item">
                 <div class="metric-icon">
@@ -483,15 +499,18 @@
   </div>
 
   <!-- Análisis Tecnológico y Salarial -->
-  <div class="tech-salary-analysis-section mt-6" *ngIf="(experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0) || (mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0)">
-    <h2 class="section-title mb-4">
-      <i class="pi pi-cog mr-2"></i>
-      Análisis Tecnológico y Salarial
-    </h2>
+  <div class="chart-section mb-6" *ngIf="(experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0) || (mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0)">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-cog"></i>
+        Análisis Tecnológico y Salarial
+      </h2>
+      <p class="section-subtitle">Relación entre experiencia, tecnologías y niveles salariales</p>
+    </div>
 
     <div class="grid">
       <!-- Experiencia vs Número de Tecnologías -->
-      <div class="col-12" *ngIf="experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0">
+      <div class="col-12" id="experiencia-tecnologias" *ngIf="experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0">
         <p-card styleClass="chart-card">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
@@ -534,7 +553,7 @@
       </div>
 
       <!-- Mapa de Calor: Industria vs Nivel Salarial -->
-      <div class="col-12" *ngIf="mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0">
+      <div class="col-12" id="mapa-calor-industria" *ngIf="mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0">
         <p-card styleClass="chart-card">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
@@ -602,11 +621,14 @@
   </div>
 
   <!-- Estado del Mercado Laboral -->
-  <div class="job-market-status-section mt-6" *ngIf="disponibilidadCambioTrabajo && disponibilidadCambioTrabajo.datos.length > 0">
-    <h2 class="section-title mb-4">
-      <i class="pi pi-briefcase mr-2"></i>
-      Estado del Mercado Laboral
-    </h2>
+  <div class="chart-section mb-6" id="disponibilidad-cambio" *ngIf="disponibilidadCambioTrabajo && disponibilidadCambioTrabajo.datos.length > 0">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-briefcase"></i>
+        Estado del Mercado Laboral
+      </h2>
+      <p class="section-subtitle">Disponibilidad para cambio de trabajo y tendencias del mercado</p>
+    </div>
 
     <div class="grid">
       <!-- Gráfico de Disponibilidad para Cambio -->
@@ -750,11 +772,14 @@
   </div>
 
   <!-- Métricas Avanzadas del Mercado Laboral -->
-  <div class="advanced-metrics-section mt-6" *ngIf="metricasAvanzadas">
-    <h2 class="section-title mb-4">
-      <i class="pi pi-chart-line mr-2"></i>
-      Análisis Avanzado del Mercado Laboral
-    </h2>
+  <div class="chart-section mb-6" id="metricas-avanzadas" *ngIf="metricasAvanzadas">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-chart-line"></i>
+        Análisis Avanzado del Mercado Laboral
+      </h2>
+      <p class="section-subtitle">Métricas detalladas y análisis profundo del mercado</p>
+    </div>
 
     <!-- Primera fila de gráficos -->
     <div class="grid mb-4">

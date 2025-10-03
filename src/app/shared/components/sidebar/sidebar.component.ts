@@ -55,12 +55,83 @@ export class SidebarComponent {
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
   }
 
+  //Método para navegar a un gráfico específico en el dashboard
+  navigateToChart(chartId: string): void {
+    // Cerrar el sidebar primero
+    this.visibleSidebar = false;
+
+    // Verificar si ya estamos en el dashboard
+    if (this.router.url === '/admin/dashboard') {
+      // Si ya estamos en el dashboard, hacer scroll directamente
+      this.scrollToElement(chartId);
+    } else {
+      // Si no estamos en el dashboard, navegar primero
+      this.router.navigate(['/admin/dashboard']).then(() => {
+        this.scrollToElement(chartId);
+      });
+    }
+  }
+
+  //Método auxiliar para hacer scroll a un elemento
+  private scrollToElement(elementId: string): void {
+    setTimeout(() => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        // Calcular posición con offset para el header fijo
+        const headerOffset = 160;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      } else {
+        console.warn(`Elemento con ID '${elementId}' no encontrado`);
+      }
+    }, 300); // Tiempo reducido para mejor UX
+  }
+
 
   //Métodos privado que retorna un array de MenuItem[] con los ítems del menú para admin o user
 
   private getAdminMenuItems(): MenuItem[] {
     return [
-      { label: 'Reporte Egresados', icon: 'pi pi-linkedin', iconStyle: {'color': '#0A66C2'}, routerLink: '/admin/dashboard' },
+      {
+        label: 'Reporte Egresados',
+        icon: 'pi pi-chart-bar',
+        iconStyle: {'color': '#3B82F6'},
+        items: [
+          { label: 'Dashboard Principal', icon: 'pi pi-fw pi-home', routerLink: '/admin/dashboard' },
+          {
+            label: 'Análisis Laboral',
+            icon: 'pi pi-fw pi-briefcase',
+            items: [
+              { label: 'Análisis Salarial', icon: 'pi pi-fw pi-dollar', command: () => this.navigateToChart('distribucion-salarial') },
+              { label: 'tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
+              { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('satisfaccion-laboral') },
+            ]
+          },
+          {
+            label: 'Experiencia y Tecnologías',
+            icon: 'pi pi-fw pi-users',
+            items: [
+              { label: 'Análisis de Experiencia', icon: 'pi pi-fw pi-users', command: () => this.navigateToChart('distribucion-experiencia') },
+              { label: 'Tecnologías vs Experiencia', icon: 'pi pi-fw pi-cog', command: () => this.navigateToChart('experiencia-tecnologias') },
+            ]
+          },
+          {
+            label: 'Indicadores Avanzados',
+            icon: 'pi pi-fw pi-chart-line',
+            items: [
+              { label: 'Mapa de Calor', icon: 'pi pi-fw pi-map', command: () => this.navigateToChart('mapa-calor-industria') },
+              { label: 'Estado del Mercado', icon: 'pi pi-fw pi-briefcase', command: () => this.navigateToChart('disponibilidad-cambio') },
+              { label: 'Métricas Avanzadas', icon: 'pi pi-fw pi-chart-pie', command: () => this.navigateToChart('metricas-avanzadas') },
+            ]
+          }
+        ]
+      },
+
       { label: 'Administradores', icon: 'pi pi-user-edit', items: [
         { label: 'Administradores activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-admin' },
         { label: 'Administradores eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-admin' }
@@ -83,7 +154,40 @@ export class SidebarComponent {
 
   private getUserMenuItems(): MenuItem[] {
     return [
-      { label: 'Reporte Egresados', icon: 'pi pi-linkedin', iconStyle: {'color': '#0A66C2'}, routerLink: '/user/dashboard' },
+      {
+        label: 'Reporte Egresados',
+        icon: 'pi pi-chart-bar',
+        iconStyle: {'color': '#3B82F6'},
+        items: [
+          { label: 'Dashboard Principal', icon: 'pi pi-fw pi-home', routerLink: '/admin/dashboard' },
+          {
+            label: 'Análisis Laboral',
+            icon: 'pi pi-fw pi-briefcase',
+            items: [
+              { label: 'Análisis Salarial', icon: 'pi pi-fw pi-dollar', command: () => this.navigateToChart('distribucion-salarial') },
+              { label: 'tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
+              { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('satisfaccion-laboral') },
+            ]
+          },
+          {
+            label: 'Experiencia y Tecnologías',
+            icon: 'pi pi-fw pi-users',
+            items: [
+              { label: 'Análisis de Experiencia', icon: 'pi pi-fw pi-users', command: () => this.navigateToChart('distribucion-experiencia') },
+              { label: 'Tecnologías vs Experiencia', icon: 'pi pi-fw pi-cog', command: () => this.navigateToChart('experiencia-tecnologias') },
+            ]
+          },
+          {
+            label: 'Indicadores Avanzados',
+            icon: 'pi pi-fw pi-chart-line',
+            items: [
+              { label: 'Mapa de Calor', icon: 'pi pi-fw pi-map', command: () => this.navigateToChart('mapa-calor-industria') },
+              { label: 'Estado del Mercado', icon: 'pi pi-fw pi-briefcase', command: () => this.navigateToChart('disponibilidad-cambio') },
+              { label: 'Métricas Avanzadas', icon: 'pi pi-fw pi-chart-pie', command: () => this.navigateToChart('metricas-avanzadas') },
+            ]
+          }
+        ]
+      },
       { label: 'Encuestas', icon: 'pi pi-users', items: [
           { label: 'Encuestas nuevas', icon: 'pi pi-file-edit', routerLink: '/user/view-encuestas' },
           { label: 'Encuestas completadas', icon: 'pi pi-check', routerLink: '/user/encuesta-completada' }
