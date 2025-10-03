@@ -11,9 +11,9 @@
 </div>
 
 <!-- Scroll to Top Button -->
-<p-scrollTop 
-  [threshold]="100" 
-  icon="pi pi-arrow-up" 
+<p-scrollTop
+  [threshold]="100"
+  icon="pi pi-arrow-up"
   styleClass="custom-scrolltop">
 </p-scrollTop>
 
@@ -302,7 +302,7 @@
             <div *ngFor="let empresa of empresasContratantes | slice:0:8" class="company-item">
               <div class="company-header">
                 <span class="company-name">{{ empresa.empresa }}</span>
-                <span class="company-employees">{{ empresa.totalEmpleados }} empleados</span>
+                <span class="company-employees">{{ getEmpleadoText(empresa.totalEmpleados) }}</span>
               </div>
               <div class="company-details">
                 <div class="detail-item">
@@ -320,7 +320,7 @@
       </div>
 
       <!-- Distribución Salarial por Industria -->
-      <div class="col-12 lg:col-4">
+      <div class="col-12 lg:col-4 " id="salarios-industria">
         <p-card styleClass="info-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
@@ -787,9 +787,9 @@
       <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
-              <h3>Años de Experiencia</h3>
+            <div class="card-header flex align-items-center gap-2">
               <i class="pi pi-clock chart-icon"></i>
+              <h3 class="m-0">Años de Experiencia</h3>
             </div>
           </ng-template>
           <div class="chart-container" style="height: 300px;">
@@ -802,9 +802,9 @@
       <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
-              <h3>Nivel de Educación</h3>
+            <div class="card-header flex align-items-center gap-2">
               <i class="pi pi-book chart-icon"></i>
+              <h3 class="m-0">Nivel de Educación</h3>
             </div>
           </ng-template>
           <div class="chart-container" style="height: 300px;">
@@ -821,9 +821,9 @@
       <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
-              <h3>Rangos Salariales</h3>
+            <div class="card-header flex align-items-center gap-2">
               <i class="pi pi-dollar chart-icon"></i>
+              <h3 class="m-0">Rangos Salariales</h3>
             </div>
           </ng-template>
           <div class="chart-container" style="height: 300px;">
@@ -837,9 +837,9 @@
       <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
-              <h3>Áreas de Interés</h3>
+            <div class="card-header flex align-items-center gap-2">
               <i class="pi pi-star chart-icon"></i>
+              <h3>Áreas de Interés</h3>
             </div>
           </ng-template>
           <div class="chart-container" style="height: 300px;">
@@ -855,9 +855,9 @@
       <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full chart-card">
           <ng-template pTemplate="header">
-            <div class="card-header">
-              <h3>Tipos de Empleo</h3>
+            <div class="card-header flex align-items-center gap-2">
               <i class="pi pi-briefcase chart-icon"></i>
+              <h3>Tipos de Empleo</h3>
             </div>
           </ng-template>
           <div class="chart-container" style="height: 300px;">
@@ -870,9 +870,9 @@
       <div class="col-12 lg:col-6 xl:col-6">
         <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header">
-              <h3>Resumen de Métricas Avanzadas</h3>
+            <div class="card-header flex align-items-center gap-2">
               <i class="pi pi-chart-bar chart-icon"></i>
+              <h3>Resumen de Métricas Avanzadas</h3>
             </div>
           </ng-template>
           <div class="grid">
