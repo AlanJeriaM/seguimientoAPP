@@ -418,3 +418,37 @@
     font-size: 0.813rem !important;
   }
 }
+
+/* ========================================
+   MEJORAS PARA EL SUBMENU DE REPORTE EGRESADOS
+======================================== */
+
+/* Estilos para separadores */
+::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem-separator {
+  margin: 0.5rem 0;
+  border-top: 1px solid #e5e7eb;
+  opacity: 0.5;
+}
+
+/* Mejoras visuales para el submenu de Reporte Egresados */
+::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem .p-menuitem-content .p-menuitem-link .p-menuitem-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Efecto hover mejorado para items del submenu */
+::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem .p-menuitem-content:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+  transform: translateX(4px);
+}
+
+/* Animación suave para el texto del menú */
+::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem .p-menuitem-content .p-menuitem-link .p-menuitem-text {
+  transition: all 0.3s ease;
+}
+
+::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem .p-menuitem-content:hover .p-menuitem-text {
+  color: #1e40af;
+  font-weight: 600;
+}
