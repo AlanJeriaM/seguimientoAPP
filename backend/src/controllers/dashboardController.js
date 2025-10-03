@@ -651,15 +651,64 @@ const obtenerDistribucionSalarial = async (req, res) => {
 // Obtener empresas que más contratan (simulado)
 const obtenerEmpresasQueContratanMas = async (req, res) => {
   try {
-    // Función para convertir rango salarial a valor promedio
+    // Función para convertir rango salarial a valor promedio (consistente)
     const convertirRangoASalario = (rango) => {
+      console.log(`🔍 [Empresas] Convirtiendo rango: "${rango}"`);
+      
       switch(rango) {
-        case '$0 - $500.000': return 250000;
-        case '$500.001 - $1.000.000': return 750000;
-        case '$1.000.001 - $2.000.000': return 1500000;
-        case '$2.000.001 - $3.000.000': return 2500000;
-        case '$3.000.001+': return 4000000;
-        default: return 1000000; // Valor por defecto
+        // Formatos del modelo de la base de datos
+        case '0-500k':
+        case '$0 - $500.000':
+          console.log('  → 250000');
+          return 250000;
+        case '500k-1M':
+        case '$500.001 - $1.000.000':
+          console.log('  → 750000');
+          return 750000;
+        case '1M-1.5M':
+        case '$1.000.001 - $1.500.000':
+          console.log('  → 1250000');
+          return 1250000;
+        case '1.5M-2M':
+        case '$1.000.001 - $2.000.000':
+          console.log('  → 1500000');
+          return 1500000;
+        case '2M-3M':
+        case '$2.000.001 - $3.000.000':
+          console.log('  → 2500000');
+          return 2500000;
+        case '3M+':
+        case '$3.000.001+':
+          console.log('  → 4000000');
+          return 4000000;
+        // Formatos adicionales que podrían existir
+        case '$0 - $500.001':
+        case '$0 - $500.000':
+          console.log('  → 250000');
+          return 250000;
+        case '$500.000 - $1.000.000':
+        case '$500.001 - $1.000.000':
+          console.log('  → 750000');
+          return 750000;
+        case '$1.000.000 - $1.500.000':
+        case '$1.000.001 - $1.500.000':
+          console.log('  → 1250000');
+          return 1250000;
+        case '$1.500.000 - $2.000.000':
+        case '$1.500.001 - $2.000.000':
+          console.log('  → 1750000');
+          return 1750000;
+        case '$2.000.000 - $3.000.000':
+        case '$2.000.001 - $3.000.000':
+          console.log('  → 2500000');
+          return 2500000;
+        case '$3.000.000+':
+        case '$3.000.001+':
+          console.log('  → 4000000');
+          return 4000000;
+        default:
+          console.log('  → 1000000 (default)');
+          return 1000000; // Valor por defecto
       }
     };
 
@@ -902,16 +951,64 @@ const obtenerEvolucionSalarial = async (req, res) => {
 
     console.log(`Usuarios encontrados para evolución salarial: ${usuarios.length}`);
 
-    // Función para convertir rango salarial a valor promedio
+    // Función para convertir rango salarial a valor promedio (igual que en distribucion salarial)
     const convertirRangoASalario = (rango) => {
+      console.log(`🔍 [Evolución] Convirtiendo rango: "${rango}"`);
+      
       switch(rango) {
-        case '0-500k': return 400000;
-        case '500k-1M': return 750000;
-        case '1M-1.5M': return 1250000;
-        case '1.5M-2M': return 1750000;
-        case '2M-3M': return 2500000;
-        case '3M+': return 3500000;
-        default: return 1000000;
+        // Formatos del modelo de la base de datos
+        case '0-500k':
+        case '$0 - $500.000':
+          console.log('  → 250000');
+          return 250000;
+        case '500k-1M':
+        case '$500.001 - $1.000.000':
+          console.log('  → 750000');
+          return 750000;
+        case '1M-1.5M':
+        case '$1.000.001 - $1.500.000':
+          console.log('  → 1250000');
+          return 1250000;
+        case '1.5M-2M':
+        case '$1.000.001 - $2.000.000':
+          console.log('  → 1500000');
+          return 1500000;
+        case '2M-3M':
+        case '$2.000.001 - $3.000.000':
+          console.log('  → 2500000');
+          return 2500000;
+        case '3M+':
+        case '$3.000.001+':
+          console.log('  → 4000000');
+          return 4000000;
+        // Formatos adicionales que podrían existir
+        case '$0 - $500.001':
+        case '$0 - $500.000':
+          console.log('  → 250000');
+          return 250000;
+        case '$500.000 - $1.000.000':
+        case '$500.001 - $1.000.000':
+          console.log('  → 750000');
+          return 750000;
+        case '$1.000.000 - $1.500.000':
+        case '$1.000.001 - $1.500.000':
+          console.log('  → 1250000');
+          return 1250000;
+        case '$1.500.000 - $2.000.000':
+        case '$1.500.001 - $2.000.000':
+          console.log('  → 1750000');
+          return 1750000;
+        case '$2.000.000 - $3.000.000':
+        case '$2.000.001 - $3.000.000':
+          console.log('  → 2500000');
+          return 2500000;
+        case '$3.000.000+':
+        case '$3.000.001+':
+          console.log('  → 4000000');
+          return 4000000;
+        default:
+          console.log('  → 1000000 (default)');
+          return 1000000; // Valor por defecto
       }
     };
 
