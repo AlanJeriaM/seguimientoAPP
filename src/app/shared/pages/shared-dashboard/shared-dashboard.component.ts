@@ -1,20 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { Subject, takeUntil } from 'rxjs';
-import { 
-  DashboardService, 
-  EstadisticasMercado, 
-  TecnologiaDemandada, 
-  DistribucionSalarial, 
-  EmpresaContratante, 
-  TendenciasMercado, 
+import {
+  DashboardService,
+  EstadisticasMercado,
+  TecnologiaDemandada,
+  DistribucionSalarial,
+  EmpresaContratante,
+  TendenciasMercado,
   PerfilUsuario,
   MetricasAvanzadas,
-  DistribucionExperiencia,
-  DistribucionEducacion,
-  TecnologiaPopular,
-  EstadisticasSalariales,
-  DistribucionAreas,
   SatisfaccionLaboral,
   EvolucionSalarial,
   DistribucionExperienciaData,
@@ -51,7 +46,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   experienciaVsTecnologias: ExperienciaVsTecnologiasData | null = null;
   mapaCalorIndustriaSalarial: MapaCalorData | null = null;
   disponibilidadCambioTrabajo: DisponibilidadCambioData | null = null;
-  
+
   loading = true;
   error: string | null = null;
   errores: string[] = [];
@@ -138,7 +133,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (datos) => {
             console.log('Datos recibidos del dashboard:', datos);
-            
+
             // Asignar datos recibidos
             if (datos.estadisticasMercado) {
               this.estadisticasMercado = datos.estadisticasMercado;
@@ -810,12 +805,12 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   getUserInitials(): string {
     const fullName = this.getFullName();
     if (!fullName || fullName === 'Usuario') return 'US';
-    
+
     const names = fullName.trim().split(' ');
     if (names.length === 1) {
       return names[0].charAt(0).toUpperCase();
     }
-    
+
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
   }
 
@@ -827,6 +822,10 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
   getSeleccionesText(cantidad: number): string {
     return cantidad === 1 ? '1 selección' : `${cantidad} selecciones`;
+  }
+
+  getEmpleadoText(cantidad: number): string {
+    return cantidad === 1 ? '1 empleado' : `${cantidad} empleados`;
   }
 
   handleImageError(event: any): void {

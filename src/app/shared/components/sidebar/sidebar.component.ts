@@ -60,13 +60,16 @@ export class SidebarComponent {
     // Cerrar el sidebar primero
     this.visibleSidebar = false;
 
-    // Verificar si ya estamos en el dashboard
-    if (this.router.url === '/admin/dashboard') {
+    // Determinar la ruta del dashboard según el tipo de usuario
+    const dashboardRoute = this.isAdmin ? '/admin/dashboard' : '/user/dashboard';
+
+    // Verificar si ya estamos en el dashboard correspondiente
+    if (this.router.url === dashboardRoute) {
       // Si ya estamos en el dashboard, hacer scroll directamente
       this.scrollToElement(chartId);
     } else {
       // Si no estamos en el dashboard, navegar primero
-      this.router.navigate(['/admin/dashboard']).then(() => {
+      this.router.navigate([dashboardRoute]).then(() => {
         this.scrollToElement(chartId);
       });
     }
@@ -109,7 +112,7 @@ export class SidebarComponent {
             items: [
               { label: 'Análisis Salarial', icon: 'pi pi-fw pi-dollar', command: () => this.navigateToChart('distribucion-salarial') },
               { label: 'tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
-              { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('satisfaccion-laboral') },
+              { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('salarios-industria') },
             ]
           },
           {
@@ -159,14 +162,14 @@ export class SidebarComponent {
         icon: 'pi pi-chart-bar',
         iconStyle: {'color': '#3B82F6'},
         items: [
-          { label: 'Dashboard Principal', icon: 'pi pi-fw pi-home', routerLink: '/admin/dashboard' },
+          { label: 'Dashboard Principal', icon: 'pi pi-fw pi-home', routerLink: '/user/dashboard' },
           {
             label: 'Análisis Laboral',
             icon: 'pi pi-fw pi-briefcase',
             items: [
               { label: 'Análisis Salarial', icon: 'pi pi-fw pi-dollar', command: () => this.navigateToChart('distribucion-salarial') },
               { label: 'tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
-              { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('satisfaccion-laboral') },
+              { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('salarios-industria') },
             ]
           },
           {
