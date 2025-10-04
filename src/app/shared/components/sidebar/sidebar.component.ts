@@ -80,10 +80,13 @@ export class SidebarComponent {
     setTimeout(() => {
       const element = document.getElementById(elementId);
       if (element) {
-        // Calcular posición con offset para el header fijo
-        const headerOffset = 160;
+        // Calcular la altura real del navbar sticky
+        const navbar = document.querySelector('.custom-toolbar') as HTMLElement;
+        const navbarHeight = navbar ? navbar.offsetHeight : 100;
+        const navbarOffset = navbarHeight + 20; // Altura del navbar + margen extra
+        
         const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
 
         window.scrollTo({
           top: offsetPosition,
@@ -111,7 +114,7 @@ export class SidebarComponent {
             icon: 'pi pi-fw pi-briefcase',
             items: [
               { label: 'Análisis Salarial', icon: 'pi pi-fw pi-dollar', command: () => this.navigateToChart('distribucion-salarial') },
-              { label: 'tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
+              { label: 'Tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
               { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('salarios-industria') },
             ]
           },
@@ -168,7 +171,7 @@ export class SidebarComponent {
             icon: 'pi pi-fw pi-briefcase',
             items: [
               { label: 'Análisis Salarial', icon: 'pi pi-fw pi-dollar', command: () => this.navigateToChart('distribucion-salarial') },
-              { label: 'tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
+              { label: 'Tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
               { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('salarios-industria') },
             ]
           },

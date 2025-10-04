@@ -191,13 +191,17 @@ const linkedinCallback = async (req, res) => {
         
         // Solo actualizar campos que están vacíos o null para preservar datos editados por el usuario
         const datosParaActualizar = {
-          // Siempre actualizar estos campos críticos
-          nombre: linkedinData.nombre,
+          // Solo actualizar correo y datos de LinkedIn (siempre necesarios)
           correo: linkedinData.correo,
           perfil_imagen_url: linkedinData.perfil_imagen_url,
           linkedin_data: linkedinData,
           ultimo_acceso: new Date()
         };
+
+        // Solo actualizar el nombre si NO fue editado manualmente
+        if (!user.nombre_editado_manual) {
+          datosParaActualizar.nombre = linkedinData.nombre;
+        }
 
         // Solo actualizar campos de perfil si están vacíos en la BD
         if (!user.posicion_actual || user.posicion_actual === 'No especificada') {
@@ -304,8 +308,8 @@ const loginLinkedIn = async (req, res) => {
       });
       console.log('Usuario simulado creado con ID:', user.id);
     } else {
-      await user.update({
-        nombre,
+      // Solo actualizar campos que NO fueron editados manualmente
+      const datosParaActualizar = {
         correo,
         linkedin_data: linkedinData,
         perfil_imagen_url,
@@ -315,7 +319,14 @@ const loginLinkedIn = async (req, res) => {
         resumen,
         industria,
         ultimo_acceso: new Date()
-      });
+      };
+
+      // Solo actualizar el nombre si NO fue editado manualmente
+      if (!user.nombre_editado_manual) {
+        datosParaActualizar.nombre = nombre;
+      }
+
+      await user.update(datosParaActualizar);
       console.log('Usuario simulado actualizado');
     }
 
