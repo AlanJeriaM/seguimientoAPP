@@ -374,6 +374,9 @@ const actualizarMiPerfil = async (req, res) => {
       );
     }
 
+    // Verificar si el nombre cambió para marcar como editado manualmente
+    const nombreCambio = user.nombre !== nombre.trim();
+    
     // Actualizar datos del usuario
     const datosActualizados = {
       nombre: nombre.trim(),
@@ -414,6 +417,12 @@ const actualizarMiPerfil = async (req, res) => {
     });
 
     datosActualizados.perfil_completo = perfilCompleto;
+
+    // Marcar nombre como editado manualmente si cambió
+    if (nombreCambio) {
+      datosActualizados.nombre_editado_manual = true;
+      console.log(`📝 Nombre editado manualmente por usuario ${user.id}: "${user.nombre}" → "${nombre.trim()}"`);
+    }
 
     console.log('Datos que se van a guardar en BD:', datosActualizados);
 
@@ -526,6 +535,9 @@ const actualizarUsuario = async (req, res) => {
       });
     }
 
+    // Verificar si el nombre cambió para marcar como editado manualmente
+    const nombreCambio = user.nombre !== nombre.trim();
+    
     // Actualizar datos del usuario
     const datosActualizados = {
       nombre: nombre.trim(),
@@ -547,6 +559,12 @@ const actualizarUsuario = async (req, res) => {
       opciones_personalizadas_area_interes: Array.isArray(opciones_personalizadas_area_interes) ? JSON.stringify(opciones_personalizadas_area_interes) : null,
       opciones_personalizadas_industria: Array.isArray(opciones_personalizadas_industria) ? JSON.stringify(opciones_personalizadas_industria) : null
     };
+
+    // Marcar nombre como editado manualmente si cambió
+    if (nombreCambio) {
+      datosActualizados.nombre_editado_manual = true;
+      console.log(`📝 Nombre editado manualmente para usuario ${user.id}: "${user.nombre}" → "${nombre.trim()}"`);
+    }
 
     await user.update(datosActualizados);
 

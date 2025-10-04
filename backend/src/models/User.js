@@ -18,6 +18,11 @@ const User = sequelize.define('User', {
     allowNull: false,
     comment: 'Nombre completo del usuario'
   },
+  nombre_editado_manual: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Indica si el nombre fue editado manualmente por el admin/usuario'
+  },
   correo: {
     type: DataTypes.STRING,
     allowNull: false,
