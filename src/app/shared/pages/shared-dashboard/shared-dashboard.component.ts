@@ -592,9 +592,10 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 // Función para crear estrellitas
                 const formatStars = (rating: number | null): string => {
                   if (rating === null || rating === undefined) return 'Sin datos';
-                  const fullStars = '★'.repeat(Math.floor(rating));
+                  // Usar emojis de estrellas que se vean mejor en tooltips
+                  const fullStars = '⭐'.repeat(Math.floor(rating));
                   const hasHalfStar = rating % 1 >= 0.5;
-                  const halfStar = hasHalfStar ? '☆' : '';
+                  const halfStar = hasHalfStar ? '✨' : '';
                   const emptyStars = '☆'.repeat(5 - Math.floor(rating) - (hasHalfStar ? 1 : 0));
                   return `${fullStars}${halfStar}${emptyStars} (${rating}/5)`;
                 };
@@ -783,10 +784,13 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
   formatSatisfactionStars(rating: number | null): string {
     if (rating === null || rating === undefined) return 'Sin datos';
+    
+    // Usar caracteres Unicode de estrellas que se vean bien
     const fullStars = '★'.repeat(Math.floor(rating));
     const hasHalfStar = rating % 1 >= 0.5;
-    const halfStar = hasHalfStar ? '☆' : '';
+    const halfStar = hasHalfStar ? '★' : '';
     const emptyStars = '☆'.repeat(5 - Math.floor(rating) - (hasHalfStar ? 1 : 0));
+    
     return `${fullStars}${halfStar}${emptyStars} (${rating}/5)`;
   }
 
@@ -822,6 +826,29 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
   getSeleccionesText(cantidad: number): string {
     return cantidad === 1 ? '1 selección' : `${cantidad} selecciones`;
+  }
+
+  // Paleta de colores del gráfico "Top Empleadores"
+  private empleadoresColors = [
+    '#ff6b35',  // Naranja vibrante
+    '#f7931e',  // Naranja dorado
+    '#0077b5',  // Azul LinkedIn
+    '#00a0b0',  // Azul turquesa
+    '#7b68ee',  // Púrpura medio
+    '#ff69b4',  // Rosa vibrante
+    '#32cd32',  // Verde lima
+    '#ffa500',  // Naranja estándar
+    '#ff1493',  // Rosa profundo
+    '#4169e1',  // Azul real
+    '#ff4500',  // Rojo naranja
+    '#9370db',  // Púrpura medio violeta
+    '#00ced1',  // Turquesa oscuro
+    '#ff6347',  // Tomate
+    '#20b2aa'   // Turquesa claro
+  ];
+
+  getTechnologyColor(index: number): string {
+    return this.empleadoresColors[index % this.empleadoresColors.length];
   }
 
   getEmpleadoText(cantidad: number): string {
@@ -880,12 +907,38 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           label: 'Satisfacción Promedio',
           data: topEmpresas.map(emp => emp.satisfaccionPromedio),
           backgroundColor: [
-            '#FFD700', '#FFA500', '#FF8C00', '#FF6347', '#FF4500',
-            '#FF1493', '#DA70D6', '#9370DB', '#7B68EE', '#6495ED'
+            '#ff6b35',  // Naranja vibrante
+            '#f7931e',  // Naranja dorado
+            '#0077b5',  // Azul LinkedIn
+            '#00a0b0',  // Azul turquesa
+            '#7b68ee',  // Púrpura medio
+            '#ff69b4',  // Rosa vibrante
+            '#32cd32',  // Verde lima
+            '#ffa500',  // Naranja estándar
+            '#ff1493',  // Rosa profundo
+            '#4169e1',  // Azul real
+            '#ff4500',  // Rojo naranja
+            '#9370db',  // Púrpura medio violeta
+            '#00ced1',  // Turquesa oscuro
+            '#ff6347',  // Tomate
+            '#20b2aa'   // Turquesa claro
           ],
           borderColor: [
-            '#B8860B', '#CD853F', '#D2691E', '#DC143C', '#B22222',
-            '#C71585', '#BA55D3', '#8A2BE2', '#483D8B', '#4682B4'
+            '#ff6b35',  // Naranja vibrante
+            '#f7931e',  // Naranja dorado
+            '#0077b5',  // Azul LinkedIn
+            '#00a0b0',  // Azul turquesa
+            '#7b68ee',  // Púrpura medio
+            '#ff69b4',  // Rosa vibrante
+            '#32cd32',  // Verde lima
+            '#ffa500',  // Naranja estándar
+            '#ff1493',  // Rosa profundo
+            '#4169e1',  // Azul real
+            '#ff4500',  // Rojo naranja
+            '#9370db',  // Púrpura medio violeta
+            '#00ced1',  // Turquesa oscuro
+            '#ff6347',  // Tomate
+            '#20b2aa'   // Turquesa claro
           ],
           borderWidth: 2,
           borderRadius: 8,
@@ -1306,6 +1359,25 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     }
 
     const datos = this.experienciaVsTecnologias.datos;
+    
+    // Paleta de colores del gráfico "Top Empleadores"
+    const coloresEmpleadores = [
+      '#ff6b35',  // Naranja vibrante
+      '#f7931e',  // Naranja dorado
+      '#0077b5',  // Azul LinkedIn
+      '#00a0b0',  // Azul turquesa
+      '#7b68ee',  // Púrpura medio
+      '#ff69b4',  // Rosa vibrante
+      '#32cd32',  // Verde lima
+      '#ffa500',  // Naranja estándar
+      '#ff1493',  // Rosa profundo
+      '#4169e1',  // Azul real
+      '#ff4500',  // Rojo naranja
+      '#9370db',  // Púrpura medio violeta
+      '#00ced1',  // Turquesa oscuro
+      '#ff6347',  // Tomate
+      '#20b2aa'   // Turquesa claro
+    ];
 
     this.charts['experienciaVsTecnologias'] = new Chart(ctx, {
       type: 'bar',
@@ -1315,8 +1387,8 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           {
             label: 'Promedio de Tecnologías Dominadas',
             data: datos.map(item => item.promedioTecnologias),
-            backgroundColor: '#3B82F6',
-            borderColor: '#2563EB',
+            backgroundColor: datos.map((_, index) => coloresEmpleadores[index % coloresEmpleadores.length]),
+            borderColor: datos.map((_, index) => coloresEmpleadores[index % coloresEmpleadores.length]),
             borderWidth: 2,
             borderRadius: 6,
             borderSkipped: false
@@ -1801,6 +1873,25 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     }
 
     const data = this.metricasAvanzadas.distribucionEducacion;
+    
+    // Paleta de colores del gráfico "Top Empleadores"
+    const coloresEmpleadores = [
+      '#ff6b35',  // Naranja vibrante
+      '#f7931e',  // Naranja dorado
+      '#0077b5',  // Azul LinkedIn
+      '#00a0b0',  // Azul turquesa
+      '#7b68ee',  // Púrpura medio
+      '#ff69b4',  // Rosa vibrante
+      '#32cd32',  // Verde lima
+      '#ffa500',  // Naranja estándar
+      '#ff1493',  // Rosa profundo
+      '#4169e1',  // Azul real
+      '#ff4500',  // Rojo naranja
+      '#9370db',  // Púrpura medio violeta
+      '#00ced1',  // Turquesa oscuro
+      '#ff6347',  // Tomate
+      '#20b2aa'   // Turquesa claro
+    ];
 
     this.charts['educacion'] = new Chart(ctx, {
       type: 'bar',
@@ -1809,8 +1900,8 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         datasets: [{
           label: 'Cantidad',
           data: data.map(item => item.cantidad),
-          backgroundColor: '#36A2EB',
-          borderColor: '#2E8BC0',
+          backgroundColor: data.map((_, index) => coloresEmpleadores[index % coloresEmpleadores.length]),
+          borderColor: data.map((_, index) => coloresEmpleadores[index % coloresEmpleadores.length]),
           borderWidth: 1
         }]
       },
@@ -1894,10 +1985,23 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       .sort((a, b) => b.cantidad - a.cantidad)
       .slice(0, 10);
 
-    // Paleta de colores profesional y elegante
-    const colors = [
-      '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-      '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+    // Paleta de colores del gráfico "Top Empleadores"
+    const coloresEmpleadores = [
+      '#ff6b35',  // Naranja vibrante
+      '#f7931e',  // Naranja dorado
+      '#0077b5',  // Azul LinkedIn
+      '#00a0b0',  // Azul turquesa
+      '#7b68ee',  // Púrpura medio
+      '#ff69b4',  // Rosa vibrante
+      '#32cd32',  // Verde lima
+      '#ffa500',  // Naranja estándar
+      '#ff1493',  // Rosa profundo
+      '#4169e1',  // Azul real
+      '#ff4500',  // Rojo naranja
+      '#9370db',  // Púrpura medio violeta
+      '#00ced1',  // Turquesa oscuro
+      '#ff6347',  // Tomate
+      '#20b2aa'   // Turquesa claro
     ];
 
     this.charts['areasInteres'] = new Chart(ctx, {
@@ -1907,8 +2011,8 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         datasets: [{
           label: 'Profesionales Interesados',
           data: data.map(item => item.cantidad),
-          backgroundColor: data.map((_, index) => colors[index % colors.length]),
-          borderColor: data.map((_, index) => colors[index % colors.length]),
+          backgroundColor: data.map((_, index) => coloresEmpleadores[index % coloresEmpleadores.length]),
+          borderColor: data.map((_, index) => coloresEmpleadores[index % coloresEmpleadores.length]),
           borderWidth: 1,
           borderRadius: 4,
           borderSkipped: false

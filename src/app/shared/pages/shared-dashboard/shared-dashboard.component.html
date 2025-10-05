@@ -259,15 +259,16 @@
             </div>
           </ng-template>
           <div class="technology-list">
-            <div *ngFor="let tech of tecnologiasDemandadas" class="technology-item">
+            <div *ngFor="let tech of tecnologiasDemandadas; let i = index" class="technology-item">
               <div class="technology-header">
-                <h4 class="technology-name">{{ tech.nombre }}</h4>
-                <span class="technology-demand">{{ getSeleccionesText(tech.demanda) }}</span>
+                <h4 class="technology-name" [style.color]="getTechnologyColor(i)">{{ tech.nombre }}</h4>
+                <span class="technology-demand" [style.color]="getTechnologyColor(i)">{{ getSeleccionesText(tech.demanda) }}</span>
               </div>
               <div class="technology-progress">
                 <p-progressBar
                   [value]="getTechDemandPercentage(tech.demanda)"
                   [showValue]="false"
+                  [style]="{'--tech-color': getTechnologyColor(i)}"
                   styleClass="tech-progress-bar">
                 </p-progressBar>
               </div>
@@ -311,7 +312,7 @@
                 </div>
                 <div class="detail-item" *ngIf="empresa.satisfaccionPromedio !== null">
                   <i class="pi pi-star"></i>
-                  <span>{{ formatSatisfactionStars(empresa.satisfaccionPromedio) }}</span>
+                  <span class="satisfaction-stars">{{ formatSatisfactionStars(empresa.satisfaccionPromedio) }}</span>
                 </div>
               </div>
             </div>
@@ -328,7 +329,7 @@
               <p-tag value="Promedios del mercado" severity="success" styleClass="info-tag"></p-tag>
             </div>
           </ng-template>
-          <div class="salary-distribution-grid">
+          <div class="salary-distribution-grid salary-grid-scrollable">
             <div *ngFor="let dist of distribucionSalarial" class="salary-card-compact">
               <div class="salary-header">
                 <h4 class="industry-name">{{ dist.industria }}</h4>
