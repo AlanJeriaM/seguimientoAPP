@@ -88,24 +88,57 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   private formInitialValue: any = null;
   hasFormChanges = false; // Opciones personalizadas del usuario
 
+  // Método para normalizar texto a minúsculas
+  normalizeText(text: string): string {
+    if (!text || typeof text !== 'string') return text;
+    return text.trim().toLowerCase();
+  }
+
+  // Método para parsear campos que pueden venir como string JSON o array
+  parseArrayField(field: any): any[] {
+    if (!field) return [];
+    
+    // Si ya es un array, retornarlo
+    if (Array.isArray(field)) {
+      return field.filter(item => item !== null && item !== undefined && item !== '');
+    }
+    
+    // Si es string, intentar parsearlo como JSON
+    if (typeof field === 'string') {
+      try {
+        const parsed = JSON.parse(field);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(item => item !== null && item !== undefined && item !== '');
+        }
+        // Si es un string simple, retornarlo como array de un elemento
+        return field.trim() ? [field.trim()] : [];
+      } catch (error) {
+        // Si no es JSON válido, tratarlo como string simple
+        return field.trim() ? [field.trim()] : [];
+      }
+    }
+    
+    return [];
+  }
+
   // Progreso del perfil
   profileProgress = 0;
 
   // Opciones para dropdowns
   industriasBase = [
-    'Tecnología de la información y servicios',
-    'Servicios financieros',
-    'Consultoría de gestión',
-    'Educación',
-    'Salud y bienestar',
-    'Retail',
-    'Manufactura',
-    'Telecomunicaciones',
-    'Medios y comunicación',
-    'Energía y servicios públicos',
-    'Construcción',
-    'Turismo y hostelería',
-    'Transporte y logística'
+    'tecnología de la información y servicios',
+    'servicios financieros',
+    'consultoría de gestión',
+    'educación',
+    'salud y bienestar',
+    'retail',
+    'manufactura',
+    'telecomunicaciones',
+    'medios y comunicación',
+    'energía y servicios públicos',
+    'construcción',
+    'turismo y hostelería',
+    'transporte y logística'
   ];
 
   // Opciones completas para el dropdown (base + personalizadas)
@@ -114,14 +147,14 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   // Nuevas opciones para campos de métricas
   // Opciones base para dropdowns (sin opciones personalizadas)
   nivelesEducacionBase: string[] = [
-    'Sin especialización',
-    'Técnico',
-    'Profesional',
-    'Diplomado',
-    'Postítulo',
-    'Magíster Profesional',
-    'Magíster Académico',
-    'Doctorado'
+    'sin especialización',
+    'técnico',
+    'profesional',
+    'diplomado',
+    'postítulo',
+    'magíster profesional',
+    'magíster académico',
+    'doctorado'
   ];
 
   // Opciones completas para el dropdown (base + personalizadas)
@@ -151,49 +184,49 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     'Sin trabajo'
   ];
 
-  // Opciones base para área de interés (sin opciones personalizadas)
+  // Opciones base para área de interés (normalizadas para coincidir con datos del backend)
   areasInteresBase = [
-    'Frontend Development',
-    'Backend Development',
-    'Full Stack Development',
-    'DevOps',
-    'Data Science',
-    'Machine Learning',
-    'Mobile Development',
-    'QA/Testing',
-    'UI/UX Design',
-    'Product Management',
-    'Project Management',
-    'Cybersecurity',
-    'Cloud Computing'
+    'frontend development',
+    'backend development',
+    'full stack development',
+    'devops',
+    'data science',
+    'machine learning',
+    'mobile development',
+    'qa/testing',
+    'ui/ux design',
+    'product management',
+    'project management',
+    'cybersecurity',
+    'cloud computing'
   ];
 
   // Array dinámico que combina opciones base + personalizadas
   areasInteres: string[] = [];
 
-  // Opciones base para tecnologías (sin opciones personalizadas)
+  // Opciones base para tecnologías (normalizadas para coincidir con datos del backend)
   especialidadesTecnicasBase = [
-    'JavaScript',
-    'Python',
-    'Java',
-    'C#',
-    'PHP',
-    'TypeScript',
-    'React',
-    'Angular',
-    'Vue.js',
-    'Node.js',
-    '.NET',
-    'Spring',
-    'Laravel',
-    'Django',
-    'Ruby on Rails',
-    'Go',
-    'Rust',
-    'Kotlin',
-    'Swift',
-    'Flutter',
-    'React Native'
+    'javascript',
+    'python',
+    'java',
+    'c#',
+    'php',
+    'typescript',
+    'react',
+    'angular',
+    'vue.js',
+    'node.js',
+    '.net',
+    'spring',
+    'laravel',
+    'django',
+    'ruby on rails',
+    'go',
+    'rust',
+    'kotlin',
+    'swift',
+    'flutter',
+    'react native'
   ];
   especialidadesTecnicas: string[] = [];
 
@@ -387,6 +420,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   reconstruirListaTecnologias() {
     // Combinar opciones base con opciones personalizadas
     this.especialidadesTecnicas = [...this.especialidadesTecnicasBase, ...this.opcionesPersonalizadasTecnologias];
+    console.log('Reconstruyendo lista de tecnologías:', {
+      especialidadesTecnicasBase: this.especialidadesTecnicasBase,
+      opcionesPersonalizadasTecnologias: this.opcionesPersonalizadasTecnologias,
+      especialidadesTecnicasFinal: this.especialidadesTecnicas
+    });
   }
 
   reconstruirListaAreasInteres() {
@@ -514,22 +552,22 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       const currentValues = this.perfilForm.get('nivel_educacion')?.value || [];
       console.log('Valores actuales después del timeout:', currentValues);
 
-      // Si "Sin especialización" está seleccionada junto con otras opciones, limpiar
-      if (currentValues.includes('Sin especialización') && currentValues.length > 1) {
-        console.log('Detección: Sin especialización con otras opciones, limpiando...');
+      // Si "sin especialización" está seleccionada junto con otras opciones, limpiar
+      if (currentValues.includes('sin especialización') && currentValues.length > 1) {
+        console.log('Detección: sin especialización con otras opciones, limpiando...');
         // Si se está intentando seleccionar otra opción, mantener solo esa opción
         const ultimaOpcion = selectedValues[selectedValues.length - 1];
-        if (ultimaOpcion && ultimaOpcion !== 'Sin especialización') {
+        if (ultimaOpcion && ultimaOpcion !== 'sin especialización') {
           this.perfilForm.get('nivel_educacion')?.setValue([ultimaOpcion]);
         } else {
-          // Si se está deseleccionando, mantener solo "Sin especialización"
-          this.perfilForm.get('nivel_educacion')?.setValue(['Sin especialización']);
+          // Si se está deseleccionando, mantener solo "sin especialización"
+          this.perfilForm.get('nivel_educacion')?.setValue(['sin especialización']);
         }
       }
-      // Si se selecciona "Sin especialización" sola, deseleccionar todas las demás
-      else if (selectedValues.includes('Sin especialización') && selectedValues.length === 1) {
-        console.log('Detección: Solo Sin especialización seleccionada');
-        this.perfilForm.get('nivel_educacion')?.setValue(['Sin especialización']);
+      // Si se selecciona "sin especialización" sola, deseleccionar todas las demás
+      else if (selectedValues.includes('sin especialización') && selectedValues.length === 1) {
+        console.log('Detección: Solo sin especialización seleccionada');
+        this.perfilForm.get('nivel_educacion')?.setValue(['sin especialización']);
       }
     }, 0);
 
@@ -577,11 +615,15 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   agregarNivelEducacion() {
     if (this.nuevaNivelEducacion?.trim()) {
       const nuevaOpcion = this.nuevaNivelEducacion.trim();
+      const opcionNormalizada = this.normalizeText(nuevaOpcion);
 
-      // Verificar que no exista ya en las opciones base ni personalizadas
-      if (!this.nivelesEducacionBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasEducacion.includes(nuevaOpcion)) {
-        // Agregar a opciones personalizadas
-        this.opcionesPersonalizadasEducacion.push(nuevaOpcion);
+      // Verificar que no exista ya (comparar con versiones normalizadas)
+      const nivelesBaseNormalizados = this.nivelesEducacionBase.map(n => this.normalizeText(n));
+      const opcionesPersonalizadasNormalizadas = this.opcionesPersonalizadasEducacion.map(n => this.normalizeText(n));
+      
+      if (!nivelesBaseNormalizados.includes(opcionNormalizada) && !opcionesPersonalizadasNormalizadas.includes(opcionNormalizada)) {
+        // Agregar a opciones personalizadas (guardar normalizado)
+        this.opcionesPersonalizadasEducacion.push(opcionNormalizada);
 
         // Reconstruir la lista completa
         this.reconstruirListaNivelesEducacion();
@@ -589,9 +631,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         // Agregar la nueva opción a la selección actual
         const valoresActuales = this.perfilForm.get('nivel_educacion')?.value || [];
 
-        // Si "Sin especialización" está seleccionada, deseleccionarla antes de agregar la nueva opción
-        const valoresSinEspecializacion = valoresActuales.filter((valor: string) => valor !== 'Sin especialización');
-        this.perfilForm.get('nivel_educacion')?.setValue([...valoresSinEspecializacion, nuevaOpcion]);
+        // Si "sin especialización" está seleccionada, deseleccionarla antes de agregar la nueva opción
+        const valoresSinEspecializacion = valoresActuales.filter((valor: string) => valor !== 'sin especialización');
+        this.perfilForm.get('nivel_educacion')?.setValue([...valoresSinEspecializacion, opcionNormalizada]);
 
         // Limpiar y cerrar el diálogo
         this.cancelarAgregarNivelEducacion();
@@ -629,18 +671,22 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   agregarTecnologia() {
     if (this.nuevaTecnologia?.trim()) {
       const nuevaOpcion = this.nuevaTecnologia.trim();
+      const opcionNormalizada = this.normalizeText(nuevaOpcion);
 
-      // Verificar que no exista ya en las opciones base ni personalizadas
-      if (!this.especialidadesTecnicasBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasTecnologias.includes(nuevaOpcion)) {
-        // Agregar a opciones personalizadas
-        this.opcionesPersonalizadasTecnologias.push(nuevaOpcion);
+      // Verificar que no exista ya (comparar con versiones normalizadas)
+      const especialidadesBaseNormalizadas = this.especialidadesTecnicasBase.map(t => this.normalizeText(t));
+      const opcionesPersonalizadasNormalizadas = this.opcionesPersonalizadasTecnologias.map(t => this.normalizeText(t));
+      
+      if (!especialidadesBaseNormalizadas.includes(opcionNormalizada) && !opcionesPersonalizadasNormalizadas.includes(opcionNormalizada)) {
+        // Agregar a opciones personalizadas (guardar normalizado)
+        this.opcionesPersonalizadasTecnologias.push(opcionNormalizada);
 
         // Reconstruir la lista completa
         this.reconstruirListaTecnologias();
 
         // Agregar la nueva opción a la selección actual
         const valoresActuales = this.perfilForm.get('especialidad_tecnica')?.value || [];
-        this.perfilForm.get('especialidad_tecnica')?.setValue([...valoresActuales, nuevaOpcion]);
+        this.perfilForm.get('especialidad_tecnica')?.setValue([...valoresActuales, opcionNormalizada]);
 
         // Limpiar y cerrar el diálogo
         this.cancelarAgregarTecnologia();
@@ -742,16 +788,22 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Verificar que no existe ya
-    if (!this.areasInteresBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasAreaInteres.includes(nuevaOpcion)) {
-      // Agregar a opciones personalizadas
-      this.opcionesPersonalizadasAreaInteres.push(nuevaOpcion);
+    // Normalizar la nueva opción
+    const opcionNormalizada = this.normalizeText(nuevaOpcion);
+
+    // Verificar que no existe ya (comparar con versiones normalizadas)
+    const areasInteresBaseNormalizadas = this.areasInteresBase.map(a => this.normalizeText(a));
+    const opcionesPersonalizadasNormalizadas = this.opcionesPersonalizadasAreaInteres.map(a => this.normalizeText(a));
+    
+    if (!areasInteresBaseNormalizadas.includes(opcionNormalizada) && !opcionesPersonalizadasNormalizadas.includes(opcionNormalizada)) {
+      // Agregar a opciones personalizadas (guardar normalizado)
+      this.opcionesPersonalizadasAreaInteres.push(opcionNormalizada);
 
       // Reconstruir la lista completa
       this.reconstruirListaAreasInteres();
 
       // Seleccionar la nueva opción
-      this.perfilForm.get('area_interes')?.setValue(nuevaOpcion);
+      this.perfilForm.get('area_interes')?.setValue(opcionNormalizada);
 
       // Limpiar el campo y cerrar el diálogo
       this.nuevaAreaInteres = '';
@@ -766,7 +818,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'success',
         summary: 'Opción agregada',
-        detail: `"${nuevaOpcion}" ha sido agregada a tus opciones personalizadas`
+        detail: `"${opcionNormalizada}" ha sido agregada a tus opciones personalizadas`
       });
     } else {
       this.messageService.add({
@@ -887,16 +939,22 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Verificar que no existe ya
-    if (!this.industriasBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasIndustria.includes(nuevaOpcion)) {
-      // Agregar a opciones personalizadas
-      this.opcionesPersonalizadasIndustria.push(nuevaOpcion);
+    // Normalizar la nueva opción
+    const opcionNormalizada = this.normalizeText(nuevaOpcion);
+
+    // Verificar que no existe ya (comparar con versiones normalizadas)
+    const industriasBaseNormalizadas = this.industriasBase.map(i => this.normalizeText(i));
+    const opcionesPersonalizadasNormalizadas = this.opcionesPersonalizadasIndustria.map(i => this.normalizeText(i));
+    
+    if (!industriasBaseNormalizadas.includes(opcionNormalizada) && !opcionesPersonalizadasNormalizadas.includes(opcionNormalizada)) {
+      // Agregar a opciones personalizadas (guardar normalizado)
+      this.opcionesPersonalizadasIndustria.push(opcionNormalizada);
 
       // Reconstruir la lista completa
       this.reconstruirListaIndustrias();
 
       // Seleccionar la nueva opción
-      this.perfilForm.get('industria')?.setValue(nuevaOpcion);
+      this.perfilForm.get('industria')?.setValue(opcionNormalizada);
 
       // Limpiar el campo y cerrar el diálogo
       this.nuevaIndustria = '';
@@ -908,7 +966,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'success',
         summary: 'Opción agregada',
-        detail: `"${nuevaOpcion}" ha sido agregada y seleccionada`,
+        detail: `"${opcionNormalizada}" ha sido agregada y seleccionada`,
         life: 3000
       });
     } else {
@@ -1125,33 +1183,14 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       console.log('Último acceso:', this.perfil.ultimo_acceso);
 
       // Cargar opciones personalizadas si existen
-      if (this.perfil.opciones_personalizadas_educacion) {
-        this.opcionesPersonalizadasEducacion = this.perfil.opciones_personalizadas_educacion;
-      }
+      this.opcionesPersonalizadasEducacion = this.parseArrayField(this.perfil.opciones_personalizadas_educacion);
+      this.opcionesPersonalizadasTecnologias = this.parseArrayField(this.perfil.opciones_personalizadas_tecnologias);
+      this.opcionesPersonalizadasAreaInteres = this.parseArrayField(this.perfil.opciones_personalizadas_area_interes);
+      this.opcionesPersonalizadasIndustria = this.parseArrayField(this.perfil.opciones_personalizadas_industria);
 
-      if (this.perfil.opciones_personalizadas_tecnologias) {
-        this.opcionesPersonalizadasTecnologias = this.perfil.opciones_personalizadas_tecnologias;
-        console.log('Opciones personalizadas de tecnologías cargadas:', this.opcionesPersonalizadasTecnologias);
-      } else {
-        console.log('No hay opciones personalizadas de tecnologías en el perfil');
-        this.opcionesPersonalizadasTecnologias = [];
-      }
-
-      if (this.perfil.opciones_personalizadas_area_interes) {
-        this.opcionesPersonalizadasAreaInteres = this.perfil.opciones_personalizadas_area_interes;
-        console.log('Opciones personalizadas de área de interés cargadas:', this.opcionesPersonalizadasAreaInteres);
-      } else {
-        console.log('No hay opciones personalizadas de área de interés en el perfil');
-        this.opcionesPersonalizadasAreaInteres = [];
-      }
-
-      if (this.perfil.opciones_personalizadas_industria) {
-        this.opcionesPersonalizadasIndustria = this.perfil.opciones_personalizadas_industria;
-        console.log('Opciones personalizadas de industria cargadas:', this.opcionesPersonalizadasIndustria);
-      } else {
-        console.log('No hay opciones personalizadas de industria en el perfil');
-        this.opcionesPersonalizadasIndustria = [];
-      }
+      console.log('Opciones personalizadas de tecnologías cargadas:', this.opcionesPersonalizadasTecnologias);
+      console.log('Opciones personalizadas de área de interés cargadas:', this.opcionesPersonalizadasAreaInteres);
+      console.log('Opciones personalizadas de industria cargadas:', this.opcionesPersonalizadasIndustria);
 
       console.log('Estado después de cargar opciones personalizadas:', {
         opcionesPersonalizadasAreaInteres: this.opcionesPersonalizadasAreaInteres,
@@ -1166,6 +1205,20 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       this.reconstruirListaAreasInteres();
       this.reconstruirListaIndustrias();
 
+      // Parsear campos de array antes de asignar al formulario
+      const nivelEducacionParsed = this.parseArrayField(this.perfil.nivel_educacion) || [];
+      const especialidadTecnicaParsed = this.parseArrayField(this.perfil.especialidad_tecnica) || [];
+      const tecnologiasPrincipalesParsed = this.parseArrayField(this.perfil.tecnologias_principales) || [];
+
+      console.log('🔍 Debug - Campos parseados del backend:', {
+        nivel_educacion_raw: this.perfil.nivel_educacion,
+        nivel_educacion_parsed: nivelEducacionParsed,
+        especialidad_tecnica_raw: this.perfil.especialidad_tecnica,
+        especialidad_tecnica_parsed: especialidadTecnicaParsed,
+        tecnologias_principales_raw: this.perfil.tecnologias_principales,
+        tecnologias_principales_parsed: tecnologiasPrincipalesParsed
+      });
+
       this.perfilForm.patchValue({
         // Campos básicos
         nombre: this.perfil.nombre || '',
@@ -1176,13 +1229,13 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         resumen: this.perfil.resumen === 'Sin resumen' ? '' : this.perfil.resumen,
         // Nuevos campos para métricas
         años_experiencia: this.perfil.años_experiencia != null ? this.perfil.años_experiencia : null,
-        nivel_educacion: this.perfil.nivel_educacion || '',
-        especialidad_tecnica: this.perfil.especialidad_tecnica || [],
+        nivel_educacion: nivelEducacionParsed,
+        especialidad_tecnica: especialidadTecnicaParsed,
         tipo_empleo_actual: this.perfil.tipo_empleo_actual || '',
         disponibilidad_cambio: this.perfil.disponibilidad_cambio || '',
         area_interes: this.perfil.area_interes || '',
         rango_salarial: this.perfil.rango_salarial || '',
-        tecnologias_principales: this.perfil.tecnologias_principales || [],
+        tecnologias_principales: tecnologiasPrincipalesParsed,
         satisfaccion_laboral: this.perfil.satisfaccion_laboral || ''
       });
 
@@ -1208,11 +1261,22 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.saving = true;
     const datosActualizados = this.perfilForm.value;
 
-    // Agregar las opciones personalizadas
-    datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
-    datosActualizados.opciones_personalizadas_tecnologias = this.opcionesPersonalizadasTecnologias;
-    datosActualizados.opciones_personalizadas_area_interes = this.opcionesPersonalizadasAreaInteres;
-    datosActualizados.opciones_personalizadas_industria = this.opcionesPersonalizadasIndustria;
+    // Normalizar campos críticos para evitar duplicados en gráficos
+    if (datosActualizados.empresa_actual) {
+      datosActualizados.empresa_actual = this.normalizeText(datosActualizados.empresa_actual);
+    }
+    if (datosActualizados.industria) {
+      datosActualizados.industria = this.normalizeText(datosActualizados.industria);
+    }
+    if (datosActualizados.area_interes) {
+      datosActualizados.area_interes = this.normalizeText(datosActualizados.area_interes);
+    }
+
+    // Normalizar opciones personalizadas
+    datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion.map(opt => this.normalizeText(opt));
+    datosActualizados.opciones_personalizadas_tecnologias = this.opcionesPersonalizadasTecnologias.map(opt => this.normalizeText(opt));
+    datosActualizados.opciones_personalizadas_area_interes = this.opcionesPersonalizadasAreaInteres.map(opt => this.normalizeText(opt));
+    datosActualizados.opciones_personalizadas_industria = this.opcionesPersonalizadasIndustria.map(opt => this.normalizeText(opt));
 
     console.log('Datos que se van a guardar:', datosActualizados);
     console.log('Opciones personalizadas de educación:', this.opcionesPersonalizadasEducacion);
