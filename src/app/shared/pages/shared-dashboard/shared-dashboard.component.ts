@@ -575,15 +575,37 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         }]
       },
       options: {
-        ...this.chartOptions,
         indexAxis: 'y' as const,
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-          ...this.chartOptions.plugins,
+          legend: {
+            display: false
+          },
+          title: {
+            display: true,
+            text: 'Principales Empleadores del Mercado',
+            font: {
+              size: 16,
+              weight: 'bold'
+            },
+            color: '#374151'
+          },
           tooltip: {
-            ...this.chartOptions.plugins.tooltip,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: '#e5e7eb',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: false,
             callbacks: {
+              title: function(context: any) {
+                return topEmpresas[context[0].dataIndex].empresa;
+              },
               label: function(context: any) {
                 const emp = topEmpresas[context.dataIndex];
+                
                 // Función para formatear números con puntos
                 const formatCurrency = (value: number): string => {
                   return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
@@ -611,6 +633,25 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
                 return tooltipLines;
               }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: {
+              color: '#f3f4f6'
+            },
+            ticks: {
+              color: '#6b7280'
+            }
+          },
+          y: {
+            grid: {
+              color: '#f3f4f6'
+            },
+            ticks: {
+              color: '#6b7280'
             }
           }
         }
@@ -1219,24 +1260,45 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           label: 'Cantidad de Profesionales',
           data: datosOrdenados.map(item => item.cantidad),
           backgroundColor: [
-            '#8B5CF6', // Púrpura
-            '#06B6D4', // Cyan
-            '#10B981', // Verde esmeralda
-            '#F59E0B', // Ámbar
-            '#EF4444', // Rojo
-            '#6366F1'  // Índigo
+            '#ff6b35',  // Naranja vibrante
+            '#f7931e',  // Naranja dorado
+            '#0077b5',  // Azul LinkedIn
+            '#00a0b0',  // Azul turquesa
+            '#7b68ee',  // Púrpura medio
+            '#ff69b4',  // Rosa vibrante
+            '#32cd32',  // Verde lima
+            '#ffa500',  // Naranja estándar
+            '#ff1493',  // Rosa profundo
+            '#4169e1'   // Azul real
           ],
           borderColor: [
-            '#7C3AED',
-            '#0891B2',
-            '#059669',
-            '#D97706',
-            '#DC2626',
-            '#4F46E5'
+            '#ff6b35',  // Naranja vibrante
+            '#f7931e',  // Naranja dorado
+            '#0077b5',  // Azul LinkedIn
+            '#00a0b0',  // Azul turquesa
+            '#7b68ee',  // Púrpura medio
+            '#ff69b4',  // Rosa vibrante
+            '#32cd32',  // Verde lima
+            '#ffa500',  // Naranja estándar
+            '#ff1493',  // Rosa profundo
+            '#4169e1'   // Azul real
           ],
           borderWidth: 2,
           borderRadius: 8,
-          borderSkipped: false
+          borderSkipped: false,
+          hoverBorderWidth: 4,
+          hoverBackgroundColor: [
+            '#ff5722',  // Naranja más intenso al hacer hover
+            '#ff9800',  // Naranja dorado más intenso
+            '#1976d2',  // Azul LinkedIn más intenso
+            '#0097a7',  // Azul turquesa más intenso
+            '#673ab7',  // Púrpura medio más intenso
+            '#e91e63',  // Rosa vibrante más intenso
+            '#4caf50',  // Verde lima más intenso
+            '#ff6f00',  // Naranja estándar más intenso
+            '#c2185b',  // Rosa profundo más intenso
+            '#303f9f'   // Azul real más intenso
+          ]
         }]
       },
       options: {
@@ -1309,29 +1371,25 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           },
           tooltip: {
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            titleColor: '#ffffff',
-            bodyColor: '#ffffff',
-            borderColor: '#8B5CF6',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: '#e5e7eb',
             borderWidth: 1,
             cornerRadius: 8,
-            displayColors: true,
+            displayColors: false,
             callbacks: {
-              title: function(tooltipItems) {
-                return `Experiencia: ${tooltipItems[0].label}`;
+              title: function(context: any) {
+                return `Experiencia: ${context[0].label}`;
               },
-              label: function(context) {
-                const dataIndex = context.dataIndex;
-                const item = datosOrdenados[dataIndex];
-
+              label: function(context: any) {
+                const item = datosOrdenados[context.dataIndex];
+                const total = datosOrdenados.reduce((sum, item) => sum + item.cantidad, 0);
+                
                 return [
                   `Profesionales: ${item.cantidad}`,
-                  `Porcentaje: ${item.porcentaje}% del total`,
+                  `Porcentaje: ${((item.cantidad / total) * 100).toFixed(1)}% del total`,
                   `Rango: ${item.añosMinimos}-${item.añosMaximos === 50 ? '50+' : item.añosMaximos} años`
                 ];
-              },
-              afterBody: function(tooltipItems) {
-                const total = datosOrdenados.reduce((sum, item) => sum + item.cantidad, 0);
-                return `Total del mercado: ${total} profesionales`;
               }
             }
           }
@@ -1549,7 +1607,16 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         borderColor: '#ffffff',
         borderWidth: 1,
         borderRadius: 4,
-        borderSkipped: false
+        borderSkipped: false,
+        hoverBorderWidth: 3,
+        hoverBackgroundColor: [
+          '#DC2626', // Rojo más intenso para <500k
+          '#D97706', // Ámbar más intenso para 500k-1M
+          '#059669', // Verde más intenso para 1M-1.5M
+          '#2563EB', // Azul más intenso para 1.5M-2M
+          '#7C3AED', // Púrpura más intenso para 2M-3M
+          '#4F46E5'  // Índigo más intenso para 3M+
+        ][index % 6]
       };
     });
 
