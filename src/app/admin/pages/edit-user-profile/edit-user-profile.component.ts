@@ -87,19 +87,19 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
   // Opciones para dropdowns
   industriasBase = [
-    'Tecnología de la información y servicios',
-    'Servicios financieros',
-    'Consultoría de gestión',
-    'Educación',
-    'Salud y bienestar',
-    'Retail',
-    'Manufactura',
-    'Telecomunicaciones',
-    'Medios y comunicación',
-    'Energía y servicios públicos',
-    'Construcción',
-    'Turismo y hostelería',
-    'Transporte y logística'
+    'tecnología de la información y servicios',
+    'servicios financieros',
+    'consultoría de gestión',
+    'educación',
+    'salud y bienestar',
+    'retail',
+    'manufactura',
+    'telecomunicaciones',
+    'medios y comunicación',
+    'energía y servicios públicos',
+    'construcción',
+    'turismo y hostelería',
+    'transporte y logística'
   ];
 
   // Opciones completas para el dropdown (base + personalizadas)
@@ -108,60 +108,60 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
   // Nuevas opciones para campos de métricas
   // Opciones base para dropdowns (sin opciones personalizadas)
   nivelesEducacionBase: string[] = [
-    'Sin especialización',
-    'Técnico',
-    'Profesional',
-    'Diplomado',
-    'Postítulo',
-    'Magíster Profesional',
-    'Magíster Académico',
-    'Doctorado'
+    'sin especialización',
+    'técnico',
+    'profesional',
+    'diplomado',
+    'postítulo',
+    'magíster profesional',
+    'magíster académico',
+    'doctorado'
   ];
 
   // Opciones completas para el dropdown (base + personalizadas)
   nivelesEducacion: string[] = [];
 
   especialidadesTecnicasBase = [
-    'JavaScript',
-    'Python',
-    'Java',
-    'C#',
-    'PHP',
-    'TypeScript',
-    'React',
-    'Angular',
-    'Vue.js',
-    'Node.js',
-    '.NET',
-    'Spring',
-    'Laravel',
-    'Django',
-    'Ruby on Rails',
-    'Go',
-    'Rust',
-    'Kotlin',
-    'Swift',
-    'Flutter',
-    'React Native'
+    'javascript',
+    'python',
+    'java',
+    'c#',
+    'php',
+    'typescript',
+    'react',
+    'angular',
+    'vue.js',
+    'node.js',
+    '.net',
+    'spring',
+    'laravel',
+    'django',
+    'ruby on rails',
+    'go',
+    'rust',
+    'kotlin',
+    'swift',
+    'flutter',
+    'react native'
   ];
 
   // Opciones completas para el dropdown (base + personalizadas)
   especialidadesTecnicas: string[] = [];
 
   areasInteresBase = [
-    'Frontend Development',
-    'Backend Development',
-    'Full Stack Development',
-    'DevOps',
-    'Data Science',
-    'Machine Learning',
-    'Mobile Development',
-    'QA/Testing',
-    'UI/UX Design',
-    'Product Management',
-    'Project Management',
-    'Cybersecurity',
-    'Cloud Computing'
+    'frontend development',
+    'backend development',
+    'full stack development',
+    'devops',
+    'data science',
+    'machine learning',
+    'mobile development',
+    'qa/testing',
+    'ui/ux design',
+    'product management',
+    'project management',
+    'cybersecurity',
+    'cloud computing'
   ];
   areasInteres: string[] = [];
 
@@ -470,6 +470,11 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  normalizeText(text: string): string {
+    if (!text) return text;
+    return text.trim().toLowerCase();
+  }
+
   private parseArrayField(field: any): any[] {
     console.log('Parsing field:', field, 'Type:', typeof field);
     
@@ -636,12 +641,14 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.nivelesEducacionBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasEducacion.includes(nuevaOpcion)) {
-      this.opcionesPersonalizadasEducacion.push(nuevaOpcion);
+    const opcionNormalizada = this.normalizeText(nuevaOpcion);
+
+    if (!this.nivelesEducacionBase.includes(opcionNormalizada) && !this.opcionesPersonalizadasEducacion.includes(opcionNormalizada)) {
+      this.opcionesPersonalizadasEducacion.push(opcionNormalizada);
       this.reconstruirListaNivelesEducacion();
       
       const valorActual = this.perfilForm.get('nivel_educacion')?.value || [];
-      this.perfilForm.get('nivel_educacion')?.setValue([...valorActual, nuevaOpcion]);
+      this.perfilForm.get('nivel_educacion')?.setValue([...valorActual, opcionNormalizada]);
       
       this.nuevaNivelEducacion = '';
       this.showAddNivelEducacionDialog = false;
@@ -740,12 +747,14 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.especialidadesTecnicasBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasTecnologias.includes(nuevaOpcion)) {
-      this.opcionesPersonalizadasTecnologias.push(nuevaOpcion);
+    const opcionNormalizada = this.normalizeText(nuevaOpcion);
+
+    if (!this.especialidadesTecnicasBase.includes(opcionNormalizada) && !this.opcionesPersonalizadasTecnologias.includes(opcionNormalizada)) {
+      this.opcionesPersonalizadasTecnologias.push(opcionNormalizada);
       this.reconstruirListaTecnologias();
       
       const valorActual = this.perfilForm.get('especialidad_tecnica')?.value || [];
-      this.perfilForm.get('especialidad_tecnica')?.setValue([...valorActual, nuevaOpcion]);
+      this.perfilForm.get('especialidad_tecnica')?.setValue([...valorActual, opcionNormalizada]);
       
       this.nuevaTecnologia = '';
       this.showAddTecnologiaDialog = false;
@@ -834,10 +843,12 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.areasInteresBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasAreaInteres.includes(nuevaOpcion)) {
-      this.opcionesPersonalizadasAreaInteres.push(nuevaOpcion);
+    const opcionNormalizada = this.normalizeText(nuevaOpcion);
+
+    if (!this.areasInteresBase.includes(opcionNormalizada) && !this.opcionesPersonalizadasAreaInteres.includes(opcionNormalizada)) {
+      this.opcionesPersonalizadasAreaInteres.push(opcionNormalizada);
       this.reconstruirListaAreasInteres();
-      this.perfilForm.get('area_interes')?.setValue(nuevaOpcion);
+      this.perfilForm.get('area_interes')?.setValue(opcionNormalizada);
       this.nuevaAreaInteres = '';
       this.showAddAreaInteresDialog = false;
 
@@ -921,10 +932,12 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.industriasBase.includes(nuevaOpcion) && !this.opcionesPersonalizadasIndustria.includes(nuevaOpcion)) {
-      this.opcionesPersonalizadasIndustria.push(nuevaOpcion);
+    const opcionNormalizada = this.normalizeText(nuevaOpcion);
+
+    if (!this.industriasBase.includes(opcionNormalizada) && !this.opcionesPersonalizadasIndustria.includes(opcionNormalizada)) {
+      this.opcionesPersonalizadasIndustria.push(opcionNormalizada);
       this.reconstruirListaIndustrias();
-      this.perfilForm.get('industria')?.setValue(nuevaOpcion);
+      this.perfilForm.get('industria')?.setValue(opcionNormalizada);
       this.nuevaIndustria = '';
       this.showAddIndustriaDialog = false;
 
@@ -998,11 +1011,22 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     this.saving = true;
     const datosActualizados = this.perfilForm.value;
 
-    // Agregar las opciones personalizadas
-    datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion;
-    datosActualizados.opciones_personalizadas_tecnologias = this.opcionesPersonalizadasTecnologias;
-    datosActualizados.opciones_personalizadas_area_interes = this.opcionesPersonalizadasAreaInteres;
-    datosActualizados.opciones_personalizadas_industria = this.opcionesPersonalizadasIndustria;
+    // Normalizar campos de texto antes de enviar
+    if (datosActualizados.empresa_actual) {
+      datosActualizados.empresa_actual = this.normalizeText(datosActualizados.empresa_actual);
+    }
+    if (datosActualizados.industria) {
+      datosActualizados.industria = this.normalizeText(datosActualizados.industria);
+    }
+    if (datosActualizados.area_interes) {
+      datosActualizados.area_interes = this.normalizeText(datosActualizados.area_interes);
+    }
+
+    // Normalizar arrays de opciones personalizadas
+    datosActualizados.opciones_personalizadas_educacion = this.opcionesPersonalizadasEducacion.map(opcion => this.normalizeText(opcion));
+    datosActualizados.opciones_personalizadas_tecnologias = this.opcionesPersonalizadasTecnologias.map(opcion => this.normalizeText(opcion));
+    datosActualizados.opciones_personalizadas_area_interes = this.opcionesPersonalizadasAreaInteres.map(opcion => this.normalizeText(opcion));
+    datosActualizados.opciones_personalizadas_industria = this.opcionesPersonalizadasIndustria.map(opcion => this.normalizeText(opcion));
 
     // Llamar al servicio para actualizar el usuario
     this.authService.actualizarUsuario(this.usuario.id, datosActualizados)
