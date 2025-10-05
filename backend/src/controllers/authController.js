@@ -6,6 +6,12 @@ const { generarJWT } = require('../services/jwt');
 const linkedinService = require('../services/linkedinService');
 const emailService = require('../services/emailService');
 
+// Función para normalizar texto a minúsculas
+const normalizeText = (text) => {
+  if (!text || typeof text !== 'string') return text;
+  return text.trim().toLowerCase();
+};
+
 // Login de administrador
 const loginAdmin = async (req, res) => {
   try {
@@ -181,9 +187,12 @@ const linkedinCallback = async (req, res) => {
         console.log('Creando nuevo usuario...');
         user = await User.create({
           ...linkedinData,
+          empresa_actual: normalizeText(linkedinData.empresa_actual),
+          industria: normalizeText(linkedinData.industria),
           linkedin_data: linkedinData,
           ultimo_acceso: new Date(),
-          activo: true
+          activo: true,
+          nombre_editado_manual: false // Nuevo campo, por defecto false
         });
         console.log('Usuario creado con ID:', user.id);
       } else {
@@ -204,20 +213,20 @@ const linkedinCallback = async (req, res) => {
         }
 
         // Solo actualizar campos de perfil si están vacíos en la BD
-        if (!user.posicion_actual || user.posicion_actual === 'No especificada') {
+        if (!user.posicion_actual || user.posicion_actual === 'no especificada') {
           datosParaActualizar.posicion_actual = linkedinData.posicion_actual;
         }
-        if (!user.empresa_actual || user.empresa_actual === 'No especificada') {
-          datosParaActualizar.empresa_actual = linkedinData.empresa_actual;
+        if (!user.empresa_actual || user.empresa_actual === 'no especificada') {
+          datosParaActualizar.empresa_actual = normalizeText(linkedinData.empresa_actual);
         }
-        if (!user.ubicacion || user.ubicacion === 'No especificada') {
+        if (!user.ubicacion || user.ubicacion === 'no especificada') {
           datosParaActualizar.ubicacion = linkedinData.ubicacion;
         }
-        if (!user.resumen || user.resumen === 'Sin resumen') {
+        if (!user.resumen || user.resumen === 'sin resumen') {
           datosParaActualizar.resumen = linkedinData.resumen;
         }
-        if (!user.industria || user.industria === 'No especificada') {
-          datosParaActualizar.industria = linkedinData.industria;
+        if (!user.industria || user.industria === 'no especificada') {
+          datosParaActualizar.industria = normalizeText(linkedinData.industria);
         }
 
         console.log('📋 Datos que se actualizarán:', datosParaActualizar);
@@ -299,12 +308,13 @@ const loginLinkedIn = async (req, res) => {
         linkedin_data: linkedinData,
         perfil_imagen_url,
         posicion_actual,
-        empresa_actual,
+        empresa_actual: normalizeText(empresa_actual),
         ubicacion,
         resumen,
-        industria,
+        industria: normalizeText(industria),
         ultimo_acceso: new Date(),
-        activo: true
+        activo: true,
+        nombre_editado_manual: false // Nuevo campo, por defecto false
       });
       console.log('Usuario simulado creado con ID:', user.id);
     } else {
@@ -314,10 +324,10 @@ const loginLinkedIn = async (req, res) => {
         linkedin_data: linkedinData,
         perfil_imagen_url,
         posicion_actual,
-        empresa_actual,
+        empresa_actual: normalizeText(empresa_actual),
         ubicacion,
         resumen,
-        industria,
+        industria: normalizeText(industria),
         ultimo_acceso: new Date()
       };
 

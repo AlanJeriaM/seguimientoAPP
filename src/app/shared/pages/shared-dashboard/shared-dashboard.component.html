@@ -259,7 +259,7 @@
             </div>
           </ng-template>
           <div class="technology-list">
-            <div *ngFor="let tech of tecnologiasDemandadas | slice:0:8" class="technology-item">
+            <div *ngFor="let tech of tecnologiasDemandadas" class="technology-item">
               <div class="technology-header">
                 <h4 class="technology-name">{{ tech.nombre }}</h4>
                 <span class="technology-demand">{{ getSeleccionesText(tech.demanda) }}</span>
@@ -299,7 +299,7 @@
             </div>
           </ng-template>
           <div class="companies-list">
-            <div *ngFor="let empresa of empresasContratantes | slice:0:8" class="company-item">
+            <div *ngFor="let empresa of empresasContratantes" class="company-item">
               <div class="company-header">
                 <span class="company-name">{{ empresa.empresa }}</span>
                 <span class="company-employees">{{ getEmpleadoText(empresa.totalEmpleados) }}</span>
@@ -329,7 +329,7 @@
             </div>
           </ng-template>
           <div class="salary-distribution-grid">
-            <div *ngFor="let dist of distribucionSalarial | slice:0:6" class="salary-card-compact">
+            <div *ngFor="let dist of distribucionSalarial" class="salary-card-compact">
               <div class="salary-header">
                 <h4 class="industry-name">{{ dist.industria }}</h4>
                 <span class="professionals-count">{{ dist.cantidad }} profesionales</span>

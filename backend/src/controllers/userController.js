@@ -1,6 +1,18 @@
 const User = require('../models/User');
 const { Op } = require('sequelize');
 
+// Función para normalizar texto a minúsculas
+const normalizeText = (text) => {
+  if (!text || typeof text !== 'string') return text;
+  return text.trim().toLowerCase();
+};
+
+// Función para normalizar array de strings
+const normalizeArray = (arr) => {
+  if (!Array.isArray(arr)) return arr;
+  return arr.map(item => normalizeText(item));
+};
+
 // Obtener todos los usuarios (solo para admin)
 const obtenerUsuarios = async (req, res) => {
   try {
@@ -76,10 +88,10 @@ const obtenerUsuarios = async (req, res) => {
         nombre: user.nombre || 'Sin nombre',
         correo: user.correo || 'Sin correo',
         perfil_imagen_url: user.perfil_imagen_url,
-        posicion_actual: user.posicion_actual || 'No especificada',
-        empresa_actual: user.empresa_actual || 'No especificada',
-        ubicacion: user.ubicacion || 'No especificada',
-        industria: user.industria || 'No especificada',
+        posicion_actual: user.posicion_actual || 'no especificada',
+        empresa_actual: user.empresa_actual || 'no especificada',
+        ubicacion: user.ubicacion || 'no especificada',
+        industria: user.industria || 'no especificada',
         ultimo_acceso: user.ultimo_acceso,
         created_at: user.created_at,
         updated_at: user.updated_at,
@@ -377,28 +389,28 @@ const actualizarMiPerfil = async (req, res) => {
     // Verificar si el nombre cambió para marcar como editado manualmente
     const nombreCambio = user.nombre !== nombre.trim();
     
-    // Actualizar datos del usuario
+    // Actualizar datos del usuario con normalización
     const datosActualizados = {
       nombre: nombre.trim(),
       posicion_actual: posicion_actual?.trim() || null,
-      empresa_actual: empresa_actual?.trim() || null,
+      empresa_actual: normalizeText(empresa_actual),
       ubicacion: ubicacion?.trim() || null,
       resumen: resumen?.trim() || null,
-      industria: industria?.trim() || null,
+      industria: normalizeText(industria),
       // Nuevos campos para métricas
       años_experiencia: años_experiencia !== undefined ? parseInt(años_experiencia) : null,
-      nivel_educacion: Array.isArray(nivelEducacionFinal) ? JSON.stringify(nivelEducacionFinal) : (nivelEducacionFinal?.trim() || null),
-      especialidad_tecnica: Array.isArray(especialidadFinal) ? JSON.stringify(especialidadFinal) : (especialidadFinal?.trim() || null),
+      nivel_educacion: Array.isArray(nivelEducacionFinal) ? JSON.stringify(normalizeArray(nivelEducacionFinal)) : (nivelEducacionFinal?.trim() || null),
+      especialidad_tecnica: Array.isArray(especialidadFinal) ? JSON.stringify(normalizeArray(especialidadFinal)) : (especialidadFinal?.trim() || null),
       tipo_empleo_actual: tipoEmpleoFinal,
       rango_salarial: rango_salarial?.trim() || null,
       disponibilidad_cambio: disponibilidad_cambio?.trim() || null,
-      tecnologias_principales: Array.isArray(tecnologias_principales) ? tecnologias_principales : null,
-      area_interes: areaInteresFinal,
+      tecnologias_principales: Array.isArray(tecnologias_principales) ? normalizeArray(tecnologias_principales) : null,
+      area_interes: normalizeText(areaInteresFinal),
       satisfaccion_laboral: satisfaccion_laboral !== undefined && satisfaccion_laboral !== '' ? parseInt(satisfaccion_laboral) : null,
-      opciones_personalizadas_educacion: Array.isArray(opciones_personalizadas_educacion) ? JSON.stringify(opciones_personalizadas_educacion) : null,
-      opciones_personalizadas_tecnologias: Array.isArray(opciones_personalizadas_tecnologias) ? JSON.stringify(opciones_personalizadas_tecnologias) : null,
-      opciones_personalizadas_area_interes: Array.isArray(opciones_personalizadas_area_interes) ? JSON.stringify(opciones_personalizadas_area_interes) : null,
-      opciones_personalizadas_industria: Array.isArray(opciones_personalizadas_industria) ? JSON.stringify(opciones_personalizadas_industria) : null
+      opciones_personalizadas_educacion: Array.isArray(opciones_personalizadas_educacion) ? JSON.stringify(normalizeArray(opciones_personalizadas_educacion)) : null,
+      opciones_personalizadas_tecnologias: Array.isArray(opciones_personalizadas_tecnologias) ? JSON.stringify(normalizeArray(opciones_personalizadas_tecnologias)) : null,
+      opciones_personalizadas_area_interes: Array.isArray(opciones_personalizadas_area_interes) ? JSON.stringify(normalizeArray(opciones_personalizadas_area_interes)) : null,
+      opciones_personalizadas_industria: Array.isArray(opciones_personalizadas_industria) ? JSON.stringify(normalizeArray(opciones_personalizadas_industria)) : null
     };
 
     // Verificar si todos los campos obligatorios están completos
@@ -538,26 +550,26 @@ const actualizarUsuario = async (req, res) => {
     // Verificar si el nombre cambió para marcar como editado manualmente
     const nombreCambio = user.nombre !== nombre.trim();
     
-    // Actualizar datos del usuario
+    // Actualizar datos del usuario con normalización
     const datosActualizados = {
       nombre: nombre.trim(),
       posicion_actual: posicion_actual?.trim() || null,
-      empresa_actual: empresa_actual?.trim() || null,
+      empresa_actual: normalizeText(empresa_actual),
       ubicacion: ubicacion?.trim() || null,
-      industria: industria?.trim() || null,
+      industria: normalizeText(industria),
       años_experiencia: años_experiencia || null,
-      nivel_educacion: Array.isArray(nivel_educacion) ? JSON.stringify(nivel_educacion) : null,
-      especialidad_tecnica: Array.isArray(especialidad_tecnica) ? JSON.stringify(especialidad_tecnica) : null,
+      nivel_educacion: Array.isArray(nivel_educacion) ? JSON.stringify(normalizeArray(nivel_educacion)) : null,
+      especialidad_tecnica: Array.isArray(especialidad_tecnica) ? JSON.stringify(normalizeArray(especialidad_tecnica)) : null,
       tipo_empleo_actual: tipo_empleo_actual?.trim() || null,
       rango_salarial: rango_salarial?.trim() || null,
       disponibilidad_cambio: disponibilidad_cambio?.trim() || null,
-      tecnologias_principales: Array.isArray(tecnologias_principales) ? JSON.stringify(tecnologias_principales) : null,
-      area_interes: area_interes?.trim() || null,
+      tecnologias_principales: Array.isArray(tecnologias_principales) ? JSON.stringify(normalizeArray(tecnologias_principales)) : null,
+      area_interes: normalizeText(area_interes),
       satisfaccion_laboral: satisfaccion_laboral || null,
-      opciones_personalizadas_educacion: Array.isArray(opciones_personalizadas_educacion) ? JSON.stringify(opciones_personalizadas_educacion) : null,
-      opciones_personalizadas_tecnologias: Array.isArray(opciones_personalizadas_tecnologias) ? JSON.stringify(opciones_personalizadas_tecnologias) : null,
-      opciones_personalizadas_area_interes: Array.isArray(opciones_personalizadas_area_interes) ? JSON.stringify(opciones_personalizadas_area_interes) : null,
-      opciones_personalizadas_industria: Array.isArray(opciones_personalizadas_industria) ? JSON.stringify(opciones_personalizadas_industria) : null
+      opciones_personalizadas_educacion: Array.isArray(opciones_personalizadas_educacion) ? JSON.stringify(normalizeArray(opciones_personalizadas_educacion)) : null,
+      opciones_personalizadas_tecnologias: Array.isArray(opciones_personalizadas_tecnologias) ? JSON.stringify(normalizeArray(opciones_personalizadas_tecnologias)) : null,
+      opciones_personalizadas_area_interes: Array.isArray(opciones_personalizadas_area_interes) ? JSON.stringify(normalizeArray(opciones_personalizadas_area_interes)) : null,
+      opciones_personalizadas_industria: Array.isArray(opciones_personalizadas_industria) ? JSON.stringify(normalizeArray(opciones_personalizadas_industria)) : null
     };
 
     // Marcar nombre como editado manualmente si cambió
@@ -643,7 +655,7 @@ const obtenerEstadisticas = async (req, res) => {
           [Op.and]: [
             { [Op.not]: null },
             { [Op.ne]: '' },
-            { [Op.ne]: 'No especificada' }
+            { [Op.ne]: 'no especificada' }
           ]
         }
       },
@@ -665,7 +677,7 @@ const obtenerEstadisticas = async (req, res) => {
           [Op.and]: [
             { [Op.not]: null },
             { [Op.ne]: '' },
-            { [Op.ne]: 'No especificada' }
+            { [Op.ne]: 'no especificada' }
           ]
         }
       },
@@ -772,10 +784,10 @@ const obtenerUsuariosEliminados = async (req, res) => {
       nombre: user.nombre || 'Sin nombre',
       correo: user.correo || 'Sin correo',
       perfil_imagen_url: user.perfil_imagen_url,
-      posicion_actual: user.posicion_actual || 'No especificada',
-      empresa_actual: user.empresa_actual || 'No especificada',
-      ubicacion: user.ubicacion || 'No especificada',
-      industria: user.industria || 'No especificada',
+      posicion_actual: user.posicion_actual || 'no especificada',
+      empresa_actual: user.empresa_actual || 'no especificada',
+      ubicacion: user.ubicacion || 'no especificada',
+      industria: user.industria || 'no especificada',
       fecha_eliminacion: user.fecha_eliminacion || user.updated_at,
       fecha_registro: user.created_at
     }));

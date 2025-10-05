@@ -24,7 +24,7 @@ const obtenerEstadisticasMercado = async (req, res) => {
       col: 'empresa_actual',
       where: {
         activo: true,
-        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
+        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'no especificada' }
       }
     });
 
@@ -34,7 +34,7 @@ const obtenerEstadisticasMercado = async (req, res) => {
       col: 'industria',
       where: {
         activo: true,
-        industria: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
+        industria: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'no especificada' }
       }
     });
 
@@ -251,8 +251,8 @@ const obtenerMetricasAvanzadas = async (req, res) => {
         cantidad,
         porcentaje: Math.round((cantidad / totalUsuarios) * 100)
       }))
-      .sort((a, b) => b.cantidad - a.cantidad)
-      .slice(0, 10);
+      .sort((a, b) => b.cantidad - a.cantidad);
+      // Sin límite: mostrar todas las tecnologías populares
 
     // 4. Estadísticas salariales
     const estadisticasSalariales = ['$0 - $500.000', '$500.001 - $1.000.000', '$1.000.001 - $2.000.000', '$2.000.001 - $3.000.000', '$3.000.001+', 'Prefiero no decir'].map(rango => {
@@ -316,49 +316,90 @@ const obtenerMetricasAvanzadas = async (req, res) => {
 // Obtener tecnologías más demandadas (simulado)
 const obtenerTecnologiasMasDemandadas = async (req, res) => {
   try {
-    // Contar especialidades técnicas más populares
-    const tecnologias = await User.findAll({
+    console.log('=== TECNOLOGIAS MAS DEMANDADAS ===');
+    
+    // Obtener usuarios con tecnologías (tanto especialidad_tecnica como tecnologias_principales)
+    const usuarios = await User.findAll({
       where: {
         activo: true,
-        especialidad_tecnica: { [Op.not]: null, [Op.ne]: '' }
+        [Op.or]: [
+          { especialidad_tecnica: { [Op.not]: null, [Op.ne]: '' } },
+          { tecnologias_principales: { [Op.not]: null, [Op.ne]: '' } }
+        ]
       },
-      attributes: ['especialidad_tecnica']
+      attributes: ['id', 'nombre', 'especialidad_tecnica', 'tecnologias_principales']
     });
+
+    console.log(`USUARIOS CON TECNOLOGIAS: ${usuarios.length}`);
 
     const tecnologiaCount = {};
 
-    tecnologias.forEach(user => {
-      let techs = user.especialidad_tecnica;
+    usuarios.forEach(user => {
+      console.log(`USUARIO: ${user.nombre}`);
+      
+      // Procesar especialidad_tecnica
+      if (user.especialidad_tecnica) {
+        let techs = user.especialidad_tecnica;
+        console.log(`  especialidad_tecnica:`, techs);
 
-      // Si es string, intentar parsearlo como JSON
-      if (typeof techs === 'string') {
-        try {
-          techs = JSON.parse(techs);
-        } catch (e) {
-          // Si no es JSON válido, tratarlo como una sola tecnología
-          techs = [techs];
+        // Si es string, intentar parsearlo como JSON
+        if (typeof techs === 'string') {
+          try {
+            techs = JSON.parse(techs);
+          } catch (e) {
+            // Si no es JSON válido, tratarlo como una sola tecnología
+            techs = [techs];
+          }
+        }
+
+        // Procesar array de tecnologías
+        if (Array.isArray(techs)) {
+          techs.forEach(tech => {
+            if (tech && tech.trim() && tech.trim() !== 'null') {
+              const techName = tech.trim();
+              console.log(`    AGREGANDO: "${techName}"`);
+              tecnologiaCount[techName] = (tecnologiaCount[techName] || 0) + 1;
+            }
+          });
         }
       }
 
-      // Si es array, procesar cada tecnología
-      if (Array.isArray(techs)) {
-        techs.forEach(tech => {
-          if (tech && tech.trim()) {
-            const techName = tech.trim();
-            tecnologiaCount[techName] = (tecnologiaCount[techName] || 0) + 1;
+      // Procesar tecnologias_principales
+      if (user.tecnologias_principales) {
+        let techsPrincipales = user.tecnologias_principales;
+        console.log(`  tecnologias_principales:`, techsPrincipales);
+
+        // Si es string, intentar parsearlo como JSON
+        if (typeof techsPrincipales === 'string') {
+          try {
+            techsPrincipales = JSON.parse(techsPrincipales);
+          } catch (e) {
+            // Si no es JSON válido, tratarlo como una sola tecnología
+            techsPrincipales = [techsPrincipales];
           }
-        });
-      } else if (techs && techs.trim()) {
-        // Si no es array, es una sola tecnología
-        const techName = techs.trim();
-        tecnologiaCount[techName] = (tecnologiaCount[techName] || 0) + 1;
+        }
+
+        // Procesar array de tecnologías principales
+        if (Array.isArray(techsPrincipales)) {
+          techsPrincipales.forEach(tech => {
+            if (tech && tech.trim() && tech.trim() !== 'null') {
+              const techName = tech.trim();
+              console.log(`    AGREGANDO PRINCIPALES: "${techName}"`);
+              tecnologiaCount[techName] = (tecnologiaCount[techName] || 0) + 1;
+            }
+          });
+        }
       }
     });
 
+    console.log('TECNOLOGIAS CONTADAS:', tecnologiaCount);
+
     const tecnologiasDemandadas = Object.entries(tecnologiaCount)
       .map(([nombre, demanda]) => ({ nombre, demanda }))
-      .sort((a, b) => b.demanda - a.demanda)
-      .slice(0, 10);
+      .sort((a, b) => b.demanda - a.demanda);
+      // Sin límite: mostrar todas las tecnologías disponibles
+
+    console.log('RESULTADO FINAL:', tecnologiasDemandadas);
 
     res.json({
       ok: true,
@@ -458,7 +499,7 @@ const obtenerDistribucionSalarial = async (req, res) => {
 
       const distribuciones = {};
       todosLosUsuarios.forEach(user => {
-        const industria = user.industria || 'Sin especificar';
+        const industria = user.industria || 'sin especificar';
         const salarioPromedio = convertirRangoASalario(user.rango_salarial);
 
         console.log(`Usuario: ${user.nombre}, Industria: ${industria}, Rango: ${user.rango_salarial}, Salario: ${salarioPromedio}`);
@@ -715,7 +756,7 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
     const empresas = await User.findAll({
       where: {
         activo: true,
-        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
+        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'no especificada' }
       },
       attributes: ['empresa_actual', 'rango_salarial', 'satisfaccion_laboral']
     });
@@ -764,8 +805,8 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
                       data.totalEmpleados >= 50 ? 'Pyme' : 'Startup'
         };
       })
-      .sort((a, b) => b.totalEmpleados - a.totalEmpleados)
-      .slice(0, 10);
+      .sort((a, b) => b.totalEmpleados - a.totalEmpleados);
+      // Sin límite: mostrar todas las empresas contratantes
 
     res.json({
       ok: true,
@@ -859,7 +900,7 @@ const obtenerSatisfaccionLaboral = async (req, res) => {
       where: {
         activo: true,
         satisfaccion_laboral: { [Op.not]: null, [Op.between]: [1, 5] },
-        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'No especificada' }
+        empresa_actual: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'no especificada' }
       },
       attributes: ['empresa_actual', 'satisfaccion_laboral']
     });
@@ -894,8 +935,8 @@ const obtenerSatisfaccionLaboral = async (req, res) => {
         }
       }))
       .filter(empresa => empresa.totalRespuestas >= 2) // Solo empresas con al menos 2 respuestas
-      .sort((a, b) => b.satisfaccionPromedio - a.satisfaccionPromedio)
-      .slice(0, 15); // Top 15 empresas
+      .sort((a, b) => b.satisfaccionPromedio - a.satisfaccionPromedio);
+      // Sin límite: mostrar todas las empresas con satisfacción laboral
 
     // Calcular estadísticas generales
     const todasLasSatisfacciones = usuarios.map(u => u.satisfaccion_laboral);
