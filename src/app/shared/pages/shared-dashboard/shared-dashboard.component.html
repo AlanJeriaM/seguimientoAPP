@@ -261,7 +261,7 @@
           <div class="technology-list">
             <div *ngFor="let tech of tecnologiasDemandadas; let i = index" class="technology-item">
               <div class="technology-header">
-                <h4 class="technology-name" [style.color]="getTechnologyColor(i)">{{ tech.nombre }}</h4>
+                <h4 class="technology-name">{{ tech.nombre }}</h4>
                 <span class="technology-demand" [style.color]="getTechnologyColor(i)">{{ getSeleccionesText(tech.demanda) }}</span>
               </div>
               <div class="technology-progress">
