@@ -340,18 +340,6 @@
                   <span class="average-label">Promedio:</span>
                   <span class="average-value">{{ dist.salarioPromedio | currency:'CLP':'symbol':'1.0-0' }}</span>
                 </div>
-                <div class="salary-variation" [ngClass]="{
-                  'positive': dist.variacionMensual > 0,
-                  'negative': dist.variacionMensual < 0,
-                  'neutral': dist.variacionMensual === 0
-                }">
-                  <i class="pi" [ngClass]="{
-                    'pi-arrow-up': dist.variacionMensual > 0,
-                    'pi-arrow-down': dist.variacionMensual < 0,
-                    'pi-minus': dist.variacionMensual === 0
-                  }"></i>
-                  <span>{{ dist.variacionMensual }}% este mes</span>
-                </div>
               </div>
             </div>
           </div>
@@ -485,11 +473,11 @@
             <div class="col-12 md:col-6 lg:col-4">
               <div class="metric-item">
                 <div class="metric-icon">
-                  <i class="pi pi-th-large text-purple-500"></i>
+                  <i class="pi pi-chart-line text-purple-500"></i>
                 </div>
                 <div class="metric-content">
-                  <p class="metric-value">{{ distribucionExperienciaProfesionales.resumen.rangosConDatos }}</p>
-                  <small>Rangos con datos</small>
+                  <p class="metric-value">{{ distribucionExperienciaProfesionales.resumen.experienciaMediana }} años</p>
+                  <small>Experiencia mediana</small>
                 </div>
               </div>
             </div>
@@ -544,9 +532,7 @@
             <div class="chart-insights">
               <p class="text-sm text-600">
                 <i class="pi pi-lightbulb mr-2"></i>
-                <strong>Insight:</strong> Este gráfico demuestra que mientras más experiencia profesional se adquiere,
-                mayor es la cantidad de tecnologías que se dominan. Los profesionales senior tienden a especializarse
-                en un stack tecnológico más amplio.
+                <strong>Insight:</strong> Este gráfico está diseñado para mostrar cómo varía la cantidad de tecnologías dominadas según los rangos de años de experiencia profesional.
               </p>
             </div>
           </ng-template>
@@ -668,7 +654,7 @@
                 <i class="pi pi-info-circle mr-2"></i>
                 <strong>Estado del Mercado:</strong> Este gráfico muestra el estado de satisfacción laboral y
                 disponibilidad para cambios de los profesionales. Los datos revelan las tendencias del mercado
-                y qué tan contentos están los trabajadores en sus posiciones actuales.
+                y qué tan satisfechos están los trabajadores en sus posiciones actuales.
               </p>
             </div>
           </ng-template>

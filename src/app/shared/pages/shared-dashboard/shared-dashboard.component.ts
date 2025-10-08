@@ -605,7 +605,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               },
               label: function(context: any) {
                 const emp = topEmpresas[context.dataIndex];
-                
+
                 // Función para formatear números con puntos
                 const formatCurrency = (value: number): string => {
                   return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
@@ -825,13 +825,13 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
   formatSatisfactionStars(rating: number | null): string {
     if (rating === null || rating === undefined) return 'Sin datos';
-    
+
     // Usar caracteres Unicode de estrellas que se vean bien
     const fullStars = '★'.repeat(Math.floor(rating));
     const hasHalfStar = rating % 1 >= 0.5;
     const halfStar = hasHalfStar ? '★' : '';
     const emptyStars = '☆'.repeat(5 - Math.floor(rating) - (hasHalfStar ? 1 : 0));
-    
+
     return `${fullStars}${halfStar}${emptyStars} (${rating}/5)`;
   }
 
@@ -1032,8 +1032,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 const stars = '★'.repeat(Math.floor(empresa.satisfaccionPromedio)) +
                             '☆'.repeat(5 - Math.floor(empresa.satisfaccionPromedio));
                 return [
-                  `Satisfacción: ${empresa.satisfaccionPromedio}/5`,
-                  `Estrellas: ${stars}`,
+                  `Satisfacción: ${stars}`,
                   `Respuestas: ${empresa.totalRespuestas}`
                 ];
               }
@@ -1384,7 +1383,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               label: function(context: any) {
                 const item = datosOrdenados[context.dataIndex];
                 const total = datosOrdenados.reduce((sum, item) => sum + item.cantidad, 0);
-                
+
                 return [
                   `Profesionales: ${item.cantidad}`,
                   `Porcentaje: ${((item.cantidad / total) * 100).toFixed(1)}% del total`,
@@ -1417,7 +1416,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     }
 
     const datos = this.experienciaVsTecnologias.datos;
-    
+
     // Paleta de colores del gráfico "Top Empleadores"
     const coloresEmpleadores = [
       '#ff6b35',  // Naranja vibrante
@@ -1550,12 +1549,12 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 return [
                   `Promedio: ${item.promedioTecnologias} tecnologías`,
                   `Profesionales: ${item.cantidad}`,
-                  `Rango de experiencia: ${item.rangoExperiencia}`
+                  // `Rango de experiencia: ${item.rangoExperiencia}`
                 ];
               },
               afterBody: function(tooltipItems) {
                 const item = datos[tooltipItems[0].dataIndex];
-                return `Muestra que mientras más experiencia, más tecnologías se dominan.`;
+                // return `Muestra la tendencia entre los años de experiencia y la cantidad de tecnologías manejadas.`;
               }
             }
           }
@@ -1583,8 +1582,11 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     }
 
     const datos = this.mapaCalorIndustriaSalarial;
-    const industriasLabels = datos.datos.map(fila => fila.industria);
     const rangosSalariales = datos.rangosSalariales.sort((a, b) => a.orden - b.orden);
+
+    // Filtrar industrias que tienen al menos un profesional
+    const industriasConDatos = datos.datos.filter(fila => fila.totalProfesionales > 0);
+    const industriasLabels = industriasConDatos.map(fila => fila.industria);
 
     // Crear datasets para cada rango salarial
     const datasets = rangosSalariales.map((rango, index) => {
@@ -1599,9 +1601,11 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
       return {
         label: rango.label,
-        data: datos.datos.map(fila => {
+        data: industriasConDatos.map(fila => {
           const celda = fila.datos.find(d => d.rangoSalarial === rango.id);
-          return celda ? celda.cantidad : 0;
+          const cantidad = celda ? celda.cantidad : 0;
+          // Retornar null en lugar de 0 para ocultar la barra
+          return cantidad > 0 ? cantidad : null;
         }),
         backgroundColor: colores[index % colores.length],
         borderColor: '#ffffff',
@@ -1714,27 +1718,35 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             cornerRadius: 8,
             displayColors: true,
             callbacks: {
-              title: function(tooltipItems) {
+              title: function(tooltipItems: any) {
                 return `${tooltipItems[0].label}`;
               },
-              label: function(context) {
+              label: function(context: any) {
                 const industria = context.label;
                 const rangoSalarial = context.dataset.label;
-                // Para gráficos stacked, obtenemos el valor crudo del dataset
-                const cantidad = (context.raw as number) || 0;
+                const cantidad = (context.raw as number);
 
-                const filaIndustria = datos.datos.find(fila => fila.industria === industria);
+                // Solo mostrar si tiene datos (null o 0 no se muestran)
+                if (!cantidad || cantidad === 0) return '';
+
+                const filaIndustria = industriasConDatos.find(fila => fila.industria === industria);
                 const totalIndustria = filaIndustria ? filaIndustria.totalProfesionales : 0;
                 const porcentaje = totalIndustria > 0 ? Math.round((cantidad / totalIndustria) * 100) : 0;
 
                 return [
                   `${rangoSalarial}: ${cantidad} profesionales`,
-                  `${porcentaje}% de ${industria}`,
-                  `Total industria: ${totalIndustria} profesionales`
+                  `${porcentaje}% de ${industria}`
                 ];
               },
-              afterBody: function(tooltipItems) {
-                return 'Muestra en qué industrias se concentran los mejores sueldos';
+              afterBody: function(tooltipItems: any) {
+                const industria = tooltipItems[0].label;
+                const filaIndustria = industriasConDatos.find(fila => fila.industria === industria);
+                const totalIndustria = filaIndustria ? filaIndustria.totalProfesionales : 0;
+
+                return [
+                  '',
+                  `Total industria: ${totalIndustria} profesionales`
+                ];
               }
             }
           }
@@ -1753,7 +1765,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('📊 Datos de disponibilidad recibidos para renderizar:', this.disponibilidadCambioTrabajo.datos);
+    console.log('Datos de disponibilidad recibidos para renderizar:', this.disponibilidadCambioTrabajo.datos);
 
     const canvas = document.getElementById('disponibilidadCambioChart') as HTMLCanvasElement;
     if (!canvas) return;
@@ -1940,7 +1952,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     }
 
     const data = this.metricasAvanzadas.distribucionEducacion;
-    
+
     // Paleta de colores del gráfico "Top Empleadores"
     const coloresEmpleadores = [
       '#ff6b35',  // Naranja vibrante
