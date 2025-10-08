@@ -18,10 +18,6 @@
           </h2>
           <p class="encuesta-descripcion">{{ encuesta.descripcion }}</p>
           <div class="encuesta-meta">
-            <span class="meta-item">
-              <i class="pi pi-clock text-blue-500"></i>
-              Tiempo estimado: {{ encuesta.tiempo_estimado }} minutos
-            </span>
             <span class="meta-item" *ngIf="encuesta.es_anonima">
               <i class="pi pi-eye-slash text-green-500"></i>
               Respuesta anónima
@@ -36,6 +32,7 @@
             severity="secondary"
             [disabled]="formularioDeshabilitado"
             (click)="salir()"
+            styleClass="w-full lg:w-auto"
           ></p-button>
         </div>
       </div>
@@ -204,6 +201,7 @@
             [outlined]="true"
             (click)="anteriorPregunta()"
             [disabled]="preguntaActual === 0 || formularioDeshabilitado"
+            styleClass="w-full lg:w-auto"
           ></p-button>
 
           <div class="navegacion-info">
@@ -216,7 +214,8 @@
             icon="pi pi-chevron-right"
             iconPos="right"
             (click)="siguientePregunta()"
-            [disabled]="formularioDeshabilitado"
+            [disabled]="formularioDeshabilitado || !isPreguntaActualRespondida()"
+            styleClass="w-full lg:w-auto"
           ></p-button>
 
           <p-button 
@@ -226,8 +225,9 @@
             iconPos="right"
             severity="success"
             [loading]="enviando"
-            [disabled]="formularioDeshabilitado"
+            [disabled]="formularioDeshabilitado || progreso < 100 || !isPreguntaActualRespondida()"
             type="submit"
+            styleClass="w-full lg:w-auto"
           ></p-button>
         </div>
       </div>
@@ -243,6 +243,7 @@
       label="Volver a encuestas" 
       icon="pi pi-arrow-left"
       (click)="salir()"
+      styleClass="w-full lg:w-auto"
     ></p-button>
   </div>
 </div>

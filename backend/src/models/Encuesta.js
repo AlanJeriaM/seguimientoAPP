@@ -20,7 +20,7 @@ const Encuesta = sequelize.define('Encuesta', {
     allowNull: true
   },
   estado: {
-    type: DataTypes.ENUM('BORRADOR', 'ACTIVA', 'PAUSADA', 'CERRADA'),
+    type: DataTypes.ENUM('BORRADOR', 'ACTIVA'),
     defaultValue: 'BORRADOR',
     allowNull: false
   },
@@ -32,23 +32,23 @@ const Encuesta = sequelize.define('Encuesta', {
     type: DataTypes.DATE,
     allowNull: true
   },
-  tiempo_estimado: {
-    type: DataTypes.INTEGER, // en minutos
-    allowNull: true,
-    defaultValue: 10
-  },
-  max_respuestas: {
-    type: DataTypes.INTEGER,
-    allowNull: true
-  },
+  // tiempo_estimado: {
+  //   type: DataTypes.INTEGER, // en minutos
+  //   allowNull: true,
+  //   defaultValue: 10
+  // },
+  // max_respuestas: {
+  //   type: DataTypes.INTEGER,
+  //   allowNull: true
+  // },
   es_anonima: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
-  permite_multiple_respuesta: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
-  },
+  // permite_multiple_respuesta: {
+  //   type: DataTypes.BOOLEAN,
+  //   defaultValue: false
+  // },
   admin_creador_id: {
     type: DataTypes.INTEGER,
     allowNull: false,

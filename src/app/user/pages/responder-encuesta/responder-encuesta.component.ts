@@ -218,11 +218,31 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   // Progreso
   actualizarProgreso(): void {
     const respuestasCompletas = this.respuestasArray.controls.filter(control => {
+      const tipo = control.get('tipo')?.value;
       const respuesta = control.get('respuesta')?.value;
-      return respuesta !== null && respuesta !== '' && respuesta !== undefined;
+      
+      // Para OPCION_MULTIPLE, verificar si hay selecciones
+      if (tipo === 'OPCION_MULTIPLE') {
+        const selecciones = control.get('selecciones')?.value || [];
+        return selecciones.some((sel: boolean) => sel === true);
+      }
+      
+      // Para arrays (respuestas múltiples)
+      if (Array.isArray(respuesta)) {
+        return respuesta.length > 0;
+      }
+      
+      // Para otros tipos, verificar que no esté vacío
+      if (typeof respuesta === 'string') {
+        return respuesta.trim() !== '';
+      }
+      
+      // Para números y fechas
+      return respuesta !== null && respuesta !== undefined && respuesta !== '';
     }).length;
 
     this.progreso = Math.round((respuestasCompletas / this.totalPreguntas) * 100);
+    console.log(`Progreso actualizado: ${respuestasCompletas}/${this.totalPreguntas} = ${this.progreso}%`);
   }
 
   // Auto-guardado
@@ -372,5 +392,30 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   getPreguntaActualTexto(): string {
     return `${this.preguntaActual + 1} de ${this.totalPreguntas}`;
+  }
+
+  isPreguntaActualRespondida(): boolean {
+    const controlActual = this.getPreguntaControl(this.preguntaActual);
+    const tipo = controlActual.get('tipo')?.value;
+    const respuesta = controlActual.get('respuesta')?.value;
+    
+    // Para OPCION_MULTIPLE, verificar si hay selecciones
+    if (tipo === 'OPCION_MULTIPLE') {
+      const selecciones = controlActual.get('selecciones')?.value || [];
+      return selecciones.some((sel: boolean) => sel === true);
+    }
+    
+    // Para arrays (respuestas múltiples)
+    if (Array.isArray(respuesta)) {
+      return respuesta.length > 0;
+    }
+    
+    // Para strings, verificar que no esté vacío (con trim)
+    if (typeof respuesta === 'string') {
+      return respuesta.trim() !== '';
+    }
+    
+    // Para números y fechas
+    return respuesta !== null && respuesta !== undefined && respuesta !== '';
   }
 }

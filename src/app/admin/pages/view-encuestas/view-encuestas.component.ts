@@ -34,9 +34,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   estados = [
     { label: 'Todas', value: 'TODOS' },
     { label: 'Borrador', value: 'BORRADOR' },
-    { label: 'Activa', value: 'ACTIVA' },
-    { label: 'Pausada', value: 'PAUSADA' },
-    { label: 'Cerrada', value: 'CERRADA' }
+    { label: 'Activa', value: 'ACTIVA' }
   ];
 
   constructor(
@@ -352,10 +350,6 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
         return 'estado-borrador';
       case 'ACTIVA':
         return 'estado-activa';
-      case 'PAUSADA':
-        return 'estado-pausada';
-      case 'CERRADA':
-        return 'estado-cerrada';
       default:
         return 'estado-borrador';
     }
@@ -377,7 +371,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
       }
       
       // Si la encuesta tiene fecha de inicio en el futuro, mostrar "Próximamente"
-      // Solo si el estado es ACTIVA (no para BORRADOR, PAUSADA, etc.)
+      // Solo si el estado es ACTIVA
       if (encuesta.fecha_inicio && estado === 'ACTIVA') {
         const fechaInicio = new Date(encuesta.fecha_inicio);
         fechaInicio.setHours(0, 0, 0, 0); // Inicio del día de inicio
@@ -393,10 +387,6 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
         return 'Borrador';
       case 'ACTIVA':
         return 'Activa';
-      case 'PAUSADA':
-        return 'Pausada';
-      case 'CERRADA':
-        return 'Cerrada';
       default:
         return estado;
     }

@@ -26,9 +26,7 @@ export class CreateEncuestaComponent implements OnInit {
 
   estados = [
     { label: 'Borrador', value: 'BORRADOR' },
-    { label: 'Activa', value: 'ACTIVA' },
-    { label: 'Pausada', value: 'PAUSADA' },
-    { label: 'Cerrada', value: 'CERRADA' }
+    { label: 'Activa', value: 'ACTIVA' }
   ];
 
   constructor(
@@ -74,10 +72,7 @@ export class CreateEncuestaComponent implements OnInit {
       estado: ['BORRADOR', Validators.required],
       fecha_inicio: [null, [this.fechaInicioValidator()]],
       fecha_fin: [null, [this.fechaFinValidator()]],
-      tiempo_estimado: [10, [Validators.required, Validators.min(1), Validators.max(120)]],
-      max_respuestas: [null],
       es_anonima: [false],
-      permite_multiple_respuesta: [false],
       preguntas: this.fb.array([], [Validators.required, Validators.minLength(1)])
     });
 
@@ -316,10 +311,7 @@ export class CreateEncuestaComponent implements OnInit {
         estado: formValue.estado,
         fecha_inicio: formValue.fecha_inicio || null,
         fecha_fin: formValue.fecha_fin || null,
-        tiempo_estimado: formValue.tiempo_estimado,
-        max_respuestas: formValue.max_respuestas || null,
         es_anonima: formValue.es_anonima,
-        permite_multiple_respuesta: formValue.permite_multiple_respuesta,
         preguntas: formValue.preguntas.map((pregunta: any, index: number) => {
           // Obtener las opciones del FormArray
           const opcionesFormArray = this.questions.at(index).get('opciones') as FormArray;
@@ -410,10 +402,7 @@ export class CreateEncuestaComponent implements OnInit {
             estado: encuesta.estado,
             fecha_inicio: encuesta.fecha_inicio ? new Date(encuesta.fecha_inicio) : null,
             fecha_fin: encuesta.fecha_fin ? new Date(encuesta.fecha_fin) : null,
-            tiempo_estimado: encuesta.tiempo_estimado,
-            max_respuestas: encuesta.max_respuestas,
-            es_anonima: encuesta.es_anonima,
-            permite_multiple_respuesta: encuesta.permite_multiple_respuesta
+            es_anonima: encuesta.es_anonima
           });
 
           // Agregar las preguntas

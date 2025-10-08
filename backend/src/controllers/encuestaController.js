@@ -10,10 +10,7 @@ const crearEncuesta = async (req, res) => {
       estado, 
       fecha_inicio, 
       fecha_fin, 
-      tiempo_estimado,
-      max_respuestas,
       es_anonima,
-      permite_multiple_respuesta,
       preguntas 
     } = req.body;
 
@@ -34,10 +31,7 @@ const crearEncuesta = async (req, res) => {
       estado: estado || 'BORRADOR',
       fecha_inicio: fecha_inicio || null,
       fecha_fin: fecha_fin || null,
-      tiempo_estimado: tiempo_estimado || 10,
-      max_respuestas: max_respuestas || null,
       es_anonima: es_anonima || false,
-      permite_multiple_respuesta: permite_multiple_respuesta || false,
       admin_creador_id: adminId
     });
 
@@ -69,7 +63,7 @@ const crearEncuesta = async (req, res) => {
         encuesta_id: encuesta.id,
         tipo: 'NUEVA_ENCUESTA',
         titulo: 'Nueva Encuesta Disponible',
-        mensaje: `Tienes una nueva encuesta disponible: "${titulo}". Tiempo estimado: ${tiempo_estimado} minutos.`,
+        mensaje: `Tienes una nueva encuesta disponible: "${titulo}".`,
         prioridad: 'MEDIA'
       }));
 
@@ -127,8 +121,7 @@ const obtenerEncuestas = async (req, res) => {
       where: whereClause,
       attributes: [
         'id', 'titulo', 'descripcion', 'estado', 'fecha_inicio', 'fecha_fin',
-        'tiempo_estimado', 'max_respuestas', 'es_anonima', 'permite_multiple_respuesta',
-        'admin_creador_id', 'fecha_creacion', 'fecha_actualizacion'
+        'es_anonima', 'admin_creador_id', 'fecha_creacion', 'fecha_actualizacion'
       ],
       order: [['fecha_creacion', 'DESC']],
       limit: parseInt(limit),
@@ -214,8 +207,7 @@ const obtenerEncuestaPorId = async (req, res) => {
       ],
       attributes: [
         'id', 'titulo', 'descripcion', 'estado', 'fecha_inicio', 'fecha_fin',
-        'tiempo_estimado', 'max_respuestas', 'es_anonima', 'permite_multiple_respuesta',
-        'admin_creador_id', 'fecha_creacion', 'fecha_actualizacion'
+        'es_anonima', 'admin_creador_id', 'fecha_creacion', 'fecha_actualizacion'
       ]
     });
 
@@ -272,10 +264,7 @@ const actualizarEncuesta = async (req, res) => {
       estado, 
       fecha_inicio, 
       fecha_fin, 
-      tiempo_estimado,
-      max_respuestas,
       es_anonima,
-      permite_multiple_respuesta,
       preguntas 
     } = req.body;
 
@@ -319,10 +308,7 @@ const actualizarEncuesta = async (req, res) => {
       estado: estado || encuesta.estado,
       fecha_inicio: fecha_inicio || encuesta.fecha_inicio,
       fecha_fin: fecha_fin || encuesta.fecha_fin,
-      tiempo_estimado: tiempo_estimado || encuesta.tiempo_estimado,
-      max_respuestas: max_respuestas || encuesta.max_respuestas,
-      es_anonima: es_anonima !== undefined ? es_anonima : encuesta.es_anonima,
-      permite_multiple_respuesta: permite_multiple_respuesta !== undefined ? permite_multiple_respuesta : encuesta.permite_multiple_respuesta
+      es_anonima: es_anonima !== undefined ? es_anonima : encuesta.es_anonima
     });
 
     // Si se proporcionan nuevas preguntas, actualizarlas
@@ -360,7 +346,7 @@ const actualizarEncuesta = async (req, res) => {
         encuesta_id: id,
         tipo: 'NUEVA_ENCUESTA',
         titulo: 'Nueva Encuesta Disponible',
-        mensaje: `Tienes una nueva encuesta disponible: "${titulo || encuesta.titulo}". Tiempo estimado: ${tiempo_estimado || encuesta.tiempo_estimado} minutos.`,
+        mensaje: `Tienes una nueva encuesta disponible: "${titulo || encuesta.titulo}".`,
         prioridad: 'MEDIA'
       }));
 

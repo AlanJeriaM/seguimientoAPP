@@ -94,7 +94,6 @@
                     <th>Creado por</th>
                     <th>Preguntas</th>
                     <th>Respuestas</th>
-                    <th>Tiempo Est.</th>
                     <th>Fecha Creación</th>
                     <th style="width: 150px">Acciones</th>
                   </tr>
@@ -143,13 +142,6 @@
                       <div class="text-center">
                         <i class="pi pi-users text-green-500 mr-2"></i>
                         {{ encuesta.total_respuestas || 0 }}
-                      </div>
-                    </td>
-                    <td>
-                      <span class="p-column-title">Tiempo Est.</span>
-                      <div class="text-center">
-                        <i class="pi pi-clock text-orange-500 mr-2"></i>
-                        {{ encuesta.tiempo_estimado }} min
                       </div>
                     </td>
                     <td>
@@ -391,98 +383,75 @@
     </div>
   </div>
 
-  <!-- Estadísticas -->
-  <div class="mb-6">
-    <div class="surface-50 p-4 border-round-lg">
-      <div class="flex align-items-center gap-3 mb-4">
-        <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center"
-             style="width: 2.5rem; height: 2.5rem;">
-          <i class="pi pi-chart-bar text-base"></i>
-        </div>
-        <div class="flex-1">
-          <h3 class="text-xl font-semibold text-900 mb-1">Estadísticas</h3>
-          <p class="text-600 mb-0 text-sm">Métricas de participación y rendimiento</p>
-        </div>
-      </div>
-
-      <div class="grid">
-        <!-- Total Preguntas -->
-        <div class="col-12 md:col-4">
-          <div class="field">
-            <label class="block text-900 font-semibold mb-2">Total Preguntas</label>
-            <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
-              <i class="pi pi-question-circle text-blue-500 mr-2"></i>
-              {{ selectedEncuesta.total_preguntas || 0 }}
-            </div>
+    <!-- Estadísticas -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center"
+               style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-chart-bar text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Estadísticas</h3>
+            <p class="text-600 mb-0 text-sm">Métricas de participación y rendimiento</p>
           </div>
         </div>
 
-        <!-- Total Respuestas -->
-        <div class="col-12 md:col-4">
-          <div class="field">
-            <label class="block text-900 font-semibold mb-2">Total Respuestas</label>
-            <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
-              <i class="pi pi-users text-green-500 mr-2"></i>
-              {{ selectedEncuesta.total_respuestas || 0 }}
+        <div class="grid">
+          <!-- Total Preguntas -->
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Total Preguntas</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                <i class="pi pi-question-circle text-blue-500 mr-2"></i>
+                {{ selectedEncuesta.total_preguntas || 0 }}
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Tiempo Estimado -->
-        <div class="col-12 md:col-4">
-          <div class="field">
-            <label class="block text-900 font-semibold mb-2">Tiempo Estimado</label>
-            <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
-              <i class="pi pi-clock text-orange-500 mr-2"></i>
-              {{ selectedEncuesta.tiempo_estimado }} minutos
+          <!-- Total Respuestas -->
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Total Respuestas</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                <i class="pi pi-users text-green-500 mr-2"></i>
+                {{ selectedEncuesta.total_respuestas || 0 }}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Configuración -->
-  <div class="mb-6">
-    <div class="surface-50 p-4 border-round-lg">
-      <div class="flex align-items-center gap-3 mb-4">
-        <div class="bg-purple-500 text-white border-circle flex align-items-center justify-content-center"
-             style="width: 2.5rem; height: 2.5rem;">
-          <i class="pi pi-cog text-base"></i>
-        </div>
-        <div class="flex-1">
-          <h3 class="text-xl font-semibold text-900 mb-1">Configuración</h3>
-          <p class="text-600 mb-0 text-sm">Opciones y permisos de la encuesta</p>
-        </div>
-      </div>
-
-      <div class="grid">
-        <!-- Encuesta Anónima -->
-        <div class="col-12 md:col-6">
-          <div class="field">
-            <div class="p-3 surface-100 border-round">
-              <p-checkbox [binary]="true"
-                          [ngModel]="selectedEncuesta.es_anonima"
-                          [disabled]="true"
-                          label="Encuesta Anónima"></p-checkbox>
-            </div>
+    <!-- Configuración -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-purple-500 text-white border-circle flex align-items-center justify-content-center"
+               style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-cog text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Configuración</h3>
+            <p class="text-600 mb-0 text-sm">Opciones y permisos de la encuesta</p>
           </div>
         </div>
 
-        <!-- Permite Múltiples Respuestas -->
-        <div class="col-12 md:col-6">
-          <div class="field">
-            <div class="p-3 surface-100 border-round">
-              <p-checkbox [binary]="true"
-                          [ngModel]="selectedEncuesta.permite_multiple_respuesta"
-                          [disabled]="true"
-                          label="Permite Múltiples Respuestas"></p-checkbox>
+        <div class="grid">
+          <!-- Encuesta Anónima -->
+          <div class="col-12">
+            <div class="field">
+              <div class="p-3 surface-100 border-round">
+                <p-checkbox [binary]="true"
+                            [ngModel]="selectedEncuesta.es_anonima"
+                            [disabled]="true"
+                            label="Encuesta Anónima"></p-checkbox>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
   <!-- Fechas Importantes -->
   <div class="mb-6">
