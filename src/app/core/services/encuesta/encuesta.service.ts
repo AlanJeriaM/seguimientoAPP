@@ -17,13 +17,10 @@ export interface Encuesta {
   id?: number;
   titulo: string;
   descripcion?: string;
-  estado: 'BORRADOR' | 'ACTIVA' | 'PAUSADA' | 'CERRADA';
+  estado: 'BORRADOR' | 'ACTIVA';
   fecha_inicio?: Date;
   fecha_fin?: Date;
-  tiempo_estimado: number;
-  max_respuestas?: number;
   es_anonima: boolean;
-  permite_multiple_respuesta: boolean;
   admin_creador_id?: number;
   preguntas?: Pregunta[];
   fecha_creacion?: Date;

@@ -7,9 +7,7 @@ export interface EncuestaDisponible {
   id: number;
   titulo: string;
   descripcion: string;
-  tiempo_estimado: number;
   es_anonima: boolean;
-  permite_multiple_respuesta: boolean;
   fecha_inicio: Date;
   fecha_fin: Date;
   ya_respondida: boolean;
@@ -31,9 +29,7 @@ export interface EncuestaParaResponder {
   id: number;
   titulo: string;
   descripcion: string;
-  tiempo_estimado: number;
   es_anonima: boolean;
-  permite_multiple_respuesta: boolean;
   preguntas: PreguntaParaResponder[];
 }
 

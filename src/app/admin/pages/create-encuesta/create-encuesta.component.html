@@ -64,45 +64,7 @@
 
         <!-- Configuración de la encuesta -->
         <div class="formgrid grid mb-4">
-          <div class="field col-12 sm:col-6 lg:col-3">
-            <label for="tiempo_estimado" class="block text-900 font-semibold mb-2 required-field">
-              Tiempo Estimado (minutos)
-            </label>
-            <p-inputNumber
-              id="tiempo_estimado"
-              formControlName="tiempo_estimado"
-              [min]="1"
-              [max]="120"
-              placeholder="10"
-              class="w-full"
-              [showButtons]="true"
-              buttonLayout="horizontal"
-              [step]="5"
-            ></p-inputNumber>
-            <small
-              *ngIf="isValidField(encuestaForm, 'tiempo_estimado')"
-              class="p-error block mt-1">
-              {{ getFieldError(encuestaForm, 'tiempo_estimado') }}
-            </small>
-          </div>
-
-          <div class="field col-12 sm:col-6 lg:col-3">
-            <label for="max_respuestas" class="block text-900 font-semibold mb-2">
-              Máximo de Respuestas
-            </label>
-            <p-inputNumber
-              id="max_respuestas"
-              formControlName="max_respuestas"
-              [min]="1"
-              placeholder="Ilimitado"
-              class="w-full"
-              [showButtons]="true"
-              buttonLayout="horizontal"
-              [step]="10"
-            ></p-inputNumber>
-          </div>
-
-          <div class="field col-12 sm:col-6 lg:col-3">
+          <div class="field col-12">
             <div class="flex align-items-center h-full">
               <p-checkbox
                 inputId="es_anonima"
@@ -112,20 +74,6 @@
               ></p-checkbox>
               <label for="es_anonima" class="text-900 font-medium">
                 Encuesta Anónima
-              </label>
-            </div>
-          </div>
-
-          <div class="field col-12 sm:col-6 lg:col-3">
-            <div class="flex align-items-center h-full">
-              <p-checkbox
-                inputId="permite_multiple_respuesta"
-                formControlName="permite_multiple_respuesta"
-                [binary]="true"
-                class="mr-2"
-              ></p-checkbox>
-              <label for="permite_multiple_respuesta" class="text-900 font-medium">
-                Múltiples Respuestas
               </label>
             </div>
           </div>

@@ -83,10 +83,6 @@
           
           <div class="encuesta-meta">
             <div class="meta-item">
-              <i class="pi pi-clock text-blue-500"></i>
-              <span>{{ encuesta.tiempo_estimado }} minutos</span>
-            </div>
-            <div class="meta-item">
               <i class="pi pi-calendar" [ngClass]="isEncuestaExpirada(encuesta) ? 'text-red-500' : 'text-green-500'"></i>
               <span [ngClass]="isEncuestaExpirada(encuesta) ? 'text-red-500' : ''">
                 Hasta: {{ encuesta.fecha_fin | date:'dd/MM/yyyy' }}
