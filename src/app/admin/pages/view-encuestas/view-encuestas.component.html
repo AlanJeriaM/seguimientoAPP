@@ -1,77 +1,74 @@
 <div class="grid">
   <div class="col-12">
     <p-tabView (activeIndexChange)="onTabChange($event)" [activeIndex]="activeTabIndex">
-      
+
       <!-- Tab de Encuestas Activas -->
       <p-tabPanel header="Encuestas Activas" leftIcon="pi pi-list">
         <div class="grid">
           <div class="col-12">
-            <p-card class="text-center" header="Gestión de Encuestas">
-              
-              <!-- Barra de herramientas -->
-              <ng-template pTemplate="caption">
-                <div class="grid">
-                  <!-- Sección de búsqueda -->
-                  <div class="col-12 lg:col-6 mb-2">
-                    <div class="flex align-items-center gap-2">
-                      <span class="p-input-icon-left flex-1 lg:flex-none" style="min-width: 200px;">
-                        <i class="pi pi-search"></i>
-                        <input
-                          pInputText
-                          type="text"
-                          [(ngModel)]="searchText"
-                          (keyup.enter)="buscarEncuestas()"
-                          placeholder="Buscar encuestas..."
-                          class="w-full lg:w-auto"
-                        />
-                      </span>
-                      <p-button
-                        styleClass="p-button-text p-button-sm flex-shrink-0"
-                        icon="pi pi-filter-slash"
-                        (click)="limpiarFiltros()"
-                        pTooltip="Limpiar filtros"
-                        [ngStyle]="{'width': 'auto', 'min-width': '2.5rem'}"
-                      ></p-button>
-                    </div>
-                  </div>
-
-                  <!-- Filtro de estado -->
-                  <div class="col-12 lg:col-3 mb-2">
-                    <p-dropdown
-                      [(ngModel)]="estadoFiltro"
-                      [options]="estados"
-                      optionLabel="label"
-                      optionValue="value"
-                      placeholder="Filtrar por estado"
-                      class="w-full"
-                      (onChange)="buscarEncuestas()"
-                    ></p-dropdown>
-                  </div>
-
-                  <!-- Botones de acción -->
-                  <div class="col-12 lg:col-3 mb-2">
-                    <div class="flex flex-column lg:flex-row justify-content-start lg:justify-content-end gap-2">
-                      <p-button
-                        pRipple
-                        label="Nueva Encuesta"
-                        icon="pi pi-plus"
-                        styleClass="p-button-sm p-button-success w-full lg:w-auto"
-                        (click)="nuevaEncuesta()"
-                        pTooltip="Crear nueva encuesta"
-                      ></p-button>
-                      <p-button
-                        pRipple
-                        label="Actualizar"
-                        icon="pi pi-refresh"
-                        styleClass="p-button-sm p-button-info w-full lg:w-auto"
-                        (click)="actualizarDatos()"
-                        [loading]="loading"
-                      ></p-button>
-                    </div>
-                  </div>
+            <!-- Barra de herramientas ARRIBA -->
+            <div class="grid mb-3">
+              <!-- Sección de búsqueda -->
+              <div class="col-12 lg:col-6 mb-2">
+                <div class="flex align-items-center gap-2">
+                  <span class="p-input-icon-left flex-1 lg:flex-none" style="min-width: 200px;">
+                    <i class="pi pi-search"></i>
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="searchText"
+                      (keyup.enter)="buscarEncuestas()"
+                      placeholder="Buscar encuestas..."
+                      class="w-full lg:w-auto"
+                    />
+                  </span>
+                  <p-button
+                    styleClass="p-button-text p-button-sm flex-shrink-0"
+                    icon="pi pi-filter-slash"
+                    (click)="limpiarFiltros()"
+                    pTooltip="Limpiar filtros"
+                    [ngStyle]="{'width': 'auto', 'min-width': '2.5rem'}"
+                  ></p-button>
                 </div>
-              </ng-template>
+              </div>
 
+              <!-- Filtro de estado -->
+              <div class="col-12 lg:col-3 mb-2">
+                <p-dropdown
+                  [(ngModel)]="estadoFiltro"
+                  [options]="estados"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Filtrar por estado"
+                  class="w-full"
+                  (onChange)="buscarEncuestas()"
+                ></p-dropdown>
+              </div>
+
+              <!-- Botones de acción -->
+              <div class="col-12 lg:col-3 mb-2">
+                <div class="flex flex-column lg:flex-row justify-content-start lg:justify-content-end gap-2">
+                  <p-button
+                    pRipple
+                    label="Encuesta"
+                    icon="pi pi-plus"
+                    styleClass="p-button-sm p-button-success w-full lg:w-auto"
+                    (click)="nuevaEncuesta()"
+                    pTooltip="Crear nueva encuesta"
+                  ></p-button>
+                  <p-button
+                    pRipple
+                    label="Actualizar"
+                    icon="pi pi-refresh"
+                    styleClass="p-button-sm p-button-info w-full lg:w-auto"
+                    (click)="actualizarDatos()"
+                    [loading]="loading"
+                  ></p-button>
+                </div>
+              </div>
+            </div>
+
+            <p-card class="text-center" header="Gestión de Encuestas">
               <!-- Tabla de encuestas -->
               <p-table
                 [value]="encuestas"
@@ -119,7 +116,7 @@
                     </td>
                     <td>
                       <span class="p-column-title">Estado</span>
-                      <span 
+                      <span
                         [class]="getEstadoBadgeClass(encuesta.estado, encuesta)"
                         class="estado-badge"
                       >
@@ -214,22 +211,19 @@
       <p-tabPanel header="Encuestas Eliminadas" leftIcon="pi pi-trash">
         <div class="grid">
           <div class="col-12">
-            <p-card class="text-center" header="Encuestas Eliminadas">
-              
-              <!-- Barra de herramientas para eliminadas -->
-              <ng-template pTemplate="caption">
-                <div class="flex justify-content-end">
-                  <p-button
-                    pRipple
-                    label="Actualizar"
-                    icon="pi pi-refresh"
-                    styleClass="p-button-sm p-button-info"
-                    (click)="actualizarDatos()"
-                    [loading]="loadingEliminadas"
-                  ></p-button>
-                </div>
-              </ng-template>
+            <!-- Barra de herramientas para eliminadas ARRIBA -->
+            <div class="flex justify-content-end mb-3">
+              <p-button
+                pRipple
+                label="Actualizar"
+                icon="pi pi-refresh"
+                styleClass="p-button-sm p-button-info"
+                (click)="actualizarDatos()"
+                [loading]="loadingEliminadas"
+              ></p-button>
+            </div>
 
+            <p-card class="text-center" header="Encuestas Eliminadas">
               <!-- Tabla de encuestas eliminadas -->
               <p-table
                 [value]="encuestasEliminadas"
@@ -274,7 +268,7 @@
                     </td>
                     <td>
                       <span class="p-column-title">Estado</span>
-                      <span 
+                      <span
                         [class]="getEstadoBadgeClass(encuesta.estado, encuesta)"
                         class="estado-badge"
                       >
@@ -333,127 +327,240 @@
 <!-- Dialog para ver detalles de la encuesta -->
 <p-dialog
   [(visible)]="displayDialog"
-  [header]="selectedEncuesta?.titulo"
+  header="Ver Encuesta"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '800px'}"
-  [contentStyle]="{'padding': '1rem', 'overflow-y': 'auto', 'max-height': '80vh'}"
+  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
   [closable]="true"
   [closeOnEscape]="true"
   [responsive]="true"
-  [breakpoints]="{'960px': '90vw', '640px': '95vw'}"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
   [dismissableMask]="true"
+  (onHide)="cerrarDialog()"
 >
-  <div *ngIf="selectedEncuesta" class="grid">
-    <div class="col-12">
-      <h3 class="text-xl font-semibold text-900 mb-3">Detalles de la Encuesta</h3>
-      
+<div *ngIf="selectedEncuesta" class="p-4">
+  <!-- Información Básica -->
+  <div class="mb-6">
+    <div class="surface-50 p-4 border-round-lg">
+      <div class="flex align-items-center gap-3 mb-4">
+        <div class="bg-blue-500 text-white border-circle flex align-items-center justify-content-center"
+             style="width: 2.5rem; height: 2.5rem;">
+          <i class="pi pi-clipboard text-base"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-xl font-semibold text-900 mb-1">Información Básica</h3>
+          <p class="text-600 mb-0 text-sm">Detalles generales de la encuesta</p>
+        </div>
+      </div>
+
       <div class="grid">
-        <div class="col-12 sm:col-6">
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Título:</label>
-            <p class="text-900">{{ selectedEncuesta.titulo }}</p>
-          </div>
-          
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Descripción:</label>
-            <p class="text-900">{{ selectedEncuesta.descripcion || 'Sin descripción' }}</p>
-          </div>
-          
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Estado:</label>
-            <span 
-              [class]="getEstadoBadgeClass(selectedEncuesta.estado, selectedEncuesta)"
-              class="estado-badge"
-            >
-              {{ getEstadoLabel(selectedEncuesta.estado, selectedEncuesta) }}
-            </span>
+        <div class="col-12">
+          <div class="field">
+            <label class="block text-900 font-semibold mb-2">Título</label>
+            <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              {{ selectedEncuesta.titulo || 'Sin título' }}
+            </div>
           </div>
         </div>
-        
-        <div class="col-12 sm:col-6">
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Tiempo Estimado:</label>
-            <p class="text-900">{{ selectedEncuesta.tiempo_estimado }} minutos</p>
-          </div>
-          
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Total Preguntas:</label>
-            <p class="text-900">{{ selectedEncuesta.total_preguntas || 0 }}</p>
-          </div>
-          
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Total Respuestas:</label>
-            <p class="text-900">{{ selectedEncuesta.total_respuestas || 0 }}</p>
+
+        <div class="col-12">
+          <div class="field">
+            <label class="block text-900 font-semibold mb-2">Descripción</label>
+            <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              {{ selectedEncuesta.descripcion || 'Sin descripción' }}
+            </div>
           </div>
         </div>
-      </div>
-      
-      <div class="mb-3">
-        <label class="block text-900 font-medium mb-1">Configuración:</label>
-        <div class="grid">
-          <div class="col-12 sm:col-6">
-            <p-checkbox
-              [binary]="true"
-              [ngModel]="selectedEncuesta.es_anonima"
-              [disabled]="true"
-              label="Encuesta Anónima"
-            ></p-checkbox>
-          </div>
-          <div class="col-12 sm:col-6">
-            <p-checkbox
-              [binary]="true"
-              [ngModel]="selectedEncuesta.permite_multiple_respuesta"
-              [disabled]="true"
-              label="Permite Múltiples Respuestas"
-            ></p-checkbox>
-          </div>
-        </div>
-      </div>
-      
-      <div class="mb-3">
-        <label class="block text-900 font-medium mb-1">Fechas:</label>
-        <div class="grid">
-          <div class="col-12 sm:col-6">
-            <label class="block text-500 text-sm mb-1">Fecha de Creación:</label>
-            <p class="text-900">{{ selectedEncuesta.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</p>
-          </div>
-          <div class="col-12 sm:col-6">
-            <label class="block text-500 text-sm mb-1">Última Actualización:</label>
-            <p class="text-900">{{ selectedEncuesta.fecha_actualizacion | date:'dd/MM/yyyy HH:mm' }}</p>
-          </div>
-          <div class="col-12 sm:col-6" *ngIf="selectedEncuesta.fecha_inicio">
-            <label class="block text-500 text-sm mb-1">Fecha de Inicio:</label>
-            <p class="text-900">{{ selectedEncuesta.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</p>
-          </div>
-          <div class="col-12 sm:col-6" *ngIf="selectedEncuesta.fecha_fin">
-            <label class="block text-500 text-sm mb-1">Fecha de Fin:</label>
-            <p class="text-900" [ngClass]="isEncuestaExpirada(selectedEncuesta) ? 'text-red-500' : ''">
-              {{ selectedEncuesta.fecha_fin | date:'dd/MM/yyyy HH:mm' }}
-              <span *ngIf="isEncuestaExpirada(selectedEncuesta)" class="text-red-500 font-semibold"> (Expirada)</span>
-            </p>
+
+        <div class="col-12">
+          <div class="field">
+            <label class="block text-900 font-semibold mb-2">Estado</label>
+            <div class="p-3 surface-100 border-round">
+              <span [class]="getEstadoBadgeClass(selectedEncuesta.estado, selectedEncuesta)"
+                    class="estado-badge">
+                {{ getEstadoLabel(selectedEncuesta.estado, selectedEncuesta) }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Estadísticas -->
+  <div class="mb-6">
+    <div class="surface-50 p-4 border-round-lg">
+      <div class="flex align-items-center gap-3 mb-4">
+        <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center"
+             style="width: 2.5rem; height: 2.5rem;">
+          <i class="pi pi-chart-bar text-base"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-xl font-semibold text-900 mb-1">Estadísticas</h3>
+          <p class="text-600 mb-0 text-sm">Métricas de participación y rendimiento</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Total Preguntas -->
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label class="block text-900 font-semibold mb-2">Total Preguntas</label>
+            <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <i class="pi pi-question-circle text-blue-500 mr-2"></i>
+              {{ selectedEncuesta.total_preguntas || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Respuestas -->
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label class="block text-900 font-semibold mb-2">Total Respuestas</label>
+            <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <i class="pi pi-users text-green-500 mr-2"></i>
+              {{ selectedEncuesta.total_respuestas || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Tiempo Estimado -->
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label class="block text-900 font-semibold mb-2">Tiempo Estimado</label>
+            <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <i class="pi pi-clock text-orange-500 mr-2"></i>
+              {{ selectedEncuesta.tiempo_estimado }} minutos
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuración -->
+  <div class="mb-6">
+    <div class="surface-50 p-4 border-round-lg">
+      <div class="flex align-items-center gap-3 mb-4">
+        <div class="bg-purple-500 text-white border-circle flex align-items-center justify-content-center"
+             style="width: 2.5rem; height: 2.5rem;">
+          <i class="pi pi-cog text-base"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-xl font-semibold text-900 mb-1">Configuración</h3>
+          <p class="text-600 mb-0 text-sm">Opciones y permisos de la encuesta</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Encuesta Anónima -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <div class="p-3 surface-100 border-round">
+              <p-checkbox [binary]="true"
+                          [ngModel]="selectedEncuesta.es_anonima"
+                          [disabled]="true"
+                          label="Encuesta Anónima"></p-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <!-- Permite Múltiples Respuestas -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <div class="p-3 surface-100 border-round">
+              <p-checkbox [binary]="true"
+                          [ngModel]="selectedEncuesta.permite_multiple_respuesta"
+                          [disabled]="true"
+                          label="Permite Múltiples Respuestas"></p-checkbox>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fechas Importantes -->
+  <div class="mb-6">
+    <div class="surface-50 p-4 border-round-lg">
+      <div class="flex align-items-center gap-3 mb-4">
+        <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center"
+             style="width: 2.5rem; height: 2.5rem;">
+          <i class="pi pi-calendar text-base"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-xl font-semibold text-900 mb-1">Fechas Importantes</h3>
+          <p class="text-600 mb-0 text-sm">Control de tiempos y vigencia</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Primera fila -->
+        <div class="col-12 md:col-6">
+          <label class="block text-900 font-semibold mb-2">Fecha de Creación</label>
+          <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+            <i class="pi pi-calendar-plus text-blue-500 mr-2"></i>
+            {{ selectedEncuesta.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <label class="block text-900 font-semibold mb-2">Última Actualización</label>
+          <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+            <i class="pi pi-sync text-green-500 mr-2"></i>
+            {{ selectedEncuesta.fecha_actualizacion | date:'dd/MM/yyyy HH:mm' }}
+          </div>
+        </div>
+
+        <!-- Segunda fila -->
+        <div class="col-12 md:col-6" *ngIf="selectedEncuesta.fecha_inicio">
+          <label class="block text-900 font-semibold mb-2">Fecha de Inicio</label>
+          <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+            <i class="pi pi-play-circle text-blue-500 mr-2"></i>
+            {{ selectedEncuesta.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6" *ngIf="selectedEncuesta.fecha_fin">
+          <label class="block text-900 font-semibold mb-2">Fecha de Fin</label>
+          <div class="p-3 surface-100 border-round border-1 border-gray-400"
+               [ngClass]="isEncuestaExpirada(selectedEncuesta) ? 'border-red-400 bg-red-50' : ''">
+            <i class="pi"
+               [ngClass]="isEncuestaExpirada(selectedEncuesta)
+                 ? 'pi-exclamation-circle text-red-500'
+                 : 'pi pi-stop-circle text-orange-500'"
+               class="mr-2"></i>
+            <span [ngClass]="isEncuestaExpirada(selectedEncuesta) ? 'text-red-700' : 'text-900'">
+              {{ selectedEncuesta.fecha_fin | date:'dd/MM/yyyy HH:mm' }}
+              <span *ngIf="isEncuestaExpirada(selectedEncuesta)" class="font-semibold"> (Expirada)</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex justify-content-end gap-2">
       <p-button
         label="Cerrar"
         icon="pi pi-times"
         (click)="cerrarDialog()"
-        styleClass="p-button-text w-full sm:w-auto"
-      ></p-button>
+        styleClass="p-button-text">
+      </p-button>
       <p-button
         *ngIf="selectedEncuesta"
         label="Editar"
         icon="pi pi-pencil"
         (click)="editarEncuesta(selectedEncuesta); cerrarDialog()"
-        styleClass="p-button-warning w-full sm:w-auto"
-      ></p-button>
+        styleClass="p-button-warning">
+      </p-button>
     </div>
   </ng-template>
 </p-dialog>
