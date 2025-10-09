@@ -10,7 +10,7 @@ import { RespuestaService, EncuestaDisponible } from '../../../core/services/res
   styleUrls: ['./view-encuestas.component.css']
 })
 export class ViewEncuestasComponent implements OnInit, OnDestroy {
-  
+
   encuestasDisponibles: EncuestaDisponible[] = [];
   loading = false;
   searchText = '';
@@ -40,7 +40,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
         this.encuestaDestacada = +params['encuesta_id'];
       }
     });
-    
+
     this.cargarEncuestasDisponibles();
   }
 
@@ -51,19 +51,19 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
 
   cargarEncuestasDisponibles(): void {
     this.loading = true;
-    
+
     this.respuestaService.obtenerEncuestasDisponibles(1, 50, this.searchText)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           if (response.ok) {
             // Mapear las encuestas del backend al formato del frontend
-            this.encuestasDisponibles = response.data.encuestas.map(encuesta => 
+            this.encuestasDisponibles = response.data.encuestas.map(encuesta =>
               this.respuestaService.mapearEncuestaDisponible(encuesta)
             );
-            
+
             console.log('Encuestas cargadas:', this.encuestasDisponibles);
-            
+
             // Limpiar destacado después de cargar
             this.limpiarDestacadoDespuesDeUnTiempo();
           }
@@ -86,7 +86,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
 
     // Filtrar por texto de búsqueda
     if (this.searchText) {
-      filtradas = filtradas.filter(encuesta => 
+      filtradas = filtradas.filter(encuesta =>
         encuesta.titulo.toLowerCase().includes(this.searchText.toLowerCase()) ||
         encuesta.descripcion.toLowerCase().includes(this.searchText.toLowerCase())
       );
@@ -94,7 +94,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
 
     // Filtrar por estado
     if (this.estadoFiltro !== 'TODAS') {
-      filtradas = filtradas.filter(encuesta => 
+      filtradas = filtradas.filter(encuesta =>
         encuesta.estado_usuario === this.estadoFiltro
       );
     }
@@ -213,19 +213,19 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     if (this.isEncuestaExpirada(encuesta)) {
       return 'Expirada';
     }
-    
+
     // Si la encuesta está próxima, mostrar texto específico
     if (this.isEncuestaProxima(encuesta)) {
       return 'Próximamente';
     }
-    
+
     switch (encuesta.estado_usuario) {
       case 'NO_INICIADA':
         return 'Iniciar';
       case 'EN_PROGRESO':
         return 'Continuar';
       case 'COMPLETADA':
-        return 'Ver resultados';
+        return 'Ver detalles';
       default:
         return 'Iniciar';
     }
@@ -236,12 +236,12 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     if (this.isEncuestaExpirada(encuesta)) {
       return 'pi pi-clock';
     }
-    
+
     // Si la encuesta está próxima, mostrar icono específico
     if (this.isEncuestaProxima(encuesta)) {
       return 'pi pi-calendar-plus';
     }
-    
+
     switch (encuesta.estado_usuario) {
       case 'NO_INICIADA':
         return 'pi pi-play';
@@ -259,12 +259,12 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     if (this.isEncuestaExpirada(encuesta)) {
       return 'secondary';
     }
-    
+
     // Si la encuesta está próxima, usar severity de información
     if (this.isEncuestaProxima(encuesta)) {
       return 'info';
     }
-    
+
     switch (encuesta.estado_usuario) {
       case 'NO_INICIADA':
         return 'primary';
@@ -284,11 +284,11 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     if (!encuesta.fecha_fin) {
       return false; // Si no tiene fecha de fin, no está expirada
     }
-    
+
     const fechaFin = new Date(encuesta.fecha_fin);
     const hoy = new Date();
     hoy.setHours(23, 59, 59, 999); // Fin del día actual
-    
+
     return fechaFin < hoy;
   }
 
@@ -300,17 +300,17 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     if (encuesta.estado_usuario === 'COMPLETADA') {
       return false;
     }
-    
+
     // Si no tiene fecha de inicio, no está próxima
     if (!encuesta.fecha_inicio) {
       return false;
     }
-    
+
     const fechaInicio = new Date(encuesta.fecha_inicio);
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0); // Inicio del día actual
     fechaInicio.setHours(0, 0, 0, 0); // Inicio del día de inicio
-    
+
     // Si la fecha de inicio es mayor al día actual, está próxima
     return fechaInicio > hoy;
   }
@@ -323,17 +323,17 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     if (this.isEncuestaExpirada(encuesta)) {
       return true;
     }
-    
+
     // Si la encuesta está próxima (fecha de inicio en el futuro), deshabilitar el botón
     if (this.isEncuestaProxima(encuesta)) {
       return true;
     }
-    
+
     // Si ya está completada, no deshabilitar (para ver resultados)
     if (encuesta.estado_usuario === 'COMPLETADA') {
       return false;
     }
-    
+
     return false;
   }
 
