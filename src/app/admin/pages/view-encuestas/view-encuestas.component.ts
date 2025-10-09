@@ -24,9 +24,15 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   totalEncuestasEliminadas = 0;
   totalPages = 0;
   totalPagesEliminadas = 0;
+  totalEncuestasSistema = 0; // Total de encuestas en el sistema (sin filtros)
   displayDialog = false;
+  displayDeleteDialog = false;
+  displayDeletePermanentDialog = false;
   editMode = false;
   selectedEncuesta?: Encuesta;
+  encuestaParaEliminar?: Encuesta;
+  encuestaParaEliminarPermanente?: Encuesta;
+  deleting = false;
   activeTabIndex = 0;
 
   private destroy$ = new Subject<void>();
@@ -35,7 +41,9 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   estados = [
     { label: 'Todas', value: 'TODOS' },
     { label: 'Borrador', value: 'BORRADOR' },
-    { label: 'Activa', value: 'ACTIVA' }
+    { label: 'Activa', value: 'ACTIVA' },
+    { label: 'Próximamente', value: 'PROXIMAMENTE' },
+    { label: 'Expirada', value: 'EXPIRADA' }
   ];
 
   constructor(
@@ -68,6 +76,8 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
 
   cargarEncuestas(): void {
     this.loading = true;
+    
+    // Cargar encuestas con filtros
     this.encuestaService.obtenerEncuestas(
       this.currentPage,
       this.pageSize,
@@ -98,6 +108,28 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     });
+
+    // Cargar total de encuestas del sistema (sin filtros) solo si hay filtros aplicados
+    if (this.estadoFiltro !== 'TODOS' || this.searchText.trim() !== '') {
+      this.encuestaService.obtenerEncuestas(
+        1,
+        1,
+        'TODOS',
+        ''
+      ).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          if (response.ok) {
+            this.totalEncuestasSistema = response.data.total;
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener total del sistema:', error);
+        }
+      });
+    } else {
+      // Si no hay filtros, el total del sistema es igual al total actual
+      this.totalEncuestasSistema = this.totalEncuestas;
+    }
   }
 
   cargarEncuestasEliminadas(): void {
@@ -137,6 +169,12 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     this.searchSubject$.next(this.searchText);
   }
 
+  onEstadoChange(): void {
+    // El cambio de estado debe ser inmediato, sin debounce
+    this.currentPage = 1;
+    this.cargarEncuestas();
+  }
+
   limpiarFiltros(): void {
     this.searchText = '';
     this.estadoFiltro = 'TODOS';
@@ -173,43 +211,58 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   eliminarEncuesta(encuesta: Encuesta): void {
-    this.confirmationService.confirm({
-      message: `¿Estás seguro de que quieres eliminar la encuesta "${encuesta.titulo}"?`,
-      header: 'Confirmar Eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // console.log('🗑️ Eliminando encuesta ID:', encuesta.id);
-        this.encuestaService.eliminarEncuesta(encuesta.id!).pipe(
-          takeUntil(this.destroy$)
-        ).subscribe({
-          next: (response) => {
-            if (response.ok) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Éxito',
-                detail: response.msj || 'Encuesta eliminada correctamente'
-              });
-              this.cargarEncuestas();
-              this.cargarEncuestasEliminadas();
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.msj || 'Error al eliminar la encuesta'
-              });
-            }
-          },
-          error: (error) => {
-            console.error('Error al eliminar encuesta:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Error del servidor al eliminar la encuesta'
-            });
-          }
+    this.encuestaParaEliminar = encuesta;
+    this.displayDeleteDialog = true;
+  }
+
+  confirmarEliminacion(): void {
+    if (!this.encuestaParaEliminar) return;
+    
+    this.deleting = true;
+    this.encuestaService.eliminarEncuesta(this.encuestaParaEliminar.id!).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (response) => {
+        if (response.ok) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: response.msj || 'Encuesta eliminada correctamente'
+          });
+          this.displayDeleteDialog = false;
+          this.encuestaParaEliminar = undefined;
+          this.cargarEncuestas();
+          this.cargarEncuestasEliminadas();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.msj || 'Error al eliminar la encuesta'
+          });
+        }
+        this.deleting = false;
+      },
+      error: (error) => {
+        console.error('Error al eliminar encuesta:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error del servidor al eliminar la encuesta'
         });
+        this.deleting = false;
       }
     });
+  }
+
+  cancelarEliminacion(): void {
+    this.displayDeleteDialog = false;
+    this.encuestaParaEliminar = undefined;
+  }
+
+  // Getter para determinar si mostrar el botón "Crear Primera Encuesta"
+  get mostrarCrearPrimeraEncuesta(): boolean {
+    // Solo mostrar si realmente no hay encuestas en el sistema
+    return this.totalEncuestasSistema === 0;
   }
 
   reactivarEncuesta(encuesta: Encuesta): void {

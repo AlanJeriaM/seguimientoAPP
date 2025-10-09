@@ -11,7 +11,7 @@
               <!-- Sección de búsqueda y filtros -->
               <div class="col-12 lg:col-9 mb-2">
                 <div class="flex flex-column sm:flex-row align-items-stretch sm:align-items-center gap-2">
-                  <span class="p-input-icon-left flex-1">
+                  <span class="p-input-icon-left w-full sm:w-auto" style="flex: 1; max-width: 100%; min-width: 200px;">
                     <i class="pi pi-search"></i>
                     <input
                       pInputText
@@ -30,8 +30,8 @@
                     optionValue="value"
                     placeholder="Filtrar por estado"
                     class="w-full sm:w-auto"
-                    [style]="{'min-width': '180px'}"
-                    (onChange)="buscarEncuestas()"
+                    [style]="{'min-width': '150px'}"
+                    (onChange)="onEstadoChange()"
                   ></p-dropdown>
                   <p-button
                     styleClass="p-button-text p-button-sm w-full sm:w-auto"
@@ -121,8 +121,8 @@
                     </td>
                     <td>
                       <span class="p-column-title">Creado por</span>
-                      <div class="text-center">
-                        <i class="pi pi-user text-blue-500 mr-2 "></i>
+                      <div>
+                        <i class="pi pi-user text-blue-500 mr-2"></i>
                         {{ encuesta.creador?.nombre_usuario || 'N/A' }}
                         {{ encuesta.creador?.apellido ? ' ' + encuesta.creador.apellido : '' }}
                       </div>
@@ -179,9 +179,12 @@
                     <td [attr.colspan]="8" class="text-center">
                       <div class="p-4">
                         <i class="pi pi-clipboard" style="font-size: 3rem; color: #6c757d;"></i>
-                        <p class="mt-2 text-500">No hay encuestas disponibles</p>
+                        <p class="mt-2 text-500">
+                          {{ mostrarCrearPrimeraEncuesta ? 'No hay encuestas disponibles' : 'No se encontraron encuestas con los filtros aplicados' }}
+                        </p>
                         <p-button
-                          label="Crear Primera Encuesta"
+                          *ngIf="mostrarCrearPrimeraEncuesta"
+                          label="Crear encuesta"
                           icon="pi pi-plus"
                           styleClass="p-button-outlined mt-2"
                           (click)="nuevaEncuesta()"
@@ -526,6 +529,104 @@
         icon="pi pi-pencil"
         (click)="editarEncuesta(selectedEncuesta); cerrarDialog()"
         styleClass="p-button-warning">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal para eliminar encuesta -->
+<p-dialog
+  [(visible)]="displayDeleteDialog"
+  header="Eliminar Encuesta"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarEliminacion()"
+>
+  <div *ngIf="encuestaParaEliminar" class="p-4">
+    <!-- Warning Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-red-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-exclamation-triangle text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Confirmar Eliminación</h3>
+            <p class="text-600 mb-0 text-sm">Esta acción no se puede deshacer</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <!-- Información de la Encuesta -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Encuesta a Eliminar</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ encuestaParaEliminar.titulo || 'Sin título' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Estado</label>
+              <div class="p-3 surface-100 border-round">
+                <span
+                  [class]="getEstadoBadgeClass(encuestaParaEliminar.estado, encuestaParaEliminar)"
+                  class="estado-badge">
+                  {{ getEstadoLabel(encuestaParaEliminar.estado, encuestaParaEliminar) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje de advertencia -->
+          <div class="col-12">
+            <div class="p-3 surface-100 border-round border-1 border-red-300 bg-red-50">
+              <div class="flex align-items-start gap-2">
+                <i class="pi pi-info-circle text-red-500 mt-1"></i>
+                <div>
+                  <p class="text-red-700 font-semibold mb-1">Advertencia</p>
+                  <p class="text-red-600 text-sm mb-0">
+                    Al eliminar esta encuesta, se desactivará y las respuestas se preservarán.
+                    Puedes reactivarla desde la pestaña "Encuestas Eliminadas".
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cancelarEliminacion()"
+        styleClass="p-button-text w-full sm:w-auto"
+        [disabled]="deleting">
+      </p-button>
+      <p-button
+        label="Eliminar Encuesta"
+        icon="pi pi-trash"
+        (click)="confirmarEliminacion()"
+        styleClass="p-button-danger w-full sm:w-auto"
+        [loading]="deleting"
+        [disabled]="deleting">
       </p-button>
     </div>
   </ng-template>

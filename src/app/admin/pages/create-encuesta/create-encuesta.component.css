@@ -38,12 +38,12 @@
 /* Estilos para los fieldsets de configuración */
 :host ::ng-deep .p-fieldset {
   border: 1px solid var(--surface-border);
-  border-radius: 6px;
+  border-radius: 5px;
 }
 
 :host ::ng-deep .p-fieldset .p-fieldset-legend {
   background: var(--surface-ground);
-  border-radius: 4px;
+  border-radius: 5px;
   padding: 0.5rem 1rem;
   font-weight: 600;
   color: var(--text-color);
