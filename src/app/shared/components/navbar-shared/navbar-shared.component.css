@@ -196,38 +196,53 @@
   width: 2.5rem !important;
   height: 2.5rem !important;
   position: relative !important;
+  overflow: visible !important;
+}
+
+::ng-deep .notification-btn .p-button {
+  overflow: visible !important;
+}
+
+::ng-deep .notification-btn .p-button-icon {
+  overflow: visible !important;
 }
 
 ::ng-deep .notification-badge {
   background-color: #ef4444 !important;
   color: white !important;
-  font-size: 0.625rem !important;
-  min-width: 1.125rem !important;
-  height: 1.125rem !important;
+  font-size: 0.75rem !important;
+  min-width: 1.25rem !important;
+  height: 1.25rem !important;
   border-radius: 50% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0.125rem !important;
-  font-weight: 600 !important;
+  padding: 0.25rem !important;
+  font-weight: 700 !important;
   line-height: 1 !important;
   position: absolute !important;
-  top: 0.125rem !important;
-  right: 0.125rem !important;
+  top: 0 !important;
+  right: 0 !important;
+  transform: translate(40%, -40%) !important;
   border: 2px solid #ffffff !important;
+  z-index: 1000 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 ::ng-deep .notification-btn .p-badge {
   background-color: #ef4444 !important;
   color: white !important;
-  font-size: 0.625rem !important;
-  min-width: 1.125rem !important;
-  height: 1.125rem !important;
+  font-size: 0.75rem !important;
+  min-width: 1.25rem !important;
+  height: 1.25rem !important;
   border-radius: 50% !important;
-  padding: 0.125rem !important;
-  font-weight: 600 !important;
+  padding: 0.25rem !important;
+  font-weight: 700 !important;
   line-height: 1 !important;
   border: 2px solid #ffffff !important;
+  z-index: 1000 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  transform: translate(40%, -40%) !important;
 }
 
 /* Panel de notificaciones */
@@ -354,6 +369,12 @@
   height: 8px;
   background-color: #3b82f6;
   border-radius: 50%;
+}
+
+.notification-footer {
+  padding: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
 }
 
 /* Mejoras adicionales para el menú */

@@ -69,11 +69,20 @@ export class CreateEncuestaComponent implements OnInit {
     this.encuestaForm = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       descripcion: [''],
-      estado: ['BORRADOR', Validators.required],
-      fecha_inicio: [null, [this.fechaInicioValidator()]],
-      fecha_fin: [null, [this.fechaFinValidator()]],
+      estado: ['', Validators.required],
+      fecha_inicio: [null, [Validators.required, this.fechaInicioValidator()]],
+      fecha_fin: [null, [Validators.required, this.fechaFinValidator()]],
       es_anonima: [false],
       preguntas: this.fb.array([], [Validators.required, Validators.minLength(1)])
+    });
+
+    // Revalidar fechas cuando cualquiera cambie
+    this.encuestaForm.get('fecha_inicio')?.valueChanges.subscribe(() => {
+      this.encuestaForm.get('fecha_fin')?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    this.encuestaForm.get('fecha_fin')?.valueChanges.subscribe(() => {
+      this.encuestaForm.get('fecha_inicio')?.updateValueAndValidity({ emitEvent: false });
     });
 
     // Agregar primera pregunta por defecto
@@ -184,6 +193,8 @@ export class CreateEncuestaComponent implements OnInit {
           return `Valor máximo: ${errors['max'].max}`;
         case 'fechaInicioInvalida':
           return 'La fecha de inicio no puede ser menor a la fecha actual';
+        case 'fechaInicioMayorQueFin':
+          return 'La fecha de inicio debe ser menor a la fecha de fin';
         case 'fechaFinInvalida':
           return 'La fecha de fin debe ser mayor a la fecha de inicio';
         case 'opcionDuplicada':
@@ -193,19 +204,32 @@ export class CreateEncuestaComponent implements OnInit {
     return null;
   }
 
-  // Validador para fecha de inicio (no puede ser menor a hoy)
+  // Validador para fecha de inicio (no puede ser menor a hoy y debe ser menor a fecha fin)
   fechaInicioValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value) return null;
-      
+
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const selectedDate = new Date(control.value);
       selectedDate.setHours(0, 0, 0, 0);
-      
+
+      // Validar que no sea menor a hoy
       if (selectedDate < today) {
         return { fechaInicioInvalida: true };
       }
+
+      // Validar que sea menor a fecha fin (si existe)
+      const fechaFin = this.encuestaForm?.get('fecha_fin')?.value;
+      if (fechaFin) {
+        const fechaFinDate = new Date(fechaFin);
+        fechaFinDate.setHours(0, 0, 0, 0);
+
+        if (selectedDate >= fechaFinDate) {
+          return { fechaInicioMayorQueFin: true };
+        }
+      }
+
       return null;
     };
   }
@@ -214,13 +238,13 @@ export class CreateEncuestaComponent implements OnInit {
   fechaFinValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value) return null;
-      
+
       const fechaInicio = this.encuestaForm?.get('fecha_inicio')?.value;
       if (!fechaInicio) return null;
-      
+
       const fechaInicioDate = new Date(fechaInicio);
       const fechaFinDate = new Date(control.value);
-      
+
       if (fechaFinDate <= fechaInicioDate) {
         return { fechaFinInvalida: true };
       }
@@ -232,23 +256,23 @@ export class CreateEncuestaComponent implements OnInit {
   duplicateOptionValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value || !control.value.trim()) return null;
-      
+
       const currentValue = control.value.trim().toLowerCase();
       const parentFormArray = control.parent?.parent as FormArray;
-      
+
       if (!parentFormArray) return null;
-      
+
       const duplicateIndex = parentFormArray.controls.findIndex((option, index) => {
         const optionValue = option.get('value')?.value;
-        return optionValue && 
-               optionValue.trim().toLowerCase() === currentValue && 
+        return optionValue &&
+               optionValue.trim().toLowerCase() === currentValue &&
                option !== control.parent;
       });
-      
+
       if (duplicateIndex !== -1) {
         return { opcionDuplicada: true };
       }
-      
+
       return null;
     };
   }
