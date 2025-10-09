@@ -117,12 +117,13 @@
               </div>
 
               <!-- OPCIÓN MÚLTIPLE -->
-              <div *ngIf="pregunta.tipo === 'OPCION_MULTIPLE'" class="opciones-container">
-                <div *ngIf="pregunta.opciones && pregunta.opciones.length > 0; else noOpcionesMultiple">
+              <div *ngIf="pregunta.tipo === 'OPCION_MULTIPLE'" class="opciones-container" [formGroup]="getPreguntaControl(preguntaActual)">
+                <div *ngIf="pregunta.opciones && pregunta.opciones.length > 0; else noOpcionesMultiple" formArrayName="selecciones">
                   <div *ngFor="let opcion of pregunta.opciones; let j = index" class="opcion-item">
                     <p-checkbox 
                       [inputId]="'check_pregunta_' + pregunta.id + '_opcion_' + j"
                       [binary]="true"
+                      [formControlName]="j"
                       [disabled]="formularioDeshabilitado"
                       (onChange)="onOpcionMultipleChange(preguntaActual, j, $event.checked)"
                     ></p-checkbox>
