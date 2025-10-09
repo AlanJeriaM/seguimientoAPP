@@ -23,7 +23,8 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     { label: 'Todas', value: 'TODAS' },
     { label: 'No iniciadas', value: 'NO_INICIADA' },
     { label: 'En progreso', value: 'EN_PROGRESO' },
-    { label: 'Completadas', value: 'COMPLETADA' }
+    { label: 'Completadas', value: 'COMPLETADA' },
+    { label: 'Expiradas', value: 'EXPIRADA' }
   ];
 
   constructor(
@@ -94,9 +95,15 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
 
     // Filtrar por estado
     if (this.estadoFiltro !== 'TODAS') {
-      filtradas = filtradas.filter(encuesta =>
-        encuesta.estado_usuario === this.estadoFiltro
-      );
+      if (this.estadoFiltro === 'EXPIRADA') {
+        // Filtrar encuestas expiradas usando la función isEncuestaExpirada
+        filtradas = filtradas.filter(encuesta => this.isEncuestaExpirada(encuesta));
+      } else {
+        // Filtrar por estado_usuario
+        filtradas = filtradas.filter(encuesta =>
+          encuesta.estado_usuario === this.estadoFiltro
+        );
+      }
     }
 
     return filtradas;
