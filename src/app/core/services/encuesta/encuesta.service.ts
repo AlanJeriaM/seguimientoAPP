@@ -25,6 +25,7 @@ export interface Encuesta {
   preguntas?: Pregunta[];
   fecha_creacion?: Date;
   fecha_actualizacion?: Date;
+  fecha_eliminacion?: Date;
   total_respuestas?: number;
   total_preguntas?: number;
 }
