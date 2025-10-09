@@ -109,14 +109,30 @@ const obtenerEncuestas = async (req, res) => {
       whereClause.estado = estado;
     }
 
+    // Preparar búsqueda avanzada
     if (search) {
-      whereClause[Op.or] = [
+      const searchLower = search.toLowerCase();
+      const searchConditions = [
         { titulo: { [Op.like]: `%${search}%` } },
         { descripcion: { [Op.like]: `%${search}%` } }
       ];
+      
+      // Si es un número, buscar también por ID
+      if (!isNaN(search)) {
+        searchConditions.push({ id: parseInt(search) });
+      }
+      
+      // Buscar por estado si coincide
+      const estadosBusqueda = ['BORRADOR', 'ACTIVA'];
+      const estadoMatch = estadosBusqueda.find(e => e.toLowerCase().includes(searchLower));
+      if (estadoMatch) {
+        searchConditions.push({ estado: estadoMatch });
+      }
+      
+      whereClause[Op.or] = searchConditions;
     }
 
-    // Primero obtenemos las encuestas sin duplicados
+    // Primero obtenemos todas las encuestas que cumplan con los filtros básicos
     const encuestas = await Encuesta.findAll({
       where: whereClause,
       attributes: [
@@ -134,7 +150,7 @@ const obtenerEncuestas = async (req, res) => {
     });
 
     // Contar respuestas para cada encuesta y obtener info del creador
-    const encuestasConStats = await Promise.all(
+    let encuestasConStats = await Promise.all(
       encuestas.map(async (encuesta) => {
         const totalRespuestas = await Respuesta.count({
           where: { encuesta_id: encuesta.id }
@@ -161,13 +177,31 @@ const obtenerEncuestas = async (req, res) => {
       })
     );
 
+    // Filtrar por nombre del creador si hay búsqueda
+    if (search) {
+      const searchLower = search.toLowerCase();
+      encuestasConStats = encuestasConStats.filter(encuesta => {
+        // Ya cumple con los otros filtros, verificar si también coincide con creador
+        if (encuesta.creador) {
+          const nombreCompleto = `${encuesta.creador.nombre_usuario || ''} ${encuesta.creador.apellido || ''}`.toLowerCase();
+          return nombreCompleto.includes(searchLower) ||
+                 // Mantener si ya coincidió con otros campos
+                 encuesta.titulo.toLowerCase().includes(searchLower) ||
+                 (encuesta.descripcion && encuesta.descripcion.toLowerCase().includes(searchLower)) ||
+                 encuesta.estado.toLowerCase().includes(searchLower) ||
+                 encuesta.id.toString().includes(search);
+        }
+        return true; // Mantener encuestas sin creador si coinciden con otros campos
+      });
+    }
+
     res.json({
       ok: true,
       data: {
         encuestas: encuestasConStats,
-        total: totalCount,
+        total: search ? encuestasConStats.length : totalCount,
         page: parseInt(page),
-        totalPages: Math.ceil(totalCount / limit)
+        totalPages: Math.ceil((search ? encuestasConStats.length : totalCount) / limit)
       }
     });
 

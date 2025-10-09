@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { EncuestaService, Encuesta } from '../../../core/services/encuesta/encuesta.service';
 import { MessageService } from 'primeng/api';
 import { ConfirmationService } from 'primeng/api';
@@ -30,6 +30,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   activeTabIndex = 0;
 
   private destroy$ = new Subject<void>();
+  private searchSubject$ = new Subject<string>();
 
   estados = [
     { label: 'Todas', value: 'TODOS' },
@@ -47,11 +48,22 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.cargarEncuestas();
     this.cargarEncuestasEliminadas();
+    
+    // Configurar búsqueda con debounce
+    this.searchSubject$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.currentPage = 1;
+      this.cargarEncuestas();
+    });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.searchSubject$.complete();
   }
 
   cargarEncuestas(): void {
@@ -121,8 +133,8 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   buscarEncuestas(): void {
-    this.currentPage = 1;
-    this.cargarEncuestas();
+    // Emitir evento al Subject para aplicar debounce
+    this.searchSubject$.next(this.searchText);
   }
 
   limpiarFiltros(): void {
