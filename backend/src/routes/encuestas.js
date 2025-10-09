@@ -21,8 +21,6 @@ router.delete('/eliminar-permanente/:id', encuestaController.eliminarEncuestaPer
 
 // Reportes y analíticas
 router.get('/reportes/estadisticas-generales', reporteController.obtenerEstadisticasGenerales);
-router.get('/reportes/tendencias', reporteController.obtenerTendenciasParticipacion);
-router.get('/reportes/comparacion', reporteController.obtenerComparacionEncuestas);
 router.get('/:id/reporte', reporteController.obtenerReporteEncuesta);
 router.get('/:id/exportar', reporteController.exportarDatosEncuesta);
 

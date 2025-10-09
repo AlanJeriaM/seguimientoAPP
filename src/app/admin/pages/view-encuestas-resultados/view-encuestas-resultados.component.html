@@ -1,7 +1,7 @@
 <div class="grid">
   <div class="col-12">
-    <p-card class="text-center" header="Reportes y Analíticas de Encuestas">
-      
+    <p-card class="text-center" header="Reportes y analíticas de Encuestas">
+
       <!-- Barra de herramientas -->
       <ng-template pTemplate="caption">
         <div class="flex justify-content-end">
@@ -21,7 +21,7 @@
         <div class="col-12">
           <h3 class="text-xl font-semibold text-900 mb-3">Estadísticas Generales</h3>
         </div>
-        
+
         <div class="col-12 sm:col-6 lg:col-3">
           <div class="stats-card">
             <div class="stats-icon">
@@ -110,78 +110,13 @@
         </div>
       </div>
 
-      <!-- Tendencias de Participación -->
-      <div class="grid mb-4">
-        <div class="col-12">
-          <h3 class="text-xl font-semibold text-900 mb-3">Tendencias de Participación</h3>
-          
-          <div class="flex align-items-center gap-2 mb-3">
-            <label for="diasTendencias" class="text-900 font-medium">Período de análisis:</label>
-            <p-dropdown
-              id="diasTendencias"
-              [(ngModel)]="diasTendencias"
-              [options]="[
-                {label: '7 días', value: 7},
-                {label: '15 días', value: 15},
-                {label: '30 días', value: 30},
-                {label: '60 días', value: 60}
-              ]"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Selecciona período"
-              (onChange)="onDiasTendenciasChange()"
-              [loading]="loadingTendencias"
-            ></p-dropdown>
-          </div>
-        </div>
-
-        <!-- Gráfico de respuestas por día -->
-        <div class="col-12 lg:col-8">
-          <div class="chart-container">
-            <h4 class="text-lg font-medium text-900 mb-2">Respuestas por Día</h4>
-            <div class="chart-placeholder">
-              <i class="pi pi-chart-line text-4xl text-500 mb-2"></i>
-              <p class="text-500">Gráfico de respuestas por día ({{ diasTendencias }} días)</p>
-              <div *ngIf="tendenciasParticipacion.respuestas_por_dia?.length > 0" class="chart-data">
-                <div *ngFor="let item of tendenciasParticipacion.respuestas_por_dia" class="chart-item">
-                  <span class="chart-date">{{ item.fecha | date:'dd/MM' }}</span>
-                  <span class="chart-value">{{ item.total }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Top encuestas por participación -->
-        <div class="col-12 lg:col-4">
-          <div class="chart-container">
-            <h4 class="text-lg font-medium text-900 mb-2">Top Encuestas</h4>
-            <div class="chart-placeholder">
-              <div *ngIf="tendenciasParticipacion.top_encuestas?.length > 0" class="top-encuestas">
-                <div *ngFor="let encuesta of tendenciasParticipacion.top_encuestas; let i = index" class="top-item">
-                  <div class="top-rank">{{ i + 1 }}</div>
-                  <div class="top-content">
-                    <div class="top-title">{{ encuesta.titulo }}</div>
-                    <div class="top-stats">{{ encuesta.usuarios_unicos }} usuarios</div>
-                  </div>
-                </div>
-              </div>
-              <div *ngIf="!tendenciasParticipacion.top_encuestas?.length" class="no-data">
-                <i class="pi pi-info-circle text-2xl text-500 mb-2"></i>
-                <p class="text-500">No hay datos disponibles</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Gestión de Encuestas para Reportes -->
       <div class="grid mb-4">
         <div class="col-12">
           <h3 class="text-xl font-semibold text-900 mb-3">Gestión de Reportes</h3>
-          
+
           <div class="grid">
-            <div class="col-12 lg:col-8">
+            <div class="col-12">
               <p-table
                 [value]="encuestasDisponibles"
                 [loading]="loading"
@@ -213,7 +148,7 @@
                       </div>
                     </td>
                     <td>
-                      <span 
+                      <span
                         [class]="getEstadoBadgeClass(encuesta.estado)"
                         class="estado-badge"
                       >
@@ -261,40 +196,6 @@
                 </ng-template>
               </p-table>
             </div>
-
-            <div class="col-12 lg:col-4">
-              <div class="comparison-panel">
-                <h4 class="text-lg font-medium text-900 mb-3">Comparación de Encuestas</h4>
-                
-                <div class="mb-3">
-                  <label class="block text-900 font-medium mb-2">Seleccionar Encuestas:</label>
-                  <p-multiSelect
-                    [options]="encuestasDisponibles"
-                    [(ngModel)]="encuestasSeleccionadas"
-                    optionLabel="titulo"
-                    optionValue="id"
-                    placeholder="Selecciona encuestas..."
-                    [showToggleAll]="false"
-                    [maxSelectedLabels]="3"
-                    class="w-full"
-                  ></p-multiSelect>
-                </div>
-
-                <p-button
-                  pRipple
-                  label="Comparar Encuestas"
-                  icon="pi pi-chart-line"
-                  styleClass="p-button-info w-full"
-                  (click)="compararEncuestas()"
-                  [disabled]="encuestasSeleccionadas.length < 2"
-                ></p-button>
-
-                <div class="mt-3 text-500 text-sm">
-                  <i class="pi pi-info-circle mr-2"></i>
-                  Selecciona al menos 2 encuestas para comparar sus resultados
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -321,22 +222,22 @@
     <!-- Información general de la encuesta -->
     <div class="col-12">
       <h3 class="text-xl font-semibold text-900 mb-3">Información General</h3>
-      
+
       <div class="grid">
         <div class="col-12 sm:col-6">
           <div class="mb-3">
             <label class="block text-900 font-medium mb-1">Título:</label>
             <p class="text-900">{{ reporteEncuesta.encuesta.titulo }}</p>
           </div>
-          
+
           <div class="mb-3">
             <label class="block text-900 font-medium mb-1">Descripción:</label>
             <p class="text-900">{{ reporteEncuesta.encuesta.descripcion || 'Sin descripción' }}</p>
           </div>
-          
+
           <div class="mb-3">
             <label class="block text-900 font-medium mb-1">Estado:</label>
-            <span 
+            <span
               [class]="getEstadoBadgeClass(reporteEncuesta.encuesta.estado)"
               class="estado-badge"
             >
@@ -344,18 +245,18 @@
             </span>
           </div>
         </div>
-        
+
         <div class="col-12 sm:col-6">
           <div class="mb-3">
             <label class="block text-900 font-medium mb-1">Tiempo Estimado:</label>
             <p class="text-900">{{ reporteEncuesta.encuesta.tiempo_estimado }} minutos</p>
           </div>
-          
+
           <div class="mb-3">
             <label class="block text-900 font-medium mb-1">Total Respuestas:</label>
             <p class="text-900">{{ reporteEncuesta.estadisticas?.total_respuestas || 0 }}</p>
           </div>
-          
+
           <div class="mb-3">
             <label class="block text-900 font-medium mb-1">Usuarios Únicos:</label>
             <p class="text-900">{{ reporteEncuesta.estadisticas?.usuarios_unicos || 0 }}</p>
@@ -367,7 +268,7 @@
     <!-- Estadísticas de preguntas -->
     <div class="col-12">
       <h3 class="text-xl font-semibold text-900 mb-3">Análisis por Pregunta</h3>
-      
+
       <div *ngIf="reporteEncuesta.preguntas?.length > 0" class="preguntas-analysis">
         <div *ngFor="let pregunta of reporteEncuesta.preguntas" class="pregunta-item">
           <div class="pregunta-header">
@@ -377,14 +278,14 @@
               <span *ngIf="pregunta.es_requerida" class="requerida-badge">Requerida</span>
             </div>
           </div>
-          
+
           <div class="pregunta-stats">
             <div class="stat-item">
               <i class="pi pi-users text-blue-500 mr-2"></i>
               <span class="stat-label">Respuestas:</span>
               <span class="stat-value">{{ pregunta.total_respuestas }}</span>
             </div>
-            
+
             <div *ngIf="pregunta.analisis" class="pregunta-analisis">
               <!-- Opciones de selección única/múltiple -->
               <div *ngIf="pregunta.analisis.opciones_count" class="opciones-analysis">
@@ -399,7 +300,7 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- Análisis de escalas -->
               <div *ngIf="pregunta.analisis.promedio !== undefined" class="escala-analysis">
                 <h5 class="text-md font-medium text-900 mb-2">Análisis de Escala:</h5>
@@ -410,7 +311,7 @@
                   <span class="stat-value">{{ pregunta.analisis.total_valores }}</span>
                 </div>
               </div>
-              
+
               <!-- Análisis de texto -->
               <div *ngIf="pregunta.analisis.respuestas_unicas !== undefined" class="texto-analysis">
                 <h5 class="text-md font-medium text-900 mb-2">Análisis de Texto:</h5>
@@ -420,7 +321,7 @@
                   <span class="stat-label ml-3">Total Respuestas:</span>
                   <span class="stat-value">{{ pregunta.analisis.total_respuestas }}</span>
                 </div>
-                
+
                 <!-- Respuestas más frecuentes -->
                 <div *ngIf="pregunta.analisis.top_respuestas?.length > 0" class="top-respuestas mt-3">
                   <h6 class="text-sm font-medium text-700 mb-2">Respuestas más frecuentes:</h6>
@@ -431,19 +332,19 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Muestra de todas las respuestas -->
                 <div *ngIf="pregunta.analisis.todas_respuestas?.length > 0" class="todas-respuestas mt-3">
                   <h6 class="text-sm font-medium text-700 mb-2">Muestra de respuestas:</h6>
                   <div class="respuestas-muestra">
-                    <span *ngFor="let resp of pregunta.analisis.todas_respuestas.slice(0, 10); let last = last" 
+                    <span *ngFor="let resp of pregunta.analisis.todas_respuestas.slice(0, 10); let last = last"
                           class="respuesta-tag">
                       {{ resp | slice:0:30 }}{{ resp.length > 30 ? '...' : '' }}{{ !last ? ',' : '' }}
                     </span>
                   </div>
                 </div>
               </div>
-              
+
               <!-- Análisis de fechas -->
               <div *ngIf="pregunta.analisis.fechas_unicas !== undefined" class="fecha-analysis">
                 <h5 class="text-md font-medium text-900 mb-2">Análisis de Fechas:</h5>
@@ -453,18 +354,18 @@
                   <span class="stat-label ml-3">Total Respuestas:</span>
                   <span class="stat-value">{{ pregunta.analisis.total_respuestas }}</span>
                 </div>
-                
+
                 <div *ngIf="pregunta.analisis.fechas_proporcionadas?.length > 0" class="fechas-muestra mt-2">
                   <h6 class="text-sm font-medium text-700 mb-2">Fechas proporcionadas:</h6>
                   <div class="fechas-grid">
-                    <span *ngFor="let fecha of pregunta.analisis.fechas_proporcionadas.slice(0, 10)" 
+                    <span *ngFor="let fecha of pregunta.analisis.fechas_proporcionadas.slice(0, 10)"
                           class="fecha-tag">
                       {{ fecha | date:'dd/MM/yyyy' }}
                     </span>
                   </div>
                 </div>
               </div>
-              
+
               <!-- Análisis numérico -->
               <div *ngIf="pregunta.analisis.minimo !== undefined" class="numero-analysis">
                 <h5 class="text-md font-medium text-900 mb-2">Análisis Numérico:</h5>
@@ -485,12 +386,12 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- Análisis general (para tipos no específicos) -->
               <div *ngIf="pregunta.analisis.respuestas_muestra" class="general-analysis">
                 <h5 class="text-md font-medium text-900 mb-2">Muestra de Respuestas:</h5>
                 <div class="respuestas-muestra">
-                  <span *ngFor="let resp of pregunta.analisis.respuestas_muestra; let last = last" 
+                  <span *ngFor="let resp of pregunta.analisis.respuestas_muestra; let last = last"
                         class="respuesta-tag">
                     {{ resp | slice:0:30 }}{{ resp.length > 30 ? '...' : '' }}{{ !last ? ',' : '' }}
                   </span>
@@ -500,31 +401,10 @@
           </div>
         </div>
       </div>
-      
+
       <div *ngIf="!reporteEncuesta.preguntas?.length" class="no-data">
         <i class="pi pi-info-circle text-2xl text-500 mb-2"></i>
         <p class="text-500">No hay preguntas disponibles para analizar</p>
-      </div>
-    </div>
-
-    <!-- Distribución temporal -->
-    <div class="col-12">
-      <h3 class="text-xl font-semibold text-900 mb-3">Distribución Temporal</h3>
-      
-      <div *ngIf="reporteEncuesta.respuestas_por_dia?.length > 0" class="temporal-analysis">
-        <div class="chart-placeholder">
-          <div class="chart-data">
-            <div *ngFor="let item of reporteEncuesta.respuestas_por_dia" class="chart-item">
-              <span class="chart-date">{{ item.fecha | date:'dd/MM/yyyy' }}</span>
-              <span class="chart-value">{{ item.total }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div *ngIf="!reporteEncuesta.respuestas_por_dia?.length" class="no-data">
-        <i class="pi pi-calendar text-2xl text-500 mb-2"></i>
-        <p class="text-500">No hay datos temporales disponibles</p>
       </div>
     </div>
   </div>
@@ -547,75 +427,3 @@
     </div>
   </ng-template>
 </p-dialog>
-
-<!-- Dialog para comparación de encuestas -->
-<p-dialog
-  [(visible)]="displayComparacionDialog"
-  header="Comparación de Encuestas"
-  [modal]="true"
-  [style]="{width: '95vw', maxWidth: '800px'}"
-  [contentStyle]="{'padding': '1rem', 'overflow-y': 'auto', 'max-height': '80vh'}"
-  [draggable]="false"
-  [resizable]="false"
-  [closable]="true"
-  [closeOnEscape]="true"
-  [responsive]="true"
-  [breakpoints]="{'960px': '90vw', '640px': '95vw'}"
-  [dismissableMask]="true"
->
-  <div class="comparison-content">
-    <h3 class="text-xl font-semibold text-900 mb-3">Comparación de {{ encuestasSeleccionadas.length }} Encuestas</h3>
-    
-    <div class="comparison-table">
-      <div class="comparison-header">
-        <div class="comparison-cell">Métrica</div>
-        <div *ngFor="let encuesta of encuestasSeleccionadas" class="comparison-cell">
-          {{ encuesta.titulo }}
-        </div>
-      </div>
-      
-      <div class="comparison-row">
-        <div class="comparison-cell">Estado</div>
-        <div *ngFor="let encuesta of encuestasSeleccionadas" class="comparison-cell">
-          <span 
-            [class]="getEstadoBadgeClass(encuesta.estado)"
-            class="estado-badge"
-          >
-            {{ getEstadoLabel(encuesta.estado) }}
-          </span>
-        </div>
-      </div>
-      
-      <div class="comparison-row">
-        <div class="comparison-cell">Total Respuestas</div>
-        <div *ngFor="let encuesta of encuestasSeleccionadas" class="comparison-cell">
-          {{ encuesta.total_respuestas || 0 }}
-        </div>
-      </div>
-      
-      <div class="comparison-row">
-        <div class="comparison-cell">Tiempo Estimado</div>
-        <div *ngFor="let encuesta of encuestasSeleccionadas" class="comparison-cell">
-          {{ encuesta.tiempo_estimado }} min
-        </div>
-      </div>
-    </div>
-    
-    <div class="mt-4 text-500 text-sm">
-      <i class="pi pi-info-circle mr-2"></i>
-      Para un análisis más detallado, utiliza los reportes individuales de cada encuesta
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <div class="flex justify-content-end">
-      <p-button
-        label="Cerrar"
-        icon="pi pi-times"
-        (click)="cerrarComparacionDialog()"
-        styleClass="p-button-text"
-      ></p-button>
-    </div>
-  </ng-template>
-</p-dialog>
-
