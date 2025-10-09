@@ -54,46 +54,47 @@
     <!-- Formulario de respuestas -->
     <form [formGroup]="formularioRespuestas" (ngSubmit)="enviarRespuestas()" *ngIf="formularioRespuestas" [class.form-disabled]="formularioDeshabilitado">
       <div class="pregunta-container">
-        <!-- Pregunta actual -->
-        <div 
-          *ngIf="encuesta.preguntas[preguntaActual] as pregunta" 
-          class="pregunta-card active"
-        >
-          <div class="pregunta-header">
-            <div class="pregunta-numero">Pregunta {{ preguntaActual + 1 }}</div>
-            <span class="pregunta-requerida" *ngIf="pregunta.es_requerida">*</span>
-          </div>
+        <!-- Pregunta actual - Usar ngFor con trackBy para forzar recreación del DOM -->
+        <ng-container *ngFor="let idx of [preguntaActual]; trackBy: trackByPreguntaIndex">
+          <div 
+            *ngIf="encuesta.preguntas[idx] as pregunta" 
+            class="pregunta-card active"
+          >
+            <div class="pregunta-header">
+              <div class="pregunta-numero">Pregunta {{ idx + 1 }}</div>
+              <span class="pregunta-requerida" *ngIf="pregunta.es_requerida">*</span>
+            </div>
 
-          <h3 class="pregunta-texto">{{ pregunta.texto }}</h3>
+            <h3 class="pregunta-texto">{{ pregunta.texto }}</h3>
 
-          <div class="respuesta-input" [formGroupName]="'respuestas'">
-            <div [formGroupName]="preguntaActual">
-              
-              <!-- TEXTO CORTO -->
-              <div *ngIf="pregunta.tipo === 'TEXTO_CORTO'">
-                <input 
-                  type="text" 
-                  pInputText 
-                  formControlName="respuesta"
-                  placeholder="Escribe tu respuesta..."
-                  class="w-full"
-                  [disabled]="formularioDeshabilitado"
-                  [class.ng-invalid]="getPreguntaControl(preguntaActual).get('respuesta')?.invalid && getPreguntaControl(preguntaActual).get('respuesta')?.touched"
-                />
-              </div>
+            <div class="respuesta-input" [formGroupName]="'respuestas'">
+              <div [formGroupName]="idx">
+                
+                <!-- TEXTO CORTO -->
+                <div *ngIf="pregunta.tipo === 'TEXTO_CORTO'">
+                  <input 
+                    type="text" 
+                    pInputText 
+                    formControlName="respuesta"
+                    placeholder="Escribe tu respuesta..."
+                    class="w-full"
+                    [disabled]="formularioDeshabilitado"
+                    [class.ng-invalid]="getPreguntaControl(idx).get('respuesta')?.invalid && getPreguntaControl(idx).get('respuesta')?.touched"
+                  />
+                </div>
 
-              <!-- TEXTO LARGO -->
-              <div *ngIf="pregunta.tipo === 'TEXTO_LARGO'">
-                <textarea 
-                  pInputTextarea 
-                  formControlName="respuesta"
-                  placeholder="Escribe tu respuesta detallada..."
-                  rows="4"
-                  class="w-full"
-                  [disabled]="formularioDeshabilitado"
-                  [class.ng-invalid]="getPreguntaControl(preguntaActual).get('respuesta')?.invalid && getPreguntaControl(preguntaActual).get('respuesta')?.touched"
-                ></textarea>
-              </div>
+                <!-- TEXTO LARGO -->
+                <div *ngIf="pregunta.tipo === 'TEXTO_LARGO'">
+                  <textarea 
+                    pInputTextarea 
+                    formControlName="respuesta"
+                    placeholder="Escribe tu respuesta detallada..."
+                    rows="4"
+                    class="w-full"
+                    [disabled]="formularioDeshabilitado"
+                    [class.ng-invalid]="getPreguntaControl(idx).get('respuesta')?.invalid && getPreguntaControl(idx).get('respuesta')?.touched"
+                  ></textarea>
+                </div>
 
               <!-- OPCIÓN ÚNICA -->
               <div *ngIf="pregunta.tipo === 'OPCION_UNICA'" class="opciones-container">
@@ -117,7 +118,7 @@
               </div>
 
               <!-- OPCIÓN MÚLTIPLE -->
-              <div *ngIf="pregunta.tipo === 'OPCION_MULTIPLE'" class="opciones-container" [formGroup]="getPreguntaControl(preguntaActual)">
+              <div *ngIf="pregunta.tipo === 'OPCION_MULTIPLE'" class="opciones-container" [formGroup]="getPreguntaControl(idx)">
                 <div *ngIf="pregunta.opciones && pregunta.opciones.length > 0; else noOpcionesMultiple" formArrayName="selecciones">
                   <div *ngFor="let opcion of pregunta.opciones; let j = index" class="opcion-item">
                     <p-checkbox 
@@ -125,7 +126,7 @@
                       [binary]="true"
                       [formControlName]="j"
                       [disabled]="formularioDeshabilitado"
-                      (onChange)="onOpcionMultipleChange(preguntaActual, j, $event.checked)"
+                      (onChange)="onOpcionMultipleChange(idx, j, $event.checked)"
                     ></p-checkbox>
                     <label [for]="'check_pregunta_' + pregunta.id + '_opcion_' + j" class="opcion-label">{{ opcion }}</label>
                   </div>
@@ -152,7 +153,7 @@
                   class="w-full"
                 ></p-slider>
                 <div class="escala-value">
-                  Valor seleccionado: {{ getPreguntaControl(preguntaActual).get('respuesta')?.value }}
+                  Valor seleccionado: {{ getPreguntaControl(idx).get('respuesta')?.value }}
                 </div>
               </div>
 
@@ -183,14 +184,15 @@
               <!-- Mensaje de error -->
               <small 
                 class="error-message" 
-                *ngIf="getPreguntaControl(preguntaActual).get('respuesta')?.invalid && getPreguntaControl(preguntaActual).get('respuesta')?.touched"
+                *ngIf="getPreguntaControl(idx).get('respuesta')?.invalid && getPreguntaControl(idx).get('respuesta')?.touched"
               >
                 <i class="pi pi-exclamation-circle"></i>
                 Esta pregunta es requerida
               </small>
             </div>
           </div>
-        </div>
+          </div>
+        </ng-container>
       </div>
 
       <!-- Navegación entre preguntas -->
@@ -248,6 +250,84 @@
     ></p-button>
   </div>
 </div>
+
+<!-- Modal para confirmar envío -->
+<p-dialog
+  [(visible)]="displayConfirmDialog"
+  header="Confirmar envío"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarEnvio()"
+>
+  <div class="p-4">
+    <!-- Information Section -->
+    <div class="surface-50 p-4 border-round-lg">
+      <div class="text-center">
+        <div class="flex justify-content-center mb-4">
+          <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+            <i class="pi pi-check text-xl"></i>
+          </div>
+        </div>
+        
+        <p class="text-600 text-lg mb-0">
+          ¿Estás seguro de enviar tus respuestas? No podrás modificarlas después.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <!-- En pantallas pequeñas: Enviar arriba, Cancelar abajo -->
+      <div class="flex flex-column sm:hidden gap-2 w-full">
+        <p-button
+          label="Enviar respuestas"
+          icon="pi pi-check"
+          (click)="confirmarEnvio()"
+          styleClass="p-button-success w-full"
+          [loading]="enviando"
+          [disabled]="enviando">
+        </p-button>
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          (click)="cancelarEnvio()"
+          styleClass="p-button-text w-full"
+          [disabled]="enviando">
+        </p-button>
+      </div>
+      
+      <!-- En pantallas grandes: Cancelar izquierda, Enviar derecha -->
+      <div class="hidden sm:flex gap-2">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          (click)="cancelarEnvio()"
+          styleClass="p-button-text"
+          [disabled]="enviando">
+        </p-button>
+        <p-button
+          label="Enviar respuestas"
+          icon="pi pi-check"
+          (click)="confirmarEnvio()"
+          styleClass="p-button-success"
+          [loading]="enviando"
+          [disabled]="enviando">
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
 
 <!-- Toast y confirmaciones -->
 <p-toast></p-toast>

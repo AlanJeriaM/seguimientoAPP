@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { Subject, takeUntil, interval } from 'rxjs';
@@ -25,6 +25,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   totalPreguntas = 0;
   progreso = 0;
   tiempoInicio?: Date;
+  displayConfirmDialog = false;
   
   // Auto-guardado
   private autoGuardado$ = interval(30000); // Cada 30 segundos
@@ -36,7 +37,8 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private respuestaService: RespuestaService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -195,15 +197,68 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   anteriorPregunta(): void {
     if (this.preguntaActual > 0) {
       this.preguntaActual--;
+      this.cdr.detectChanges();
     }
   }
 
   siguientePregunta(): void {
     const controlActual = this.getPreguntaControl(this.preguntaActual);
+    const preguntaActualData = this.encuesta?.preguntas[this.preguntaActual];
     
-    if (controlActual.valid || !this.encuesta?.preguntas[this.preguntaActual].es_requerida) {
+    // Si la pregunta no es requerida, permitir avanzar
+    if (!preguntaActualData?.es_requerida) {
       if (this.preguntaActual < this.totalPreguntas - 1) {
         this.preguntaActual++;
+      }
+      return;
+    }
+    
+    // Validar según el tipo de pregunta
+    const tipo = controlActual.get('tipo')?.value;
+    const respuesta = controlActual.get('respuesta')?.value;
+    let esValida = false;
+    
+    switch (tipo) {
+      case 'TEXTO_CORTO':
+      case 'TEXTO_LARGO':
+        // Validar que el texto no esté vacío (sin contar espacios)
+        esValida = typeof respuesta === 'string' && respuesta.trim() !== '';
+        break;
+        
+      case 'OPCION_UNICA':
+        // Validar que se haya seleccionado una opción
+        esValida = respuesta !== null && respuesta !== undefined && respuesta !== '';
+        break;
+        
+      case 'OPCION_MULTIPLE':
+        // Validar que se haya seleccionado al menos una opción
+        const selecciones = controlActual.get('selecciones') as FormArray;
+        esValida = selecciones && selecciones.value.some((sel: boolean) => sel === true);
+        break;
+        
+      case 'NUMERO':
+        // Validar que se haya ingresado un número válido
+        esValida = respuesta !== null && respuesta !== undefined && respuesta !== '' && !isNaN(respuesta);
+        break;
+        
+      case 'ESCALA':
+        // Para escala, siempre hay un valor por defecto
+        esValida = respuesta !== null && respuesta !== undefined;
+        break;
+        
+      case 'FECHA':
+        // Validar que se haya seleccionado una fecha
+        esValida = respuesta !== null && respuesta !== undefined;
+        break;
+        
+      default:
+        esValida = controlActual.valid;
+    }
+    
+    if (esValida) {
+      if (this.preguntaActual < this.totalPreguntas - 1) {
+        this.preguntaActual++;
+        this.cdr.detectChanges();
       }
     } else {
       this.messageService.add({
@@ -273,14 +328,16 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.confirmationService.confirm({
-      message: '¿Estás seguro de enviar tus respuestas? No podrás modificarlas después.',
-      header: 'Confirmar envío',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.procesarEnvio();
-      }
-    });
+    this.displayConfirmDialog = true;
+  }
+
+  cancelarEnvio(): void {
+    this.displayConfirmDialog = false;
+  }
+
+  confirmarEnvio(): void {
+    this.displayConfirmDialog = false;
+    this.procesarEnvio();
   }
 
   private procesarEnvio(): void {
@@ -417,5 +474,10 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
     
     // Para números y fechas
     return respuesta !== null && respuesta !== undefined && respuesta !== '';
+  }
+
+  // TrackBy function para forzar recreación del DOM cuando cambia la pregunta
+  trackByPreguntaIndex(index: number, item: number): number {
+    return item; // Retorna el índice de la pregunta actual
   }
 }
