@@ -16,6 +16,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   loading = false;
   loadingEliminadas = false;
   searchText = '';
+  searchTextEliminadas = '';
   estadoFiltro = 'TODOS';
   currentPage = 1;
   currentPageEliminadas = 1;
@@ -136,7 +137,8 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     this.loadingEliminadas = true;
     this.encuestaService.obtenerEncuestasEliminadas(
       this.currentPageEliminadas,
-      this.pageSize
+      this.pageSize,
+      this.searchTextEliminadas
     ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         if (response.ok) {
@@ -180,6 +182,17 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     this.estadoFiltro = 'TODOS';
     this.currentPage = 1;
     this.cargarEncuestas();
+  }
+
+  buscarEncuestasEliminadas(): void {
+    this.currentPageEliminadas = 1;
+    this.cargarEncuestasEliminadas();
+  }
+
+  limpiarFiltrosEliminadas(): void {
+    this.searchTextEliminadas = '';
+    this.currentPageEliminadas = 1;
+    this.cargarEncuestasEliminadas();
   }
 
   onPageChange(event: any): void {

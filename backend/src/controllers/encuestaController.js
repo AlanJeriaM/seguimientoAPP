@@ -529,14 +529,30 @@ const eliminarEncuesta = async (req, res) => {
 // Obtener encuestas eliminadas
 const obtenerEncuestasEliminadas = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search } = req.query;
     const offset = (page - 1) * limit;
     const adminId = req.usuario.id;
 
+    const whereClause = {
+      activo: false
+    };
+
+    // Agregar búsqueda si se proporciona
+    if (search && search.trim() !== '') {
+      const searchLower = search.toLowerCase();
+      whereClause[Op.or] = [
+        { titulo: { [Op.like]: `%${search}%` } },
+        { descripcion: { [Op.like]: `%${search}%` } }
+      ];
+      
+      // Si es un número, buscar también por ID
+      if (!isNaN(search)) {
+        whereClause[Op.or].push({ id: parseInt(search) });
+      }
+    }
+
     const encuestas = await Encuesta.findAndCountAll({
-      where: { 
-        activo: false
-      },
+      where: whereClause,
       attributes: [
         'id', 'titulo', 'descripcion', 'estado', 'fecha_eliminacion',
         'fecha_creacion', 'fecha_actualizacion'

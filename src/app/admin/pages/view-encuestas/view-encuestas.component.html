@@ -204,15 +204,44 @@
         <div class="grid">
           <div class="col-12">
             <!-- Barra de herramientas para eliminadas ARRIBA -->
-            <div class="flex justify-content-end mb-3">
-              <p-button
-                pRipple
-                label="Actualizar"
-                icon="pi pi-refresh"
-                styleClass="p-button-sm p-button-info"
-                (click)="actualizarDatos()"
-                [loading]="loadingEliminadas"
-              ></p-button>
+            <div class="grid mb-3">
+              <!-- Sección de búsqueda -->
+              <div class="col-12 lg:col-9 mb-2">
+                <div class="flex flex-column sm:flex-row align-items-stretch sm:align-items-center gap-2">
+                  <span class="p-input-icon-left w-full sm:w-auto" style="flex: 1; max-width: 100%; min-width: 200px;">
+                    <i class="pi pi-search"></i>
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="searchTextEliminadas"
+                      (input)="buscarEncuestasEliminadas()"
+                      (keyup.enter)="buscarEncuestasEliminadas()"
+                      placeholder="Buscar encuestas eliminadas..."
+                      class="w-full"
+                    />
+                  </span>
+                  <p-button
+                    styleClass="p-button-text p-button-sm w-full sm:w-auto"
+                    icon="pi pi-filter-slash"
+                    (click)="limpiarFiltrosEliminadas()"
+                    pTooltip="Limpiar filtros"
+                  ></p-button>
+                </div>
+              </div>
+
+              <!-- Botones de acción -->
+              <div class="col-12 lg:col-3 mb-2">
+                <div class="flex flex-column sm:flex-row justify-content-start lg:justify-content-end gap-2">
+                  <p-button
+                    pRipple
+                    label="Actualizar"
+                    icon="pi pi-refresh"
+                    styleClass="p-button-sm p-button-info w-full lg:w-auto"
+                    (click)="actualizarDatos()"
+                    [loading]="loadingEliminadas"
+                  ></p-button>
+                </div>
+              </div>
             </div>
 
             <p-card class="text-center" header="Encuestas Eliminadas">
@@ -237,7 +266,6 @@
                   <tr>
                     <th>ID</th>
                     <th>Título</th>
-                    <th>Estado</th>
                     <th>Fecha Eliminación</th>
                     <th>Fecha Creación</th>
                     <th style="width: 150px">Acciones</th>
@@ -257,15 +285,6 @@
                       <div *ngIf="encuesta.descripcion" class="text-500 text-sm mt-1">
                         {{ encuesta.descripcion | slice:0:100 }}{{ encuesta.descripcion.length > 100 ? '...' : '' }}
                       </div>
-                    </td>
-                    <td>
-                      <span class="p-column-title">Estado</span>
-                      <span
-                        [class]="getEstadoBadgeClass(encuesta.estado, encuesta)"
-                        class="estado-badge"
-                      >
-                        {{ getEstadoLabel(encuesta.estado, encuesta) }}
-                      </span>
                     </td>
                     <td>
                       <span class="p-column-title">Fecha Eliminación</span>
@@ -299,7 +318,7 @@
                 <!-- Mensaje cuando no hay datos -->
                 <ng-template pTemplate="emptymessage" let-columns>
                   <tr>
-                    <td [attr.colspan]="6" class="text-center">
+                    <td [attr.colspan]="5" class="text-center">
                       <div class="p-4">
                         <i class="pi pi-trash" style="font-size: 3rem; color: #6c757d;"></i>
                         <p class="mt-2 text-500">No hay encuestas eliminadas</p>
