@@ -234,12 +234,6 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
     this.notificacionService.actualizarContadorNoLeidas();
   }
 
-  verTodasLasNotificaciones(): void {
-    this.notificationPanel.hide();
-    // Podrías crear una página dedicada para ver todas las notificaciones
-    // this.router.navigate(['/user/notificaciones']);
-  }
-
   getNotificationIcon(tipo: string): string {
     switch (tipo) {
       case 'NUEVA_ENCUESTA':
