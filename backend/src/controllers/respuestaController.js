@@ -36,7 +36,7 @@ const obtenerEncuestasDisponibles = async (req, res) => {
     const encuestasConEstado = await Promise.all(
       encuestas.rows.map(async (encuesta) => {
         const yaRespondio = await Respuesta.findOne({
-          where: { 
+          where: {
             encuesta_id: encuesta.id,
             usuario_id: usuarioId
           },
@@ -44,7 +44,7 @@ const obtenerEncuestasDisponibles = async (req, res) => {
         });
 
         const totalPreguntas = await Pregunta.count({
-          where: { 
+          where: {
             encuesta_id: encuesta.id,
             activo: true
           }
@@ -88,7 +88,7 @@ const obtenerEncuestaParaResponder = async (req, res) => {
 
     // Verificar que la encuesta esté activa
     const encuesta = await Encuesta.findOne({
-      where: { 
+      where: {
         id: id,
         estado: 'ACTIVA',
         activo: true
@@ -101,7 +101,7 @@ const obtenerEncuestaParaResponder = async (req, res) => {
           required: false,
           order: [['orden', 'ASC']],
           attributes: [
-            'id', 'texto', 'tipo', 'es_requerida', 'orden', 
+            'id', 'texto', 'tipo', 'es_requerida', 'orden',
             'opciones', 'configuracion'
           ]
         }
@@ -121,7 +121,7 @@ const obtenerEncuestaParaResponder = async (req, res) => {
 
     // Verificar si ya respondió
     const yaRespondio = await Respuesta.findOne({
-      where: { 
+      where: {
         encuesta_id: id,
         usuario_id: usuarioId
       }
@@ -137,7 +137,7 @@ const obtenerEncuestaParaResponder = async (req, res) => {
     // Crear o actualizar sesión
     const sessionToken = crypto.randomBytes(32).toString('hex');
     const [sesion] = await SesionEncuesta.findOrCreate({
-      where: { 
+      where: {
         encuesta_id: id,
         usuario_id: usuarioId
       },
@@ -167,7 +167,7 @@ const obtenerEncuestaParaResponder = async (req, res) => {
             pregunta.opciones = pregunta.opciones.split(',').map(opt => opt.trim()).filter(opt => opt);
           }
         }
-        
+
         if (pregunta.configuracion && typeof pregunta.configuracion === 'string') {
           try {
             pregunta.configuracion = JSON.parse(pregunta.configuracion);
@@ -181,8 +181,8 @@ const obtenerEncuestaParaResponder = async (req, res) => {
     // Marcar notificación como leída
     await Notificacion.update(
       { leida: true, fecha_leida: new Date() },
-      { 
-        where: { 
+      {
+        where: {
           usuario_id: usuarioId,
           encuesta_id: id,
           tipo: 'NUEVA_ENCUESTA'
@@ -225,7 +225,7 @@ const enviarRespuestas = async (req, res) => {
 
     // Verificar que la encuesta esté activa
     const encuesta = await Encuesta.findOne({
-      where: { 
+      where: {
         id: id,
         estado: 'ACTIVA',
         activo: true
@@ -250,7 +250,7 @@ const enviarRespuestas = async (req, res) => {
 
     // Verificar sesión
     const sesion = await SesionEncuesta.findOne({
-      where: { 
+      where: {
         encuesta_id: id,
         usuario_id: usuarioId,
         session_token: session_token
@@ -267,7 +267,7 @@ const enviarRespuestas = async (req, res) => {
     // Verificar si ya respondió (si no permite múltiples respuestas)
     if (!encuesta.permite_multiple_respuesta) {
       const yaRespondio = await Respuesta.findOne({
-        where: { 
+        where: {
           encuesta_id: id,
           usuario_id: usuarioId
         }
@@ -284,7 +284,7 @@ const enviarRespuestas = async (req, res) => {
     // Validar que todas las preguntas requeridas tengan respuesta
     const preguntasRequeridas = encuesta.preguntas.filter(p => p.es_requerida);
     const preguntasRespondidas = respuestas.map(r => r.pregunta_id);
-    
+
     for (const pregunta of preguntasRequeridas) {
       if (!preguntasRespondidas.includes(pregunta.id)) {
         return res.status(400).json({
@@ -434,7 +434,7 @@ const obtenerNotificaciones = async (req, res) => {
     const offset = (page - 1) * limit;
     const usuarioId = req.usuario.id;
 
-    const whereClause = { 
+    const whereClause = {
       usuario_id: usuarioId,
       activo: true
     };
@@ -481,7 +481,7 @@ const marcarNotificacionLeida = async (req, res) => {
     const usuarioId = req.usuario.id;
 
     const notificacion = await Notificacion.findOne({
-      where: { 
+      where: {
         id: id,
         usuario_id: usuarioId,
         activo: true
