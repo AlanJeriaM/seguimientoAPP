@@ -29,11 +29,16 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   displayDialog = false;
   displayDeleteDialog = false;
   displayDeletePermanentDialog = false;
+  displayReactivateDialog = false;
   editMode = false;
   selectedEncuesta?: Encuesta;
   encuestaParaEliminar?: Encuesta;
   encuestaParaEliminarPermanente?: Encuesta;
+  encuestaParaReactivar?: Encuesta;
   deleting = false;
+  deletingPermanently = false;
+  reactivating = false;
+  confirmText = '';
   activeTabIndex = 0;
 
   private destroy$ = new Subject<void>();
@@ -279,47 +284,21 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   }
 
   reactivarEncuesta(encuesta: Encuesta): void {
-    this.confirmationService.confirm({
-      message: `¿Estás seguro de que quieres reactivar la encuesta "${encuesta.titulo}"?`,
-      header: 'Confirmar Reactivación',
-      icon: 'pi pi-question-circle',
-      accept: () => {
-        this.encuestaService.reactivarEncuesta(encuesta.id!).pipe(
-          takeUntil(this.destroy$)
-        ).subscribe({
-          next: (response) => {
-            if (response.ok) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Éxito',
-                detail: response.msj || 'Encuesta reactivada correctamente'
-              });
-              this.cargarEncuestas();
-              this.cargarEncuestasEliminadas();
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.msj || 'Error al reactivar la encuesta'
-              });
-            }
-          },
-          error: (error) => {
-            console.error('Error al reactivar encuesta:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Error del servidor al reactivar la encuesta'
-            });
-          }
-        });
-      }
-    });
+    this.encuestaParaReactivar = encuesta;
+    this.displayReactivateDialog = true;
   }
 
-  eliminarPermanentemente(encuesta: Encuesta): void {
-    // Primero verificar si tiene respuestas
-    this.encuestaService.eliminarEncuestaPermanentemente(encuesta.id!).pipe(
+  cancelarReactivacion(): void {
+    this.displayReactivateDialog = false;
+    this.encuestaParaReactivar = undefined;
+    this.reactivating = false;
+  }
+
+  confirmarReactivacion(): void {
+    if (!this.encuestaParaReactivar) return;
+    
+    this.reactivating = true;
+    this.encuestaService.reactivarEncuesta(this.encuestaParaReactivar.id!).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
@@ -327,21 +306,72 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
-            detail: response.msj || 'Encuesta eliminada permanentemente'
+            detail: response.msj || 'Encuesta reactivada correctamente'
           });
+          this.displayReactivateDialog = false;
+          this.encuestaParaReactivar = undefined;
+          this.cargarEncuestas();
           this.cargarEncuestasEliminadas();
         } else {
-          // Si requiere confirmación debido a respuestas asociadas
-          if (response.requiere_confirmacion && response.data) {
-            this.confirmarEliminacionConRespuestas(encuesta, response.data);
-          } else {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: response.msj || 'Error al eliminar permanentemente la encuesta'
-            });
-          }
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.msj || 'Error al reactivar la encuesta'
+          });
         }
+        this.reactivating = false;
+      },
+      error: (error) => {
+        console.error('Error al reactivar encuesta:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error del servidor al reactivar la encuesta'
+        });
+        this.reactivating = false;
+      }
+    });
+  }
+
+  eliminarPermanentemente(encuesta: Encuesta): void {
+    this.encuestaParaEliminarPermanente = encuesta;
+    this.confirmText = '';
+    this.displayDeletePermanentDialog = true;
+  }
+
+  cancelarEliminacionPermanente(): void {
+    this.displayDeletePermanentDialog = false;
+    this.encuestaParaEliminarPermanente = undefined;
+    this.confirmText = '';
+    this.deletingPermanently = false;
+  }
+
+  confirmarEliminacionPermanente(): void {
+    if (!this.encuestaParaEliminarPermanente || this.confirmText !== 'ELIMINAR') return;
+    
+    this.deletingPermanently = true;
+    this.encuestaService.eliminarEncuestaPermanentemente(this.encuestaParaEliminarPermanente.id!, true).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (response) => {
+        if (response.ok) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Eliminación Completada',
+            detail: response.msj || 'Encuesta eliminada permanentemente'
+          });
+          this.displayDeletePermanentDialog = false;
+          this.encuestaParaEliminarPermanente = undefined;
+          this.confirmText = '';
+          this.cargarEncuestasEliminadas();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.msj || 'Error al eliminar permanentemente la encuesta'
+          });
+        }
+        this.deletingPermanently = false;
       },
       error: (error) => {
         console.error('Error al eliminar permanentemente encuesta:', error);
@@ -350,48 +380,7 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
           summary: 'Error',
           detail: 'Error del servidor al eliminar permanentemente la encuesta'
         });
-      }
-    });
-  }
-
-  private confirmarEliminacionConRespuestas(encuesta: Encuesta, data: any): void {
-    this.confirmationService.confirm({
-      message: `⚠️ ADVERTENCIA: Esta encuesta tiene datos asociados.\n\n${data.mensaje_confirmacion}\n\n¿Deseas continuar con la eliminación permanente?`,
-      header: 'Eliminación Permanente - Confirmar',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
-      acceptLabel: 'Sí, eliminar todo',
-      rejectLabel: 'Cancelar',
-      accept: () => {
-        // Hacer la llamada con force_delete=true
-        this.encuestaService.eliminarEncuestaPermanentemente(encuesta.id!, true).pipe(
-          takeUntil(this.destroy$)
-        ).subscribe({
-          next: (response) => {
-            if (response.ok) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Eliminación Completada',
-                detail: response.msj || 'Encuesta y todos sus datos eliminados permanentemente'
-              });
-              this.cargarEncuestasEliminadas();
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.msj || 'Error en la eliminación'
-              });
-            }
-          },
-          error: (error) => {
-            console.error('Error en eliminación forzada:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Error del servidor en la eliminación'
-            });
-          }
-        });
+        this.deletingPermanently = false;
       }
     });
   }
