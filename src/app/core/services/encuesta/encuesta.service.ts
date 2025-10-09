@@ -97,10 +97,14 @@ export class EncuestaService {
   }
 
   // Obtener encuestas eliminadas
-  obtenerEncuestasEliminadas(page: number = 1, limit: number = 10): Observable<any> {
-    const params = new HttpParams()
+  obtenerEncuestasEliminadas(page: number = 1, limit: number = 10, search?: string): Observable<any> {
+    let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
+
+    if (search && search.trim() !== '') {
+      params = params.set('search', search);
+    }
 
     return this.http.get(`${this.baseUrl}/eliminadas`, { params });
   }
