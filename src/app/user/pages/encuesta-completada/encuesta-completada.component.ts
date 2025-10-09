@@ -135,24 +135,6 @@ export class EncuestaCompletadaComponent implements OnInit, OnDestroy {
     this.mostrarDetalles = true;
   }
 
-  descargarResultados(encuesta: EncuestaCompletada): void {
-    if (!encuesta.puede_ver_resultados) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'No disponible',
-        detail: 'Los resultados de esta encuesta no están disponibles para descarga'
-      });
-      return;
-    }
-
-    // TODO: Implementar descarga de resultados
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Descarga iniciada',
-      detail: `Descargando resultados de "${encuesta.titulo}"`
-    });
-  }
-
   volverALista(): void {
     this.mostrarDetalles = false;
     this.encuestaSeleccionada = undefined;
