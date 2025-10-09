@@ -292,18 +292,6 @@ const obtenerReporteEncuesta = async (req, res) => {
     const tiempoPromedioSegundos = tiempoPromedio?.tiempo_promedio || 0;
     const tiempoPromedioMinutos = Math.round(tiempoPromedioSegundos / 60);
 
-    // Distribución temporal de respuestas
-    const respuestasPorDia = await Respuesta.findAll({
-      where: { encuesta_id: id },
-      attributes: [
-        [sequelize.fn('DATE', sequelize.col('fecha_respuesta')), 'fecha'],
-        [sequelize.fn('COUNT', sequelize.col('id')), 'total']
-      ],
-      group: [sequelize.fn('DATE', sequelize.col('fecha_respuesta'))],
-      order: [[sequelize.fn('DATE', sequelize.col('fecha_respuesta')), 'ASC']],
-      raw: true
-    });
-
     res.json({
       ok: true,
       data: {
@@ -321,8 +309,7 @@ const obtenerReporteEncuesta = async (req, res) => {
           tiempo_promedio_minutos: tiempoPromedioMinutos,
           tasa_completacion: totalRespuestas > 0 ? (usuariosUnicos / totalRespuestas * 100).toFixed(2) : 0
         },
-        preguntas: reportePreguntas,
-        respuestas_por_dia: respuestasPorDia
+        preguntas: reportePreguntas
       }
     });
 
@@ -331,174 +318,6 @@ const obtenerReporteEncuesta = async (req, res) => {
     res.status(500).json({
       ok: false,
       msj: 'Error del servidor al obtener el reporte'
-    });
-  }
-};
-
-// Obtener comparación entre encuestas
-const obtenerComparacionEncuestas = async (req, res) => {
-  try {
-    const adminId = req.usuario.id;
-    const { encuesta_ids } = req.query;
-
-    if (!encuesta_ids || !Array.isArray(encuesta_ids)) {
-      return res.status(400).json({
-        ok: false,
-        msj: 'Se requieren IDs de encuestas para comparar'
-      });
-    }
-
-    const comparacion = await Promise.all(
-      encuesta_ids.map(async (encuestaId) => {
-        const encuesta = await Encuesta.findOne({
-          where: { 
-            id: encuestaId,
-            activo: true
-          },
-          attributes: ['id', 'titulo', 'estado', 'fecha_creacion']
-        });
-
-        if (!encuesta) return null;
-
-        const totalRespuestas = await Respuesta.count({
-          where: { encuesta_id: encuestaId }
-        });
-
-        const usuariosUnicos = await Respuesta.count({
-          where: { encuesta_id: encuestaId },
-          distinct: true,
-          col: 'usuario_id'
-        });
-
-        const tiempoPromedio = await Respuesta.findOne({
-          where: { encuesta_id: encuestaId },
-          attributes: [
-            [sequelize.fn('AVG', sequelize.col('tiempo_respuesta')), 'tiempo_promedio']
-          ],
-          raw: true
-        });
-
-        return {
-          id: encuesta.id,
-          titulo: encuesta.titulo,
-          estado: encuesta.estado,
-          fecha_creacion: encuesta.fecha_creacion,
-          total_respuestas: totalRespuestas,
-          usuarios_unicos: usuariosUnicos,
-          tiempo_promedio_minutos: Math.round((tiempoPromedio?.tiempo_promedio || 0) / 60)
-        };
-      })
-    );
-
-    const comparacionFiltrada = comparacion.filter(c => c !== null);
-
-    res.json({
-      ok: true,
-      data: {
-        comparacion: comparacionFiltrada,
-        total_encuestas: comparacionFiltrada.length
-      }
-    });
-
-  } catch (error) {
-    console.error('Error en obtenerComparacionEncuestas:', error);
-    res.status(500).json({
-      ok: false,
-      msj: 'Error del servidor al obtener la comparación'
-    });
-  }
-};
-
-// Obtener tendencias de participación
-const obtenerTendenciasParticipacion = async (req, res) => {
-  try {
-    const adminId = req.usuario.id;
-    const { dias = 30 } = req.query;
-
-    const fechaLimite = new Date();
-    fechaLimite.setDate(fechaLimite.getDate() - parseInt(dias));
-
-    // Respuestas por día
-    const respuestasPorDia = await Respuesta.findAll({
-      include: [{
-        model: Encuesta,
-        as: 'encuesta',
-        where: { 
-          activo: true
-        }
-      }],
-      where: {
-        fecha_respuesta: {
-          [Op.gte]: fechaLimite
-        }
-      },
-      attributes: [
-        [sequelize.fn('DATE', sequelize.col('fecha_respuesta')), 'fecha'],
-        [sequelize.fn('COUNT', sequelize.col('Respuesta.id')), 'total']
-      ],
-      group: [sequelize.fn('DATE', sequelize.col('fecha_respuesta'))],
-      order: [[sequelize.fn('DATE', sequelize.col('fecha_respuesta')), 'ASC']],
-      raw: true
-    });
-
-    // Usuarios activos por día
-    const usuariosActivosPorDia = await Respuesta.findAll({
-      include: [{
-        model: Encuesta,
-        as: 'encuesta',
-        where: { 
-          activo: true
-        }
-      }],
-      where: {
-        fecha_respuesta: {
-          [Op.gte]: fechaLimite
-        }
-      },
-      attributes: [
-        [sequelize.fn('DATE', sequelize.col('fecha_respuesta')), 'fecha'],
-        [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('usuario_id'))), 'usuarios_unicos']
-      ],
-      group: [sequelize.fn('DATE', sequelize.col('fecha_respuesta'))],
-      order: [[sequelize.fn('DATE', sequelize.col('fecha_respuesta')), 'ASC']],
-      raw: true
-    });
-
-    // Top encuestas por participación
-    const topEncuestas = await Respuesta.findAll({
-      include: [{
-        model: Encuesta,
-        as: 'encuesta',
-        where: { 
-          activo: true
-        },
-        attributes: ['id', 'titulo']
-      }],
-      attributes: [
-        'encuesta_id',
-        [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('usuario_id'))), 'usuarios_unicos']
-      ],
-      group: ['encuesta_id'],
-      order: [[sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('usuario_id'))), 'DESC']],
-      limit: 5,
-      raw: true
-    });
-
-    res.json({
-      ok: true,
-      data: {
-        periodo_dias: parseInt(dias),
-        respuestas_por_dia: respuestasPorDia,
-        usuarios_activos_por_dia: usuariosActivosPorDia,
-        top_encuestas: topEncuestas
-      }
-    });
-
-  } catch (error) {
-    console.error('Error en obtenerTendenciasParticipacion:', error);
-    res.status(500).json({
-      ok: false,
-      msj: 'Error del servidor al obtener las tendencias'
     });
   }
 };
@@ -585,8 +404,6 @@ const exportarDatosEncuesta = async (req, res) => {
 module.exports = {
   obtenerEstadisticasGenerales,
   obtenerReporteEncuesta,
-  obtenerComparacionEncuestas,
-  obtenerTendenciasParticipacion,
   exportarDatosEncuesta
 };
 

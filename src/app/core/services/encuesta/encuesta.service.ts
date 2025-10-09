@@ -134,18 +134,6 @@ export class EncuestaService {
     return this.http.get(`${this.baseUrl}/${id}/reporte`);
   }
 
-  // Obtener tendencias de participación
-  obtenerTendenciasParticipacion(dias: number = 30): Observable<any> {
-    const params = new HttpParams().set('dias', dias.toString());
-    return this.http.get(`${this.baseUrl}/reportes/tendencias`, { params });
-  }
-
-  // Obtener comparación entre encuestas
-  obtenerComparacionEncuestas(encuestaIds: number[]): Observable<any> {
-    const params = new HttpParams().set('encuesta_ids', JSON.stringify(encuestaIds));
-    return this.http.get(`${this.baseUrl}/reportes/comparacion`, { params });
-  }
-
   // Exportar datos de encuesta
   exportarDatosEncuesta(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/${id}/exportar`);

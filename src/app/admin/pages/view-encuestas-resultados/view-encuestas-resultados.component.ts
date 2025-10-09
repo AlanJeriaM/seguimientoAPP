@@ -10,18 +10,13 @@ import { MessageService } from 'primeng/api';
 })
 export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
   estadisticasGenerales: any = {};
-  tendenciasParticipacion: any = {};
-  encuestasSeleccionadas: any[] = [];
   encuestasDisponibles: any[] = [];
   reporteEncuesta: any = {};
   loading = false;
   loadingEstadisticas = false;
-  loadingTendencias = false;
   loadingReporte = false;
-  diasTendencias = 30;
   encuestaIdSeleccionada: number | null = null;
   displayReporteDialog = false;
-  displayComparacionDialog = false;
 
   private destroy$ = new Subject<void>();
 
@@ -32,7 +27,6 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarEstadisticasGenerales();
-    this.cargarTendenciasParticipacion();
     this.cargarEncuestasDisponibles();
   }
 
@@ -70,35 +64,6 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     });
   }
 
-  cargarTendenciasParticipacion(): void {
-    this.loadingTendencias = true;
-    this.encuestaService.obtenerTendenciasParticipacion(this.diasTendencias).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (response) => {
-        if (response.ok) {
-          this.tendenciasParticipacion = response.data;
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.msj || 'Error al cargar tendencias'
-          });
-        }
-        this.loadingTendencias = false;
-      },
-      error: (error) => {
-        console.error('Error al cargar tendencias:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error del servidor al cargar tendencias'
-        });
-        this.loadingTendencias = false;
-      }
-    });
-  }
-
   cargarEncuestasDisponibles(): void {
     this.loading = true;
     this.encuestaService.obtenerEncuestas(1, 100).pipe(
@@ -126,10 +91,6 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     });
-  }
-
-  onDiasTendenciasChange(): void {
-    this.cargarTendenciasParticipacion();
   }
 
   verReporteEncuesta(encuestaId: number): void {
@@ -232,32 +193,14 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     return csvRows.join('\n');
   }
 
-  compararEncuestas(): void {
-    if (this.encuestasSeleccionadas.length < 2) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Advertencia',
-        detail: 'Selecciona al menos 2 encuestas para comparar'
-      });
-      return;
-    }
-
-    this.displayComparacionDialog = true;
-  }
-
   cerrarReporteDialog(): void {
     this.displayReporteDialog = false;
     this.reporteEncuesta = {};
     this.encuestaIdSeleccionada = null;
   }
 
-  cerrarComparacionDialog(): void {
-    this.displayComparacionDialog = false;
-  }
-
   actualizarDatos(): void {
     this.cargarEstadisticasGenerales();
-    this.cargarTendenciasParticipacion();
     this.cargarEncuestasDisponibles();
   }
 
