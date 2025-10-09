@@ -54,7 +54,7 @@ class EmailService {
                 max-width: 500px;
                 margin: 0 auto;
                 background: white;
-                border-radius: 8px;
+                border-radius: 5px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 overflow: hidden;
             }
@@ -89,7 +89,7 @@ class EmailService {
             .code-box {
                 background-color: #f8f9fa;
                 border: 2px solid #e9ecef;
-                border-radius: 6px;
+                border-radius: 5px;
                 padding: 20px;
                 text-align: center;
                 margin: 24px 0;
@@ -195,7 +195,7 @@ class EmailService {
                 max-width: 500px;
                 margin: 0 auto;
                 background: white;
-                border-radius: 8px;
+                border-radius: 5px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 overflow: hidden;
             }
@@ -230,7 +230,7 @@ class EmailService {
             .success-box {
                 background-color: #f0fdf4;
                 border: 2px solid #bbf7d0;
-                border-radius: 6px;
+                border-radius: 5px;
                 padding: 20px;
                 text-align: center;
                 margin: 24px 0;
@@ -248,7 +248,7 @@ class EmailService {
                 color: #374151;
                 background-color: white;
                 padding: 8px 12px;
-                border-radius: 4px;
+                border-radius: 5px;
                 display: inline-block;
             }
 

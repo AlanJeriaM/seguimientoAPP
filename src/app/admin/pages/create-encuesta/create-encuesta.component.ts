@@ -16,6 +16,8 @@ export class CreateEncuestaComponent implements OnInit {
   editMode = false;
   encuestaId?: number;
   today = new Date();
+  formInitialValue: any = null;
+  hasChanges = false;
 
   questionTypes = [
     { label: 'Texto', value: 'TEXTO_LARGO' },
@@ -83,6 +85,11 @@ export class CreateEncuestaComponent implements OnInit {
 
     this.encuestaForm.get('fecha_fin')?.valueChanges.subscribe(() => {
       this.encuestaForm.get('fecha_inicio')?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    // Detectar cambios en el formulario
+    this.encuestaForm.valueChanges.subscribe(() => {
+      this.detectarCambios();
     });
 
     // Agregar primera pregunta por defecto
@@ -493,6 +500,10 @@ export class CreateEncuestaComponent implements OnInit {
             this.addQuestion();
           }
 
+          // Guardar valor inicial del formulario para detectar cambios
+          this.formInitialValue = JSON.parse(JSON.stringify(this.encuestaForm.value));
+          this.hasChanges = false;
+
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
@@ -551,5 +562,17 @@ export class CreateEncuestaComponent implements OnInit {
       this.questions.setControl(index, nextQuestion);
       this.questions.setControl(index + 1, currentQuestion);
     }
+  }
+
+  detectarCambios(): void {
+    if (!this.editMode || !this.formInitialValue) {
+      this.hasChanges = true; // En modo creación siempre hay "cambios"
+      return;
+    }
+
+    const currentValue = this.encuestaForm.value;
+    
+    // Comparar valores actuales con valores iniciales
+    this.hasChanges = JSON.stringify(currentValue) !== JSON.stringify(this.formInitialValue);
   }
 }

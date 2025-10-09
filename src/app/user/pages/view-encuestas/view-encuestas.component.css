@@ -122,7 +122,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--surface-border);
-  border-radius: 12px;
+  border-radius: 5px;
   overflow: hidden;
   transition: all 0.3s ease;
 }
@@ -163,7 +163,7 @@
 /* Estados */
 .estado-badge {
   padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  border-radius: 5px;
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -243,11 +243,11 @@
 
 ::ng-deep .progress-bar .p-progressbar {
   height: 8px;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 ::ng-deep .progress-bar .p-progressbar-value {
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .progress-note {
@@ -284,7 +284,7 @@
   padding: 0.75rem;
   background-color: #eff6ff;
   border: 1px solid #bfdbfe;
-  border-radius: 8px;
+  border-radius: 5px;
 }
 
 .upcoming-info {
@@ -310,7 +310,7 @@
   padding: 0.75rem;
   background-color: #fef2f2;
   border: 1px solid #fecaca;
-  border-radius: 8px;
+  border-radius: 5px;
 }
 
 .expired-info {

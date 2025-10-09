@@ -121,7 +121,7 @@
   width: 100% !important;
   padding: 1rem !important;
   border: 2px solid #e5e7eb !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   font-size: 1rem !important;
   transition: border-color 0.2s ease !important; /* Transición simplificada */
   background: rgba(255,255,255,0.9) !important;
@@ -154,7 +154,7 @@
   margin-top: 0.5rem;
   padding: 0.5rem;
   background: rgba(239,68,68,0.1);
-  border-radius: 8px;
+  border-radius: 5px;
   border-left: 3px solid var(--error);
 }
 
@@ -170,7 +170,7 @@
   font-size: 0.9rem;
   transition: color 0.2s ease;
   padding: 0.5rem;
-  border-radius: 8px;
+  border-radius: 5px;
 }
 .forgot-link:hover { background: rgba(37,99,235,0.1); }
 
@@ -192,7 +192,7 @@
   margin-top: 1.5rem;
   padding: 0.75rem;
   background: rgba(16,185,129,0.1);
-  border-radius: 8px;
+  border-radius: 5px;
   color: var(--success);
   font-size: 0.875rem;
   font-weight: 500;

@@ -106,7 +106,12 @@ const obtenerEncuestas = async (req, res) => {
     };
 
     if (estado && estado !== 'TODOS') {
-      whereClause.estado = estado;
+      // Estados básicos del modelo
+      if (estado === 'BORRADOR') {
+        whereClause.estado = estado;
+      }
+      // Los estados ACTIVA, PROXIMAMENTE y EXPIRADA se manejan después del filtrado básico
+      // porque necesitan cálculos basados en fechas
     }
 
     // Preparar búsqueda avanzada
@@ -149,11 +154,69 @@ const obtenerEncuestas = async (req, res) => {
       where: whereClause
     });
 
+    // Filtrar por estados calculados (PROXIMAMENTE, EXPIRADA, ACTIVA real) si es necesario
+    let encuestasFiltradas = encuestas;
+    if (estado === 'PROXIMAMENTE' || estado === 'EXPIRADA' || estado === 'ACTIVA') {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      
+      encuestasFiltradas = encuestas.filter(encuesta => {
+        if (estado === 'EXPIRADA') {
+          // Encuesta expirada: tiene fecha_fin y ya pasó
+          if (encuesta.fecha_fin) {
+            const fechaFin = new Date(encuesta.fecha_fin);
+            fechaFin.setHours(23, 59, 59, 999);
+            return fechaFin < hoy;
+          }
+          return false;
+        } else if (estado === 'PROXIMAMENTE') {
+          // Encuesta próxima: estado ACTIVA con fecha_inicio en el futuro
+          if (encuesta.estado === 'ACTIVA' && encuesta.fecha_inicio) {
+            const fechaInicio = new Date(encuesta.fecha_inicio);
+            fechaInicio.setHours(0, 0, 0, 0);
+            return fechaInicio > hoy;
+          }
+          return false;
+        } else if (estado === 'ACTIVA') {
+          // Encuesta realmente activa: estado ACTIVA y ya comenzó (no es próxima) y no expiró
+          if (encuesta.estado === 'ACTIVA') {
+            // Verificar si no es próxima
+            if (encuesta.fecha_inicio) {
+              const fechaInicio = new Date(encuesta.fecha_inicio);
+              fechaInicio.setHours(0, 0, 0, 0);
+              if (fechaInicio > hoy) {
+                return false; // Es próxima, no activa
+              }
+            }
+            
+            // Verificar si no expiró
+            if (encuesta.fecha_fin) {
+              const fechaFin = new Date(encuesta.fecha_fin);
+              fechaFin.setHours(23, 59, 59, 999);
+              if (fechaFin < hoy) {
+                return false; // Expiró, no activa
+              }
+            }
+            
+            return true; // Es realmente activa
+          }
+          return false;
+        }
+        return true;
+      });
+    }
+
     // Contar respuestas para cada encuesta y obtener info del creador
     let encuestasConStats = await Promise.all(
-      encuestas.map(async (encuesta) => {
-        const totalRespuestas = await Respuesta.count({
-          where: { encuesta_id: encuesta.id }
+      encuestasFiltradas.map(async (encuesta) => {
+        // Contar usuarios únicos que completaron la encuesta
+        const usuariosCompletaron = await SesionEncuesta.count({
+          where: { 
+            encuesta_id: encuesta.id,
+            estado: 'COMPLETADA'
+          },
+          distinct: true,
+          col: 'usuario_id'
         });
 
         const totalPreguntas = await Pregunta.count({
@@ -170,7 +233,7 @@ const obtenerEncuestas = async (req, res) => {
 
         return {
           ...encuesta.toJSON(),
-          total_respuestas: totalRespuestas,
+          total_respuestas: usuariosCompletaron,
           total_preguntas: totalPreguntas,
           creador: creador ? creador.toJSON() : null
         };
@@ -195,13 +258,18 @@ const obtenerEncuestas = async (req, res) => {
       });
     }
 
+    // Calcular el total correcto considerando filtros por estados calculados
+    const totalFinal = (estado === 'PROXIMAMENTE' || estado === 'EXPIRADA' || estado === 'ACTIVA') ? 
+      encuestasConStats.length : 
+      (search ? encuestasConStats.length : totalCount);
+
     res.json({
       ok: true,
       data: {
         encuestas: encuestasConStats,
-        total: search ? encuestasConStats.length : totalCount,
+        total: totalFinal,
         page: parseInt(page),
-        totalPages: Math.ceil((search ? encuestasConStats.length : totalCount) / limit)
+        totalPages: Math.ceil(totalFinal / limit)
       }
     });
 
