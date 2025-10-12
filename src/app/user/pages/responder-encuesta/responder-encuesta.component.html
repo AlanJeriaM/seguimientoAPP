@@ -329,6 +329,101 @@
   </ng-template>
 </p-dialog>
 
+<!-- Modal para confirmar salida y guardar progreso -->
+<p-dialog
+  [(visible)]="displayExitDialog"
+  header="Guardar progreso"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="cancelarSalida()"
+>
+  <div class="p-4">
+    <!-- Information Section -->
+    <div class="surface-50 p-4 border-round-lg">
+      <div class="text-center">
+        <div class="flex justify-content-center mb-4">
+          <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
+            <i class="pi pi-save text-xl"></i>
+          </div>
+        </div>
+        
+        <p class="text-600 text-lg mb-3">
+          Tienes un {{ progreso }}% de progreso completado.
+        </p>
+        <p class="text-600 mb-0">
+          ¿Deseas guardar tu progreso antes de salir?
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <!-- En pantallas pequeñas: Guardar arriba, Salir sin guardar en medio, Cancelar abajo -->
+      <div class="flex flex-column sm:hidden gap-2 w-full">
+        <p-button
+          label="Guardar y salir"
+          icon="pi pi-save"
+          (click)="guardarYSalir()"
+          styleClass="p-button-success w-full"
+          [loading]="guardandoProgreso"
+          [disabled]="guardandoProgreso">
+        </p-button>
+        <p-button
+          label="Salir sin guardar"
+          icon="pi pi-sign-out"
+          (click)="salirSinGuardar()"
+          styleClass="p-button-danger w-full"
+          [disabled]="guardandoProgreso">
+        </p-button>
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          (click)="cancelarSalida()"
+          styleClass="p-button-text w-full"
+          [disabled]="guardandoProgreso">
+        </p-button>
+      </div>
+      
+      <!-- En pantallas grandes: Cancelar, Salir sin guardar, Guardar -->
+      <div class="hidden sm:flex gap-2">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          (click)="cancelarSalida()"
+          styleClass="p-button-text"
+          [disabled]="guardandoProgreso">
+        </p-button>
+        <p-button
+          label="Salir sin guardar"
+          icon="pi pi-sign-out"
+          (click)="salirSinGuardar()"
+          styleClass="p-button-danger"
+          [disabled]="guardandoProgreso">
+        </p-button>
+        <p-button
+          label="Guardar y salir"
+          icon="pi pi-save"
+          (click)="guardarYSalir()"
+          styleClass="p-button-success"
+          [loading]="guardandoProgreso"
+          [disabled]="guardandoProgreso">
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
+
 <!-- Toast y confirmaciones -->
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>

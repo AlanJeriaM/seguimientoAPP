@@ -18,8 +18,9 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   // Estados para filtros
-  estadoFiltro = 'TODAS';
+  estadoFiltro = 'PENDIENTES';
   estados = [
+    { label: 'Pendientes', value: 'PENDIENTES' },
     { label: 'Todas', value: 'TODAS' },
     { label: 'No iniciadas', value: 'NO_INICIADA' },
     { label: 'En progreso', value: 'EN_PROGRESO' },
@@ -95,11 +96,34 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
 
     // Filtrar por estado
     if (this.estadoFiltro !== 'TODAS') {
-      if (this.estadoFiltro === 'EXPIRADA') {
-        // Filtrar encuestas expiradas usando la función isEncuestaExpirada
-        filtradas = filtradas.filter(encuesta => this.isEncuestaExpirada(encuesta));
+      if (this.estadoFiltro === 'PENDIENTES') {
+        // Filtrar encuestas pendientes: NO_INICIADA o EN_PROGRESO (sin expiradas)
+        filtradas = filtradas.filter(encuesta => 
+          (encuesta.estado_usuario === 'NO_INICIADA' || encuesta.estado_usuario === 'EN_PROGRESO') 
+          && !this.isEncuestaExpirada(encuesta)
+        );
+      } else if (this.estadoFiltro === 'EXPIRADA') {
+        // Filtrar solo encuestas expiradas que NO estén completadas
+        filtradas = filtradas.filter(encuesta => 
+          this.isEncuestaExpirada(encuesta) && encuesta.estado_usuario !== 'COMPLETADA'
+        );
+      } else if (this.estadoFiltro === 'NO_INICIADA') {
+        // Filtrar solo encuestas no iniciadas que NO estén expiradas
+        filtradas = filtradas.filter(encuesta => 
+          encuesta.estado_usuario === 'NO_INICIADA' && !this.isEncuestaExpirada(encuesta)
+        );
+      } else if (this.estadoFiltro === 'EN_PROGRESO') {
+        // Filtrar solo encuestas en progreso que NO estén expiradas
+        filtradas = filtradas.filter(encuesta => 
+          encuesta.estado_usuario === 'EN_PROGRESO' && !this.isEncuestaExpirada(encuesta)
+        );
+      } else if (this.estadoFiltro === 'COMPLETADA') {
+        // Filtrar solo encuestas completadas (sin importar si están expiradas)
+        filtradas = filtradas.filter(encuesta => 
+          encuesta.estado_usuario === 'COMPLETADA'
+        );
       } else {
-        // Filtrar por estado_usuario
+        // Para cualquier otro estado, filtrar por estado_usuario
         filtradas = filtradas.filter(encuesta =>
           encuesta.estado_usuario === this.estadoFiltro
         );
@@ -197,6 +221,8 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
         return 'estado-en-progreso';
       case 'COMPLETADA':
         return 'estado-completada';
+      case 'EXPIRADA':
+        return 'estado-expirada';
       default:
         return '';
     }
@@ -210,6 +236,8 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
         return 'En progreso';
       case 'COMPLETADA':
         return 'Completada';
+      case 'EXPIRADA':
+        return 'Expirada';
       default:
         return 'Desconocido';
     }
@@ -228,13 +256,13 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
 
     switch (encuesta.estado_usuario) {
       case 'NO_INICIADA':
-        return 'Iniciar';
+        return 'Iniciar encuesta';
       case 'EN_PROGRESO':
-        return 'Continuar';
+        return 'Continuar encuesta';
       case 'COMPLETADA':
         return 'Ver detalles';
       default:
-        return 'Iniciar';
+        return 'Iniciar encuesta';
     }
   }
 
@@ -282,6 +310,24 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
       default:
         return 'primary';
     }
+  }
+
+  /**
+   * Obtiene el estado correcto de la encuesta considerando expiración
+   */
+  getEstadoEncuesta(encuesta: EncuestaDisponible): string {
+    // Si la encuesta está completada, ese estado tiene máxima prioridad
+    if (encuesta.estado_usuario === 'COMPLETADA') {
+      return 'COMPLETADA';
+    }
+    
+    // Si la encuesta está expirada (y no está completada), ese estado tiene prioridad
+    if (this.isEncuestaExpirada(encuesta)) {
+      return 'EXPIRADA';
+    }
+    
+    // Si no está expirada ni completada, retornar el estado del usuario
+    return encuesta.estado_usuario || 'NO_INICIADA';
   }
 
   /**

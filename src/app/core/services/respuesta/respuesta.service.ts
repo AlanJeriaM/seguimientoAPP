@@ -87,8 +87,8 @@ export class RespuestaService {
   /**
    * Obtiene una encuesta específica para responder
    */
-  obtenerEncuestaParaResponder(encuestaId: number): Observable<{ok: boolean, data: {encuesta: EncuestaParaResponder, session_token: string, ya_respondida: boolean}}> {
-    return this.http.get<{ok: boolean, data: {encuesta: EncuestaParaResponder, session_token: string, ya_respondida: boolean}}>(`${this.baseUrl}/encuesta/${encuestaId}`);
+  obtenerEncuestaParaResponder(encuestaId: number): Observable<{ok: boolean, data: {encuesta: EncuestaParaResponder, session_token: string, ya_respondida: boolean, progreso_guardado?: {progreso: number, pregunta_actual: number, respuestas: any[]}}}> {
+    return this.http.get<{ok: boolean, data: {encuesta: EncuestaParaResponder, session_token: string, ya_respondida: boolean, progreso_guardado?: {progreso: number, pregunta_actual: number, respuestas: any[]}}}>(`${this.baseUrl}/encuesta/${encuestaId}`);
   }
 
   /**
@@ -98,6 +98,24 @@ export class RespuestaService {
     return this.http.post<{ok: boolean, msj: string, data?: any}>(`${this.baseUrl}/encuesta/${encuestaId}/respuestas`, {
       respuestas: respuestas,
       session_token: sessionToken
+    });
+  }
+
+  /**
+   * Guarda el progreso de la encuesta sin completarla
+   */
+  guardarProgresoEncuesta(
+    encuestaId: number, 
+    respuestas: RespuestaUsuario[], 
+    sessionToken?: string,
+    preguntaActual?: number,
+    progreso?: number
+  ): Observable<{ok: boolean, msj: string, data?: any}> {
+    return this.http.post<{ok: boolean, msj: string, data?: any}>(`${this.baseUrl}/encuesta/${encuestaId}/guardar-progreso`, {
+      respuestas: respuestas,
+      session_token: sessionToken,
+      pregunta_actual: preguntaActual,
+      progreso: progreso
     });
   }
 
@@ -134,8 +152,10 @@ export class RespuestaService {
       ...encuesta,
       fecha_inicio: new Date(encuesta.fecha_inicio),
       fecha_fin: new Date(encuesta.fecha_fin),
-      estado_usuario: encuesta.ya_respondida ? 'COMPLETADA' : 'NO_INICIADA',
-      progreso: encuesta.ya_respondida ? 100 : 0,
+      // Usar el estado_usuario que viene del backend (si existe), sino calcularlo
+      estado_usuario: encuesta.estado_usuario || (encuesta.ya_respondida ? 'COMPLETADA' : 'NO_INICIADA'),
+      // Usar el progreso que viene del backend (si existe), sino calcularlo
+      progreso: encuesta.progreso !== undefined ? encuesta.progreso : (encuesta.ya_respondida ? 100 : 0),
       ultima_respuesta: encuesta.ultima_respuesta ? new Date(encuesta.ultima_respuesta) : undefined
     };
   }

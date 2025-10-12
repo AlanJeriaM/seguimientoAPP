@@ -49,6 +49,11 @@ const SesionEncuesta = sequelize.define('SesionEncuesta', {
     type: DataTypes.INTEGER, // porcentaje completado (0-100)
     defaultValue: 0
   },
+  pregunta_actual: {
+    type: DataTypes.INTEGER, // índice de la pregunta actual
+    allowNull: true,
+    defaultValue: 0
+  },
   ip_address: {
     type: DataTypes.STRING(45),
     allowNull: true

@@ -16,6 +16,9 @@ router.get('/encuesta/:id', respuestaController.obtenerEncuestaParaResponder);
 // Enviar respuestas
 router.post('/encuesta/:id/respuestas', respuestaController.enviarRespuestas);
 
+// Guardar progreso de encuesta
+router.post('/encuesta/:id/guardar-progreso', respuestaController.guardarProgresoEncuesta);
+
 // Historial de encuestas respondidas
 router.get('/historial', respuestaController.obtenerHistorialEncuestas);
 
