@@ -189,13 +189,18 @@
 }
 
 .estado-en-progreso {
-  background-color: #fff3e0;
-  color: #f57c00;
+  background-color: #fffde7;
+  color: #f9a825;
 }
 
 .estado-completada {
   background-color: #e8f5e8;
   color: #388e3c;
+}
+
+.estado-expirada {
+  background-color: #ffebee;
+  color: #c62828;
 }
 
 /* Contenido de la card */

@@ -84,7 +84,7 @@ export class SidebarComponent {
         const navbar = document.querySelector('.custom-toolbar') as HTMLElement;
         const navbarHeight = navbar ? navbar.offsetHeight : 100;
         const navbarOffset = navbarHeight + 20; // Altura del navbar + margen extra
-        
+
         const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
 
@@ -195,7 +195,7 @@ export class SidebarComponent {
         ]
       },
       { label: 'Encuestas', icon: 'pi pi-users', items: [
-          { label: 'Encuestas nuevas', icon: 'pi pi-file-edit', routerLink: '/user/view-encuestas' },
+          { label: 'Mis encuestas', icon: 'pi pi-file-edit', routerLink: '/user/view-encuestas' },
           { label: 'Encuestas completadas', icon: 'pi pi-check', routerLink: '/user/encuesta-completada' }
         ]
       }

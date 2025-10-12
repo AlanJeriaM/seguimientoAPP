@@ -69,9 +69,9 @@
             <div class="header-info">
               <h4 class="encuesta-titulo">{{ encuesta.titulo }}</h4>
               <span 
-                [class]="'estado-badge ' + getEstadoBadgeClass(encuesta.estado_usuario || 'NO_INICIADA')"
+                [class]="'estado-badge ' + getEstadoBadgeClass(getEstadoEncuesta(encuesta))"
               >
-                {{ getEstadoLabel(encuesta.estado_usuario || 'NO_INICIADA') }}
+                {{ getEstadoLabel(getEstadoEncuesta(encuesta)) }}
               </span>
             </div>
           </div>

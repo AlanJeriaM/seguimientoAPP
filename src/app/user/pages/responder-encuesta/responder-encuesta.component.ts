@@ -26,6 +26,8 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   progreso = 0;
   tiempoInicio?: Date;
   displayConfirmDialog = false;
+  displayExitDialog = false;
+  guardandoProgreso = false;
   
   // Auto-guardado
   private autoGuardado$ = interval(30000); // Cada 30 segundos
@@ -86,6 +88,12 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
             });
             
             this.inicializarFormulario();
+            
+            // Cargar progreso guardado si existe
+            if (response.data.progreso_guardado && response.data.progreso_guardado.respuestas.length > 0) {
+              this.cargarProgresoGuardado(response.data.progreso_guardado);
+            }
+            
             console.log('Encuesta cargada:', this.encuesta);
             console.log('Session token:', this.sessionToken);
           }
@@ -305,12 +313,18 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
     if (this.progreso > 0 && this.progreso < 100) {
       const respuestas = this.extraerRespuestas();
       
-      this.respuestaService.guardarProgreso(this.encuestaId, respuestas).subscribe({
+      this.respuestaService.guardarProgresoEncuesta(
+        this.encuestaId, 
+        respuestas,
+        this.sessionToken,
+        this.preguntaActual,
+        this.progreso
+      ).subscribe({
         next: () => {
-          console.log('Progreso guardado automáticamente');
+          console.log('✅ Progreso guardado automáticamente:', this.progreso + '%');
         },
         error: (error) => {
-          console.error('Error al guardar progreso:', error);
+          console.error('❌ Error al guardar progreso:', error);
         }
       });
     }
@@ -382,6 +396,8 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   extraerRespuestas(): RespuestaUsuario[] {
     const respuestas: RespuestaUsuario[] = [];
+    
+    console.log('📝 Extrayendo respuestas del formulario...');
 
     this.respuestasArray.controls.forEach((control, index) => {
       const pregunta = this.encuesta!.preguntas[index];
@@ -393,19 +409,36 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
         const selecciones = formGroup.get('selecciones')?.value || [];
         const opciones = formGroup.get('opciones')?.value || [];
         respuestaValue = opciones.filter((_: string, i: number) => selecciones[i]);
+        console.log(`  🔘 Pregunta ${index + 1} (Opción Múltiple):`, {
+          selecciones: selecciones,
+          opciones: opciones,
+          respuestasFiltradas: respuestaValue
+        });
       } else if (pregunta.tipo === 'FECHA' && respuestaValue) {
         respuestaValue = new Date(respuestaValue).toISOString();
       }
 
-      if (respuestaValue !== null && respuestaValue !== '' && respuestaValue !== undefined) {
+      // Validar que la respuesta tenga contenido
+      const tieneContenido = 
+        respuestaValue !== null && 
+        respuestaValue !== '' && 
+        respuestaValue !== undefined &&
+        (Array.isArray(respuestaValue) ? respuestaValue.length > 0 : true);
+
+      if (tieneContenido) {
+        const respuestaFormateada = Array.isArray(respuestaValue) ? respuestaValue.join(',') : String(respuestaValue);
+        console.log(`  ✅ Pregunta ${index + 1} (ID: ${pregunta.id}): ${respuestaFormateada}`);
         respuestas.push({
           pregunta_id: pregunta.id,
-          respuesta: Array.isArray(respuestaValue) ? respuestaValue.join(',') : String(respuestaValue),
+          respuesta: respuestaFormateada,
           tiempo_respuesta: this.calcularTiempoRespuesta()
         });
+      } else {
+        console.log(`  ⏭️ Pregunta ${index + 1} (ID: ${pregunta.id}): Sin respuesta`);
       }
     });
 
+    console.log(`📊 Total respuestas extraídas: ${respuestas.length}`);
     return respuestas;
   }
 
@@ -429,17 +462,154 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   // Utilidades
   salir(): void {
-    if (this.progreso > 0) {
-      this.confirmationService.confirm({
-        message: 'Tienes progreso sin guardar. ¿Estás seguro de salir?',
-        header: 'Confirmar salida',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-          this.router.navigate(['/user/view-encuestas']);
+    if (this.progreso > 0 && this.progreso < 100) {
+      // Si hay progreso, mostrar modal para guardar
+      this.displayExitDialog = true;
+    } else {
+      // Si no hay progreso o está completo, salir directamente
+      this.router.navigate(['/user/view-encuestas']);
+    }
+  }
+
+  cancelarSalida(): void {
+    this.displayExitDialog = false;
+  }
+
+  salirSinGuardar(): void {
+    this.displayExitDialog = false;
+    this.router.navigate(['/user/view-encuestas']);
+  }
+
+  guardarYSalir(): void {
+    console.log('🔵 Iniciando guardado de progreso...');
+    console.log('📊 Progreso actual:', this.progreso + '%');
+    console.log('📍 Pregunta actual:', this.preguntaActual);
+    console.log('🔑 Session token:', this.sessionToken);
+    
+    this.guardandoProgreso = true;
+    this.guardarProgreso().then(() => {
+      console.log('✅ Progreso guardado exitosamente');
+      this.displayExitDialog = false;
+      this.guardandoProgreso = false;
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Progreso guardado',
+        detail: 'Tu progreso ha sido guardado. Puedes continuar después.'
+      });
+      setTimeout(() => {
+        this.router.navigate(['/user/view-encuestas']);
+      }, 1500);
+    }).catch((error) => {
+      console.error('❌ Error al guardar progreso:', error);
+      this.guardandoProgreso = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo guardar el progreso'
+      });
+    });
+  }
+
+  private async guardarProgreso(): Promise<void> {
+    const respuestas = this.extraerRespuestas();
+    
+    console.log('📤 Enviando al backend:');
+    console.log('  - Encuesta ID:', this.encuestaId);
+    console.log('  - Total respuestas:', respuestas.length);
+    console.log('  - Progreso:', this.progreso + '%');
+    console.log('  - Pregunta actual:', this.preguntaActual);
+    
+    return new Promise((resolve, reject) => {
+      this.respuestaService.guardarProgresoEncuesta(
+        this.encuestaId,
+        respuestas,
+        this.sessionToken,
+        this.preguntaActual,
+        this.progreso
+      ).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          console.log('📥 Respuesta del backend:', response);
+          if (response.ok) {
+            resolve();
+          } else {
+            reject(new Error(response.msj || 'Error al guardar'));
+          }
+        },
+        error: (error) => {
+          console.error('❌ Error HTTP:', error);
+          reject(error);
         }
       });
-    } else {
-      this.router.navigate(['/user/view-encuestas']);
+    });
+  }
+
+  private cargarProgresoGuardado(progresoData: any): void {
+    try {
+      // Restaurar pregunta actual
+      if (progresoData.pregunta_actual !== undefined) {
+        this.preguntaActual = progresoData.pregunta_actual;
+      }
+
+      // Restaurar respuestas en el formulario
+      if (progresoData.respuestas && Array.isArray(progresoData.respuestas)) {
+        progresoData.respuestas.forEach((respuestaGuardada: any) => {
+          const preguntaIndex = this.encuesta?.preguntas.findIndex(
+            p => p.id === respuestaGuardada.pregunta_id
+          );
+
+          if (preguntaIndex !== undefined && preguntaIndex !== -1) {
+            const control = this.getPreguntaControl(preguntaIndex);
+            const pregunta = this.encuesta?.preguntas[preguntaIndex];
+
+            if (pregunta?.tipo === 'OPCION_MULTIPLE') {
+              // Para opciones múltiples, las respuestas vienen como string separado por comas
+              try {
+                let respuestasArray: string[];
+                
+                // Intentar parsear como JSON primero
+                try {
+                  respuestasArray = JSON.parse(respuestaGuardada.respuesta);
+                } catch {
+                  // Si no es JSON, separar por comas
+                  respuestasArray = respuestaGuardada.respuesta.split(',').map((r: string) => r.trim());
+                }
+                
+                const selecciones = control.get('selecciones') as FormArray;
+                
+                console.log('🔄 Restaurando opciones múltiples:', respuestasArray);
+                
+                // Marcar las opciones seleccionadas
+                respuestasArray.forEach((respuesta: string) => {
+                  const opcionIndex = pregunta.opciones?.indexOf(respuesta);
+                  console.log(`  Buscando "${respuesta}" en opciones:`, opcionIndex);
+                  if (opcionIndex !== undefined && opcionIndex !== -1 && selecciones.at(opcionIndex)) {
+                    selecciones.at(opcionIndex).setValue(true);
+                    console.log(`  ✅ Marcada opción ${opcionIndex}`);
+                  }
+                });
+              } catch (e) {
+                console.warn('❌ Error al parsear respuestas múltiples:', e);
+              }
+            } else {
+              // Para otros tipos, solo establecer el valor
+              console.log(`🔄 Restaurando respuesta tipo ${pregunta?.tipo}:`, respuestaGuardada.respuesta);
+              control.get('respuesta')?.setValue(respuestaGuardada.respuesta);
+            }
+          }
+        });
+
+        // Actualizar progreso
+        this.actualizarProgreso();
+
+        // Mostrar mensaje de reanudación
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Progreso restaurado',
+          detail: `Continuando desde la pregunta ${this.preguntaActual + 1}`
+        });
+      }
+    } catch (error) {
+      console.error('Error al cargar progreso guardado:', error);
     }
   }
 

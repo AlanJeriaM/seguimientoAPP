@@ -32,9 +32,18 @@ const obtenerEncuestasDisponibles = async (req, res) => {
       offset: parseInt(offset)
     });
 
-    // Verificar si el usuario ya respondió cada encuesta
+    // Verificar si el usuario ya respondió cada encuesta y su estado
     const encuestasConEstado = await Promise.all(
       encuestas.rows.map(async (encuesta) => {
+        // Verificar sesión del usuario
+        const sesion = await SesionEncuesta.findOne({
+          where: {
+            encuesta_id: encuesta.id,
+            usuario_id: usuarioId
+          },
+          order: [['fecha_actualizacion', 'DESC']]
+        });
+
         const yaRespondio = await Respuesta.findOne({
           where: {
             encuesta_id: encuesta.id,
@@ -50,11 +59,43 @@ const obtenerEncuestasDisponibles = async (req, res) => {
           }
         });
 
+        const totalRespuestas = await Respuesta.count({
+          where: {
+            encuesta_id: encuesta.id,
+            usuario_id: usuarioId
+          }
+        });
+
+        // Determinar estado del usuario
+        let estadoUsuario = 'NO_INICIADA';
+        let progresoUsuario = 0;
+
+        if (sesion) {
+          console.log(`📋 Encuesta ${encuesta.id} - Sesión encontrada:`, {
+            sesion_id: sesion.id,
+            sesion_estado: sesion.estado,
+            sesion_progreso: sesion.progreso,
+            total_respuestas: totalRespuestas
+          });
+          
+          if (sesion.estado === 'COMPLETADA') {
+            estadoUsuario = 'COMPLETADA';
+            progresoUsuario = 100;
+          } else if (sesion.estado === 'EN_PROGRESO' && totalRespuestas > 0) {
+            estadoUsuario = 'EN_PROGRESO';
+            progresoUsuario = sesion.progreso || Math.round((totalRespuestas / totalPreguntas) * 100);
+          }
+          
+          console.log(`  ➡️ Estado determinado: ${estadoUsuario} (${progresoUsuario}%)`);
+        }
+
         return {
           ...encuesta.toJSON(),
           ya_respondida: !!yaRespondio,
           total_preguntas: totalPreguntas,
-          ultima_respuesta: yaRespondio ? yaRespondio.fecha_creacion : null
+          ultima_respuesta: yaRespondio ? yaRespondio.fecha_creacion : null,
+          estado_usuario: estadoUsuario,
+          progreso: progresoUsuario
         };
       })
     );
@@ -119,42 +160,43 @@ const obtenerEncuestaParaResponder = async (req, res) => {
       });
     }
 
-    // Verificar si ya respondió
+    // Verificar sesión existente
+    const sesion = await SesionEncuesta.findOne({
+      where: {
+        encuesta_id: id,
+        usuario_id: usuarioId
+      }
+    });
+
+    // Solo bloquear si la sesión está COMPLETADA
+    if (sesion && sesion.estado === 'COMPLETADA' && !encuesta.permite_multiple_respuesta) {
+      return res.status(400).json({
+        ok: false,
+        msj: 'Ya has completado esta encuesta'
+      });
+    }
+
+    // Crear sesión si no existe, o usar la existente
+    let sesionActual = sesion;
+    if (!sesionActual) {
+      const sessionToken = crypto.randomBytes(32).toString('hex');
+      sesionActual = await SesionEncuesta.create({
+        encuesta_id: id,
+        usuario_id: usuarioId,
+        session_token: sessionToken,
+        estado: 'INICIADA',
+        ip_address: req.ip,
+        user_agent: req.get('User-Agent')
+      });
+    }
+
+    // Verificar si ya respondió (para información)
     const yaRespondio = await Respuesta.findOne({
       where: {
         encuesta_id: id,
         usuario_id: usuarioId
       }
     });
-
-    if (yaRespondio && !encuesta.permite_multiple_respuesta) {
-      return res.status(400).json({
-        ok: false,
-        msj: 'Ya has respondido esta encuesta'
-      });
-    }
-
-    // Crear o actualizar sesión
-    const sessionToken = crypto.randomBytes(32).toString('hex');
-    const [sesion] = await SesionEncuesta.findOrCreate({
-      where: {
-        encuesta_id: id,
-        usuario_id: usuarioId
-      },
-      defaults: {
-        session_token: sessionToken,
-        estado: 'INICIADA',
-        ip_address: req.ip,
-        user_agent: req.get('User-Agent')
-      }
-    });
-
-    if (sesion.estado === 'COMPLETADA' && !encuesta.permite_multiple_respuesta) {
-      return res.status(400).json({
-        ok: false,
-        msj: 'Ya has completado esta encuesta'
-      });
-    }
 
     // Procesar las opciones para que sean arrays reales
     if (encuesta.preguntas) {
@@ -178,6 +220,15 @@ const obtenerEncuestaParaResponder = async (req, res) => {
       });
     }
 
+    // Obtener respuestas guardadas si existen (para reanudar)
+    const respuestasGuardadas = await Respuesta.findAll({
+      where: {
+        encuesta_id: id,
+        usuario_id: usuarioId
+      },
+      attributes: ['pregunta_id', 'respuesta']
+    });
+
     // Marcar notificación como leída
     await Notificacion.update(
       { leida: true, fecha_leida: new Date() },
@@ -194,8 +245,16 @@ const obtenerEncuestaParaResponder = async (req, res) => {
       ok: true,
       data: {
         encuesta,
-        session_token: sesion.session_token,
-        ya_respondida: !!yaRespondio
+        session_token: sesionActual.session_token,
+        ya_respondida: !!yaRespondio,
+        progreso_guardado: {
+          progreso: sesionActual.progreso || 0,
+          pregunta_actual: sesionActual.pregunta_actual || 0,
+          respuestas: respuestasGuardadas.map(r => ({
+            pregunta_id: r.pregunta_id,
+            respuesta: r.respuesta
+          }))
+        }
       }
     });
 
@@ -264,21 +323,12 @@ const enviarRespuestas = async (req, res) => {
       });
     }
 
-    // Verificar si ya respondió (si no permite múltiples respuestas)
-    if (!encuesta.permite_multiple_respuesta) {
-      const yaRespondio = await Respuesta.findOne({
-        where: {
-          encuesta_id: id,
-          usuario_id: usuarioId
-        }
+    // Verificar si ya completó la encuesta (si no permite múltiples respuestas)
+    if (!encuesta.permite_multiple_respuesta && sesion.estado === 'COMPLETADA') {
+      return res.status(400).json({
+        ok: false,
+        msj: 'Ya has completado esta encuesta'
       });
-
-      if (yaRespondio) {
-        return res.status(400).json({
-          ok: false,
-          msj: 'Ya has respondido esta encuesta'
-        });
-      }
     }
 
     // Validar que todas las preguntas requeridas tengan respuesta
@@ -297,7 +347,17 @@ const enviarRespuestas = async (req, res) => {
     // Calcular tiempo de respuesta
     const tiempoRespuesta = Math.floor((Date.now() - new Date(sesion.fecha_inicio)) / 1000);
 
-    // Guardar respuestas
+    // Eliminar respuestas anteriores (del progreso guardado) para evitar duplicados
+    await Respuesta.destroy({
+      where: {
+        encuesta_id: id,
+        usuario_id: usuarioId
+      }
+    });
+
+    console.log('🗑️ Respuestas anteriores eliminadas, guardando respuestas finales...');
+
+    // Guardar respuestas finales
     const respuestasGuardadas = [];
     for (const respuesta of respuestas) {
       const pregunta = encuesta.preguntas.find(p => p.id === respuesta.pregunta_id);
@@ -314,6 +374,9 @@ const enviarRespuestas = async (req, res) => {
         respuestasGuardadas.push(respuestaGuardada);
       }
     }
+
+    console.log(`✅ ${respuestasGuardadas.length} respuestas finales guardadas`);
+
 
     // Actualizar sesión
     await sesion.update({
@@ -350,6 +413,163 @@ const enviarRespuestas = async (req, res) => {
     res.status(500).json({
       ok: false,
       msj: 'Error del servidor al enviar las respuestas'
+    });
+  }
+};
+
+// Guardar progreso de encuesta (sin completarla)
+const guardarProgresoEncuesta = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { respuestas, session_token, pregunta_actual, progreso } = req.body;
+    const usuarioId = req.usuario.id;
+
+    console.log('🔵 guardarProgresoEncuesta - Inicio');
+    console.log('  - Encuesta ID:', id);
+    console.log('  - Usuario ID:', usuarioId);
+    console.log('  - Progreso recibido:', progreso);
+    console.log('  - Pregunta actual:', pregunta_actual);
+    console.log('  - Total respuestas:', respuestas?.length);
+
+    // Verificar que la encuesta esté activa
+    const encuesta = await Encuesta.findOne({
+      where: {
+        id: id,
+        estado: 'ACTIVA',
+        activo: true
+      }
+    });
+
+    if (!encuesta) {
+      return res.status(404).json({
+        ok: false,
+        msj: 'Encuesta no encontrada o no está disponible'
+      });
+    }
+
+    // Buscar o crear sesión
+    let sesion = await SesionEncuesta.findOne({
+      where: {
+        encuesta_id: id,
+        usuario_id: usuarioId
+      }
+    });
+
+    // Verificar si la sesión está completada
+    if (sesion && sesion.estado === 'COMPLETADA') {
+      return res.status(400).json({
+        ok: false,
+        msj: 'Esta encuesta ya ha sido completada'
+      });
+    }
+
+    // Crear sesión si no existe
+    if (!sesion) {
+      sesion = await SesionEncuesta.create({
+        encuesta_id: id,
+        usuario_id: usuarioId,
+        session_token: session_token || crypto.randomBytes(32).toString('hex'),
+        fecha_inicio: new Date(),
+        estado: 'EN_PROGRESO',
+        progreso: 0,
+        pregunta_actual: 0
+      });
+      console.log('✅ Sesión creada con estado EN_PROGRESO:', sesion.id);
+    }
+
+    // Guardar/actualizar respuestas (sin marcar como completadas)
+    if (respuestas && Array.isArray(respuestas) && respuestas.length > 0) {
+      let respuestasCreadas = 0;
+      let respuestasActualizadas = 0;
+      
+      for (const respuesta of respuestas) {
+        // Verificar si ya existe una respuesta para esta pregunta
+        const respuestaExistente = await Respuesta.findOne({
+          where: {
+            encuesta_id: id,
+            pregunta_id: respuesta.pregunta_id,
+            usuario_id: usuarioId
+          }
+        });
+
+        if (respuestaExistente) {
+          // Actualizar respuesta existente
+          await respuestaExistente.update({
+            respuesta: respuesta.respuesta,
+            fecha_respuesta: new Date()
+          });
+          respuestasActualizadas++;
+        } else {
+          // Crear nueva respuesta
+          await Respuesta.create({
+            encuesta_id: id,
+            pregunta_id: respuesta.pregunta_id,
+            usuario_id: usuarioId,
+            respuesta: respuesta.respuesta,
+            tiempo_respuesta: Math.floor((Date.now() - new Date(sesion.fecha_inicio)) / 1000),
+            ip_address: req.ip
+          });
+          respuestasCreadas++;
+        }
+      }
+      
+      console.log(`💾 Respuestas guardadas: ${respuestasCreadas} nuevas, ${respuestasActualizadas} actualizadas`);
+    }
+
+    // Recalcular el progreso real basado en las respuestas guardadas en BD
+    const totalPreguntasEncuesta = await Pregunta.count({
+      where: {
+        encuesta_id: id,
+        activo: true
+      }
+    });
+
+    const totalRespuestasGuardadas = await Respuesta.count({
+      where: {
+        encuesta_id: id,
+        usuario_id: usuarioId
+      }
+    });
+
+    const progresoReal = totalPreguntasEncuesta > 0 
+      ? Math.round((totalRespuestasGuardadas / totalPreguntasEncuesta) * 100) 
+      : 0;
+
+    console.log(`📊 Progreso recalculado: ${totalRespuestasGuardadas}/${totalPreguntasEncuesta} = ${progresoReal}%`);
+
+    // Actualizar sesión con el progreso real
+    await sesion.update({
+      estado: 'EN_PROGRESO',
+      progreso: progresoReal,
+      pregunta_actual: pregunta_actual !== undefined ? pregunta_actual : sesion.pregunta_actual,
+      fecha_actualizacion: new Date()
+    });
+
+    // Recargar sesión para confirmar el estado
+    await sesion.reload();
+    console.log('📊 Estado final de la sesión:', {
+      id: sesion.id,
+      estado: sesion.estado,
+      progreso: sesion.progreso,
+      pregunta_actual: sesion.pregunta_actual
+    });
+
+    res.json({
+      ok: true,
+      msj: 'Progreso guardado correctamente',
+      data: {
+        sesion_id: sesion.id,
+        estado: sesion.estado,
+        progreso: sesion.progreso,
+        pregunta_actual: sesion.pregunta_actual
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en guardarProgresoEncuesta:', error);
+    res.status(500).json({
+      ok: false,
+      msj: 'Error del servidor al guardar el progreso'
     });
   }
 };
@@ -518,6 +738,7 @@ module.exports = {
   obtenerEncuestasDisponibles,
   obtenerEncuestaParaResponder,
   enviarRespuestas,
+  guardarProgresoEncuesta,
   obtenerHistorialEncuestas,
   obtenerNotificaciones,
   marcarNotificacionLeida
