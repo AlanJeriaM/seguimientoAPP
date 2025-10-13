@@ -194,207 +194,372 @@
 <!-- Dialog para ver reporte de encuesta -->
 <p-dialog
   [(visible)]="displayReporteDialog"
-  [header]="'Reporte: ' + (reporteEncuesta.encuesta?.titulo || '')"
+  header="Ver Reporte de Encuesta"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '1000px'}"
-  [contentStyle]="{'padding': '1rem', 'overflow-y': 'auto', 'max-height': '80vh'}"
+  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
   [closable]="true"
   [closeOnEscape]="true"
   [responsive]="true"
-  [breakpoints]="{'960px': '90vw', '640px': '95vw'}"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
   [dismissableMask]="true"
 >
-  <div *ngIf="reporteEncuesta.encuesta" class="grid">
-    <!-- Información general de la encuesta -->
-    <div class="col-12">
-      <h3 class="text-xl font-semibold text-900 mb-3">Información General</h3>
+  <div *ngIf="reporteEncuesta.encuesta">
+    <!-- Pestañas -->
+    <p-tabView (onChange)="onTabChange($event)">
+      <!-- Pestaña: Detalles -->
+      <p-tabPanel header="Detalles">
+        <ng-template pTemplate="header">
+          <i class="pi pi-info-circle mr-2"></i>
+          <span>Detalles</span>
+        </ng-template>
 
-      <div class="grid">
-        <div class="col-12 sm:col-6">
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Título:</label>
-            <p class="text-900">{{ reporteEncuesta.encuesta.titulo }}</p>
+        <div class="p-4">
+          <!-- Información General Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-blue-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-chart-line text-base"></i>
           </div>
-
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Descripción:</label>
-            <p class="text-900">{{ reporteEncuesta.encuesta.descripcion || 'Sin descripción' }}</p>
-          </div>
-
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Estado:</label>
-            <span
-              [class]="getEstadoBadgeClass(reporteEncuesta.encuesta.estado, reporteEncuesta.encuesta)"
-              class="estado-badge"
-            >
-              {{ getEstadoLabel(reporteEncuesta.encuesta.estado, reporteEncuesta.encuesta) }}
-            </span>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Información General</h3>
+            <p class="text-600 mb-0 text-sm">Datos generales de la encuesta</p>
           </div>
         </div>
 
-        <div class="col-12 sm:col-6">
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Tiempo Estimado:</label>
-            <p class="text-900">{{ reporteEncuesta.encuesta.tiempo_estimado }} minutos</p>
+        <div class="grid">
+          <!-- Título -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Título</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ reporteEncuesta.encuesta.titulo }}
+              </div>
+            </div>
           </div>
 
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Total Respuestas:</label>
-            <p class="text-900">{{ reporteEncuesta.estadisticas?.total_respuestas || 0 }}</p>
+          <!-- Estado -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Estado</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400">
+                <span
+                  [class]="getEstadoBadgeClass(reporteEncuesta.encuesta.estado, reporteEncuesta.encuesta)"
+                  class="estado-badge"
+                >
+                  {{ getEstadoLabel(reporteEncuesta.encuesta.estado, reporteEncuesta.encuesta) }}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div class="mb-3">
-            <label class="block text-900 font-medium mb-1">Usuarios Únicos:</label>
-            <p class="text-900">{{ reporteEncuesta.estadisticas?.usuarios_unicos || 0 }}</p>
+          <!-- Descripción -->
+          <div class="col-12">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Descripción</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                {{ reporteEncuesta.encuesta.descripcion || 'Sin descripción' }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Estadísticas de preguntas -->
-    <div class="col-12">
-      <h3 class="text-xl font-semibold text-900 mb-3">Análisis por Pregunta</h3>
+    <!-- Estadísticas Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-chart-bar text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Estadísticas</h3>
+            <p class="text-600 mb-0 text-sm">Métricas y análisis de participación</p>
+          </div>
+        </div>
 
-      <div *ngIf="reporteEncuesta.preguntas?.length > 0" class="preguntas-analysis">
-        <div *ngFor="let pregunta of reporteEncuesta.preguntas" class="pregunta-item">
-          <div class="pregunta-header">
-            <h4 class="text-lg font-medium text-900">{{ pregunta.texto }}</h4>
-            <div class="pregunta-meta">
-              <span class="tipo-badge">{{ getTipoPreguntaLabel(pregunta.tipo) }}</span>
-              <span *ngIf="pregunta.es_requerida" class="requerida-badge">Requerida</span>
+        <div class="grid">
+          <!-- Usuarios Únicos -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Usuarios Únicos</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                <i class="pi pi-users text-blue-500 mr-2"></i>
+                {{ reporteEncuesta.estadisticas?.usuarios_unicos || 0 }}
+              </div>
             </div>
           </div>
 
-          <div class="pregunta-stats">
-            <div class="stat-item">
-              <i class="pi pi-users text-blue-500 mr-2"></i>
-              <span class="stat-label">Respuestas:</span>
-              <span class="stat-value">{{ pregunta.total_respuestas }}</span>
+          <!-- Total Preguntas -->
+          <div class="col-12 lg:col-6">
+            <div class="field">
+              <label class="block text-900 font-semibold mb-2">Total Preguntas</label>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+                <i class="pi pi-question-circle text-green-500 mr-2"></i>
+                {{ reporteEncuesta.preguntas?.length || 0 }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Análisis por Pregunta Section -->
+    <div class="mb-6">
+      <div class="surface-50 p-4 border-round-lg">
+        <div class="flex align-items-center gap-3 mb-4">
+          <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-question-circle text-base"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-900 mb-1">Análisis por Pregunta</h3>
+            <p class="text-600 mb-0 text-sm">Estadísticas detalladas de cada pregunta</p>
+          </div>
+        </div>
+
+        <div *ngIf="reporteEncuesta.preguntas?.length > 0" class="preguntas-analysis">
+          <div *ngFor="let pregunta of reporteEncuesta.preguntas; let i = index" class="pregunta-item">
+            <!-- Título de la pregunta -->
+            <div class="mb-3 pb-3 border-bottom-1 border-200">
+              <h3 class="text-xl font-bold text-primary-600 mb-0">Pregunta N° {{ i + 1 }}</h3>
+            </div>
+            
+            <div class="pregunta-header">
+              <h4 class="text-lg font-medium text-900">{{ pregunta.texto }}</h4>
+              <div class="pregunta-meta">
+                <span class="tipo-badge">{{ getTipoPreguntaLabel(pregunta.tipo) }}</span>
+                <span *ngIf="pregunta.es_requerida" class="requerida-badge">Requerida</span>
+              </div>
             </div>
 
-            <div *ngIf="pregunta.analisis" class="pregunta-analisis">
-              <!-- Opciones de selección única/múltiple -->
-              <div *ngIf="pregunta.analisis.opciones_count" class="opciones-analysis">
-                <h5 class="text-md font-medium text-900 mb-2">Distribución de Opciones:</h5>
-                <div class="opciones-grid">
-                  <div *ngFor="let opcion of pregunta.analisis.opciones_count | keyvalue" class="opcion-item">
-                    <span class="opcion-texto">{{ opcion.key }}</span>
-                    <div class="opcion-stats">
-                      <span class="opcion-count">{{ opcion.value }}</span>
-                      <span class="opcion-percentage">({{ getPercentage(asNumber(opcion.value), pregunta.total_respuestas) }}%)</span>
-                    </div>
-                  </div>
-                </div>
+            <div class="pregunta-stats">
+              <div class="stat-item">
+                <i class="pi pi-users text-blue-500 mr-2"></i>
+                <span class="stat-label">Respuestas:</span>
+                <span class="stat-value">{{ pregunta.total_respuestas }}</span>
               </div>
 
-              <!-- Análisis de escalas -->
-              <div *ngIf="pregunta.analisis.promedio !== undefined" class="escala-analysis">
-                <h5 class="text-md font-medium text-900 mb-2">Análisis de Escala:</h5>
-                <div class="escala-stats">
-                  <span class="stat-label">Promedio:</span>
-                  <span class="stat-value">{{ pregunta.analisis.promedio }}</span>
-                  <span class="stat-label ml-3">Total Valores:</span>
-                  <span class="stat-value">{{ pregunta.analisis.total_valores }}</span>
-                </div>
-              </div>
-
-              <!-- Análisis de texto -->
-              <div *ngIf="pregunta.analisis.respuestas_unicas !== undefined" class="texto-analysis">
-                <h5 class="text-md font-medium text-900 mb-2">Análisis de Texto:</h5>
-                <div class="texto-stats">
-                  <span class="stat-label">Respuestas Únicas:</span>
-                  <span class="stat-value">{{ pregunta.analisis.respuestas_unicas }}</span>
-                  <span class="stat-label ml-3">Total Respuestas:</span>
-                  <span class="stat-value">{{ pregunta.analisis.total_respuestas }}</span>
-                </div>
-
-                <!-- Respuestas más frecuentes -->
-                <div *ngIf="pregunta.analisis.top_respuestas?.length > 0" class="top-respuestas mt-3">
-                  <h6 class="text-sm font-medium text-700 mb-2">Respuestas más frecuentes:</h6>
-                  <div class="respuestas-frecuentes">
-                    <div *ngFor="let resp of pregunta.analisis.top_respuestas.slice(0, 5)" class="respuesta-item">
-                      <span class="respuesta-texto">{{ resp.respuesta | slice:0:50 }}{{ resp.respuesta.length > 50 ? '...' : '' }}</span>
-                      <span class="respuesta-count">({{ resp.count }})</span>
+              <div *ngIf="pregunta.analisis" class="pregunta-analisis">
+                <!-- Opciones de selección única/múltiple -->
+                <div *ngIf="pregunta.analisis.opciones_count" class="opciones-analysis">
+                  <h5 class="text-md font-medium text-900 mb-2">Distribución de Opciones:</h5>
+                  <div class="opciones-grid">
+                    <div *ngFor="let opcion of pregunta.analisis.opciones_count | keyvalue" class="opcion-item">
+                      <span class="opcion-texto">{{ opcion.key }}</span>
+                      <div class="opcion-stats">
+                        <span class="opcion-count">{{ opcion.value }}</span>
+                        <span class="opcion-percentage">({{ getPercentage(asNumber(opcion.value), pregunta.total_respuestas) }}%)</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Muestra de todas las respuestas -->
-                <div *ngIf="pregunta.analisis.todas_respuestas?.length > 0" class="todas-respuestas mt-3">
-                  <h6 class="text-sm font-medium text-700 mb-2">Muestra de respuestas:</h6>
+                <!-- Análisis de escalas -->
+                <div *ngIf="pregunta.analisis.promedio !== undefined" class="escala-analysis">
+                  <h5 class="text-md font-medium text-900 mb-2">Análisis de Escala:</h5>
+                  <div class="escala-stats">
+                    <span class="stat-label">Promedio:</span>
+                    <span class="stat-value">{{ pregunta.analisis.promedio }}</span>
+                    <span class="stat-label ml-3">Total Valores:</span>
+                    <span class="stat-value">{{ pregunta.analisis.total_valores }}</span>
+                  </div>
+                </div>
+
+                <!-- Análisis de texto -->
+                <div *ngIf="pregunta.analisis.respuestas_unicas !== undefined" class="texto-analysis">
+                  <h5 class="text-md font-medium text-900 mb-2">Análisis de Texto:</h5>
+                  <div class="texto-stats">
+                    <span class="stat-label">Respuestas Únicas:</span>
+                    <span class="stat-value">{{ pregunta.analisis.respuestas_unicas }}</span>
+                    <span class="stat-label ml-3">Total Respuestas:</span>
+                    <span class="stat-value">{{ pregunta.analisis.total_respuestas }}</span>
+                  </div>
+
+                  <!-- Respuestas más frecuentes -->
+                  <div *ngIf="pregunta.analisis.top_respuestas?.length > 0" class="top-respuestas mt-3">
+                    <h6 class="text-sm font-medium text-700 mb-2">Respuestas más frecuentes:</h6>
+                    <div class="respuestas-frecuentes">
+                      <div *ngFor="let resp of pregunta.analisis.top_respuestas.slice(0, 5)" class="respuesta-item">
+                        <span class="respuesta-texto">{{ resp.respuesta | slice:0:50 }}{{ resp.respuesta.length > 50 ? '...' : '' }}</span>
+                        <span class="respuesta-count">({{ resp.count }})</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Muestra de todas las respuestas -->
+                  <div *ngIf="pregunta.analisis.todas_respuestas?.length > 0" class="todas-respuestas mt-3">
+                    <h6 class="text-sm font-medium text-700 mb-2">Muestra de respuestas:</h6>
+                    <div class="respuestas-muestra">
+                      <span *ngFor="let resp of pregunta.analisis.todas_respuestas.slice(0, 10); let last = last"
+                            class="respuesta-tag">
+                        {{ resp | slice:0:30 }}{{ resp.length > 30 ? '...' : '' }}{{ !last ? ',' : '' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Análisis de fechas -->
+                <div *ngIf="pregunta.analisis.fechas_unicas !== undefined" class="fecha-analysis">
+                  <h5 class="text-md font-medium text-900 mb-2">Análisis de Fechas:</h5>
+                  <div class="fecha-stats">
+                    <span class="stat-label">Fechas Únicas:</span>
+                    <span class="stat-value">{{ pregunta.analisis.fechas_unicas }}</span>
+                    <span class="stat-label ml-3">Total Respuestas:</span>
+                    <span class="stat-value">{{ pregunta.analisis.total_respuestas }}</span>
+                  </div>
+
+                  <div *ngIf="pregunta.analisis.fechas_proporcionadas?.length > 0" class="fechas-muestra mt-2">
+                    <h6 class="text-sm font-medium text-700 mb-2">Fechas proporcionadas:</h6>
+                    <div class="fechas-grid">
+                      <span *ngFor="let fecha of pregunta.analisis.fechas_proporcionadas.slice(0, 10)"
+                            class="fecha-tag">
+                        {{ fecha | date:'dd/MM/yyyy' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Análisis numérico -->
+                <div *ngIf="pregunta.analisis.minimo !== undefined" class="numero-analysis">
+                  <h5 class="text-md font-medium text-900 mb-2">Análisis Numérico:</h5>
+                  <div class="numero-stats">
+                    <div class="stat-row">
+                      <span class="stat-label">Promedio:</span>
+                      <span class="stat-value">{{ pregunta.analisis.promedio }}</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Mínimo:</span>
+                      <span class="stat-value">{{ pregunta.analisis.minimo }}</span>
+                      <span class="stat-label ml-3">Máximo:</span>
+                      <span class="stat-value">{{ pregunta.analisis.maximo }}</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Valores Válidos:</span>
+                      <span class="stat-value">{{ pregunta.analisis.valores_validos }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Análisis general (para tipos no específicos) -->
+                <div *ngIf="pregunta.analisis.respuestas_muestra" class="general-analysis">
+                  <h5 class="text-md font-medium text-900 mb-2">Muestra de Respuestas:</h5>
                   <div class="respuestas-muestra">
-                    <span *ngFor="let resp of pregunta.analisis.todas_respuestas.slice(0, 10); let last = last"
+                    <span *ngFor="let resp of pregunta.analisis.respuestas_muestra; let last = last"
                           class="respuesta-tag">
                       {{ resp | slice:0:30 }}{{ resp.length > 30 ? '...' : '' }}{{ !last ? ',' : '' }}
                     </span>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <!-- Análisis de fechas -->
-              <div *ngIf="pregunta.analisis.fechas_unicas !== undefined" class="fecha-analysis">
-                <h5 class="text-md font-medium text-900 mb-2">Análisis de Fechas:</h5>
-                <div class="fecha-stats">
-                  <span class="stat-label">Fechas Únicas:</span>
-                  <span class="stat-value">{{ pregunta.analisis.fechas_unicas }}</span>
-                  <span class="stat-label ml-3">Total Respuestas:</span>
-                  <span class="stat-value">{{ pregunta.analisis.total_respuestas }}</span>
-                </div>
+        <div *ngIf="!reporteEncuesta.preguntas?.length" class="no-data">
+          <i class="pi pi-info-circle text-2xl text-500 mb-2"></i>
+          <p class="text-500">No hay preguntas disponibles para analizar</p>
+        </div>
+      </div>
+    </div>
+        </div>
+      </p-tabPanel>
 
-                <div *ngIf="pregunta.analisis.fechas_proporcionadas?.length > 0" class="fechas-muestra mt-2">
-                  <h6 class="text-sm font-medium text-700 mb-2">Fechas proporcionadas:</h6>
-                  <div class="fechas-grid">
-                    <span *ngFor="let fecha of pregunta.analisis.fechas_proporcionadas.slice(0, 10)"
-                          class="fecha-tag">
-                      {{ fecha | date:'dd/MM/yyyy' }}
-                    </span>
-                  </div>
-                </div>
+      <!-- Pestaña: Gráficos -->
+      <p-tabPanel header="Gráficos">
+        <ng-template pTemplate="header">
+          <i class="pi pi-chart-bar mr-2"></i>
+          <span>Gráficos</span>
+        </ng-template>
+
+        <div class="p-4">
+          <div *ngIf="reporteEncuesta.preguntas?.length > 0" class="graficos-container">
+            <div *ngFor="let pregunta of reporteEncuesta.preguntas; let i = index" class="mb-5">
+              <!-- Título de la pregunta -->
+              <div class="mb-3 pb-3 border-bottom-1 border-200">
+                <h3 class="text-xl font-bold text-primary-600 mb-0">Pregunta N° {{ i + 1 }}</h3>
               </div>
-
-              <!-- Análisis numérico -->
-              <div *ngIf="pregunta.analisis.minimo !== undefined" class="numero-analysis">
-                <h5 class="text-md font-medium text-900 mb-2">Análisis Numérico:</h5>
-                <div class="numero-stats">
-                  <div class="stat-row">
-                    <span class="stat-label">Promedio:</span>
-                    <span class="stat-value">{{ pregunta.analisis.promedio }}</span>
-                  </div>
-                  <div class="stat-row">
-                    <span class="stat-label">Mínimo:</span>
-                    <span class="stat-value">{{ pregunta.analisis.minimo }}</span>
-                    <span class="stat-label ml-3">Máximo:</span>
-                    <span class="stat-value">{{ pregunta.analisis.maximo }}</span>
-                  </div>
-                  <div class="stat-row">
-                    <span class="stat-label">Valores Válidos:</span>
-                    <span class="stat-value">{{ pregunta.analisis.valores_validos }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Análisis general (para tipos no específicos) -->
-              <div *ngIf="pregunta.analisis.respuestas_muestra" class="general-analysis">
-                <h5 class="text-md font-medium text-900 mb-2">Muestra de Respuestas:</h5>
-                <div class="respuestas-muestra">
-                  <span *ngFor="let resp of pregunta.analisis.respuestas_muestra; let last = last"
-                        class="respuesta-tag">
-                    {{ resp | slice:0:30 }}{{ resp.length > 30 ? '...' : '' }}{{ !last ? ',' : '' }}
+              
+              <!-- Header de la pregunta -->
+              <div class="mb-3">
+                <h4 class="text-lg font-semibold text-900 mb-2">{{ pregunta.texto }}</h4>
+                <div class="flex gap-2 mb-3">
+                  <span class="tipo-badge">{{ getTipoPreguntaLabel(pregunta.tipo) }}</span>
+                  <span class="text-600 text-sm">
+                    <i class="pi pi-users mr-1"></i>
+                    {{ pregunta.total_respuestas }} respuestas
                   </span>
+                </div>
+              </div>
+
+              <!-- Gráfico según tipo de pregunta -->
+              <div class="chart-wrapper surface-50 p-4 border-round-lg">
+                <!-- Opciones: Gráfico de Dona -->
+                <div *ngIf="pregunta.analisis?.opciones_count">
+                  <canvas [id]="'chart-opciones-' + i" style="max-height: 350px;"></canvas>
+                </div>
+
+                <!-- Escala: Gráfico de Barras Horizontal -->
+                <div *ngIf="pregunta.analisis?.promedio !== undefined && pregunta.tipo === 'ESCALA'">
+                  <canvas [id]="'chart-escala-' + i" style="max-height: 300px;"></canvas>
+                </div>
+
+                <!-- Texto: Top 10 respuestas en Barras Horizontales -->
+                <div *ngIf="pregunta.analisis?.top_respuestas?.length > 0">
+                  <canvas [id]="'chart-texto-' + i" style="max-height: 400px;"></canvas>
+                </div>
+
+                <!-- Numérico: Gráfico de Barras Vertical -->
+                <div *ngIf="pregunta.analisis?.minimo !== undefined && pregunta.tipo === 'NUMERO'">
+                  <div class="grid mb-3">
+                    <div class="col-12 sm:col-4 text-center">
+                      <div class="p-3 surface-100 border-round">
+                        <div class="text-2xl font-bold text-blue-600">{{ pregunta.analisis.promedio || 0 }}</div>
+                        <div class="text-sm text-600">Promedio</div>
+                      </div>
+                    </div>
+                    <div class="col-12 sm:col-4 text-center">
+                      <div class="p-3 surface-100 border-round">
+                        <div class="text-2xl font-bold text-green-600">{{ pregunta.analisis.minimo || 0 }}</div>
+                        <div class="text-sm text-600">Mínimo</div>
+                      </div>
+                    </div>
+                    <div class="col-12 sm:col-4 text-center">
+                      <div class="p-3 surface-100 border-round">
+                        <div class="text-2xl font-bold text-orange-600">{{ pregunta.analisis.maximo || 0 }}</div>
+                        <div class="text-sm text-600">Máximo</div>
+                      </div>
+                    </div>
+                  </div>
+                  <canvas [id]="'chart-numerico-' + i" style="max-height: 250px;"></canvas>
+                </div>
+
+                <!-- Fechas: Gráfico de Línea Temporal -->
+                <div *ngIf="pregunta.analisis?.fechas_unicas !== undefined && pregunta.tipo === 'FECHA'">
+                  <canvas [id]="'chart-fechas-' + i" style="max-height: 300px;"></canvas>
+                </div>
+
+                <!-- Mensaje si no hay datos para graficar -->
+                <div *ngIf="!pregunta.analisis || pregunta.total_respuestas === 0" class="text-center p-5">
+                  <i class="pi pi-chart-line text-4xl text-400 mb-3"></i>
+                  <p class="text-600">No hay suficientes datos para mostrar gráficos</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div *ngIf="!reporteEncuesta.preguntas?.length" class="no-data">
-        <i class="pi pi-info-circle text-2xl text-500 mb-2"></i>
-        <p class="text-500">No hay preguntas disponibles para analizar</p>
-      </div>
-    </div>
+          <div *ngIf="!reporteEncuesta.preguntas?.length" class="text-center p-5">
+            <i class="pi pi-chart-bar text-6xl text-400 mb-3"></i>
+            <p class="text-600 text-lg">No hay preguntas disponibles para graficar</p>
+          </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
   </div>
 
   <ng-template pTemplate="footer">
