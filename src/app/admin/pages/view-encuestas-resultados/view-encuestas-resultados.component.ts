@@ -3,6 +3,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { EncuestaService } from '../../../core/services/encuesta/encuesta.service';
 import { MessageService } from 'primeng/api';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import * as XLSX from 'xlsx';
 
 Chart.register(...registerables);
 
@@ -103,10 +104,10 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     // Destruir gráficos anteriores y resetear flag
     this.destruirGraficos();
     this.chartsRendered = false;
-
+    
     this.encuestaIdSeleccionada = encuestaId;
     this.loadingReporte = true;
-
+    
     this.encuestaService.obtenerReporteEncuesta(encuestaId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -114,6 +115,10 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
         if (response.ok) {
           this.reporteEncuesta = response.data;
           this.displayReporteDialog = true;
+          
+          console.log('📊 Reporte cargado:', this.reporteEncuesta);
+          console.log('   - Tiene preguntas:', !!this.reporteEncuesta.preguntas);
+          console.log('   - Total preguntas:', this.reporteEncuesta.preguntas?.length);
         } else {
           this.messageService.add({
             severity: 'error',
@@ -143,11 +148,11 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response) => {
         if (response.ok) {
-          this.descargarCSV(response.data, `encuesta_${encuestaId}_datos.csv`);
+          this.generarExcelReporte(response.data);
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
-            detail: 'Datos exportados correctamente'
+            detail: 'Datos exportados correctamente a Excel'
           });
         } else {
           this.messageService.add({
@@ -170,37 +175,144 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     });
   }
 
-  descargarCSV(data: any, filename: string): void {
-    const csvContent = this.convertirACSV(data.datos);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', filename);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  }
-
-  convertirACSV(datos: any[]): string {
-    if (!datos || datos.length === 0) return '';
-
-    const headers = Object.keys(datos[0]);
-    const csvRows = [headers.join(',')];
-
-    for (const row of datos) {
-      const values = headers.map(header => {
-        const value = row[header];
-        return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+  /**
+   * Genera un archivo Excel con formato similar a Google Forms
+   */
+  private generarExcelReporte(data: any): void {
+    const workbook = XLSX.utils.book_new();
+    
+    // Información de la encuesta
+    const encuestaInfo = data.encuesta || {};
+    const respuestas = data.datos || [];
+    
+    // Crear hoja de resumen
+    const resumenData = [
+      ['REPORTE DE ENCUESTA'],
+      [],
+      ['Título:', encuestaInfo.titulo || 'Sin título'],
+      ['Descripción:', encuestaInfo.descripcion || 'Sin descripción'],
+      ['Estado:', encuestaInfo.estado || 'N/A'],
+      ['Total de respuestas:', respuestas.length],
+      ['Fecha de exportación:', new Date().toLocaleDateString('es-ES')],
+      []
+    ];
+    
+    const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+    
+    // Estilos para el resumen
+    wsResumen['!cols'] = [{ width: 25 }, { width: 50 }];
+    
+    XLSX.utils.book_append_sheet(workbook, wsResumen, 'Resumen');
+    
+    // Crear hoja de respuestas detalladas (estilo Google Forms)
+    if (respuestas.length > 0) {
+      // Preparar datos en formato de tabla
+      const respuestasFormateadas: any[] = [];
+      
+      respuestas.forEach((respuesta: any, index: number) => {
+        const fila: any = {
+          'N°': index + 1,
+          'Marca temporal': respuesta.fecha_respuesta 
+            ? new Date(respuesta.fecha_respuesta).toLocaleString('es-ES')
+            : 'N/A',
+          'Usuario': respuesta.usuario_nombre || 'Anónimo'
+        };
+        
+        // Agregar cada pregunta como columna
+        if (respuesta.respuestas && Array.isArray(respuesta.respuestas)) {
+          respuesta.respuestas.forEach((resp: any) => {
+            const preguntaTexto = resp.pregunta || 'Pregunta';
+            fila[preguntaTexto] = resp.respuesta || '';
+          });
+        }
+        
+        respuestasFormateadas.push(fila);
       });
-      csvRows.push(values.join(','));
+      
+      const wsRespuestas = XLSX.utils.json_to_sheet(respuestasFormateadas);
+      
+      // Ajustar ancho de columnas
+      const columnWidths = [
+        { width: 5 },  // N°
+        { width: 20 }, // Marca temporal
+        { width: 25 }  // Usuario
+      ];
+      
+      // Ancho automático para columnas de preguntas
+      if (respuestasFormateadas.length > 0) {
+        const firstRow = respuestasFormateadas[0];
+        Object.keys(firstRow).forEach((key, idx) => {
+          if (idx >= 3) { // Después de N°, Marca temporal, Usuario
+            columnWidths.push({ width: 30 });
+          }
+        });
+      }
+      
+      wsRespuestas['!cols'] = columnWidths;
+      
+      XLSX.utils.book_append_sheet(workbook, wsRespuestas, 'Respuestas');
     }
-
-    return csvRows.join('\n');
+    
+    // Crear hoja de estadísticas por pregunta
+    if (data.preguntas && data.preguntas.length > 0) {
+      const estadisticasData: any[] = [];
+      
+      estadisticasData.push(['ESTADÍSTICAS POR PREGUNTA']);
+      estadisticasData.push([]);
+      
+      data.preguntas.forEach((pregunta: any, index: number) => {
+        estadisticasData.push([`Pregunta ${index + 1}:`, pregunta.texto]);
+        estadisticasData.push(['Tipo:', this.getTipoPreguntaLabel(pregunta.tipo)]);
+        estadisticasData.push(['Total respuestas:', pregunta.total_respuestas]);
+        
+        if (pregunta.analisis) {
+          // Análisis de opciones
+          if (pregunta.analisis.opciones_count) {
+            estadisticasData.push(['']);
+            estadisticasData.push(['Opción', 'Cantidad', 'Porcentaje']);
+            Object.entries(pregunta.analisis.opciones_count).forEach(([opcion, cantidad]) => {
+              const porcentaje = this.getPercentage(Number(cantidad), pregunta.total_respuestas);
+              estadisticasData.push([opcion, cantidad, `${porcentaje}%`]);
+            });
+          }
+          
+          // Análisis de escala
+          if (pregunta.analisis.promedio !== undefined) {
+            estadisticasData.push(['']);
+            estadisticasData.push(['Promedio:', pregunta.analisis.promedio]);
+            estadisticasData.push(['Total valores:', pregunta.analisis.total_valores]);
+          }
+          
+          // Análisis numérico
+          if (pregunta.analisis.minimo !== undefined) {
+            estadisticasData.push(['']);
+            estadisticasData.push(['Promedio:', pregunta.analisis.promedio]);
+            estadisticasData.push(['Mínimo:', pregunta.analisis.minimo]);
+            estadisticasData.push(['Máximo:', pregunta.analisis.maximo]);
+            estadisticasData.push(['Valores válidos:', pregunta.analisis.valores_validos]);
+          }
+          
+          // Análisis de texto
+          if (pregunta.analisis.respuestas_unicas !== undefined) {
+            estadisticasData.push(['']);
+            estadisticasData.push(['Respuestas únicas:', pregunta.analisis.respuestas_unicas]);
+            estadisticasData.push(['Total respuestas:', pregunta.analisis.total_respuestas]);
+          }
+        }
+        
+        estadisticasData.push([]);
+        estadisticasData.push([]);
+      });
+      
+      const wsEstadisticas = XLSX.utils.aoa_to_sheet(estadisticasData);
+      wsEstadisticas['!cols'] = [{ width: 30 }, { width: 40 }, { width: 15 }];
+      
+      XLSX.utils.book_append_sheet(workbook, wsEstadisticas, 'Estadísticas');
+    }
+    
+    // Generar y descargar el archivo
+    const nombreArchivo = `Reporte_${encuestaInfo.titulo || 'Encuesta'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, nombreArchivo);
   }
 
   cerrarReporteDialog(): void {
