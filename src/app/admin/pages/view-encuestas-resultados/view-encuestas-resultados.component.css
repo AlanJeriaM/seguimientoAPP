@@ -163,12 +163,12 @@
   color: #065f46;
 }
 
-.estado-pausada {
-  background: #fef3c7;
-  color: #92400e;
+.estado-proximamente {
+  background: #dbeafe;
+  color: #1e40af;
 }
 
-.estado-cerrada {
+.estado-expirada {
   background: #fee2e2;
   color: #991b1b;
 }

@@ -204,31 +204,75 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     this.cargarEncuestasDisponibles();
   }
 
-  getEstadoBadgeClass(estado: string): string {
+  getEstadoBadgeClass(estado: string, encuesta?: any): string {
+    if (encuesta) {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0); // Inicio del día actual
+      
+      // Si la encuesta está expirada, usar clase específica
+      if (encuesta.fecha_fin) {
+        const fechaFin = new Date(encuesta.fecha_fin);
+        fechaFin.setHours(23, 59, 59, 999);
+        
+        if (fechaFin < hoy) {
+          return 'estado-expirada';
+        }
+      }
+      
+      // Si la encuesta tiene fecha de inicio en el futuro, usar clase específica
+      // Solo si el estado es ACTIVA
+      if (encuesta.fecha_inicio && estado === 'ACTIVA') {
+        const fechaInicio = new Date(encuesta.fecha_inicio);
+        fechaInicio.setHours(0, 0, 0, 0);
+        
+        if (fechaInicio > hoy) {
+          return 'estado-proximamente';
+        }
+      }
+    }
+    
     switch (estado) {
       case 'BORRADOR':
         return 'estado-borrador';
       case 'ACTIVA':
         return 'estado-activa';
-      case 'PAUSADA':
-        return 'estado-pausada';
-      case 'CERRADA':
-        return 'estado-cerrada';
       default:
         return 'estado-borrador';
     }
   }
 
-  getEstadoLabel(estado: string): string {
+  getEstadoLabel(estado: string, encuesta?: any): string {
+    if (encuesta) {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0); // Inicio del día actual
+      
+      // Si la encuesta tiene fecha de fin y ya pasó, mostrar "Expirada"
+      if (encuesta.fecha_fin) {
+        const fechaFin = new Date(encuesta.fecha_fin);
+        fechaFin.setHours(23, 59, 59, 999); // Fin del día de expiración
+        
+        if (fechaFin < hoy) {
+          return 'Expirada';
+        }
+      }
+      
+      // Si la encuesta tiene fecha de inicio en el futuro, mostrar "Próximamente"
+      // Solo si el estado es ACTIVA
+      if (encuesta.fecha_inicio && estado === 'ACTIVA') {
+        const fechaInicio = new Date(encuesta.fecha_inicio);
+        fechaInicio.setHours(0, 0, 0, 0); // Inicio del día de inicio
+        
+        if (fechaInicio > hoy) {
+          return 'Próximamente';
+        }
+      }
+    }
+    
     switch (estado) {
       case 'BORRADOR':
         return 'Borrador';
       case 'ACTIVA':
         return 'Activa';
-      case 'PAUSADA':
-        return 'Pausada';
-      case 'CERRADA':
-        return 'Cerrada';
       default:
         return estado;
     }
