@@ -345,6 +345,8 @@ const obtenerReporteEncuesta = async (req, res) => {
           descripcion: encuesta.descripcion,
           estado: encuesta.estado,
           fecha_creacion: encuesta.fecha_creacion,
+          fecha_inicio: encuesta.fecha_inicio,
+          fecha_fin: encuesta.fecha_fin,
           tiempo_estimado: encuesta.tiempo_estimado
         },
         estadisticas: {
