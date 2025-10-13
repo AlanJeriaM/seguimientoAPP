@@ -109,10 +109,10 @@
                 [value]="encuestasDisponibles"
                 [loading]="loading"
                 [paginator]="true"
-                [rows]="5"
+                [rows]="10"
                 [showCurrentPageReport]="true"
                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} encuestas"
-                [rowsPerPageOptions]="[5, 10, 20]"
+                [rowsPerPageOptions]="[10, 20, 50]"
                 styleClass="p-datatable-sm"
                 responsiveLayout="scroll"
               >
@@ -207,6 +207,7 @@
   [responsive]="true"
   [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
   [dismissableMask]="true"
+  (onHide)="cerrarReporteDialog()"
 >
   <div *ngIf="reporteEncuesta.encuesta">
     <!-- Pestañas -->

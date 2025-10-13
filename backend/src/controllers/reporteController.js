@@ -394,34 +394,97 @@ const exportarDatosEncuesta = async (req, res) => {
         {
           model: User,
           as: 'usuario',
-          attributes: ['nombre', 'apellido', 'correo']
+          attributes: ['id', 'nombre', 'correo']
         },
         {
           model: Pregunta,
           as: 'pregunta',
-          attributes: ['texto', 'tipo', 'orden']
+          attributes: ['id', 'texto', 'tipo', 'orden']
         }
       ],
       order: [
         ['usuario_id', 'ASC'],
         ['pregunta_id', 'ASC']
-      ],
-      raw: true
+      ]
     });
 
-    // Formatear datos para CSV
-    const datosCSV = respuestas.map(respuesta => ({
-      usuario_id: respuesta['usuario.id'],
-      nombre: respuesta['usuario.nombre'],
-      apellido: respuesta['usuario.apellido'],
-      correo: respuesta['usuario.correo'],
-      pregunta_id: respuesta['pregunta.id'],
-      pregunta_texto: respuesta['pregunta.texto'],
-      pregunta_tipo: respuesta['pregunta.tipo'],
-      pregunta_orden: respuesta['pregunta.orden'],
-      respuesta: respuesta.respuesta,
-      fecha_respuesta: respuesta.fecha_respuesta,
-      tiempo_respuesta: respuesta.tiempo_respuesta
+    // Agrupar respuestas por usuario
+    const respuestasPorUsuario = {};
+    
+    respuestas.forEach(respuesta => {
+      const userId = respuesta.usuario_id || 'anonimo';
+      
+      if (!respuestasPorUsuario[userId]) {
+        respuestasPorUsuario[userId] = {
+          usuario_id: userId,
+          usuario_nombre: respuesta.usuario?.nombre || 'Anónimo',
+          usuario_correo: respuesta.usuario?.correo || 'N/A',
+          fecha_respuesta: respuesta.fecha_respuesta,
+          respuestas: []
+        };
+      }
+      
+      respuestasPorUsuario[userId].respuestas.push({
+        pregunta_id: respuesta.pregunta_id,
+        pregunta: respuesta.pregunta?.texto || 'Pregunta sin texto',
+        tipo: respuesta.pregunta?.tipo || 'TEXTO_CORTO',
+        orden: respuesta.pregunta?.orden || 0,
+        respuesta: respuesta.respuesta
+      });
+    });
+    
+    // Convertir a array ordenado
+    const datosFormateados = Object.values(respuestasPorUsuario).map(item => {
+      // Ordenar respuestas por orden de pregunta
+      item.respuestas.sort((a, b) => a.orden - b.orden);
+      return item;
+    });
+
+    // Obtener preguntas con análisis para la hoja de estadísticas
+    const preguntas = await Pregunta.findAll({
+      where: { 
+        encuesta_id: id,
+        activo: true
+      },
+      attributes: ['id', 'texto', 'tipo', 'orden', 'es_requerida'],
+      order: [['orden', 'ASC']]
+    });
+
+    // Calcular análisis para cada pregunta
+    const preguntasConAnalisis = await Promise.all(preguntas.map(async (pregunta) => {
+      const respuestasPregunta = await Respuesta.findAll({
+        where: {
+          encuesta_id: id,
+          pregunta_id: pregunta.id
+        },
+        attributes: ['respuesta']
+      });
+
+      const analisis = {
+        total_respuestas: respuestasPregunta.length
+      };
+
+      // Análisis según tipo
+      if (pregunta.tipo === 'OPCION_UNICA' || pregunta.tipo === 'OPCION_MULTIPLE') {
+        const opcionesCount = {};
+        respuestasPregunta.forEach(r => {
+          const respuestas = r.respuesta.split(',').map(s => s.trim());
+          respuestas.forEach(resp => {
+            opcionesCount[resp] = (opcionesCount[resp] || 0) + 1;
+          });
+        });
+        analisis.opciones_count = opcionesCount;
+      }
+
+      return {
+        id: pregunta.id,
+        texto: pregunta.texto,
+        tipo: pregunta.tipo,
+        orden: pregunta.orden,
+        es_requerida: pregunta.es_requerida,
+        total_respuestas: respuestasPregunta.length,
+        analisis
+      };
     }));
 
     res.json({
@@ -429,10 +492,13 @@ const exportarDatosEncuesta = async (req, res) => {
       data: {
         encuesta: {
           id: encuesta.id,
-          titulo: encuesta.titulo
+          titulo: encuesta.titulo,
+          descripcion: encuesta.descripcion,
+          estado: encuesta.estado
         },
-        total_respuestas: datosCSV.length,
-        datos: datosCSV
+        total_respuestas: datosFormateados.length,
+        datos: datosFormateados,
+        preguntas: preguntasConAnalisis
       }
     });
 
