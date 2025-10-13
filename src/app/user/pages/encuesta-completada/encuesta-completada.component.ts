@@ -65,7 +65,7 @@ export class EncuestaCompletadaComponent implements OnInit, OnDestroy {
                 titulo: encuesta.titulo,
                 descripcion: encuesta.descripcion,
                 fecha_completada: new Date(encuesta.fecha_respuesta),
-                tiempo_invertido: 0, // El backend no proporciona esto actualmente
+                tiempo_invertido: encuesta.tiempo_total || 0, // Tiempo en segundos desde el backend
                 total_preguntas: encuesta.total_preguntas,
                 total_respuestas: encuesta.respuestas?.length || 0,
                 porcentaje_completado: 100, // Si está en historial, está completada
@@ -159,13 +159,28 @@ export class EncuestaCompletadaComponent implements OnInit, OnDestroy {
     return 'estado-completada';
   }
 
-  getTiempoInvertidoTexto(minutos: number): string {
-    if (minutos < 60) {
-      return `${minutos} min`;
+  getTiempoInvertidoTexto(segundos: number): string {
+    if (!segundos || segundos === 0) {
+      return '0 min';
+    }
+
+    // Convertir segundos a minutos
+    const totalMinutos = Math.floor(segundos / 60);
+    const segundosRestantes = segundos % 60;
+    
+    // Si es menos de 1 minuto, mostrar solo segundos
+    if (totalMinutos === 0) {
+      return `${segundosRestantes} seg`;
     }
     
-    const horas = Math.floor(minutos / 60);
-    const minutosRestantes = minutos % 60;
+    // Si es menos de 1 hora, mostrar solo minutos
+    if (totalMinutos < 60) {
+      return `${totalMinutos} min`;
+    }
+    
+    // Si es más de 1 hora, mostrar horas y minutos
+    const horas = Math.floor(totalMinutos / 60);
+    const minutosRestantes = totalMinutos % 60;
     
     if (minutosRestantes === 0) {
       return `${horas}h`;

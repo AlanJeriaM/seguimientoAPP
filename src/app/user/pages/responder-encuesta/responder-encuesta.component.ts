@@ -25,6 +25,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   totalPreguntas = 0;
   progreso = 0;
   tiempoInicio?: Date;
+  tiempoInicioSesion?: Date; // Tiempo de inicio de esta sesión actual
   displayConfirmDialog = false;
   displayExitDialog = false;
   guardandoProgreso = false;
@@ -76,6 +77,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
             this.sessionToken = response.data.session_token;
             this.totalPreguntas = this.encuesta.preguntas.length;
             this.tiempoInicio = new Date();
+            this.tiempoInicioSesion = new Date(); // Registrar inicio de esta sesión
 
             // Validar que las preguntas tengan opciones cuando es necesario
             this.encuesta.preguntas.forEach(pregunta => {
@@ -310,24 +312,26 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   // Auto-guardado
   guardarProgresoAutomatico(): void {
-    if (this.progreso > 0 && this.progreso < 100) {
-      const respuestas = this.extraerRespuestas();
+      if (this.progreso > 0 && this.progreso < 100) {
+        const respuestas = this.extraerRespuestas();
+        const tiempoTranscurrido = this.calcularTiempoTranscurrido();
 
-      this.respuestaService.guardarProgresoEncuesta(
-        this.encuestaId,
-        respuestas,
-        this.sessionToken,
-        this.preguntaActual,
-        this.progreso
-      ).subscribe({
-        next: () => {
-          console.log('Progreso guardado automáticamente:', this.progreso + '%');
-        },
-        error: (error) => {
-          console.error('Error al guardar progreso:', error);
-        }
-      });
-    }
+        this.respuestaService.guardarProgresoEncuesta(
+          this.encuestaId,
+          respuestas,
+          this.sessionToken,
+          this.preguntaActual,
+          this.progreso,
+          tiempoTranscurrido
+        ).subscribe({
+          next: () => {
+            console.log('Progreso guardado automáticamente:', this.progreso + '%', 'Tiempo:', tiempoTranscurrido, 'seg');
+          },
+          error: (error) => {
+            console.error('Error al guardar progreso:', error);
+          }
+        });
+      }
   }
 
   // Envío de respuestas
@@ -358,8 +362,9 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
     this.enviando = true;
     this.formularioDeshabilitado = true; // Deshabilitar formulario inmediatamente
     const respuestas = this.extraerRespuestas();
+    const tiempoTranscurrido = this.calcularTiempoTranscurrido();
 
-    this.respuestaService.enviarRespuestas(this.encuestaId, respuestas, this.sessionToken)
+    this.respuestaService.enviarRespuestas(this.encuestaId, respuestas, this.sessionToken, tiempoTranscurrido)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -513,12 +518,14 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   private async guardarProgreso(): Promise<void> {
     const respuestas = this.extraerRespuestas();
+    const tiempoTranscurrido = this.calcularTiempoTranscurrido();
 
     console.log('Enviando al backend:');
     console.log('  - Encuesta ID:', this.encuestaId);
     console.log('  - Total respuestas:', respuestas.length);
     console.log('  - Progreso:', this.progreso + '%');
     console.log('  - Pregunta actual:', this.preguntaActual);
+    console.log('  - Tiempo transcurrido:', tiempoTranscurrido, 'segundos');
 
     return new Promise((resolve, reject) => {
       this.respuestaService.guardarProgresoEncuesta(
@@ -526,7 +533,8 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
         respuestas,
         this.sessionToken,
         this.preguntaActual,
-        this.progreso
+        this.progreso,
+        tiempoTranscurrido
       ).pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
           console.log('Respuesta del backend:', response);
@@ -620,6 +628,18 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   getPorcentajeProgreso(): number {
     return this.progreso;
+  }
+
+  /**
+   * Calcula el tiempo transcurrido en segundos desde el inicio de esta sesión
+   */
+  private calcularTiempoTranscurrido(): number {
+    if (!this.tiempoInicioSesion) {
+      return 0;
+    }
+    const ahora = new Date();
+    const diferenciaMs = ahora.getTime() - this.tiempoInicioSesion.getTime();
+    return Math.floor(diferenciaMs / 1000); // convertir a segundos
   }
 
   getPreguntaActualTexto(): string {
