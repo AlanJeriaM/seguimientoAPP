@@ -444,6 +444,85 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Métodos auxiliares para resúmenes de datos
+  getOpcionMasSeleccionada(opcionesCount: any): string {
+    if (!opcionesCount) return 'N/A';
+    
+    let maxCount = 0;
+    let opcionMasSeleccionada = '';
+    
+    Object.entries(opcionesCount).forEach(([opcion, cantidad]) => {
+      if (Number(cantidad) > maxCount) {
+        maxCount = Number(cantidad);
+        opcionMasSeleccionada = opcion;
+      }
+    });
+    
+    return opcionMasSeleccionada || 'N/A';
+  }
+
+  getCantidadOpcionMasSeleccionada(opcionesCount: any): number {
+    if (!opcionesCount) return 0;
+    
+    let maxCount = 0;
+    
+    Object.entries(opcionesCount).forEach(([opcion, cantidad]) => {
+      if (Number(cantidad) > maxCount) {
+        maxCount = Number(cantidad);
+      }
+    });
+    
+    return maxCount;
+  }
+
+  getInterpretacionEscala(promedio: number): string {
+    if (promedio >= 4.5) return 'Excelente - Muy satisfecho';
+    if (promedio >= 3.5) return 'Bueno - Satisfecho';
+    if (promedio >= 2.5) return 'Regular - Neutral';
+    if (promedio >= 1.5) return 'Malo - Insatisfecho';
+    return 'Muy malo - Muy insatisfecho';
+  }
+
+
+  getDistribucionNumerica(minimo: number, maximo: number, promedio: number): string {
+    if (!minimo && !maximo && !promedio) return 'Sin datos';
+    
+    const rango = maximo - minimo;
+    const posicionPromedio = ((promedio - minimo) / rango) * 100;
+    
+    if (posicionPromedio >= 80) return 'Distribución alta';
+    if (posicionPromedio >= 60) return 'Distribución media-alta';
+    if (posicionPromedio >= 40) return 'Distribución media';
+    if (posicionPromedio >= 20) return 'Distribución media-baja';
+    return 'Distribución baja';
+  }
+
+  getFechaMinima(fechas: string[]): Date {
+    if (!fechas || fechas.length === 0) return new Date();
+    
+    return new Date(Math.min(...fechas.map(fecha => new Date(fecha).getTime())));
+  }
+
+  getFechaMaxima(fechas: string[]): Date {
+    if (!fechas || fechas.length === 0) return new Date();
+    
+    return new Date(Math.max(...fechas.map(fecha => new Date(fecha).getTime())));
+  }
+
+  // Métodos auxiliares para templates
+  getOpcionKey(opcion: any): string {
+    return String(opcion.key || '');
+  }
+
+  getOpcionKeyLength(opcion: any): number {
+    return String(opcion.key || '').length;
+  }
+
+  getOpcionesCount(opcionesCount: any): number {
+    if (!opcionesCount) return 0;
+    return Object.keys(opcionesCount).length;
+  }
+
   getPrioridadLabel(prioridad: string): string {
     switch (prioridad) {
       case 'BAJA':

@@ -84,6 +84,78 @@
   color: #3b82f6;
 }
 
+/* Resumen de datos */
+.resumen-datos {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-left: 4px solid #3b82f6;
+  position: sticky;
+  top: 1rem;
+  min-height: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.resumen-opciones .opciones-resumen {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.resumen-opciones .opciones-resumen::-webkit-scrollbar {
+  width: 4px;
+}
+
+.resumen-opciones .opciones-resumen::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.resumen-opciones .opciones-resumen::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.resumen-opciones .opciones-resumen::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.resumen-escala .interpretacion {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left: 3px solid #3b82f6;
+}
+
+.resumen-texto .diversidad {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-left: 3px solid #22c55e;
+}
+
+.resumen-numerico .distribucion {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left: 3px solid #f59e0b;
+}
+
+.resumen-fechas .rango-fechas {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-left: 3px solid #6366f1;
+}
+
+/* Asegurar que el contenido del resumen se distribuya bien */
+.resumen-datos > * {
+  flex-shrink: 0;
+}
+
+.resumen-opciones,
+.resumen-escala,
+.resumen-texto,
+.resumen-numerico,
+.resumen-fechas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 /* Top encuestas */
 .top-encuestas {
   text-align: left;
@@ -562,10 +634,11 @@
 }
 
 .chart-wrapper {
-  min-height: 300px;
+  min-height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 }
 
 .chart-wrapper canvas {
