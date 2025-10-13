@@ -11,12 +11,12 @@ import { RespuestaService, EncuestaParaResponder, PreguntaParaResponder, Respues
   styleUrls: ['./responder-encuesta.component.css']
 })
 export class ResponderEncuestaComponent implements OnInit, OnDestroy {
-  
+
   encuestaId!: number;
   encuesta?: EncuestaParaResponder;
   formularioRespuestas!: FormGroup;
   sessionToken?: string;
-  
+
   // Estados
   loading = false;
   enviando = false;
@@ -28,7 +28,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   displayConfirmDialog = false;
   displayExitDialog = false;
   guardandoProgreso = false;
-  
+
   // Auto-guardado
   private autoGuardado$ = interval(30000); // Cada 30 segundos
   private destroy$ = new Subject<void>();
@@ -66,7 +66,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   cargarEncuesta(): void {
     this.loading = true;
-    
+
     this.respuestaService.obtenerEncuestaParaResponder(this.encuestaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -76,7 +76,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
             this.sessionToken = response.data.session_token;
             this.totalPreguntas = this.encuesta.preguntas.length;
             this.tiempoInicio = new Date();
-            
+
             // Validar que las preguntas tengan opciones cuando es necesario
             this.encuesta.preguntas.forEach(pregunta => {
               if (pregunta.tipo === 'OPCION_UNICA' || pregunta.tipo === 'OPCION_MULTIPLE') {
@@ -86,14 +86,14 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
                 }
               }
             });
-            
+
             this.inicializarFormulario();
-            
+
             // Cargar progreso guardado si existe
             if (response.data.progreso_guardado && response.data.progreso_guardado.respuestas.length > 0) {
               this.cargarProgresoGuardado(response.data.progreso_guardado);
             }
-            
+
             console.log('Encuesta cargada:', this.encuesta);
             console.log('Session token:', this.sessionToken);
           }
@@ -150,7 +150,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
       case 'OPCION_MULTIPLE':
         // Crear controles independientes para cada opción
-        const opcionesControls = (pregunta.opciones || []).map(() => 
+        const opcionesControls = (pregunta.opciones || []).map(() =>
           this.formBuilder.control(false)
         );
         return this.formBuilder.group({
@@ -212,7 +212,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   siguientePregunta(): void {
     const controlActual = this.getPreguntaControl(this.preguntaActual);
     const preguntaActualData = this.encuesta?.preguntas[this.preguntaActual];
-    
+
     // Si la pregunta no es requerida, permitir avanzar
     if (!preguntaActualData?.es_requerida) {
       if (this.preguntaActual < this.totalPreguntas - 1) {
@@ -220,49 +220,49 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
       }
       return;
     }
-    
+
     // Validar según el tipo de pregunta
     const tipo = controlActual.get('tipo')?.value;
     const respuesta = controlActual.get('respuesta')?.value;
     let esValida = false;
-    
+
     switch (tipo) {
       case 'TEXTO_CORTO':
       case 'TEXTO_LARGO':
         // Validar que el texto no esté vacío (sin contar espacios)
         esValida = typeof respuesta === 'string' && respuesta.trim() !== '';
         break;
-        
+
       case 'OPCION_UNICA':
         // Validar que se haya seleccionado una opción
         esValida = respuesta !== null && respuesta !== undefined && respuesta !== '';
         break;
-        
+
       case 'OPCION_MULTIPLE':
         // Validar que se haya seleccionado al menos una opción
         const selecciones = controlActual.get('selecciones') as FormArray;
         esValida = selecciones && selecciones.value.some((sel: boolean) => sel === true);
         break;
-        
+
       case 'NUMERO':
         // Validar que se haya ingresado un número válido
         esValida = respuesta !== null && respuesta !== undefined && respuesta !== '' && !isNaN(respuesta);
         break;
-        
+
       case 'ESCALA':
         // Para escala, siempre hay un valor por defecto
         esValida = respuesta !== null && respuesta !== undefined;
         break;
-        
+
       case 'FECHA':
         // Validar que se haya seleccionado una fecha
         esValida = respuesta !== null && respuesta !== undefined;
         break;
-        
+
       default:
         esValida = controlActual.valid;
     }
-    
+
     if (esValida) {
       if (this.preguntaActual < this.totalPreguntas - 1) {
         this.preguntaActual++;
@@ -283,23 +283,23 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
     const respuestasCompletas = this.respuestasArray.controls.filter(control => {
       const tipo = control.get('tipo')?.value;
       const respuesta = control.get('respuesta')?.value;
-      
+
       // Para OPCION_MULTIPLE, verificar si hay selecciones
       if (tipo === 'OPCION_MULTIPLE') {
         const selecciones = control.get('selecciones')?.value || [];
         return selecciones.some((sel: boolean) => sel === true);
       }
-      
+
       // Para arrays (respuestas múltiples)
       if (Array.isArray(respuesta)) {
         return respuesta.length > 0;
       }
-      
+
       // Para otros tipos, verificar que no esté vacío
       if (typeof respuesta === 'string') {
         return respuesta.trim() !== '';
       }
-      
+
       // Para números y fechas
       return respuesta !== null && respuesta !== undefined && respuesta !== '';
     }).length;
@@ -312,19 +312,19 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   guardarProgresoAutomatico(): void {
     if (this.progreso > 0 && this.progreso < 100) {
       const respuestas = this.extraerRespuestas();
-      
+
       this.respuestaService.guardarProgresoEncuesta(
-        this.encuestaId, 
+        this.encuestaId,
         respuestas,
         this.sessionToken,
         this.preguntaActual,
         this.progreso
       ).subscribe({
         next: () => {
-          console.log('✅ Progreso guardado automáticamente:', this.progreso + '%');
+          console.log('Progreso guardado automáticamente:', this.progreso + '%');
         },
         error: (error) => {
-          console.error('❌ Error al guardar progreso:', error);
+          console.error('Error al guardar progreso:', error);
         }
       });
     }
@@ -396,8 +396,8 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
 
   extraerRespuestas(): RespuestaUsuario[] {
     const respuestas: RespuestaUsuario[] = [];
-    
-    console.log('📝 Extrayendo respuestas del formulario...');
+
+    console.log('Extrayendo respuestas del formulario...');
 
     this.respuestasArray.controls.forEach((control, index) => {
       const pregunta = this.encuesta!.preguntas[index];
@@ -409,7 +409,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
         const selecciones = formGroup.get('selecciones')?.value || [];
         const opciones = formGroup.get('opciones')?.value || [];
         respuestaValue = opciones.filter((_: string, i: number) => selecciones[i]);
-        console.log(`  🔘 Pregunta ${index + 1} (Opción Múltiple):`, {
+        console.log(`  Pregunta ${index + 1} (Opción Múltiple):`, {
           selecciones: selecciones,
           opciones: opciones,
           respuestasFiltradas: respuestaValue
@@ -419,26 +419,26 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
       }
 
       // Validar que la respuesta tenga contenido
-      const tieneContenido = 
-        respuestaValue !== null && 
-        respuestaValue !== '' && 
+      const tieneContenido =
+        respuestaValue !== null &&
+        respuestaValue !== '' &&
         respuestaValue !== undefined &&
         (Array.isArray(respuestaValue) ? respuestaValue.length > 0 : true);
 
       if (tieneContenido) {
         const respuestaFormateada = Array.isArray(respuestaValue) ? respuestaValue.join(',') : String(respuestaValue);
-        console.log(`  ✅ Pregunta ${index + 1} (ID: ${pregunta.id}): ${respuestaFormateada}`);
+        console.log(`  Pregunta ${index + 1} (ID: ${pregunta.id}): ${respuestaFormateada}`);
         respuestas.push({
           pregunta_id: pregunta.id,
           respuesta: respuestaFormateada,
           tiempo_respuesta: this.calcularTiempoRespuesta()
         });
       } else {
-        console.log(`  ⏭️ Pregunta ${index + 1} (ID: ${pregunta.id}): Sin respuesta`);
+        console.log(` Pregunta ${index + 1} (ID: ${pregunta.id}): Sin respuesta`);
       }
     });
 
-    console.log(`📊 Total respuestas extraídas: ${respuestas.length}`);
+    console.log(`Total respuestas extraídas: ${respuestas.length}`);
     return respuestas;
   }
 
@@ -481,44 +481,45 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   }
 
   guardarYSalir(): void {
-    console.log('🔵 Iniciando guardado de progreso...');
-    console.log('📊 Progreso actual:', this.progreso + '%');
-    console.log('📍 Pregunta actual:', this.preguntaActual);
-    console.log('🔑 Session token:', this.sessionToken);
-    
     this.guardandoProgreso = true;
+    this.formularioDeshabilitado = true; // Deshabilitar formulario
+
     this.guardarProgreso().then(() => {
-      console.log('✅ Progreso guardado exitosamente');
+      console.log('Progreso guardado exitosamente');
       this.displayExitDialog = false;
-      this.guardandoProgreso = false;
+
+      // Mostrar toast (ahora solo hay uno en navbar-shared con preventOpenDuplicates)
       this.messageService.add({
         severity: 'success',
         summary: 'Progreso guardado',
-        detail: 'Tu progreso ha sido guardado. Puedes continuar después.'
+        detail: 'Continúa más tarde.'
       });
+
+      // Redirigir después de un breve delay para que se vea el toast
       setTimeout(() => {
         this.router.navigate(['/user/view-encuestas']);
-      }, 1500);
+      }, 1000);
     }).catch((error) => {
-      console.error('❌ Error al guardar progreso:', error);
+      console.error('Error al guardar progreso:', error);
       this.guardandoProgreso = false;
+      this.formularioDeshabilitado = false; // Rehabilitar formulario en caso de error
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'No se pudo guardar el progreso'
+        detail: 'No se pudo guardar el progreso. Inténtalo nuevamente.'
       });
     });
   }
 
   private async guardarProgreso(): Promise<void> {
     const respuestas = this.extraerRespuestas();
-    
-    console.log('📤 Enviando al backend:');
+
+    console.log('Enviando al backend:');
     console.log('  - Encuesta ID:', this.encuestaId);
     console.log('  - Total respuestas:', respuestas.length);
     console.log('  - Progreso:', this.progreso + '%');
     console.log('  - Pregunta actual:', this.preguntaActual);
-    
+
     return new Promise((resolve, reject) => {
       this.respuestaService.guardarProgresoEncuesta(
         this.encuestaId,
@@ -528,7 +529,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
         this.progreso
       ).pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
-          console.log('📥 Respuesta del backend:', response);
+          console.log('Respuesta del backend:', response);
           if (response.ok) {
             resolve();
           } else {
@@ -536,7 +537,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('❌ Error HTTP:', error);
+          console.error('Error HTTP:', error);
           reject(error);
         }
       });
@@ -544,6 +545,8 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
   }
 
   private cargarProgresoGuardado(progresoData: any): void {
+    console.log('cargarProgresoGuardado llamada');
+
     try {
       // Restaurar pregunta actual
       if (progresoData.pregunta_actual !== undefined) {
@@ -565,7 +568,7 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
               // Para opciones múltiples, las respuestas vienen como string separado por comas
               try {
                 let respuestasArray: string[];
-                
+
                 // Intentar parsear como JSON primero
                 try {
                   respuestasArray = JSON.parse(respuestaGuardada.respuesta);
@@ -573,26 +576,26 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
                   // Si no es JSON, separar por comas
                   respuestasArray = respuestaGuardada.respuesta.split(',').map((r: string) => r.trim());
                 }
-                
+
                 const selecciones = control.get('selecciones') as FormArray;
-                
-                console.log('🔄 Restaurando opciones múltiples:', respuestasArray);
-                
+
+                console.log('Restaurando opciones múltiples:', respuestasArray);
+
                 // Marcar las opciones seleccionadas
                 respuestasArray.forEach((respuesta: string) => {
                   const opcionIndex = pregunta.opciones?.indexOf(respuesta);
                   console.log(`  Buscando "${respuesta}" en opciones:`, opcionIndex);
                   if (opcionIndex !== undefined && opcionIndex !== -1 && selecciones.at(opcionIndex)) {
                     selecciones.at(opcionIndex).setValue(true);
-                    console.log(`  ✅ Marcada opción ${opcionIndex}`);
+                    console.log(` Marcada opción ${opcionIndex}`);
                   }
                 });
               } catch (e) {
-                console.warn('❌ Error al parsear respuestas múltiples:', e);
+                console.warn('Error al parsear respuestas múltiples:', e);
               }
             } else {
               // Para otros tipos, solo establecer el valor
-              console.log(`🔄 Restaurando respuesta tipo ${pregunta?.tipo}:`, respuestaGuardada.respuesta);
+              console.log(`Restaurando respuesta tipo ${pregunta?.tipo}:`, respuestaGuardada.respuesta);
               control.get('respuesta')?.setValue(respuestaGuardada.respuesta);
             }
           }
@@ -601,11 +604,13 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
         // Actualizar progreso
         this.actualizarProgreso();
 
-        // Mostrar mensaje de reanudación
+        console.log(`Progreso restaurado: ${progresoData.respuestas.length} respuestas cargadas, pregunta actual: ${this.preguntaActual + 1}`);
+
+        // Mostrar mensaje de progreso restaurado
         this.messageService.add({
           severity: 'info',
           summary: 'Progreso restaurado',
-          detail: `Continuando desde la pregunta ${this.preguntaActual + 1}`
+          detail: `Continua respondiendo`
         });
       }
     } catch (error) {
@@ -625,23 +630,23 @@ export class ResponderEncuestaComponent implements OnInit, OnDestroy {
     const controlActual = this.getPreguntaControl(this.preguntaActual);
     const tipo = controlActual.get('tipo')?.value;
     const respuesta = controlActual.get('respuesta')?.value;
-    
+
     // Para OPCION_MULTIPLE, verificar si hay selecciones
     if (tipo === 'OPCION_MULTIPLE') {
       const selecciones = controlActual.get('selecciones')?.value || [];
       return selecciones.some((sel: boolean) => sel === true);
     }
-    
+
     // Para arrays (respuestas múltiples)
     if (Array.isArray(respuesta)) {
       return respuesta.length > 0;
     }
-    
+
     // Para strings, verificar que no esté vacío (con trim)
     if (typeof respuesta === 'string') {
       return respuesta.trim() !== '';
     }
-    
+
     // Para números y fechas
     return respuesta !== null && respuesta !== undefined && respuesta !== '';
   }
