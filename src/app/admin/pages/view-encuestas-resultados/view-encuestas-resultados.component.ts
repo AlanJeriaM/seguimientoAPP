@@ -2,6 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { EncuestaService } from '../../../core/services/encuesta/encuesta.service';
 import { MessageService } from 'primeng/api';
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-view-encuestas-resultados',
@@ -17,6 +20,8 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
   loadingReporte = false;
   encuestaIdSeleccionada: number | null = null;
   displayReporteDialog = false;
+  private chartsRendered = false;
+  private charts: { [key: string]: Chart } = {};
 
   private destroy$ = new Subject<void>();
 
@@ -33,6 +38,7 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.destruirGraficos();
   }
 
   cargarEstadisticasGenerales(): void {
@@ -94,9 +100,13 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
   }
 
   verReporteEncuesta(encuestaId: number): void {
+    // Destruir gráficos anteriores y resetear flag
+    this.destruirGraficos();
+    this.chartsRendered = false;
+
     this.encuestaIdSeleccionada = encuestaId;
     this.loadingReporte = true;
-    
+
     this.encuestaService.obtenerReporteEncuesta(encuestaId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -127,7 +137,7 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
 
   exportarDatosEncuesta(encuestaId: number): void {
     this.loading = true;
-    
+
     this.encuestaService.exportarDatosEncuesta(encuestaId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -164,7 +174,7 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     const csvContent = this.convertirACSV(data.datos);
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    
+
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
@@ -178,10 +188,10 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
 
   convertirACSV(datos: any[]): string {
     if (!datos || datos.length === 0) return '';
-    
+
     const headers = Object.keys(datos[0]);
     const csvRows = [headers.join(',')];
-    
+
     for (const row of datos) {
       const values = headers.map(header => {
         const value = row[header];
@@ -189,7 +199,7 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
       });
       csvRows.push(values.join(','));
     }
-    
+
     return csvRows.join('\n');
   }
 
@@ -197,6 +207,29 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     this.displayReporteDialog = false;
     this.reporteEncuesta = {};
     this.encuestaIdSeleccionada = null;
+    this.destruirGraficos();
+    this.chartsRendered = false;
+  }
+
+  /**
+   * Se ejecuta cuando se cambia de pestaña
+   */
+  onTabChange(event: any): void {
+    console.log('Cambio de pestaña:', event.index);
+
+    // Si se cambia a la pestaña de gráficos (index 1)
+    if (event.index === 1) {
+      console.log('Cambiando a pestaña de gráficos');
+
+      // Destruir gráficos anteriores antes de renderizar nuevos
+      this.destruirGraficos();
+      this.chartsRendered = false;
+
+      // Esperar a que el DOM esté listo
+      setTimeout(() => {
+        this.renderizarGraficos();
+      }, 300);
+    }
   }
 
   actualizarDatos(): void {
@@ -208,29 +241,29 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     if (encuesta) {
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0); // Inicio del día actual
-      
+
       // Si la encuesta está expirada, usar clase específica
       if (encuesta.fecha_fin) {
         const fechaFin = new Date(encuesta.fecha_fin);
         fechaFin.setHours(23, 59, 59, 999);
-        
+
         if (fechaFin < hoy) {
           return 'estado-expirada';
         }
       }
-      
+
       // Si la encuesta tiene fecha de inicio en el futuro, usar clase específica
       // Solo si el estado es ACTIVA
       if (encuesta.fecha_inicio && estado === 'ACTIVA') {
         const fechaInicio = new Date(encuesta.fecha_inicio);
         fechaInicio.setHours(0, 0, 0, 0);
-        
+
         if (fechaInicio > hoy) {
           return 'estado-proximamente';
         }
       }
     }
-    
+
     switch (estado) {
       case 'BORRADOR':
         return 'estado-borrador';
@@ -245,29 +278,29 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     if (encuesta) {
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0); // Inicio del día actual
-      
+
       // Si la encuesta tiene fecha de fin y ya pasó, mostrar "Expirada"
       if (encuesta.fecha_fin) {
         const fechaFin = new Date(encuesta.fecha_fin);
         fechaFin.setHours(23, 59, 59, 999); // Fin del día de expiración
-        
+
         if (fechaFin < hoy) {
           return 'Expirada';
         }
       }
-      
+
       // Si la encuesta tiene fecha de inicio en el futuro, mostrar "Próximamente"
       // Solo si el estado es ACTIVA
       if (encuesta.fecha_inicio && estado === 'ACTIVA') {
         const fechaInicio = new Date(encuesta.fecha_inicio);
         fechaInicio.setHours(0, 0, 0, 0); // Inicio del día de inicio
-        
+
         if (fechaInicio > hoy) {
           return 'Próximamente';
         }
       }
     }
-    
+
     switch (estado) {
       case 'BORRADOR':
         return 'Borrador';
@@ -336,6 +369,352 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
 
   asNumber(value: unknown): number {
     return Number(value) || 0;
+  }
+
+  /**
+   * Renderiza todos los gráficos de las preguntas
+   */
+  private renderizarGraficos(): void {
+    if (!this.reporteEncuesta.preguntas || this.chartsRendered) {
+      console.log('No se pueden renderizar gráficos:', {
+        tienePreguntas: !!this.reporteEncuesta.preguntas,
+        yaRenderizado: this.chartsRendered
+      });
+      return;
+    }
+
+    console.log('Renderizando gráficos para', this.reporteEncuesta.preguntas.length, 'preguntas');
+
+    this.reporteEncuesta.preguntas.forEach((pregunta: any, index: number) => {
+      console.log(`   Pregunta ${index + 1}:`, pregunta.texto);
+      console.log('   - Tipo:', pregunta.tipo);
+      console.log('   - Total respuestas:', pregunta.total_respuestas);
+      console.log('   - Tiene análisis:', !!pregunta.analisis);
+
+      if (!pregunta.analisis || pregunta.total_respuestas === 0) {
+        console.log('   Sin datos para graficar');
+        return;
+      }
+
+      // Renderizar según tipo de pregunta
+      if (pregunta.analisis.opciones_count) {
+        console.log('Renderizando gráfico de dona');
+        this.renderizarGraficoDona(pregunta, index);
+      } else if (pregunta.tipo === 'ESCALA' && pregunta.analisis.promedio !== undefined) {
+        console.log('Renderizando gráfico de escala');
+        this.renderizarGraficoEscala(pregunta, index);
+      } else if (pregunta.analisis.top_respuestas && pregunta.analisis.top_respuestas.length > 0) {
+        console.log('Renderizando gráfico de texto');
+        this.renderizarGraficoTexto(pregunta, index);
+      } else if (pregunta.tipo === 'NUMERO' && pregunta.analisis.minimo !== undefined) {
+        console.log('  Renderizando gráfico numérico');
+        this.renderizarGraficoNumerico(pregunta, index);
+      } else if (pregunta.tipo === 'FECHA' && pregunta.analisis.fechas_unicas !== undefined) {
+        console.log('Renderizando gráfico de fechas');
+        this.renderizarGraficoFechas(pregunta, index);
+      }
+    });
+
+    this.chartsRendered = true;
+    console.log('Gráficos renderizados');
+  }
+
+  /**
+   * Renderiza gráfico de dona para preguntas de opción única/múltiple
+   */
+  private renderizarGraficoDona(pregunta: any, index: number): void {
+    const canvas = document.getElementById(`chart-opciones-${index}`) as HTMLCanvasElement;
+    console.log(`Buscando canvas: chart-opciones-${index}`, canvas ? 'Encontrado' : 'No encontrado');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Destruir gráfico anterior si existe
+    const chartKey = `opciones-${index}`;
+    if (this.charts[chartKey]) {
+      this.charts[chartKey].destroy();
+    }
+
+    const opciones = Object.entries(pregunta.analisis.opciones_count);
+    const labels = opciones.map(([key]) => key);
+    const data = opciones.map(([, value]) => Number(value));
+
+    const config: ChartConfiguration = {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            '#4F46E5', '#0EA5E9', '#10B981', '#F59E0B', '#EF4444',
+            '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'
+          ],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              padding: 15,
+              font: { size: 12 }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = data.reduce((a, b) => a + b, 0);
+                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    this.charts[chartKey] = new Chart(ctx, config);
+  }
+
+  /**
+   * Renderiza gráfico de barras horizontales para escala
+   */
+  private renderizarGraficoEscala(pregunta: any, index: number): void {
+    const canvas = document.getElementById(`chart-escala-${index}`) as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const chartKey = `escala-${index}`;
+    if (this.charts[chartKey]) {
+      this.charts[chartKey].destroy();
+    }
+
+    // Obtener distribución de valores si existe
+    const valoresCount = pregunta.analisis.valores_count || {};
+    const labels = Object.keys(valoresCount).sort((a, b) => Number(a) - Number(b));
+    const data = labels.map(label => valoresCount[label]);
+
+    const config: ChartConfiguration = {
+      type: 'bar',
+      data: {
+        labels: labels.map(l => `Valor ${l}`),
+        datasets: [{
+          label: 'Cantidad de respuestas',
+          data: data,
+          backgroundColor: '#4F46E5',
+          borderColor: '#4338CA',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.parsed.x} respuestas`
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+          }
+        }
+      }
+    };
+
+    this.charts[chartKey] = new Chart(ctx, config);
+  }
+
+  /**
+   * Renderiza gráfico de barras horizontales para respuestas de texto
+   */
+  private renderizarGraficoTexto(pregunta: any, index: number): void {
+    const canvas = document.getElementById(`chart-texto-${index}`) as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const chartKey = `texto-${index}`;
+    if (this.charts[chartKey]) {
+      this.charts[chartKey].destroy();
+    }
+
+    const topRespuestas = pregunta.analisis.top_respuestas.slice(0, 10);
+    const labels = topRespuestas.map((r: any) => {
+      const texto = r.respuesta || '';
+      return texto.length > 40 ? texto.substring(0, 40) + '...' : texto;
+    });
+    const data = topRespuestas.map((r: any) => r.count);
+
+    const config: ChartConfiguration = {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Frecuencia',
+          data: data,
+          backgroundColor: '#10B981',
+          borderColor: '#059669',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: (items) => {
+                const item = items[0];
+                const respuesta = topRespuestas[item.dataIndex];
+                return respuesta.respuesta;
+              },
+              label: (context) => `Frecuencia: ${context.parsed.x}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+          }
+        }
+      }
+    };
+
+    this.charts[chartKey] = new Chart(ctx, config);
+  }
+
+  /**
+   * Renderiza gráfico de barras verticales para números
+   */
+  private renderizarGraficoNumerico(pregunta: any, index: number): void {
+    const canvas = document.getElementById(`chart-numerico-${index}`) as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const chartKey = `numerico-${index}`;
+    if (this.charts[chartKey]) {
+      this.charts[chartKey].destroy();
+    }
+
+    const config: ChartConfiguration = {
+      type: 'bar',
+      data: {
+        labels: ['Mínimo', 'Promedio', 'Máximo'],
+        datasets: [{
+          label: 'Valores',
+          data: [
+            pregunta.analisis.minimo || 0,
+            pregunta.analisis.promedio || 0,
+            pregunta.analisis.maximo || 0
+          ],
+          backgroundColor: ['#10B981', '#4F46E5', '#F59E0B'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    };
+
+    this.charts[chartKey] = new Chart(ctx, config);
+  }
+
+  /**
+   * Renderiza gráfico de línea para fechas
+   */
+  private renderizarGraficoFechas(pregunta: any, index: number): void {
+    const canvas = document.getElementById(`chart-fechas-${index}`) as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const chartKey = `fechas-${index}`;
+    if (this.charts[chartKey]) {
+      this.charts[chartKey].destroy();
+    }
+
+    const fechasProporcionadas = pregunta.analisis.fechas_proporcionadas || [];
+
+    // Agrupar por fecha y contar
+    const fechasCount: { [key: string]: number } = {};
+    fechasProporcionadas.forEach((fecha: string) => {
+      const fechaKey = new Date(fecha).toLocaleDateString('es-ES');
+      fechasCount[fechaKey] = (fechasCount[fechaKey] || 0) + 1;
+    });
+
+    const labels = Object.keys(fechasCount).sort();
+    const data = labels.map(label => fechasCount[label]);
+
+    const config: ChartConfiguration = {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Respuestas por fecha',
+          data: data,
+          borderColor: '#4F46E5',
+          backgroundColor: 'rgba(79, 70, 229, 0.1)',
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: true }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+          }
+        }
+      }
+    };
+
+    this.charts[chartKey] = new Chart(ctx, config);
+  }
+
+  /**
+   * Destruye todos los gráficos activos
+   */
+  private destruirGraficos(): void {
+    Object.values(this.charts).forEach(chart => {
+      if (chart) {
+        chart.destroy();
+      }
+    });
+    this.charts = {};
   }
 }
 

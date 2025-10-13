@@ -556,3 +556,59 @@
   }
 }
 
+/* Estilos para la pestaña de gráficos */
+.graficos-container {
+  width: 100%;
+}
+
+.chart-wrapper {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-wrapper canvas {
+  max-width: 100%;
+}
+
+/* Separador entre preguntas */
+.pregunta-item {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+}
+
+.pregunta-item:not(:last-child) {
+  border-bottom: 2px solid var(--surface-200);
+}
+
+/* TabView personalizado */
+::ng-deep .p-tabview .p-tabview-nav {
+  background: transparent;
+  border-bottom: 2px solid var(--surface-border);
+}
+
+::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  background: transparent;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+  color: var(--text-color-secondary);
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
+}
+
+::ng-deep .p-tabview .p-tabview-nav li:not(.p-highlight):hover .p-tabview-nav-link {
+  color: var(--text-color);
+  background: var(--surface-100);
+}
+
+::ng-deep .p-tabview .p-tabview-panels {
+  background: transparent;
+  padding: 0;
+}
+
