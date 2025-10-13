@@ -14,10 +14,51 @@ const obtenerEstadisticasGenerales = async (req, res) => {
       }
     });
 
-    const encuestasActivas = await Encuesta.count({
+    // Obtener todas las encuestas para calcular estados dinámicos
+    const todasEncuestas = await Encuesta.findAll({
       where: { 
-        estado: 'ACTIVA',
         activo: true
+      },
+      attributes: ['id', 'estado', 'fecha_inicio', 'fecha_fin']
+    });
+
+    // Calcular estados dinámicos
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    let encuestasActivas = 0;
+    let encuestasProximamente = 0;
+    let encuestasExpiradas = 0;
+    let encuestasBorrador = 0;
+
+    todasEncuestas.forEach(encuesta => {
+      // Verificar si está expirada
+      if (encuesta.fecha_fin) {
+        const fechaFin = new Date(encuesta.fecha_fin);
+        fechaFin.setHours(23, 59, 59, 999);
+        
+        if (fechaFin < hoy) {
+          encuestasExpiradas++;
+          return;
+        }
+      }
+
+      // Verificar si es próximamente (solo para ACTIVA)
+      if (encuesta.estado === 'ACTIVA' && encuesta.fecha_inicio) {
+        const fechaInicio = new Date(encuesta.fecha_inicio);
+        fechaInicio.setHours(0, 0, 0, 0);
+        
+        if (fechaInicio > hoy) {
+          encuestasProximamente++;
+          return;
+        }
+      }
+
+      // Contar por estado base
+      if (encuesta.estado === 'ACTIVA') {
+        encuestasActivas++;
+      } else if (encuesta.estado === 'BORRADOR') {
+        encuestasBorrador++;
       }
     });
 
@@ -85,6 +126,9 @@ const obtenerEstadisticasGenerales = async (req, res) => {
       data: {
         total_encuestas: totalEncuestas,
         encuestas_activas: encuestasActivas,
+        encuestas_proximamente: encuestasProximamente,
+        encuestas_expiradas: encuestasExpiradas,
+        encuestas_borrador: encuestasBorrador,
         total_preguntas: totalPreguntas,
         total_respuestas: totalRespuestas,
         total_usuarios: totalUsuarios,

@@ -73,31 +73,19 @@
 
       <!-- Estadísticas Adicionales -->
       <div class="grid mb-4">
-        <div class="col-12 sm:col-6 lg:col-4">
+        <div class="col-12 sm:col-6 lg:col-6">
           <div class="stats-card">
             <div class="stats-icon">
-              <i class="pi pi-question-circle text-indigo-500"></i>
+              <i class="pi pi-user text-cyan-500"></i>
             </div>
             <div class="stats-content">
-              <div class="stats-value">{{ estadisticasGenerales.total_preguntas || 0 }}</div>
-              <div class="stats-label">Total Preguntas</div>
+              <div class="stats-value">{{ estadisticasGenerales.total_usuarios || 0 }}</div>
+              <div class="stats-label">Total Usuarios</div>
             </div>
           </div>
         </div>
 
-        <div class="col-12 sm:col-6 lg:col-4">
-          <div class="stats-card">
-            <div class="stats-icon">
-              <i class="pi pi-comment text-teal-500"></i>
-            </div>
-            <div class="stats-content">
-              <div class="stats-value">{{ estadisticasGenerales.total_respuestas || 0 }}</div>
-              <div class="stats-label">Total Respuestas</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 sm:col-6 lg:col-4">
+        <div class="col-12 sm:col-6 lg:col-6">
           <div class="stats-card">
             <div class="stats-icon">
               <i class="pi pi-clock text-amber-500"></i>
@@ -149,10 +137,10 @@
                     </td>
                     <td>
                       <span
-                        [class]="getEstadoBadgeClass(encuesta.estado)"
+                        [class]="getEstadoBadgeClass(encuesta.estado, encuesta)"
                         class="estado-badge"
                       >
-                        {{ getEstadoLabel(encuesta.estado) }}
+                        {{ getEstadoLabel(encuesta.estado, encuesta) }}
                       </span>
                     </td>
                     <td>
@@ -238,10 +226,10 @@
           <div class="mb-3">
             <label class="block text-900 font-medium mb-1">Estado:</label>
             <span
-              [class]="getEstadoBadgeClass(reporteEncuesta.encuesta.estado)"
+              [class]="getEstadoBadgeClass(reporteEncuesta.encuesta.estado, reporteEncuesta.encuesta)"
               class="estado-badge"
             >
-              {{ getEstadoLabel(reporteEncuesta.encuesta.estado) }}
+              {{ getEstadoLabel(reporteEncuesta.encuesta.estado, reporteEncuesta.encuesta) }}
             </span>
           </div>
         </div>
