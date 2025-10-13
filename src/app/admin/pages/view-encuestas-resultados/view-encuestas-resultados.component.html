@@ -498,65 +498,174 @@
                 </div>
               </div>
 
-              <!-- Gráfico según tipo de pregunta -->
-              <div class="chart-wrapper surface-50 p-4 border-round-lg">
-                <!-- Opciones: Gráfico de Dona -->
-                <div *ngIf="pregunta.analisis?.opciones_count">
-                  <canvas [id]="'chart-opciones-' + i" style="max-height: 350px;"></canvas>
-                </div>
-
-                <!-- Escala: Gráfico de Barras Horizontal -->
-                <div *ngIf="pregunta.analisis?.promedio !== undefined && pregunta.tipo === 'ESCALA'">
-                  <canvas [id]="'chart-escala-' + i" style="max-height: 300px;"></canvas>
-                </div>
-
-                <!-- Texto: Top 10 respuestas en Barras Horizontales -->
-                <div *ngIf="pregunta.analisis?.top_respuestas?.length > 0">
-                  <canvas [id]="'chart-texto-' + i" style="max-height: 400px;"></canvas>
-                </div>
-
-                <!-- Numérico: Gráfico de Barras Vertical -->
-                <div *ngIf="pregunta.analisis?.minimo !== undefined && pregunta.tipo === 'NUMERO'">
-                  <div class="grid mb-3">
-                    <div class="col-12 sm:col-4 text-center">
-                      <div class="p-3 surface-100 border-round">
-                        <div class="text-2xl font-bold text-blue-600">{{ pregunta.analisis.promedio || 0 }}</div>
-                        <div class="text-sm text-600">Promedio</div>
-                      </div>
+              <!-- Contenido con gráfico y resumen -->
+              <div class="grid">
+                <!-- Gráfico -->
+                <div class="col-12 lg:col-8">
+                  <div class="chart-wrapper surface-50 p-4 border-round-lg">
+                    <!-- Opciones: Gráfico de Dona -->
+                    <div *ngIf="pregunta.analisis?.opciones_count">
+                      <canvas [id]="'chart-opciones-' + i" style="max-height: 350px;"></canvas>
                     </div>
-                    <div class="col-12 sm:col-4 text-center">
-                      <div class="p-3 surface-100 border-round">
-                        <div class="text-2xl font-bold text-green-600">{{ pregunta.analisis.minimo || 0 }}</div>
-                        <div class="text-sm text-600">Mínimo</div>
-                      </div>
+
+                    <!-- Escala: Gráfico de Barras Horizontal -->
+                    <div *ngIf="pregunta.analisis?.promedio !== undefined && pregunta.tipo === 'ESCALA'">
+                      <canvas [id]="'chart-escala-' + i" style="max-height: 300px;"></canvas>
                     </div>
-                    <div class="col-12 sm:col-4 text-center">
-                      <div class="p-3 surface-100 border-round">
-                        <div class="text-2xl font-bold text-orange-600">{{ pregunta.analisis.maximo || 0 }}</div>
-                        <div class="text-sm text-600">Máximo</div>
-                      </div>
+
+                    <!-- Texto: Top 10 respuestas en Barras Horizontales -->
+                    <div *ngIf="pregunta.analisis?.top_respuestas?.length > 0">
+                      <canvas [id]="'chart-texto-' + i" style="max-height: 400px;"></canvas>
+                    </div>
+
+                    <!-- Numérico: Gráfico de Barras Vertical -->
+                    <div *ngIf="pregunta.analisis?.minimo !== undefined && pregunta.tipo === 'NUMERO'">
+                      <canvas [id]="'chart-numerico-' + i" style="max-height: 300px;"></canvas>
+                    </div>
+
+                    <!-- Fechas: Gráfico de Línea Temporal -->
+                    <div *ngIf="pregunta.analisis?.fechas_unicas !== undefined && pregunta.tipo === 'FECHA'">
+                      <canvas [id]="'chart-fechas-' + i" style="max-height: 300px;"></canvas>
                     </div>
                   </div>
-                  <canvas [id]="'chart-numerico-' + i" style="max-height: 250px;"></canvas>
                 </div>
 
-                <!-- Fechas: Gráfico de Línea Temporal -->
-                <div *ngIf="pregunta.analisis?.fechas_unicas !== undefined && pregunta.tipo === 'FECHA'">
-                  <canvas [id]="'chart-fechas-' + i" style="max-height: 300px;"></canvas>
-                </div>
+                <!-- Resumen de datos -->
+                <div class="col-12 lg:col-4">
+                  <div class="resumen-datos surface-100 p-4 border-round-lg border-1 border-200">
+                    <h5 class="text-lg font-semibold text-900 mb-3 flex align-items-center">
+                      <i class="pi pi-info-circle text-primary mr-2"></i>
+                      Resumen de Datos
+                    </h5>
 
-                <!-- Mensaje si no hay datos para graficar -->
-                <div *ngIf="!pregunta.analisis || pregunta.total_respuestas === 0" class="text-center p-5">
-                  <i class="pi pi-chart-line text-4xl text-400 mb-3"></i>
-                  <p class="text-600">No hay suficientes datos para mostrar gráficos</p>
+                    <!-- Resumen para Opciones (Selección única/múltiple) -->
+                    <div *ngIf="pregunta.analisis?.opciones_count" class="resumen-opciones">
+                      <div class="mb-3">
+                        <div class="text-sm text-600">
+                          Total de opciones: <span class="text-xl font-bold text-primary">{{ getOpcionesCount(pregunta.analisis.opciones_count) }}</span>
+                        </div>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-2">Opción más seleccionada:</div>
+                        <div class="p-2 surface-50 border-round">
+                          <div class="font-semibold text-900">{{ getOpcionMasSeleccionada(pregunta.analisis.opciones_count) }}</div>
+                          <div class="text-sm text-600">{{ getCantidadOpcionMasSeleccionada(pregunta.analisis.opciones_count) }} respuestas</div>
+                        </div>
+                      </div>
+
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-1">Distribución:</div>
+                        <div class="opciones-resumen">
+                          <div *ngFor="let opcion of pregunta.analisis.opciones_count | keyvalue" class="flex justify-content-between align-items-center mb-1">
+                            <span class="text-sm">{{ getOpcionKey(opcion) | slice:0:25 }}{{ getOpcionKeyLength(opcion) > 25 ? '...' : '' }}</span>
+                            <span class="text-sm font-semibold">{{ getPercentage(asNumber(opcion.value), pregunta.total_respuestas) }}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Resumen para Escala -->
+                    <div *ngIf="pregunta.analisis?.promedio !== undefined && pregunta.tipo === 'ESCALA'" class="resumen-escala">
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-1">Puntuación promedio:</div>
+                        <div class="text-2xl font-bold text-primary">{{ pregunta.analisis.promedio | number:'1.1-1' }}</div>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-1">Total de respuestas:</div>
+                        <div class="text-lg font-semibold text-900">{{ pregunta.analisis.total_valores }}</div>
+                      </div>
+
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-2">Interpretación:</div>
+                        <div class="p-2 surface-50 border-round">
+                          <div class="text-sm text-900">{{ getInterpretacionEscala(pregunta.analisis.promedio) }}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Resumen para Texto -->
+                    <div *ngIf="pregunta.analisis?.top_respuestas?.length > 0" class="resumen-texto">
+                      <div class="mb-3">
+                        <div class="text-sm text-600">
+                          Respuestas únicas: <span class="text-xl font-bold text-primary">{{ pregunta.analisis.respuestas_unicas || pregunta.analisis.total_respuestas }}</span>
+                        </div>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-2">Respuesta más frecuente:</div>
+                        <div class="p-2 surface-50 border-round">
+                          <div class="font-semibold text-900">{{ pregunta.analisis.top_respuestas[0]?.respuesta | slice:0:30 }}{{ pregunta.analisis.top_respuestas[0]?.respuesta.length > 30 ? '...' : '' }}</div>
+                          <div class="text-sm text-600">{{ pregunta.analisis.top_respuestas[0]?.count }} menciones</div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <!-- Resumen para Numérico -->
+                    <div *ngIf="pregunta.analisis?.minimo !== undefined && pregunta.tipo === 'NUMERO'" class="resumen-numerico">
+                      <div class="grid mb-3">
+                        <div class="col-6 text-center">
+                          <div class="text-sm text-600 mb-1">Promedio</div>
+                          <div class="text-xl font-bold text-blue-600">{{ pregunta.analisis.promedio | number:'1.1-1' }}</div>
+                        </div>
+                        <div class="col-6 text-center">
+                          <div class="text-sm text-600 mb-1">Rango</div>
+                          <div class="text-lg font-semibold text-900">{{ pregunta.analisis.minimo }} - {{ pregunta.analisis.maximo }}</div>
+                        </div>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-1">Valores válidos:</div>
+                        <div class="text-lg font-semibold text-900">{{ pregunta.analisis.valores_validos }}</div>
+                      </div>
+
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-2">Distribución:</div>
+                        <div class="p-2 surface-50 border-round">
+                          <div class="text-sm text-900">{{ getDistribucionNumerica(pregunta.analisis.minimo, pregunta.analisis.maximo, pregunta.analisis.promedio) }}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Resumen para Fechas -->
+                    <div *ngIf="pregunta.analisis?.fechas_unicas !== undefined && pregunta.tipo === 'FECHA'" class="resumen-fechas">
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-1">Fechas únicas:</div>
+                        <div class="text-xl font-bold text-primary">{{ pregunta.analisis.fechas_unicas }}</div>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <div class="text-sm text-600 mb-1">Total respuestas:</div>
+                        <div class="text-lg font-semibold text-900">{{ pregunta.analisis.total_respuestas }}</div>
+                      </div>
+
+                      <div class="mb-3" *ngIf="pregunta.analisis.fechas_proporcionadas?.length > 0">
+                        <div class="text-sm text-600 mb-2">Rango de fechas:</div>
+                        <div class="p-2 surface-50 border-round">
+                          <div class="text-sm text-900">
+                            <div>Desde: {{ getFechaMinima(pregunta.analisis.fechas_proporcionadas) | date:'dd/MM/yyyy' }}</div>
+                            <div>Hasta: {{ getFechaMaxima(pregunta.analisis.fechas_proporcionadas) | date:'dd/MM/yyyy' }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Mensaje si no hay datos -->
+                    <div *ngIf="!pregunta.analisis || pregunta.total_respuestas === 0" class="text-center">
+                      <i class="pi pi-exclamation-triangle text-2xl text-500 mb-2"></i>
+                      <p class="text-500 text-sm">No hay datos suficientes para generar resumen</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div *ngIf="!reporteEncuesta.preguntas?.length" class="text-center p-5">
-            <i class="pi pi-chart-bar text-6xl text-400 mb-3"></i>
-            <p class="text-600 text-lg">No hay preguntas disponibles para graficar</p>
+            <div *ngIf="!reporteEncuesta.preguntas?.length" class="text-center p-5">
+              <i class="pi pi-chart-bar text-6xl text-400 mb-3"></i>
+              <p class="text-600 text-lg">No hay preguntas disponibles para graficar</p>
+            </div>
           </div>
         </div>
       </p-tabPanel>
