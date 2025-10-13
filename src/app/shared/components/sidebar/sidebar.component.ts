@@ -104,35 +104,35 @@ export class SidebarComponent {
   private getAdminMenuItems(): MenuItem[] {
     return [
       {
-        label: 'Reporte Egresados',
+        label: 'Reporte egresados',
         icon: 'pi pi-chart-bar',
         iconStyle: {'color': '#3B82F6'},
         items: [
-          { label: 'Dashboard Principal', icon: 'pi pi-fw pi-home', routerLink: '/admin/dashboard' },
+          { label: 'Dashboard principal', icon: 'pi pi-fw pi-home', routerLink: '/admin/dashboard' },
           {
-            label: 'Análisis Laboral',
+            label: 'Análisis laboral',
             icon: 'pi pi-fw pi-briefcase',
             items: [
-              { label: 'Análisis Salarial', icon: 'pi pi-fw pi-dollar', command: () => this.navigateToChart('distribucion-salarial') },
-              { label: 'Tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
-              { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('salarios-industria') },
+              { label: 'Análisis salarial', command: () => this.navigateToChart('distribucion-salarial') },
+              { label: 'Tecnologías mas usadas', command: () => this.navigateToChart('tecnologias-demandadas') },
+              { label: 'Satisfacción laboral',  command: () => this.navigateToChart('salarios-industria') },
             ]
           },
           {
-            label: 'Experiencia y Tecnologías',
+            label: 'Experiencia y tecnologías',
             icon: 'pi pi-fw pi-users',
             items: [
-              { label: 'Análisis de Experiencia', icon: 'pi pi-fw pi-users', command: () => this.navigateToChart('distribucion-experiencia') },
-              { label: 'Tecnologías vs Experiencia', icon: 'pi pi-fw pi-cog', command: () => this.navigateToChart('experiencia-tecnologias') },
+              { label: 'Análisis de experiencia', command: () => this.navigateToChart('distribucion-experiencia') },
+              { label: 'Tecnologías vs Experiencia', command: () => this.navigateToChart('experiencia-tecnologias') },
             ]
           },
           {
-            label: 'Indicadores Avanzados',
+            label: 'Indicadores avanzados',
             icon: 'pi pi-fw pi-chart-line',
             items: [
-              { label: 'Mapa de Calor', icon: 'pi pi-fw pi-map', command: () => this.navigateToChart('mapa-calor-industria') },
-              { label: 'Estado del Mercado', icon: 'pi pi-fw pi-briefcase', command: () => this.navigateToChart('disponibilidad-cambio') },
-              { label: 'Métricas Avanzadas', icon: 'pi pi-fw pi-chart-pie', command: () => this.navigateToChart('metricas-avanzadas') },
+              { label: 'Mapa de calor', command: () => this.navigateToChart('mapa-calor-industria') },
+              { label: 'Estado del mercado',  command: () => this.navigateToChart('disponibilidad-cambio') },
+              { label: 'Métricas avanzadas', command: () => this.navigateToChart('metricas-avanzadas') },
             ]
           }
         ]
@@ -161,35 +161,35 @@ export class SidebarComponent {
   private getUserMenuItems(): MenuItem[] {
     return [
       {
-        label: 'Reporte Egresados',
+        label: 'Reporte egresados',
         icon: 'pi pi-chart-bar',
         iconStyle: {'color': '#3B82F6'},
         items: [
-          { label: 'Dashboard Principal', icon: 'pi pi-fw pi-home', routerLink: '/user/dashboard' },
+          { label: 'Dashboard principal', icon: 'pi pi-fw pi-home', routerLink: '/user/dashboard' },
           {
-            label: 'Análisis Laboral',
+            label: 'Análisis laboral',
             icon: 'pi pi-fw pi-briefcase',
             items: [
-              { label: 'Análisis Salarial', icon: 'pi pi-fw pi-dollar', command: () => this.navigateToChart('distribucion-salarial') },
-              { label: 'Tecnologías mas usadas', icon: 'pi pi-fw pi-building', command: () => this.navigateToChart('tecnologias-demandadas') },
-              { label: 'Satisfacción Laboral', icon: 'pi pi-fw pi-star', command: () => this.navigateToChart('salarios-industria') },
+              { label: 'Análisis salarial',  command: () => this.navigateToChart('distribucion-salarial') },
+              { label: 'Tecnologías mas usadas',  command: () => this.navigateToChart('tecnologias-demandadas') },
+              { label: 'Satisfacción laboral',  command: () => this.navigateToChart('salarios-industria') },
             ]
           },
           {
-            label: 'Experiencia y Tecnologías',
+            label: 'Experiencia y tecnologías',
             icon: 'pi pi-fw pi-users',
             items: [
-              { label: 'Análisis de Experiencia', icon: 'pi pi-fw pi-users', command: () => this.navigateToChart('distribucion-experiencia') },
-              { label: 'Tecnologías vs Experiencia', icon: 'pi pi-fw pi-cog', command: () => this.navigateToChart('experiencia-tecnologias') },
+              { label: 'Análisis de experiencia',  command: () => this.navigateToChart('distribucion-experiencia') },
+              { label: 'Tecnologías vs Experiencia',  command: () => this.navigateToChart('experiencia-tecnologias') },
             ]
           },
           {
-            label: 'Indicadores Avanzados',
+            label: 'Indicadores avanzados',
             icon: 'pi pi-fw pi-chart-line',
             items: [
-              { label: 'Mapa de Calor', icon: 'pi pi-fw pi-map', command: () => this.navigateToChart('mapa-calor-industria') },
-              { label: 'Estado del Mercado', icon: 'pi pi-fw pi-briefcase', command: () => this.navigateToChart('disponibilidad-cambio') },
-              { label: 'Métricas Avanzadas', icon: 'pi pi-fw pi-chart-pie', command: () => this.navigateToChart('metricas-avanzadas') },
+              { label: 'Mapa de calor',command: () => this.navigateToChart('mapa-calor-industria') },
+              { label: 'Estado del mercado', command: () => this.navigateToChart('disponibilidad-cambio') },
+              { label: 'Métricas avanzadas', command: () => this.navigateToChart('metricas-avanzadas') },
             ]
           }
         ]
