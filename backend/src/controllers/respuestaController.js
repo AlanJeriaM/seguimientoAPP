@@ -271,7 +271,7 @@ const obtenerEncuestaParaResponder = async (req, res) => {
 const enviarRespuestas = async (req, res) => {
   try {
     const { id } = req.params;
-    const { respuestas, session_token } = req.body;
+    const { respuestas, session_token, tiempo_transcurrido } = req.body;
     const usuarioId = req.usuario.id;
 
     // Validar campos requeridos
@@ -377,12 +377,18 @@ const enviarRespuestas = async (req, res) => {
 
     console.log(`✅ ${respuestasGuardadas.length} respuestas finales guardadas`);
 
+    // Calcular tiempo total: acumulado + tiempo de esta sesión
+    const tiempoAcumuladoPrevio = sesion.tiempo_acumulado || 0;
+    const tiempoTotalFinal = tiempoAcumuladoPrevio + (tiempo_transcurrido || 0);
+
+    console.log(`⏱️ Tiempo acumulado previo: ${tiempoAcumuladoPrevio}s, Tiempo esta sesión: ${tiempo_transcurrido}s, Total: ${tiempoTotalFinal}s`);
 
     // Actualizar sesión
     await sesion.update({
       estado: 'COMPLETADA',
       fecha_fin: new Date(),
-      tiempo_total: tiempoRespuesta,
+      tiempo_total: tiempoTotalFinal,
+      tiempo_acumulado: tiempoTotalFinal,
       progreso: 100
     });
 
@@ -421,7 +427,7 @@ const enviarRespuestas = async (req, res) => {
 const guardarProgresoEncuesta = async (req, res) => {
   try {
     const { id } = req.params;
-    const { respuestas, session_token, pregunta_actual, progreso } = req.body;
+    const { respuestas, session_token, pregunta_actual, progreso, tiempo_transcurrido } = req.body;
     const usuarioId = req.usuario.id;
 
     console.log('🔵 guardarProgresoEncuesta - Inicio');
@@ -430,6 +436,7 @@ const guardarProgresoEncuesta = async (req, res) => {
     console.log('  - Progreso recibido:', progreso);
     console.log('  - Pregunta actual:', pregunta_actual);
     console.log('  - Total respuestas:', respuestas?.length);
+    console.log('  - Tiempo transcurrido:', tiempo_transcurrido, 'segundos');
 
     // Verificar que la encuesta esté activa
     const encuesta = await Encuesta.findOne({
@@ -537,11 +544,18 @@ const guardarProgresoEncuesta = async (req, res) => {
 
     console.log(`📊 Progreso recalculado: ${totalRespuestasGuardadas}/${totalPreguntasEncuesta} = ${progresoReal}%`);
 
-    // Actualizar sesión con el progreso real
+    // Calcular tiempo acumulado
+    const tiempoAcumuladoPrevio = sesion.tiempo_acumulado || 0;
+    const nuevoTiempoAcumulado = tiempoAcumuladoPrevio + (tiempo_transcurrido || 0);
+
+    console.log(`⏱️ Actualizando tiempo: ${tiempoAcumuladoPrevio}s + ${tiempo_transcurrido}s = ${nuevoTiempoAcumulado}s`);
+
+    // Actualizar sesión con el progreso real y tiempo acumulado
     await sesion.update({
       estado: 'EN_PROGRESO',
       progreso: progresoReal,
       pregunta_actual: pregunta_actual !== undefined ? pregunta_actual : sesion.pregunta_actual,
+      tiempo_acumulado: nuevoTiempoAcumulado,
       fecha_actualizacion: new Date()
     });
 
@@ -581,60 +595,74 @@ const obtenerHistorialEncuestas = async (req, res) => {
     const offset = (page - 1) * limit;
     const usuarioId = req.usuario.id;
 
-    // Obtener encuestas respondidas
-    const respuestas = await Respuesta.findAndCountAll({
-      where: { usuario_id: usuarioId },
+    // Obtener sesiones completadas del usuario
+    const sesionesCompletadas = await SesionEncuesta.findAndCountAll({
+      where: {
+        usuario_id: usuarioId,
+        estado: 'COMPLETADA'
+      },
       include: [
         {
           model: Encuesta,
           as: 'encuesta',
-          attributes: ['id', 'titulo', 'descripcion', 'estado']
-        },
-        {
-          model: Pregunta,
-          as: 'pregunta',
-          attributes: ['id', 'texto', 'tipo']
+          attributes: ['id', 'titulo', 'descripcion', 'estado'],
+          include: [
+            {
+              model: Pregunta,
+              as: 'preguntas',
+              where: { activo: true },
+              required: false,
+              attributes: ['id']
+            }
+          ]
         }
       ],
-      attributes: ['id', 'respuesta', 'fecha_respuesta', 'tiempo_respuesta'],
-      order: [['fecha_respuesta', 'DESC']],
+      attributes: ['id', 'encuesta_id', 'fecha_fin', 'tiempo_total', 'progreso'],
+      order: [['fecha_fin', 'DESC']],
       limit: parseInt(limit),
-      offset: parseInt(offset),
-      raw: true
+      offset: parseInt(offset)
     });
 
-    // Agrupar por encuesta
-    const encuestasRespondidas = {};
-    respuestas.rows.forEach(respuesta => {
-      const encuestaId = respuesta['encuesta.id'];
-      if (!encuestasRespondidas[encuestaId]) {
-        encuestasRespondidas[encuestaId] = {
-          id: encuestaId,
-          titulo: respuesta['encuesta.titulo'],
-          descripcion: respuesta['encuesta.descripcion'],
-          estado: respuesta['encuesta.estado'],
-          fecha_respuesta: respuesta.fecha_respuesta,
-          total_preguntas: 0,
-          respuestas: []
-        };
-      }
-      encuestasRespondidas[encuestaId].respuestas.push({
-        pregunta: respuesta['pregunta.texto'],
-        respuesta: respuesta.respuesta,
-        tipo: respuesta['pregunta.tipo']
+    // Mapear el historial con información completa
+    const historial = await Promise.all(sesionesCompletadas.rows.map(async (sesion) => {
+      // Obtener todas las respuestas de esta encuesta
+      const respuestas = await Respuesta.findAll({
+        where: {
+          encuesta_id: sesion.encuesta_id,
+          usuario_id: usuarioId
+        },
+        include: [
+          {
+            model: Pregunta,
+            as: 'pregunta',
+            attributes: ['id', 'texto', 'tipo']
+          }
+        ]
       });
-      encuestasRespondidas[encuestaId].total_preguntas++;
-    });
 
-    const historial = Object.values(encuestasRespondidas);
+      return {
+        id: sesion.encuesta.id,
+        titulo: sesion.encuesta.titulo,
+        descripcion: sesion.encuesta.descripcion,
+        estado: sesion.encuesta.estado,
+        fecha_respuesta: sesion.fecha_fin,
+        tiempo_total: sesion.tiempo_total || 0, // Tiempo en segundos
+        total_preguntas: sesion.encuesta.preguntas?.length || 0,
+        respuestas: respuestas.map(r => ({
+          pregunta: r.pregunta.texto,
+          respuesta: r.respuesta,
+          tipo: r.pregunta.tipo
+        }))
+      };
+    }));
 
     res.json({
       ok: true,
       data: {
         historial,
-        total: respuestas.count,
+        total: sesionesCompletadas.count,
         page: parseInt(page),
-        totalPages: Math.ceil(respuestas.count / limit)
+        totalPages: Math.ceil(sesionesCompletadas.count / limit)
       }
     });
 

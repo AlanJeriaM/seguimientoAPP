@@ -45,6 +45,11 @@ const SesionEncuesta = sequelize.define('SesionEncuesta', {
     type: DataTypes.INTEGER, // en segundos
     allowNull: true
   },
+  tiempo_acumulado: {
+    type: DataTypes.INTEGER, // tiempo acumulado de sesiones parciales en segundos
+    allowNull: true,
+    defaultValue: 0
+  },
   progreso: {
     type: DataTypes.INTEGER, // porcentaje completado (0-100)
     defaultValue: 0

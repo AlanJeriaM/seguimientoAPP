@@ -94,10 +94,11 @@ export class RespuestaService {
   /**
    * Envía las respuestas de una encuesta
    */
-  enviarRespuestas(encuestaId: number, respuestas: RespuestaUsuario[], sessionToken?: string): Observable<{ok: boolean, msj: string, data?: any}> {
+  enviarRespuestas(encuestaId: number, respuestas: RespuestaUsuario[], sessionToken?: string, tiempoTranscurrido?: number): Observable<{ok: boolean, msj: string, data?: any}> {
     return this.http.post<{ok: boolean, msj: string, data?: any}>(`${this.baseUrl}/encuesta/${encuestaId}/respuestas`, {
       respuestas: respuestas,
-      session_token: sessionToken
+      session_token: sessionToken,
+      tiempo_transcurrido: tiempoTranscurrido
     });
   }
 
@@ -109,13 +110,15 @@ export class RespuestaService {
     respuestas: RespuestaUsuario[], 
     sessionToken?: string,
     preguntaActual?: number,
-    progreso?: number
+    progreso?: number,
+    tiempoTranscurrido?: number
   ): Observable<{ok: boolean, msj: string, data?: any}> {
     return this.http.post<{ok: boolean, msj: string, data?: any}>(`${this.baseUrl}/encuesta/${encuestaId}/guardar-progreso`, {
       respuestas: respuestas,
       session_token: sessionToken,
       pregunta_actual: preguntaActual,
-      progreso: progreso
+      progreso: progreso,
+      tiempo_transcurrido: tiempoTranscurrido
     });
   }
 
