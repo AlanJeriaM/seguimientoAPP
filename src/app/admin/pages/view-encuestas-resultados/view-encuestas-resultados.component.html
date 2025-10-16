@@ -2,20 +2,6 @@
   <div class="col-12">
     <p-card class="text-center" header="Reportes y analíticas de Encuestas">
 
-      <!-- Barra de herramientas -->
-      <ng-template pTemplate="caption">
-        <div class="flex justify-content-end">
-          <p-button
-            pRipple
-            label="Actualizar Datos"
-            icon="pi pi-refresh"
-            styleClass="p-button-sm p-button-info"
-            (click)="actualizarDatos()"
-            [loading]="loading"
-          ></p-button>
-        </div>
-      </ng-template>
-
       <!-- Estadísticas Generales -->
       <div class="grid mb-4">
         <div class="col-12">
@@ -101,7 +87,17 @@
       <!-- Gestión de Encuestas para Reportes -->
       <div class="grid mb-4">
         <div class="col-12">
-          <h3 class="text-xl font-semibold text-900 mb-3">Gestión de Reportes</h3>
+          <div class="flex justify-content-between align-items-center mb-3">
+            <h3 class="text-xl font-semibold text-900 m-0">Gestión de Reportes</h3>
+            <p-button
+              pRipple
+              label="Actualizar Datos"
+              icon="pi pi-refresh"
+              styleClass="p-button-sm p-button-info"
+              (click)="actualizarDatos()"
+              [loading]="loading"
+            ></p-button>
+          </div>
 
           <div class="grid">
             <div class="col-12">
