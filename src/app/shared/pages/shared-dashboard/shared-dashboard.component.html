@@ -262,7 +262,7 @@
             <div *ngFor="let tech of tecnologiasDemandadas; let i = index" class="technology-item">
               <div class="technology-header">
                 <h4 class="technology-name">{{ tech.nombre }}</h4>
-                <span class="technology-demand" [style.color]="getTechnologyColor(i)">{{ getSeleccionesText(tech.demanda) }}</span>
+                <span class="technology-demand">{{ getSeleccionesText(tech.demanda) }}</span>
               </div>
               <div class="technology-progress">
                 <p-progressBar

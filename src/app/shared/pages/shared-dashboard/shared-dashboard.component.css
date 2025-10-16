@@ -762,14 +762,19 @@
 .technology-name {
   font-size: 1rem;
   font-weight: 600;
-  color: #000000;
   margin: 0;
 }
 
 .technology-demand {
   font-weight: 700;
-  color: var(--linkedin-blue);
   font-size: 0.9rem;
+  margin-right: 1.5rem;
+}
+
+.technology-progress {
+  margin-left: 0;
+  margin-right: 1.5rem;
+  padding-left: 0;
 }
 
 /* Progress bar con colores dinámicos para tecnologías */
