@@ -99,55 +99,75 @@
     </div>
   </div>
 
-  <!-- Market Stats Cards - Separadas del header -->
+  <!-- Market Stats Cards con Gráfico - Separadas del header -->
   <div class="stats-overview mb-6" id="resumen-general">
-    <div class="grid">
-      <div class="col-12 md:col-6 xl:col-3">
-        <div class="stat-card stat-card-blue">
-          <div class="stat-icon">
-            <i class="pi pi-users"></i>
+    <div class="grid align-items-center">
+      <!-- Estadísticas del mercado (lado izquierdo) -->
+      <div class="col-12 lg:col-8">
+        <div class="grid">
+          <div class="col-12 md:col-6 xl:col-6">
+            <div class="stat-card stat-card-blue stat-card-sm">
+              <div class="stat-icon">
+                <i class="pi pi-users"></i>
+              </div>
+              <div class="stat-content">
+                <h3 class="stat-value">{{ getTotalProfesionales() | number }}</h3>
+                <p class="stat-label">Profesionales activos</p>
+              </div>
+            </div>
           </div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ getTotalProfesionales() | number }}</h3>
-            <p class="stat-label">Profesionales activos</p>
+
+          <div class="col-12 md:col-6 xl:col-6">
+            <div class="stat-card stat-card-green stat-card-sm">
+              <div class="stat-icon">
+                <i class="pi pi-chart-line"></i>
+              </div>
+              <div class="stat-content">
+                <h3 class="stat-value">{{ getNuevosProfesionales() | number }}</h3>
+                <p class="stat-label">Nuevos este mes</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-6 xl:col-6">
+            <div class="stat-card stat-card-orange stat-card-sm">
+              <div class="stat-icon">
+                <i class="pi pi-building"></i>
+              </div>
+              <div class="stat-content">
+                <h3 class="stat-value">{{ getEmpresasUnicas() | number }}</h3>
+                <p class="stat-label">Empresas únicas</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-6 xl:col-6">
+            <div class="stat-card stat-card-purple stat-card-sm">
+              <div class="stat-icon">
+                <i class="pi pi-sitemap"></i>
+              </div>
+              <div class="stat-content">
+                <h3 class="stat-value">{{ getIndustriasUnicas() | number }}</h3>
+                <p class="stat-label">Industrias diferentes</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="col-12 md:col-6 xl:col-3">
-        <div class="stat-card stat-card-green">
-          <div class="stat-icon">
-            <i class="pi pi-chart-line"></i>
+      <!-- Gráfico Composición del Mercado (lado derecho) -->
+      <div class="col-12 lg:col-4">
+        <p-card styleClass="chart-card h-full">
+          <ng-template pTemplate="header">
+            <div class="card-header-custom">
+              <h3>Composición del Mercado</h3>
+              <p-tag value="Métricas clave" severity="info" styleClass="info-tag"></p-tag>
+            </div>
+          </ng-template>
+          <div class="chart-container">
+            <canvas id="estadisticasGeneralesChart"></canvas>
           </div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ getNuevosProfesionales() | number }}</h3>
-            <p class="stat-label">Nuevos este mes</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 md:col-6 xl:col-3">
-        <div class="stat-card stat-card-orange">
-          <div class="stat-icon">
-            <i class="pi pi-building"></i>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ getEmpresasUnicas() | number }}</h3>
-            <p class="stat-label">Empresas únicas</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 md:col-6 xl:col-3">
-        <div class="stat-card stat-card-purple">
-          <div class="stat-icon">
-            <i class="pi pi-sitemap"></i>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-value">{{ getIndustriasUnicas() | number }}</h3>
-            <p class="stat-label">Industrias diferentes</p>
-          </div>
-        </div>
+        </p-card>
       </div>
     </div>
   </div>
@@ -235,22 +255,8 @@
     </div>
 
     <div class="grid">
-      <div class="col-12 lg:col-6">
-        <p-card styleClass="chart-card h-full">
-          <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Composición del Mercado</h3>
-              <p-tag value="Métricas clave" severity="info" styleClass="info-tag"></p-tag>
-            </div>
-          </ng-template>
-          <div class="chart-container">
-            <canvas id="estadisticasGeneralesChart"></canvas>
-          </div>
-        </p-card>
-      </div>
-
       <!-- Tecnologías Más Demandadas -->
-      <div class="col-12 lg:col-6" id="tecnologias-demandadas">
+      <div class="col-12" id="tecnologias-demandadas">
         <p-card styleClass="chart-card h-full">
           <ng-template pTemplate="header">
             <div class="card-header-custom">
