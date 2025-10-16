@@ -95,6 +95,8 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
           this.encuestas = response.data.encuestas;
           this.totalEncuestas = response.data.total;
           this.totalPages = response.data.totalPages;
+          // Ordenar encuestas: las expiradas van al final
+          this.ordenarEncuestas();
         } else {
           this.messageService.add({
             severity: 'error',
@@ -213,6 +215,37 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
   actualizarDatos(): void {
     this.cargarEncuestas();
     this.cargarEncuestasEliminadas();
+  }
+
+  ordenarEncuestas(): void {
+    this.encuestas.sort((a, b) => {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+
+      // Función para determinar si una encuesta está expirada
+      const esExpirada = (encuesta: Encuesta) => {
+        if (encuesta.fecha_fin) {
+          const fechaFin = new Date(encuesta.fecha_fin);
+          fechaFin.setHours(23, 59, 59, 999);
+          return fechaFin < hoy;
+        }
+        return false;
+      };
+
+      const aExpirada = esExpirada(a);
+      const bExpirada = esExpirada(b);
+
+      // Si una está expirada y la otra no, la expirada va al final
+      if (aExpirada && !bExpirada) {
+        return 1; // a va después de b
+      }
+      if (!aExpirada && bExpirada) {
+        return -1; // a va antes de b
+      }
+
+      // Si ambas tienen el mismo estado de expiración, mantener orden original
+      return 0;
+    });
   }
 
   nuevaEncuesta(): void {
