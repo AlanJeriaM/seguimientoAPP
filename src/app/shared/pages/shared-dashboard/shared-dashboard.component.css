@@ -214,10 +214,72 @@
   height: 4px;
 }
 
-.stat-card-blue::before { background: var(--linkedin-blue); }
-.stat-card-green::before { background: var(--success-color); }
-.stat-card-orange::before { background: var(--warning-color); }
-.stat-card-purple::before { background: var(--purple-color); }
+.stat-card-sm {
+  padding: 1.5rem;
+}
+
+.stat-card-sm .stat-icon {
+  width: 50px;
+  height: 50px;
+}
+
+.stat-card-sm .stat-value {
+  font-size: 2rem;
+}
+
+/* Estilos modernos para las tarjetas de estadísticas */
+.stat-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.stat-card:hover {
+  transform: translateY(2px);
+  box-shadow: 0 5px 10px rgba(211, 211, 211, 0.2);
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+/* Estilo específico para el contenedor del gráfico de estadísticas generales */
+.chart-container:has(#estadisticasGeneralesChart) {
+  min-height: 300px;
+  padding: 1.5rem;
+}
+/*
+.stat-card-blue::before {
+  background: #0077b5;
+  height: 3px;
+}
+.stat-card-green::before {
+  background: #00a0b0;
+  height: 3px;
+}
+.stat-card-orange::before {
+  background: #f7931e;
+  height: 3px;
+}
+.stat-card-purple::before {
+
+  background: #ff6b35;
+  height: 3px;
+} */
 
 .stat-icon {
   display: inline-flex;
@@ -228,26 +290,58 @@
   border-radius: 50%;
   margin-bottom: 1rem;
   color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
 }
 
-.stat-card-blue .stat-icon { background: var(--linkedin-blue); }
-.stat-card-green .stat-icon { background: var(--success-color); }
-.stat-card-orange .stat-icon { background: var(--warning-color); }
-.stat-card-purple .stat-icon { background: var(--purple-color); }
+.stat-card:hover .stat-icon {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card-blue .stat-icon {
+  background: #0077b5;
+}
+.stat-card-green .stat-icon {
+  background: #00a0b0;
+}
+.stat-card-orange .stat-icon {
+  background: #f7931e;
+}
+.stat-card-purple .stat-icon {
+  background: #ff6b35;
+}
 
 .stat-value {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #2c3e50;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0 0 0.5rem 0;
   line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-value {
+  transform: scale(1.05);
 }
 
 .stat-label {
-  color: #7f8c8d;
-  font-size: 1rem;
-  font-weight: 500;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 600;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-label {
+  opacity: 1;
+  color: #475569;
 }
 
 /* Chart Cards */

@@ -733,10 +733,10 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         labels: ['Profesionales Activos', 'Empresas Únicas', 'Industrias Únicas', 'Nuevos Este Mes'],
         datasets: [{
           data: [
-            stats.totalProfesionales,
-            stats.empresasUnicas * 10, // Escalar para mejor visualización
-            stats.industriasUnicas * 50, // Escalar para mejor visualización
-            stats.nuevosProfesionalesEsteMes * 5 // Escalar para mejor visualización
+            stats.totalProfesionales, // Profesionales Activos
+            stats.empresasUnicas, // Empresas Únicas
+            stats.industriasUnicas, // Industrias Únicas
+            stats.nuevosProfesionalesEsteMes // Nuevos Este Mes
           ],
           backgroundColor: [
             '#0077b5',
@@ -754,7 +754,15 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           ...this.chartOptions.plugins,
           legend: {
             ...this.chartOptions.plugins.legend,
-            position: 'right' as const
+            position: 'bottom' as const,
+            labels: {
+              ...this.chartOptions.plugins.legend.labels,
+              padding: 10,
+              usePointStyle: true,
+              font: {
+                size: 12
+              }
+            }
           },
           tooltip: {
             ...this.chartOptions.plugins.tooltip,
