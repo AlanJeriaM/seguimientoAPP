@@ -748,7 +748,8 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
         }]
       },
       options: {
-        ...this.chartOptions,
+        responsive: true,
+        maintainAspectRatio: false,
         cutout: '60%',
         plugins: {
           ...this.chartOptions.plugins,

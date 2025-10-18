@@ -1,12 +1,12 @@
 <!-- Loading State -->
-<div *ngIf="loading" class="loading-container">
-  <div class="loading-content">
+<div *ngIf="loading" class="flex align-items-center justify-content-center" style="min-height: 80vh;">
+  <div class="text-center">
     <p-progressSpinner
       strokeWidth="4"
       fill="transparent"
       animationDuration="1s">
     </p-progressSpinner>
-    <h3 class="loading-text">Cargando datos del mercado laboral...</h3>
+    <h3 class="mt-4 text-primary">Cargando datos del mercado laboral...</h3>
   </div>
 </div>
 
@@ -18,11 +18,11 @@
 </p-scrollTop>
 
 <!-- Error State -->
-<div *ngIf="error && !loading" class="error-container">
+<div *ngIf="error && !loading" class="flex flex-column align-items-center justify-content-center p-4" style="min-height: 50vh;">
   <p-message
     severity="error"
     [text]="error"
-    >
+    styleClass="w-full md:w-8 lg:w-6">
   </p-message>
   <p-button
     label="Reintentar"
@@ -33,20 +33,21 @@
 </div>
 
 <!-- Main Dashboard -->
-<div *ngIf="!loading && !error" class="dashboard-container">
+<div *ngIf="!loading && !error" class="p-3 md:p-4 lg:p-5">
 
   <!-- Header Section -->
-  <div class="dashboard-header mb-6">
-    <div class="header-content">
+  <div class="surface-card shadow-2 border-round mb-4 md:mb-5 lg:mb-6 p-3 md:p-4 lg:p-5">
+    <div class="flex flex-column lg:flex-row align-items-start lg:align-items-center justify-content-between gap-3 md:gap-4">
+
       <!-- Perfil Personal del Usuario -->
-      <div class="profile-section" *ngIf="perfilUsuario">
-        <div class="profile-avatar" [class.clickable-profile]="!isAdmin()" (click)="navigateToProfile()">
+      <div class="flex align-items-center gap-3 w-full lg:w-auto" *ngIf="perfilUsuario">
+        <div [class.cursor-pointer]="!isAdmin()" (click)="navigateToProfile()">
           <img
             *ngIf="perfilUsuario?.perfil_imagen_url && !imageError"
             [src]="perfilUsuario.perfil_imagen_url"
             alt="Perfil de LinkedIn"
             class="border-circle shadow-3"
-            style="width: 80px; height: 80px; object-fit: cover;"
+            style="width: 60px; height: 60px; object-fit: cover;"
             (error)="handleImageError($event)"
           >
           <p-avatar
@@ -57,19 +58,23 @@
             [style]="{'background-color': '#0077b5', 'color': '#ffffff'}">
           </p-avatar>
         </div>
-        <div class="profile-info">
-          <h1 class="profile-name" [class.clickable-profile]="!isAdmin()" (click)="navigateToProfile()">{{ getFullName() }}</h1>
-          <p class="profile-headline">{{ getCurrentPosition() }}</p>
-          <div class="profile-meta">
-            <span class="meta-item">
+        <div class="flex-1">
+          <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-900 m-0 mb-2"
+              [class.cursor-pointer]="!isAdmin()"
+              (click)="navigateToProfile()">
+            {{ getFullName() }}
+          </h1>
+          <p class="text-sm md:text-base text-700 m-0 mb-2">{{ getCurrentPosition() }}</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="text-xs md:text-sm text-600 flex align-items-center gap-1">
               <i class="pi pi-map-marker"></i>
               {{ getLocation() }}
             </span>
-            <span class="meta-item">
+            <span class="text-xs md:text-sm text-600 flex align-items-center gap-1">
               <i class="pi pi-building"></i>
               {{ getCurrentCompany() }}
             </span>
-            <span class="meta-item">
+            <span class="text-xs md:text-sm text-600 hidden md:flex align-items-center gap-1">
               <i class="pi pi-briefcase"></i>
               {{ getIndustry() }}
             </span>
@@ -77,151 +82,145 @@
         </div>
       </div>
 
-
-
-    <!-- Placeholder si no hay perfil -->
-    <div class="profile-section" *ngIf="!perfilUsuario">
-      <div class="profile-info">
-        <h1 class="profile-name">Dashboard del Mercado Laboral</h1>
-        <p class="profile-headline">Información y estadísticas del mercado tecnológico</p>
+      <!-- Placeholder si no hay perfil -->
+      <div class="w-full" *ngIf="!perfilUsuario">
+        <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-900 m-0 mb-2">Dashboard del Mercado Laboral</h1>
+        <p class="text-sm md:text-base text-700 m-0">Información y estadísticas del mercado tecnológico</p>
       </div>
-    </div>
 
-    <!-- Market Growth Badge -->
-    <div class="growth-indicator">
-      <div class="growth-card">
-        <span class="growth-label">Crecimiento del mercado</span>
-        <div class="growth-value">
-          <span class="growth-percentage">+{{ (estadisticasMercado?.porcentajeCrecimiento || 0) }}%</span>
-          <span class="growth-text">este mes</span>
+      <!-- Market Growth Badge -->
+      <div class="w-full lg:w-auto">
+        <div class="surface-100 border-round p-3 text-center">
+          <span class="block text-xs text-600 mb-1">Crecimiento del mercado</span>
+          <span class="block text-2xl md:text-3xl font-bold text-green-500">+{{ (estadisticasMercado?.porcentajeCrecimiento || 0) }}%</span>
+          <span class="block text-xs text-600">este mes</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Market Stats Cards con Gráfico - Separadas del header -->
-  <div class="stats-overview mb-6" id="resumen-general">
-    <div class="grid align-items-center">
-      <!-- Estadísticas del mercado (lado izquierdo) -->
-      <div class="col-12 lg:col-8">
-        <div class="grid">
-          <div class="col-12 md:col-6 xl:col-6">
-            <div class="stat-card stat-card-blue stat-card-sm">
-              <div class="stat-icon">
-                <i class="pi pi-users"></i>
-              </div>
-              <div class="stat-content">
-                <h3 class="stat-value">{{ getTotalProfesionales() | number }}</h3>
-                <p class="stat-label">Profesionales activos</p>
-              </div>
+  <!-- Market Stats Cards con Gráfico -->
+  <div class="stats-chart-container mb-4 md:mb-5 lg:mb-6" id="resumen-general">
+    <!-- Estadísticas del mercado -->
+    <div class="stats-grid">
+      <div class="stat-card-wrapper">
+        <div class="surface-card shadow-2 border-round p-3 md:p-4 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #5DB3E0 0%, #2493cf 100%) !important; color: #ffffff;">
+          <div class="flex align-items-center mb-3">
+            <div class="flex align-items-center justify-content-center border-circle" style="width: 3rem; height: 3rem; background-color: rgba(255, 255, 255, 0.2);">
+              <i class="pi pi-users text-white text-xl"></i>
             </div>
           </div>
-
-          <div class="col-12 md:col-6 xl:col-6">
-            <div class="stat-card stat-card-green stat-card-sm">
-              <div class="stat-icon">
-                <i class="pi pi-chart-line"></i>
-              </div>
-              <div class="stat-content">
-                <h3 class="stat-value">{{ getNuevosProfesionales() | number }}</h3>
-                <p class="stat-label">Nuevos este mes</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 md:col-6 xl:col-6">
-            <div class="stat-card stat-card-orange stat-card-sm">
-              <div class="stat-icon">
-                <i class="pi pi-building"></i>
-              </div>
-              <div class="stat-content">
-                <h3 class="stat-value">{{ getEmpresasUnicas() | number }}</h3>
-                <p class="stat-label">Empresas únicas</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 md:col-6 xl:col-6">
-            <div class="stat-card stat-card-purple stat-card-sm">
-              <div class="stat-icon">
-                <i class="pi pi-sitemap"></i>
-              </div>
-              <div class="stat-content">
-                <h3 class="stat-value">{{ getIndustriasUnicas() | number }}</h3>
-                <p class="stat-label">Industrias diferentes</p>
-              </div>
-            </div>
+          <div class="flex-1">
+            <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white m-0 mb-2">{{ getTotalProfesionales() | number }}</h3>
+            <p class="text-xs md:text-sm text-white m-0" style="opacity: 0.9;">Profesionales activos</p>
           </div>
         </div>
       </div>
 
-      <!-- Gráfico Composición del Mercado (lado derecho) -->
-      <div class="col-12 lg:col-4">
-        <p-card styleClass="chart-card h-full">
-          <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Composición del Mercado</h3>
-              <p-tag value="Métricas clave" severity="info" styleClass="info-tag"></p-tag>
+      <div class="stat-card-wrapper">
+        <div class="surface-card shadow-2 border-round p-3 md:p-4 h-full flex flex-column justify-content-between" style="background-color: #00a0b0 !important; color: #ffffff;">
+          <div class="flex align-items-center mb-3">
+            <div class="flex align-items-center justify-content-center border-circle" style="width: 3rem; height: 3rem; background-color: rgba(255, 255, 255, 0.2);">
+              <i class="pi pi-chart-line text-white text-xl"></i>
             </div>
-          </ng-template>
-          <div class="chart-container">
-            <canvas id="estadisticasGeneralesChart"></canvas>
           </div>
-        </p-card>
+          <div class="flex-1">
+            <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white m-0 mb-2">{{ getNuevosProfesionales() | number }}</h3>
+            <p class="text-xs md:text-sm text-white m-0" style="opacity: 0.9;">Nuevos este mes</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card-wrapper">
+        <div class="surface-card shadow-2 border-round p-3 md:p-4 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #FF9B73 0%, #ff6b35 100%) !important; color: #ffffff;">
+          <div class="flex align-items-center mb-3">
+            <div class="flex align-items-center justify-content-center border-circle" style="width: 3rem; height: 3rem; background-color: rgba(255, 255, 255, 0.2);">
+              <i class="pi pi-building text-white text-xl"></i>
+            </div>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white m-0 mb-2">{{ getEmpresasUnicas() | number }}</h3>
+            <p class="text-xs md:text-sm text-white m-0" style="opacity: 0.9;">Empresas únicas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card-wrapper">
+        <div class="surface-card shadow-2 border-round p-3 md:p-4 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #FFB35C 0%, #f7931e 100%) !important; color: #ffffff;">
+          <div class="flex align-items-center mb-3">
+            <div class="flex align-items-center justify-content-center border-circle" style="width: 3rem; height: 3rem; background-color: rgba(255, 255, 255, 0.2);">
+              <i class="pi pi-sitemap text-white text-xl"></i>
+            </div>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white m-0 mb-2">{{ getIndustriasUnicas() | number }}</h3>
+            <p class="text-xs md:text-sm text-white m-0" style="opacity: 0.9;">Industrias diferentes</p>
+          </div>
+        </div>
       </div>
     </div>
+
+
+    <!-- Gráfico Composición del Mercado -->
+    <div class="chart-container">
+      <p-card styleClass="h-full">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+            <h3 class="text-base md:text-lg font-semibold text-900 m-0">Composición del Mercado</h3>
+            <p-tag value="Métricas clave" severity="info"></p-tag>
+          </div>
+        </ng-template>
+        <div class="chart-wrapper">
+          <canvas id="estadisticasGeneralesChart"></canvas>
+        </div>
+      </p-card>
+    </div>
   </div>
-
-
 
   <!-- Análisis de Tendencias del Mercado -->
-  <div class="chart-section mb-6" id="tendencias-mercado">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-chart-line"></i>
-        Tendencias del Mercado Laboral
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="tendencias-mercado">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-chart-line text-primary"></i>
+        <span>Tendencias del Mercado Laboral</span>
       </h2>
-      <p class="section-subtitle">Evolución y crecimiento del mercado en los últimos 6 meses</p>
+      <p class="text-sm md:text-base text-600 m-0">Evolución y crecimiento del mercado en los últimos 6 meses</p>
     </div>
 
-    <div class="grid">
-      <div class="col-12">
-        <p-card styleClass="chart-card">
-          <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Evolución Temporal del Mercado</h3>
-              <p-tag value="Últimos 6 meses" severity="success" styleClass="info-tag"></p-tag>
-            </div>
-          </ng-template>
-          <div class="chart-container large-chart">
-            <canvas id="tendenciasMercadoChart"></canvas>
-          </div>
-        </p-card>
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+          <h3 class="text-base md:text-lg font-semibold text-900 m-0">Evolución temporal del mercado en registros y perfiles</h3>
+          <p-tag value="Últimos 6 meses" severity="success"></p-tag>
+        </div>
+      </ng-template>
+      <div style="height: 300px; position: relative;">
+        <canvas id="tendenciasMercadoChart"></canvas>
       </div>
-    </div>
+    </p-card>
   </div>
 
   <!-- Análisis Salarial y Empresarial -->
-  <div class="chart-section mb-6">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-dollar"></i>
-        Análisis Salarial y Empresarial
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-dollar text-primary"></i>
+        <span>Análisis Salarial y Empresarial</span>
       </h2>
-      <p class="section-subtitle">Distribución salarial por industria y principales empleadores</p>
+      <p class="text-sm md:text-base text-600 m-0">Distribución salarial por industria y principales empleadores</p>
     </div>
 
     <div class="grid">
       <!-- Distribución Salarial por Industria -->
       <div class="col-12 lg:col-8" id="distribucion-salarial">
-        <p-card styleClass="chart-card h-full">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Distribución Salarial por Industria</h3>
-              <p-tag value="Promedios del mercado" severity="success" styleClass="info-tag"></p-tag>
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Distribución Salarial por Industria</h3>
+              <p-tag value="Promedios del mercado" severity="success"></p-tag>
             </div>
           </ng-template>
-          <div class="chart-container">
+          <div style="height: 300px; position: relative;">
             <canvas id="distribucionSalarialChart"></canvas>
           </div>
         </p-card>
@@ -229,14 +228,14 @@
 
       <!-- Empresas que Más Contratan -->
       <div class="col-12 lg:col-4" id="empresas-contratantes">
-        <p-card styleClass="chart-card h-full">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Top Empleadores</h3>
-              <p-tag value="Principales contratadores" severity="warning" styleClass="info-tag"></p-tag>
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Top Empleadores</h3>
+              <p-tag value="Principales contratadores" severity="warning"></p-tag>
             </div>
           </ng-template>
-          <div class="chart-container">
+          <div style="height: 300px; position: relative;">
             <canvas id="empresasContratantesChart"></canvas>
           </div>
         </p-card>
@@ -244,81 +243,74 @@
     </div>
   </div>
 
-  <!-- Estadísticas Generales del Mercado -->
-  <div class="chart-section mb-6" id="estadisticas-generales">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-chart-pie"></i>
-        Distribución General del Mercado
+  <!-- Tecnologías Más Demandadas -->
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="tecnologias-demandadas">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-chart-pie text-primary"></i>
+        <span>Distribución General del Mercado</span>
       </h2>
-      <p class="section-subtitle">Visión general de la composición del mercado laboral</p>
+      <p class="text-sm md:text-base text-600 m-0">Visión general de la composición del mercado laboral</p>
     </div>
 
-    <div class="grid">
-      <!-- Tecnologías Más Demandadas -->
-      <div class="col-12" id="tecnologias-demandadas">
-        <p-card styleClass="chart-card h-full">
-          <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Tecnologías Más Demandadas</h3>
-              <p-tag value="Skills más populares" severity="info" styleClass="info-tag"></p-tag>
-            </div>
-          </ng-template>
-          <div class="technology-list">
-            <div *ngFor="let tech of tecnologiasDemandadas; let i = index" class="technology-item">
-              <div class="technology-header">
-                <h4 class="technology-name">{{ tech.nombre }}</h4>
-                <span class="technology-demand">{{ getSeleccionesText(tech.demanda) }}</span>
-              </div>
-              <div class="technology-progress">
-                <p-progressBar
-                  [value]="getTechDemandPercentage(tech.demanda)"
-                  [showValue]="false"
-                  [style]="{'--tech-color': getTechnologyColor(i)}"
-                  styleClass="tech-progress-bar">
-                </p-progressBar>
-              </div>
-            </div>
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+          <h3 class="text-base md:text-lg font-semibold text-900 m-0">Tecnologías Más Demandadas</h3>
+          <p-tag value="Skills más populares" severity="info"></p-tag>
+        </div>
+      </ng-template>
+      <div class="overflow-y-auto" style="max-height: 400px;">
+        <div *ngFor="let tech of tecnologiasDemandadas; let i = index" class="py-3 border-bottom-1 surface-border">
+          <div class="flex align-items-center justify-content-between mb-2">
+            <h4 class="text-sm md:text-base font-semibold m-0" style="color: #000000;">{{ tech.nombre }}</h4>
+            <span class="text-sm md:text-base font-bold mr-3" style="color: #000000;">{{ getSeleccionesText(tech.demanda) }}</span>
           </div>
-        </p-card>
+          <div class="mr-3">
+            <p-progressBar
+              [value]="getTechDemandPercentage(tech.demanda)"
+              [showValue]="false"
+              [style]="{'--tech-color': getTechnologyColor(i), 'height': '0.75rem'}"
+              styleClass="tech-progress-bar">
+            </p-progressBar>
+          </div>
+        </div>
       </div>
-    </div>
+    </p-card>
   </div>
 
   <!-- Información Detallada de Empresas -->
-  <div class="chart-section mb-6">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-building"></i>
-        Información Detallada de Empresas
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-building text-primary"></i>
+        <span>Información Detallada de Empresas</span>
       </h2>
-      <p class="section-subtitle">Análisis detallado de las principales empresas y sus métricas</p>
+      <p class="text-sm md:text-base text-600 m-0">Análisis detallado de las principales empresas y sus métricas</p>
     </div>
 
     <div class="grid">
       <!-- Top Empresas -->
       <div class="col-12 lg:col-8">
-        <p-card styleClass="info-card h-full">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Principales Empleadores del Mercado</h3>
-              <p-tag value="Top empresas" severity="info" styleClass="info-tag"></p-tag>
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Principales Empleadores del Mercado</h3>
+              <p-tag value="Top empresas" severity="info"></p-tag>
             </div>
           </ng-template>
-          <div class="companies-list">
-            <div *ngFor="let empresa of empresasContratantes" class="company-item">
-              <div class="company-header">
-                <span class="company-name">{{ empresa.empresa }}</span>
-                <span class="company-employees">{{ getEmpleadoText(empresa.totalEmpleados) }}</span>
+          <div class="overflow-y-auto" style="max-height: 500px;">
+            <div *ngFor="let empresa of empresasContratantes" class="py-3 border-bottom-1 surface-border">
+              <div class="flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                <span class="text-sm md:text-base font-semibold text-900">{{ empresa.empresa }}</span>
+                <span class="text-sm md:text-base font-bold" style="margin-right: 1rem;">{{ getEmpleadoText(empresa.totalEmpleados) }}</span>
               </div>
-              <div class="company-details">
-                <div class="detail-item">
-                  <i class="pi pi-dollar"></i>
+              <div class="flex flex-column md:flex-row gap-2 md:gap-3">
+                <div class="flex align-items-center gap-2 text-xs md:text-sm text-600">
                   <span>{{ empresa.promedioSalario | currency:'CLP':'symbol':'1.0-0' }} promedio</span>
                 </div>
-                <div class="detail-item" *ngIf="empresa.satisfaccionPromedio !== null">
-                  <i class="pi pi-star"></i>
-                  <span class="satisfaction-stars">{{ formatSatisfactionStars(empresa.satisfaccionPromedio) }}</span>
+                <div class="flex align-items-center gap-2 text-xs md:text-sm text-600" *ngIf="empresa.satisfaccionPromedio !== null">
+                  <span class="text-yellow-500 font-bold">{{ formatSatisfactionStars(empresa.satisfaccionPromedio) }}</span>
                 </div>
               </div>
             </div>
@@ -327,25 +319,23 @@
       </div>
 
       <!-- Distribución Salarial por Industria -->
-      <div class="col-12 lg:col-4 " id="salarios-industria">
-        <p-card styleClass="info-card h-full">
+      <div class="col-12 lg:col-4" id="salarios-industria">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Salarios por Industria</h3>
-              <p-tag value="Promedios del mercado" severity="success" styleClass="info-tag"></p-tag>
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Salarios por Industria</h3>
+              <p-tag value="Promedios del mercado" severity="success"></p-tag>
             </div>
           </ng-template>
-          <div class="salary-distribution-grid salary-grid-scrollable">
-            <div *ngFor="let dist of distribucionSalarial" class="salary-card-compact">
-              <div class="salary-header">
-                <h4 class="industry-name">{{ dist.industria }}</h4>
-                <span class="professionals-count">{{ dist.cantidad }} profesionales</span>
+          <div class="overflow-y-auto" style="max-height: 500px;">
+            <div *ngFor="let dist of distribucionSalarial" class="surface-100 border-round p-3 mb-2">
+              <div class="mb-2 text-center">
+                <h4 class="text-sm md:text-base font-semibold text-900 m-0 mb-1">{{ dist.industria }}</h4>
+                <span class="text-xs text-600">{{ dist.cantidad }} profesionales</span>
               </div>
-              <div class="salary-details">
-                <div class="salary-average">
-                  <span class="average-label">Promedio:</span>
-                  <span class="average-value">{{ dist.salarioPromedio | currency:'CLP':'symbol':'1.0-0' }}</span>
-                </div>
+              <div class="flex align-items-center justify-content-between">
+                <span class="text-xs text-600">Promedio</span>
+                <span class="text-sm md:text-base font-bold text-green-500">{{ dist.salarioPromedio | currency:'CLP':'symbol':'1.0-0' }}</span>
               </div>
             </div>
           </div>
@@ -354,63 +344,56 @@
     </div>
   </div>
 
-
   <!-- Análisis de Satisfacción Laboral -->
-  <div class="chart-section mb-6" id="satisfaccion-laboral" *ngIf="satisfaccionLaboral && satisfaccionLaboral.empresas.length > 0">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-star"></i>
-        Satisfacción Laboral por Empresa
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="satisfaccion-laboral" *ngIf="satisfaccionLaboral && satisfaccionLaboral.empresas.length > 0">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-star text-primary"></i>
+        <span>Satisfacción Laboral por Empresa</span>
       </h2>
-      <p class="section-subtitle">Análisis de satisfacción y bienestar en el entorno laboral</p>
+      <p class="text-sm md:text-base text-600 m-0">Análisis de satisfacción y bienestar en el entorno laboral</p>
     </div>
 
-    <div class="grid">
-      <div class="col-12">
-        <p-card styleClass="chart-card">
-          <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Top Empresas con Mejor Satisfacción Laboral</h3>
-              <p-tag
-                [value]="'Promedio general: ' + (satisfaccionLaboral.general.satisfaccionPromedio | number:'1.1-1') + '/5 ★'"
-                severity="success"
-                styleClass="info-tag">
-              </p-tag>
-            </div>
-          </ng-template>
-          <div class="chart-container large-chart">
-            <canvas id="satisfaccionLaboralChart"></canvas>
-          </div>
-        </p-card>
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+          <h3 class="text-base md:text-lg font-semibold text-900 m-0">Top Empresas con Mejor Satisfacción Laboral</h3>
+          <p-tag
+            [value]="'Promedio general: ' + (satisfaccionLaboral.general.satisfaccionPromedio | number:'1.1-1') + '/5 ★'"
+            severity="success">
+          </p-tag>
+        </div>
+      </ng-template>
+      <div style="height: 350px; position: relative;">
+        <canvas id="satisfaccionLaboralChart"></canvas>
       </div>
-    </div>
+    </p-card>
   </div>
 
   <!-- Análisis de Experiencia Profesional -->
-  <div class="chart-section mb-6" *ngIf="(evolucionSalarial && evolucionSalarial.datos.length > 0) || (distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0)">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-users"></i>
-        Análisis de Experiencia Profesional
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" *ngIf="(evolucionSalarial && evolucionSalarial.datos.length > 0) || (distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0)">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-users text-primary"></i>
+        <span>Análisis de Experiencia Profesional</span>
       </h2>
-      <p class="section-subtitle">Evolución salarial y distribución de profesionales por experiencia</p>
+      <p class="text-sm md:text-base text-600 m-0">Evolución salarial y distribución de profesionales por experiencia</p>
     </div>
 
     <div class="grid">
       <!-- Evolución Salarial por Experiencia -->
       <div class="col-12 lg:col-6" id="evolucion-salarial" *ngIf="evolucionSalarial && evolucionSalarial.datos.length > 0">
-        <p-card styleClass="chart-card h-full">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Evolución del Salario por Experiencia</h3>
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Evolución del Salario por Experiencia</h3>
               <p-tag
                 [value]="'Salario promedio: $' + (evolucionSalarial.resumen.salarioPromedioGeneral | number:'1.0-0')"
-                severity="success"
-                styleClass="info-tag">
+                severity="success">
               </p-tag>
             </div>
           </ng-template>
-          <div class="chart-container" style="height: 400px;">
+          <div style="height: 300px; position: relative;">
             <canvas id="evolucionSalarialChart"></canvas>
           </div>
         </p-card>
@@ -418,25 +401,23 @@
 
       <!-- Distribución de Profesionales por Experiencia -->
       <div class="col-12 lg:col-6" id="distribucion-experiencia" *ngIf="distribucionExperienciaProfesionales && distribucionExperienciaProfesionales.datos.length > 0">
-        <p-card styleClass="chart-card h-full">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Distribución de Profesionales por Experiencia</h3>
-              <div class="flex gap-2" *ngIf="distribucionExperienciaProfesionales.resumen.rangoMasPopular">
+            <div class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Distribución de Profesionales por Experiencia</h3>
+              <div class="flex flex-wrap gap-2" *ngIf="distribucionExperienciaProfesionales.resumen.rangoMasPopular">
                 <p-tag
                   [value]="'Más común: ' + distribucionExperienciaProfesionales.resumen.rangoMasPopular.rango"
-                  severity="info"
-                  styleClass="info-tag">
+                  severity="info">
                 </p-tag>
                 <p-tag
                   [value]="distribucionExperienciaProfesionales.resumen.totalProfesionales + ' profesionales'"
-                  severity="warning"
-                  styleClass="info-tag">
+                  severity="warning">
                 </p-tag>
               </div>
             </div>
           </ng-template>
-          <div class="chart-container" style="height: 400px;">
+          <div style="height: 300px; position: relative;">
             <canvas id="distribucionExperienciaChart"></canvas>
           </div>
         </p-card>
@@ -444,46 +425,40 @@
 
       <!-- Estadísticas de Experiencia -->
       <div class="col-12" *ngIf="distribucionExperienciaProfesionales">
-        <p-card styleClass="info-card">
+        <p-card>
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Estadísticas del Mercado Laboral</h3>
-              <p-tag value="Métricas clave de experiencia" severity="info" styleClass="info-tag"></p-tag>
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Estadísticas del Mercado Laboral</h3>
+              <p-tag value="Métricas clave de experiencia" severity="info"></p-tag>
             </div>
           </ng-template>
           <div class="grid">
             <div class="col-12 md:col-6 lg:col-4">
-              <div class="metric-item">
-                <div class="metric-icon">
-                  <i class="pi pi-chart-bar text-blue-500"></i>
-                </div>
-                <div class="metric-content">
-                  <p class="metric-value">{{ distribucionExperienciaProfesionales.resumen.experienciaPromedio }} años</p>
-                  <small>Experiencia promedio</small>
+              <div class="surface-100 border-round p-3 flex align-items-center gap-3">
+                <i class="pi pi-chart-bar text-blue-500 text-2xl"></i>
+                <div>
+                  <p class="text-xl font-bold text-900 m-0">{{ distribucionExperienciaProfesionales.resumen.experienciaPromedio }} años</p>
+                  <small class="text-600">Experiencia promedio</small>
                 </div>
               </div>
             </div>
 
             <div class="col-12 md:col-6 lg:col-4" *ngIf="distribucionExperienciaProfesionales.resumen.rangoMasPopular">
-              <div class="metric-item">
-                <div class="metric-icon">
-                  <i class="pi pi-users text-green-500"></i>
-                </div>
-                <div class="metric-content">
-                  <p class="metric-value">{{ distribucionExperienciaProfesionales.resumen.rangoMasPopular.porcentaje }}%</p>
-                  <small>{{ distribucionExperienciaProfesionales.resumen.rangoMasPopular.rango }} (más común)</small>
+              <div class="surface-100 border-round p-3 flex align-items-center gap-3">
+                <i class="pi pi-users text-green-500 text-2xl"></i>
+                <div>
+                  <p class="text-xl font-bold text-900 m-0">{{ distribucionExperienciaProfesionales.resumen.rangoMasPopular.porcentaje }}%</p>
+                  <small class="text-600">{{ distribucionExperienciaProfesionales.resumen.rangoMasPopular.rango }} (más común)</small>
                 </div>
               </div>
             </div>
 
             <div class="col-12 md:col-6 lg:col-4">
-              <div class="metric-item">
-                <div class="metric-icon">
-                  <i class="pi pi-chart-line text-purple-500"></i>
-                </div>
-                <div class="metric-content">
-                  <p class="metric-value">{{ distribucionExperienciaProfesionales.resumen.experienciaMediana }} años</p>
-                  <small>Experiencia mediana</small>
+              <div class="surface-100 border-round p-3 flex align-items-center gap-3">
+                <i class="pi pi-chart-line text-purple-500 text-2xl"></i>
+                <div>
+                  <p class="text-xl font-bold text-900 m-0">{{ distribucionExperienciaProfesionales.resumen.experienciaMediana }} años</p>
+                  <small class="text-600">Experiencia mediana</small>
                 </div>
               </div>
             </div>
@@ -494,51 +469,42 @@
   </div>
 
   <!-- Análisis Tecnológico y Salarial -->
-  <div class="chart-section mb-6" *ngIf="(experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0) || (mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0)">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-cog"></i>
-        Análisis Tecnológico y Salarial
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" *ngIf="(experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0) || (mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0)">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-cog text-primary"></i>
+        <span>Análisis Tecnológico y Salarial</span>
       </h2>
-      <p class="section-subtitle">Relación entre experiencia, tecnologías y niveles salariales</p>
+      <p class="text-sm md:text-base text-600 m-0">Relación entre experiencia, tecnologías y niveles salariales</p>
     </div>
 
     <div class="grid">
       <!-- Experiencia vs Número de Tecnologías -->
       <div class="col-12" id="experiencia-tecnologias" *ngIf="experienciaVsTecnologias && experienciaVsTecnologias.datos.length > 0">
-        <p-card styleClass="chart-card">
+        <p-card>
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Experiencia vs Número de Tecnologías Dominadas</h3>
-              <div class="flex gap-2">
+            <div class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Experiencia vs Número de Tecnologías Dominadas</h3>
+              <div class="flex flex-wrap gap-2">
                 <p-tag
-                  [value]="'Promedio general: ' + experienciaVsTecnologias.resumen.promedioGeneralTecnologias + ' tecnologías'"
-                  severity="info"
-                  styleClass="info-tag">
+                  [value]="'Promedio: ' + experienciaVsTecnologias.resumen.promedioGeneralTecnologias + ' tecnologías'"
+                  severity="info">
                 </p-tag>
                 <p-tag
-                  [value]="'Máximo encontrado: ' + experienciaVsTecnologias.resumen.maxTecnologiasEncontradas + ' tecnologías'"
-                  severity="success"
-                  styleClass="info-tag">
-                </p-tag>
-                <p-tag
-                  [value]="experienciaVsTecnologias.resumen.totalProfesionales + ' profesionales'"
-                  severity="warning"
-                  styleClass="info-tag">
+                  [value]="'Máximo: ' + experienciaVsTecnologias.resumen.maxTecnologiasEncontradas + ' tecnologías'"
+                  severity="success">
                 </p-tag>
               </div>
             </div>
           </ng-template>
-
-          <div class="chart-container" style="height: 450px;">
+          <div style="height: 350px; position: relative;">
             <canvas id="experienciaVsTecnologiasChart"></canvas>
           </div>
-
           <ng-template pTemplate="footer">
-            <div class="chart-insights">
-              <p class="text-sm text-600">
+            <div class="surface-100 border-round p-3">
+              <p class="text-sm text-600 m-0">
                 <i class="pi pi-lightbulb mr-2"></i>
-                <strong>Insight:</strong> Este gráfico está diseñado para mostrar cómo varía la cantidad de tecnologías dominadas según los rangos de años de experiencia profesional.
+                <strong>Insight:</strong> Este gráfico muestra cómo varía la cantidad de tecnologías dominadas según los rangos de años de experiencia profesional.
               </p>
             </div>
           </ng-template>
@@ -547,60 +513,47 @@
 
       <!-- Mapa de Calor: Industria vs Nivel Salarial -->
       <div class="col-12" id="mapa-calor-industria" *ngIf="mapaCalorIndustriaSalarial && mapaCalorIndustriaSalarial.datos.length > 0">
-        <p-card styleClass="chart-card">
+        <p-card>
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Mapa de Calor: Industria vs Nivel Salarial</h3>
-              <div class="flex gap-2" *ngIf="mapaCalorIndustriaSalarial.estadisticas.industriaMasComun">
+            <div class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Mapa de Calor: Industria vs Nivel Salarial</h3>
+              <div class="flex flex-wrap gap-2" *ngIf="mapaCalorIndustriaSalarial.estadisticas.industriaMasComun">
                 <p-tag
                   [value]="'Industria líder: ' + mapaCalorIndustriaSalarial.estadisticas.industriaMasComun.nombre"
-                  severity="info"
-                  styleClass="info-tag">
+                  severity="info">
                 </p-tag>
                 <p-tag
-                  [value]="mapaCalorIndustriaSalarial.estadisticas.totalIndustrias + ' industrias analizadas'"
-                  severity="success"
-                  styleClass="info-tag">
-                </p-tag>
-                <p-tag
-                  [value]="mapaCalorIndustriaSalarial.estadisticas.totalProfesionales + ' profesionales'"
-                  severity="warning"
-                  styleClass="info-tag">
+                  [value]="mapaCalorIndustriaSalarial.estadisticas.totalIndustrias + ' industrias'"
+                  severity="success">
                 </p-tag>
               </div>
             </div>
           </ng-template>
-
-          <div class="chart-container" style="height: 500px;">
+          <div style="height: 400px; position: relative;">
             <canvas id="mapaCalorIndustriaSalarialChart"></canvas>
           </div>
-
           <ng-template pTemplate="footer">
-            <div class="chart-insights">
-              <p class="text-sm text-600">
+            <div class="surface-100 border-round p-3 mb-3">
+              <p class="text-sm text-600 m-0">
                 <i class="pi pi-eye mr-2"></i>
-                <strong>Análisis:</strong> Este mapa de calor revela en qué industrias se concentran los profesionales
-                con diferentes niveles salariales. Las barras más altas en rangos salariales superiores indican industrias
-                que ofrecen mejores compensaciones.
+                <strong>Análisis:</strong> Este mapa de calor revela en qué industrias se concentran los profesionales con diferentes niveles salariales.
               </p>
             </div>
-          </ng-template>
 
-          <!-- Distribución por Rangos Salariales -->
-          <ng-template pTemplate="content">
-            <div class="mt-4">
-              <h4 class="text-lg font-semibold mb-3">Distribución por Rangos Salariales</h4>
+            <!-- Distribución por Rangos Salariales -->
+            <div>
+              <h4 class="text-base md:text-lg font-semibold text-900 mb-3">Distribución por Rangos Salariales</h4>
               <div class="grid">
                 <div class="col-12 md:col-6 lg:col-4"
                      *ngFor="let item of mapaCalorIndustriaSalarial.estadisticas.distribucionPorRango">
-                  <div class="metric-item border-round p-3 surface-100">
+                  <div class="surface-100 border-round p-3">
                     <div class="flex align-items-center justify-content-between">
                       <div>
-                        <p class="font-semibold text-900 mb-1">{{ item.rango }}</p>
+                        <p class="font-semibold text-900 mb-1 text-sm md:text-base">{{ item.rango }}</p>
                         <small class="text-600">{{ item.cantidad }} profesionales</small>
                       </div>
                       <div class="text-right">
-                        <p class="text-2xl font-bold text-primary">{{ item.porcentaje }}%</p>
+                        <p class="text-xl md:text-2xl font-bold text-primary m-0">{{ item.porcentaje }}%</p>
                       </div>
                     </div>
                   </div>
@@ -614,53 +567,42 @@
   </div>
 
   <!-- Estado del Mercado Laboral -->
-  <div class="chart-section mb-6" id="disponibilidad-cambio" *ngIf="disponibilidadCambioTrabajo && disponibilidadCambioTrabajo.datos.length > 0">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-briefcase"></i>
-        Estado del Mercado Laboral
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="disponibilidad-cambio" *ngIf="disponibilidadCambioTrabajo && disponibilidadCambioTrabajo.datos.length > 0">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-briefcase text-primary"></i>
+        <span>Estado del Mercado Laboral</span>
       </h2>
-      <p class="section-subtitle">Disponibilidad para cambio de trabajo y tendencias del mercado</p>
+      <p class="text-sm md:text-base text-600 m-0">Disponibilidad para cambio de trabajo y tendencias del mercado</p>
     </div>
 
     <div class="grid">
-      <!-- Gráfico de Disponibilidad para Cambio -->
+      <!-- Gráfico de Disponibilidad -->
       <div class="col-12 lg:col-8">
-        <p-card styleClass="chart-card h-full">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header-custom">
-              <h3>Disponibilidad para Cambio de Trabajo</h3>
-              <div class="flex gap-2" *ngIf="disponibilidadCambioTrabajo.resumen.opcionMasComun">
+            <div class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Disponibilidad para Cambio de Trabajo</h3>
+              <div class="flex flex-wrap gap-2" *ngIf="disponibilidadCambioTrabajo.resumen.opcionMasComun">
                 <p-tag
                   [value]="'Más común: ' + disponibilidadCambioTrabajo.resumen.opcionMasComun.disponibilidad"
-                  severity="info"
-                  styleClass="info-tag">
+                  severity="info">
                 </p-tag>
                 <p-tag
-                  [value]="disponibilidadCambioTrabajo.resumen.porcentajePotencialmenteDisponibles + '% potencialmente disponibles'"
-                  severity="success"
-                  styleClass="info-tag">
-                </p-tag>
-                <p-tag
-                  [value]="disponibilidadCambioTrabajo.resumen.totalProfesionales + ' profesionales'"
-                  severity="warning"
-                  styleClass="info-tag">
+                  [value]="disponibilidadCambioTrabajo.resumen.porcentajePotencialmenteDisponibles + '% disponibles'"
+                  severity="success">
                 </p-tag>
               </div>
             </div>
           </ng-template>
-
-          <div class="chart-container" style="height: 400px;">
+          <div style="height: 350px; position: relative;">
             <canvas id="disponibilidadCambioChart"></canvas>
           </div>
-
           <ng-template pTemplate="footer">
-            <div class="chart-insights">
-              <p class="text-sm text-600">
+            <div class="surface-100 border-round p-3">
+              <p class="text-sm text-600 m-0">
                 <i class="pi pi-info-circle mr-2"></i>
-                <strong>Estado del Mercado:</strong> Este gráfico muestra el estado de satisfacción laboral y
-                disponibilidad para cambios de los profesionales. Los datos revelan las tendencias del mercado
-                y qué tan satisfechos están los trabajadores en sus posiciones actuales.
+                <strong>Estado del Mercado:</strong> Este gráfico muestra el estado de satisfacción laboral y disponibilidad para cambios de los profesionales.
               </p>
             </div>
           </ng-template>
@@ -669,91 +611,93 @@
 
       <!-- Métricas de Disponibilidad -->
       <div class="col-12 lg:col-4">
-        <p-card styleClass="info-card h-full">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <h3>Métricas de Disponibilidad</h3>
+            <div class="p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Métricas de Disponibilidad</h3>
+            </div>
           </ng-template>
 
-          <div class="availability-metrics">
+          <div class="flex flex-column gap-3">
             <!-- Usuarios Activamente Buscando -->
-            <div class="metric-item border-round p-3 mb-3" style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #EF4444;">
+            <div class="border-round p-3" style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #EF4444;">
               <div class="flex align-items-center justify-content-between">
                 <div>
-                  <p class="font-semibold text-900 mb-1">Activamente Buscando</p>
+                  <p class="font-semibold text-900 mb-1 text-sm md:text-base">Activamente Buscando</p>
                   <small class="text-600">Alta disponibilidad</small>
                 </div>
                 <div class="text-right">
-                  <p class="text-2xl font-bold" style="color: #EF4444;">{{ disponibilidadCambioTrabajo.resumen.usuariosActivos }}</p>
+                  <p class="text-xl md:text-2xl font-bold m-0" style="color: #EF4444;">{{ disponibilidadCambioTrabajo.resumen.usuariosActivos }}</p>
                   <small class="text-500">profesionales</small>
                 </div>
               </div>
             </div>
 
             <!-- Usuarios Abiertos a Oportunidades -->
-            <div class="metric-item border-round p-3 mb-3" style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981;">
+            <div class="border-round p-3" style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981;">
               <div class="flex align-items-center justify-content-between">
                 <div>
-                  <p class="font-semibold text-900 mb-1">Abierto a Oportunidades</p>
+                  <p class="font-semibold text-900 mb-1 text-sm md:text-base">Abierto a Oportunidades</p>
                   <small class="text-600">Disponibilidad media</small>
                 </div>
                 <div class="text-right">
-                  <p class="text-2xl font-bold" style="color: #10B981;">{{ disponibilidadCambioTrabajo.resumen.usuariosAbiertos }}</p>
+                  <p class="text-xl md:text-2xl font-bold m-0" style="color: #10B981;">{{ disponibilidadCambioTrabajo.resumen.usuariosAbiertos }}</p>
                   <small class="text-500">profesionales</small>
                 </div>
               </div>
             </div>
 
             <!-- Usuarios No Seguros -->
-            <div class="metric-item border-round p-3 mb-3" style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid #F59E0B;">
+            <div class="border-round p-3" style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid #F59E0B;">
               <div class="flex align-items-center justify-content-between">
                 <div>
-                  <p class="font-semibold text-900 mb-1">No Seguro</p>
+                  <p class="font-semibold text-900 mb-1 text-sm md:text-base">No Seguro</p>
                   <small class="text-600">Indecisión laboral</small>
                 </div>
                 <div class="text-right">
-                  <p class="text-2xl font-bold" style="color: #F59E0B;">{{ disponibilidadCambioTrabajo.resumen.usuariosIndecisos }}</p>
+                  <p class="text-xl md:text-2xl font-bold m-0" style="color: #F59E0B;">{{ disponibilidadCambioTrabajo.resumen.usuariosIndecisos }}</p>
                   <small class="text-500">profesionales</small>
                 </div>
               </div>
             </div>
 
             <!-- Usuarios No Disponibles -->
-            <div class="metric-item border-round p-3 mb-3" style="background: rgba(107, 114, 128, 0.1); border-left: 4px solid #6B7280;">
+            <div class="border-round p-3" style="background: rgba(107, 114, 128, 0.1); border-left: 4px solid #6B7280;">
               <div class="flex align-items-center justify-content-between">
                 <div>
-                  <p class="font-semibold text-900 mb-1">No Disponible</p>
+                  <p class="font-semibold text-900 mb-1 text-sm md:text-base">No Disponible</p>
                   <small class="text-600">Satisfechos actualmente</small>
                 </div>
                 <div class="text-right">
-                  <p class="text-2xl font-bold" style="color: #6B7280;">{{ disponibilidadCambioTrabajo.resumen.usuariosNoDisponibles }}</p>
+                  <p class="text-xl md:text-2xl font-bold m-0" style="color: #6B7280;">{{ disponibilidadCambioTrabajo.resumen.usuariosNoDisponibles }}</p>
                   <small class="text-500">profesionales</small>
+                </div>
               </div>
             </div>
-          </div>
 
             <!-- Usuarios Sin Trabajo -->
-            <div class="metric-item border-round p-3 mb-3" style="background: rgba(139, 92, 246, 0.1); border-left: 4px solid #8B5CF6;">
+            <div class="border-round p-3" style="background: rgba(139, 92, 246, 0.1); border-left: 4px solid #8B5CF6;">
               <div class="flex align-items-center justify-content-between">
                 <div>
-                  <p class="font-semibold text-900 mb-1">Sin Trabajo</p>
+                  <p class="font-semibold text-900 mb-1 text-sm md:text-base">Sin Trabajo</p>
                   <small class="text-600">Búsqueda activa de empleo</small>
                 </div>
                 <div class="text-right">
-                  <p class="text-2xl font-bold" style="color: #8B5CF6;">{{ disponibilidadCambioTrabajo.resumen.usuariosSinTrabajo }}</p>
+                  <p class="text-xl md:text-2xl font-bold m-0" style="color: #8B5CF6;">{{ disponibilidadCambioTrabajo.resumen.usuariosSinTrabajo }}</p>
                   <small class="text-500">profesionales</small>
                 </div>
               </div>
             </div>
 
             <!-- Potencialmente Disponibles -->
-            <div class="metric-item border-round p-3" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3B82F6;">
+            <div class="border-round p-3" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3B82F6;">
               <div class="flex align-items-center justify-content-between">
                 <div>
-                  <p class="font-semibold text-900 mb-1">Total Potencialmente Disponibles</p>
+                  <p class="font-semibold text-900 mb-1 text-sm md:text-base">Total Potencialmente Disponibles</p>
                   <small class="text-600">Activos + Abiertos + Sin trabajo</small>
                 </div>
                 <div class="text-right">
-                  <p class="text-2xl font-bold" style="color: #3B82F6;">{{ disponibilidadCambioTrabajo.resumen.usuariosPotencialmenteDisponibles }}</p>
+                  <p class="text-xl md:text-2xl font-bold m-0" style="color: #3B82F6;">{{ disponibilidadCambioTrabajo.resumen.usuariosPotencialmenteDisponibles }}</p>
                   <small class="text-500">{{ disponibilidadCambioTrabajo.resumen.porcentajePotencialmenteDisponibles }}% del total</small>
                 </div>
               </div>
@@ -765,77 +709,75 @@
   </div>
 
   <!-- Métricas Avanzadas del Mercado Laboral -->
-  <div class="chart-section mb-6" id="metricas-avanzadas" *ngIf="metricasAvanzadas">
-    <div class="section-header">
-      <h2 class="section-title">
-        <i class="pi pi-chart-line"></i>
-        Análisis Avanzado del Mercado Laboral
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="metricas-avanzadas" *ngIf="metricasAvanzadas">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-chart-line text-primary"></i>
+        <span>Análisis Avanzado del Mercado Laboral</span>
       </h2>
-      <p class="section-subtitle">Métricas detalladas y análisis profundo del mercado</p>
+      <p class="text-sm md:text-base text-600 m-0">Métricas detalladas y análisis profundo del mercado</p>
     </div>
 
     <!-- Primera fila de gráficos -->
-    <div class="grid mb-4">
+    <div class="grid mb-3">
       <!-- Distribución por Experiencia -->
-      <div class="col-12 lg:col-6 xl:col-6">
-        <p-card styleClass="h-full chart-card">
+      <div class="col-12 md:col-6">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header flex align-items-center gap-2">
-              <i class="pi pi-clock chart-icon"></i>
-              <h3 class="m-0">Años de Experiencia</h3>
+            <div class="flex align-items-center gap-2 p-3">
+              <i class="pi pi-clock text-primary text-xl"></i>
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Años de Experiencia</h3>
             </div>
           </ng-template>
-          <div class="chart-container" style="height: 300px;">
+          <div style="height: 250px; position: relative;">
             <canvas id="experienciaChart"></canvas>
           </div>
         </p-card>
       </div>
 
       <!-- Distribución por Educación -->
-      <div class="col-12 lg:col-6 xl:col-6">
-        <p-card styleClass="h-full chart-card">
+      <div class="col-12 md:col-6">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header flex align-items-center gap-2">
-              <i class="pi pi-book chart-icon"></i>
-              <h3 class="m-0">Nivel de Educación</h3>
+            <div class="flex align-items-center gap-2 p-3">
+              <i class="pi pi-book text-primary text-xl"></i>
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Nivel de Educación</h3>
             </div>
           </ng-template>
-          <div class="chart-container" style="height: 300px;">
+          <div style="height: 250px; position: relative;">
             <canvas id="educacionChart"></canvas>
           </div>
         </p-card>
       </div>
-
     </div>
 
     <!-- Segunda fila de gráficos -->
-    <div class="grid mb-4">
+    <div class="grid mb-3">
       <!-- Distribución Salarial -->
-      <div class="col-12 lg:col-6 xl:col-6">
-        <p-card styleClass="h-full chart-card">
+      <div class="col-12 md:col-6">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header flex align-items-center gap-2">
-              <i class="pi pi-dollar chart-icon"></i>
-              <h3 class="m-0">Rangos Salariales</h3>
+            <div class="flex align-items-center gap-2 p-3">
+              <i class="pi pi-dollar text-primary text-xl"></i>
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Rangos Salariales</h3>
             </div>
           </ng-template>
-          <div class="chart-container" style="height: 300px;">
+          <div style="height: 250px; position: relative;">
             <canvas id="salarioChart"></canvas>
           </div>
         </p-card>
       </div>
 
-
       <!-- Áreas de Interés -->
-      <div class="col-12 lg:col-6 xl:col-6">
-        <p-card styleClass="h-full chart-card">
+      <div class="col-12 md:col-6">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header flex align-items-center gap-2">
-              <i class="pi pi-star chart-icon"></i>
-              <h3>Áreas de Interés</h3>
+            <div class="flex align-items-center gap-2 p-3">
+              <i class="pi pi-star text-primary text-xl"></i>
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Áreas de Interés</h3>
             </div>
           </ng-template>
-          <div class="chart-container" style="height: 300px;">
+          <div style="height: 250px; position: relative;">
             <canvas id="areasInteresChart"></canvas>
           </div>
         </p-card>
@@ -843,75 +785,76 @@
     </div>
 
     <!-- Tercera fila -->
-    <div class="grid mb-4">
+    <div class="grid">
       <!-- Tipos de Empleo -->
-      <div class="col-12 lg:col-6 xl:col-6">
-        <p-card styleClass="h-full chart-card">
+      <div class="col-12 md:col-6">
+        <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header flex align-items-center gap-2">
-              <i class="pi pi-briefcase chart-icon"></i>
-              <h3>Tipos de Empleo</h3>
+            <div class="flex align-items-center gap-2 p-3">
+              <i class="pi pi-briefcase text-primary text-xl"></i>
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Tipos de Empleo</h3>
             </div>
           </ng-template>
-          <div class="chart-container" style="height: 300px;">
+          <div style="height: 250px; position: relative;">
             <canvas id="tiposEmpleoChart"></canvas>
           </div>
         </p-card>
       </div>
 
-      <!-- Estadísticas de Perfil Completo -->
-      <div class="col-12 lg:col-6 xl:col-6">
+      <!-- Resumen de Métricas -->
+      <div class="col-12 md:col-6">
         <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="card-header flex align-items-center gap-2">
-              <i class="pi pi-chart-bar chart-icon"></i>
-              <h3>Resumen de Métricas Avanzadas</h3>
+            <div class="flex align-items-center gap-2 p-3">
+              <i class="pi pi-chart-bar text-primary text-xl"></i>
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Resumen de Métricas Avanzadas</h3>
             </div>
           </ng-template>
-          <div class="grid">
-            <div class="col-12 sm:col-6 lg:col-4">
-              <div class="metric-summary">
-                <h4>Total Profesionales</h4>
-                <p class="metric-value">{{ getTotalProfesionales() }}</p>
-                <small>Con perfil completo</small>
+          <div class="grid p-3">
+            <div class="col-12">
+              <div class="surface-100 border-round p-3 text-center">
+                <h4 class="text-sm text-600 m-0 mb-2">Total Profesionales</h4>
+                <p class="text-2xl font-bold text-900 m-0">{{ getTotalProfesionales() }}</p>
+                <small class="text-600">Con perfil completo</small>
               </div>
             </div>
-            <div class="col-12 sm:col-6 lg:col-4" *ngIf="metricasAvanzadas.tecnologiasPopulares.length > 0">
-              <div class="metric-summary">
-                <h4>Top Tecnología</h4>
-                <p class="metric-value text-truncate" [title]="metricasAvanzadas.tecnologiasPopulares[0].tecnologia">
+            <div class="col-12" *ngIf="metricasAvanzadas.tecnologiasPopulares.length > 0">
+              <div class="surface-100 border-round p-3 text-center">
+                <h4 class="text-sm text-600 m-0 mb-2">Top Tecnología</h4>
+                <p class="text-xl font-bold text-900 m-0 white-space-nowrap overflow-hidden text-overflow-ellipsis"
+                   [title]="metricasAvanzadas.tecnologiasPopulares[0].tecnologia">
                   {{ metricasAvanzadas.tecnologiasPopulares[0].tecnologia }}
                 </p>
-                <small>{{ metricasAvanzadas.tecnologiasPopulares[0].cantidad }} profesionales</small>
+                <small class="text-600">{{ metricasAvanzadas.tecnologiasPopulares[0].cantidad }} profesionales</small>
               </div>
             </div>
-            <div class="col-12 sm:col-6 lg:col-4" *ngIf="metricasAvanzadas.distribucionAreas.length > 0">
-              <div class="metric-summary">
-                <h4>Área Principal</h4>
-                <p class="metric-value text-truncate" [title]="metricasAvanzadas.distribucionAreas[0].area">
+            <div class="col-12" *ngIf="metricasAvanzadas.distribucionAreas.length > 0">
+              <div class="surface-100 border-round p-3 text-center">
+                <h4 class="text-sm text-600 m-0 mb-2">Área Principal</h4>
+                <p class="text-xl font-bold text-900 m-0 white-space-nowrap overflow-hidden text-overflow-ellipsis"
+                   [title]="metricasAvanzadas.distribucionAreas[0].area">
                   {{ metricasAvanzadas.distribucionAreas[0].area }}
                 </p>
-                <small>{{ metricasAvanzadas.distribucionAreas[0].cantidad }} profesionales</small>
+                <small class="text-600">{{ metricasAvanzadas.distribucionAreas[0].cantidad }} profesionales</small>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </p-card>
+        </p-card>
       </div>
     </div>
   </div>
 
   <!-- Error Messages -->
-  <div class="errors-section mt-4" *ngIf="errores.length > 0">
-    <p-messages>
-      <ng-template pTemplate>
-        <div class="ml-2">
-          <h5>Algunos datos no pudieron cargarse:</h5>
-          <ul>
-            <li *ngFor="let error of errores">{{ error }}</li>
-          </ul>
-        </div>
-      </ng-template>
-    </p-messages>
+  <div *ngIf="errores.length > 0" class="surface-card shadow-2 border-round p-3 md:p-4 border-left-3 border-red-500">
+    <div class="flex align-items-start gap-3">
+      <i class="pi pi-exclamation-triangle text-red-500 text-2xl"></i>
+      <div class="flex-1">
+        <h5 class="text-base md:text-lg font-semibold text-900 m-0 mb-2">Algunos datos no pudieron cargarse:</h5>
+        <ul class="m-0 pl-3">
+          <li *ngFor="let error of errores" class="text-sm text-600 mb-1">{{ error }}</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
 </div>
