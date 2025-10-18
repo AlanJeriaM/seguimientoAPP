@@ -158,38 +158,6 @@ canvas {
   transition: all 0.3s ease !important;
 }
 
-/* Responsive: Ajustes adicionales para pantallas pequeñas */
-@media (max-width: 576px) {
-  /* Reducir padding en pantallas muy pequeñas */
-  ::ng-deep .p-card .p-card-body {
-    padding: 0.75rem !important;
-  }
-
-  ::ng-deep .p-card .p-card-header {
-    padding: 0.75rem !important;
-  }
-
-  /* Ajustar tamaño de iconos en móvil */
-  .pi {
-    font-size: 1rem !important;
-  }
-
-  /* Scroll top button más pequeño en móvil */
-  ::ng-deep .custom-scrolltop {
-    width: 2.5rem !important;
-    height: 2.5rem !important;
-    bottom: 1rem !important;
-    right: 1rem !important;
-  }
-}
-
-@media (max-width: 768px) {
-  /* Ajustar altura de gráficos en tablets */
-  canvas {
-    min-height: 200px;
-  }
-}
-
 /* Animación suave para carga de contenido */
 @keyframes fadeIn {
   from {
@@ -214,36 +182,9 @@ canvas {
   border-radius: 5px;
 }
 
-/* Responsive para tags - apilarlos en móvil */
-@media (max-width: 576px) {
-  ::ng-deep .p-tag {
-    font-size: 0.65rem;
-    padding: 0.2rem 0.5rem;
-  }
-}
-
 /* Asegurar que los flex containers se comporten bien en todas las pantallas */
 .flex-wrap {
   flex-wrap: wrap;
-}
-
-/* Mejora de legibilidad en pantallas pequeñas */
-@media (max-width: 576px) {
-  h1 {
-    font-size: 1.5rem !important;
-  }
-
-  h2 {
-    font-size: 1.25rem !important;
-  }
-
-  h3 {
-    font-size: 1rem !important;
-  }
-
-  h4 {
-    font-size: 0.875rem !important;
-  }
 }
 
 /* Estrellas de satisfacción - mantener color amarillo */
@@ -292,32 +233,84 @@ img {
   transition: none !important;
 }
 
-/* Stats Chart Container - CSS Grid para alineación perfecta */
-.stats-chart-container {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1.5rem;
-  align-items: stretch;
+
+/* Profile Image con efecto hover mejorado */
+.profile-image-wrapper {
+  position: relative;
+  transition: transform 0.3s ease;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  align-items: stretch;
+.profile-image-wrapper:hover {
+  transform: scale(1.05);
 }
 
-.stat-card-wrapper {
-  display: flex;
-  flex-direction: column;
+.profile-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
 }
 
-.chart-container {
-  display: flex;
-  flex-direction: column;
+.profile-image:hover {
+  box-shadow: 0 6px 20px rgba(10, 102, 194, 0.3);
+  border-color: #0A66C2;
 }
 
-/* Responsive para stats-chart-container */
+/* Nombre del perfil con efecto hover */
+.profile-name {
+  transition: color 0.2s ease;
+}
+
+.profile-name.cursor-pointer:hover {
+  color: #0A66C2 !important;
+}
+
+/* Detalles del perfil con hover suave */
+.profile-detail {
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.profile-detail:hover {
+  background-color: rgba(10, 102, 194, 0.08);
+}
+
+/* Market Growth Badge - Rediseñado con glassmorphism */
+.market-growth-badge {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(10, 102, 194, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+  min-width: 180px;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.15);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.market-growth-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+}
+
+.market-growth-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.25);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablets y pantallas medianas */
 @media (max-width: 992px) {
   .stats-chart-container {
     grid-template-columns: 1fr;
@@ -328,6 +321,11 @@ img {
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
   }
+
+  .market-growth-badge {
+    min-width: 100%;
+    padding: 1rem 1.25rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -335,5 +333,83 @@ img {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
+
+  /* Ajustar altura de gráficos en tablets */
+  canvas {
+    min-height: 200px;
+  }
+
+  .profile-image,
+  .profile-image-wrapper img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .header-gradient {
+    padding: 1rem !important;
+  }
 }
 
+/* Mobile - Pantallas pequeñas */
+@media (max-width: 576px) {
+  /* Reducir padding en pantallas muy pequeñas */
+  ::ng-deep .p-card .p-card-body {
+    padding: 0.75rem !important;
+  }
+
+  ::ng-deep .p-card .p-card-header {
+    padding: 0.75rem !important;
+  }
+
+  /* Ajustar tamaño de iconos en móvil */
+  .pi {
+    font-size: 1rem !important;
+  }
+
+  /* Scroll top button más pequeño en móvil */
+  ::ng-deep .custom-scrolltop {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    bottom: 1rem !important;
+    right: 1rem !important;
+  }
+
+  /* Tags más pequeños en móvil */
+  ::ng-deep .p-tag {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  /* Mejora de legibilidad en pantallas pequeñas */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+
+  h2 {
+    font-size: 1.25rem !important;
+  }
+
+  h3 {
+    font-size: 1rem !important;
+  }
+
+  h4 {
+    font-size: 0.875rem !important;
+  }
+
+  /* Header mejorado - responsive */
+  .profile-image,
+  .profile-image-wrapper img {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .market-growth-badge {
+    padding: 0.875rem 1rem;
+  }
+
+  .profile-detail {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
