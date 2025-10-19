@@ -122,9 +122,9 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
           this.reporteEncuesta = response.data;
           this.displayReporteDialog = true;
 
-          console.log('📊 Reporte cargado:', this.reporteEncuesta);
-          console.log('   - Tiene preguntas:', !!this.reporteEncuesta.preguntas);
-          console.log('   - Total preguntas:', this.reporteEncuesta.preguntas?.length);
+          console.log('Reporte cargado:', this.reporteEncuesta);
+          console.log('Tiene preguntas:', !!this.reporteEncuesta.preguntas);
+          console.log('Total preguntas:', this.reporteEncuesta.preguntas?.length);
         } else {
           this.messageService.add({
             severity: 'error',
@@ -627,10 +627,10 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     console.log('Renderizando gráficos para', this.reporteEncuesta.preguntas.length, 'preguntas');
 
     this.reporteEncuesta.preguntas.forEach((pregunta: any, index: number) => {
-      console.log(`   Pregunta ${index + 1}:`, pregunta.texto);
-      console.log('   - Tipo:', pregunta.tipo);
-      console.log('   - Total respuestas:', pregunta.total_respuestas);
-      console.log('   - Tiene análisis:', !!pregunta.analisis);
+      console.log(`Pregunta ${index + 1}:`, pregunta.texto);
+      console.log('Tipo:', pregunta.tipo);
+      console.log('Total respuestas:', pregunta.total_respuestas);
+      console.log('Tiene análisis:', !!pregunta.analisis);
 
       if (!pregunta.analisis || pregunta.total_respuestas === 0) {
         console.log('   Sin datos para graficar');

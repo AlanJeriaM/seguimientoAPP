@@ -103,8 +103,8 @@ const generateResumen = (nombre, tecnologiasSeleccionadas, areaInteres) => {
 // Función principal para generar usuarios
 const generateTestUsers = async () => {
   try {
-    console.log('🚀 Iniciando generación de usuarios de prueba...');
-    
+    console.log('Iniciando generación de usuarios de prueba...');
+
     // Verificar si ya existen usuarios de prueba
     const existingTestUsers = await User.count({
       where: {
@@ -115,16 +115,16 @@ const generateTestUsers = async () => {
     });
 
     if (existingTestUsers > 0) {
-      console.log(`⚠️  Ya existen ${existingTestUsers} usuarios de prueba. ¿Deseas continuar? (S/N)`);
+      console.log(`Ya existen ${existingTestUsers} usuarios de prueba. ¿Deseas continuar? (S/N)`);
       // En un script automático, continuamos
     }
 
     const usersToCreate = [];
-    
+
     for (let i = 0; i < 50; i++) {
       const nombre = nombres[i];
       const correo = generateEmail(nombre, i + 1);
-      
+
       // Generar datos aleatorios pero realistas
       const empresaActual = randomChoice(empresas);
       const industria = randomChoice(industrias);
@@ -137,7 +137,7 @@ const generateTestUsers = async () => {
       const disponibilidad = randomChoice(disponibilidades);
       const ubicacion = randomChoice(ubicaciones);
       const satisfaccionLaboral = Math.floor(Math.random() * 5) + 1; // 1-5
-      
+
       // Generar opciones personalizadas (algunos usuarios tendrán opciones personalizadas)
       const opcionesPersonalizadas = {
         educacion: Math.random() < 0.2 ? [`nivel personalizado ${i + 1}`] : [],
@@ -182,25 +182,25 @@ const generateTestUsers = async () => {
     }
 
     // Crear usuarios en lotes para mejor rendimiento
-    console.log('📝 Creando usuarios en la base de datos...');
-    
+    console.log('Creando usuarios en la base de datos...');
+
     let createdCount = 0;
     for (let i = 0; i < usersToCreate.length; i += 10) {
       const batch = usersToCreate.slice(i, i + 10);
       await User.bulkCreate(batch);
       createdCount += batch.length;
-      console.log(`✅ Creados ${createdCount}/${usersToCreate.length} usuarios`);
+      console.log(`Creados ${createdCount}/${usersToCreate.length} usuarios`);
     }
 
-    console.log('🎉 ¡Usuarios de prueba creados exitosamente!');
-    console.log(`📊 Total de usuarios creados: ${createdCount}`);
-    console.log(`📧 Correos generados: ${usersToCreate.slice(0, 5).map(u => u.correo).join(', ')}...`);
-    console.log(`🔑 Contraseña por defecto para todos: password123`);
-    console.log(`🏢 Empresas incluidas: ${[...new Set(usersToCreate.map(u => u.empresa_actual))].slice(0, 10).join(', ')}...`);
-    console.log(`💻 Tecnologías incluidas: ${[...new Set(usersToCreate.flatMap(u => JSON.parse(u.especialidad_tecnica)))].slice(0, 15).join(', ')}...`);
+    console.log('¡Usuarios de prueba creados exitosamente!');
+    console.log(`Total de usuarios creados: ${createdCount}`);
+    console.log(`Correos generados: ${usersToCreate.slice(0, 5).map(u => u.correo).join(', ')}...`);
+    console.log(`Contraseña por defecto para todos: password123`);
+    console.log(`Empresas incluidas: ${[...new Set(usersToCreate.map(u => u.empresa_actual))].slice(0, 10).join(', ')}...`);
+    console.log(`Tecnologías incluidas: ${[...new Set(usersToCreate.flatMap(u => JSON.parse(u.especialidad_tecnica)))].slice(0, 15).join(', ')}...`);
 
   } catch (error) {
-    console.error('❌ Error generando usuarios de prueba:', error);
+    console.error('Error generando usuarios de prueba:', error);
   } finally {
     await sequelize.close();
   }

@@ -317,7 +317,7 @@ const obtenerMetricasAvanzadas = async (req, res) => {
 const obtenerTecnologiasMasDemandadas = async (req, res) => {
   try {
     console.log('=== TECNOLOGIAS MAS DEMANDADAS ===');
-    
+
     // Obtener usuarios con tecnologías (tanto especialidad_tecnica como tecnologias_principales)
     const usuarios = await User.findAll({
       where: {
@@ -336,7 +336,7 @@ const obtenerTecnologiasMasDemandadas = async (req, res) => {
 
     usuarios.forEach(user => {
       console.log(`USUARIO: ${user.nombre}`);
-      
+
       // Procesar especialidad_tecnica
       if (user.especialidad_tecnica) {
         let techs = user.especialidad_tecnica;
@@ -418,65 +418,52 @@ const obtenerTecnologiasMasDemandadas = async (req, res) => {
 // Obtener distribución salarial con variación mensual real
 const obtenerDistribucionSalarial = async (req, res) => {
   try {
-    console.log('🔍 Obteniendo distribución salarial...');
+    console.log('Obteniendo distribución salarial...');
 
     // Función para convertir rango salarial a valor promedio
     const convertirRangoASalario = (rango) => {
-      console.log(`🔍 Convirtiendo rango: "${rango}"`);
+      console.log(`Convirtiendo rango: "${rango}"`);
 
       switch(rango) {
         // Formatos del modelo de la base de datos
         case '0-500k':
         case '$0 - $500.000':
-          console.log('  → 250000');
           return 250000;
         case '500k-1M':
         case '$500.001 - $1.000.000':
-          console.log('  → 750000');
           return 750000;
         case '1M-1.5M':
         case '$1.000.001 - $1.500.000':
-          console.log('  → 1250000');
           return 1250000;
         case '1.5M-2M':
         case '$1.000.001 - $2.000.000':
-          console.log('  → 1500000');
           return 1500000;
         case '2M-3M':
         case '$2.000.001 - $3.000.000':
-          console.log('  → 2500000');
           return 2500000;
         case '3M+':
         case '$3.000.001+':
-          console.log('  → 4000000');
           return 4000000;
         // Formatos adicionales que podrían existir
         case '$0 - $500.001':
         case '$0 - $500.000':
-          console.log('  → 250000');
           return 250000;
         case '$500.000 - $1.000.000':
         case '$500.001 - $1.000.000':
-          console.log('  → 750000');
           return 750000;
         case '$1.000.000 - $1.500.000':
         case '$1.000.001 - $1.500.000':
-          console.log('  → 1250000');
           return 1250000;
         case '$1.500.000 - $2.000.000':
         case '$1.500.001 - $2.000.000':
-          console.log('  → 1750000');
           return 1750000;
         case '$2.000.000 - $3.000.000':
         case '$2.000.001 - $3.000.000':
-          console.log('  → 2500000');
           return 2500000;
         case '$3.000.000+':
         case '$3.000.001+':
-          console.log('  → 4000000');
           return 4000000;
         default:
-          console.log('  → 1000000 (default)');
           return 1000000; // Valor por defecto
       }
     };
@@ -694,61 +681,48 @@ const obtenerEmpresasQueContratanMas = async (req, res) => {
   try {
     // Función para convertir rango salarial a valor promedio (consistente)
     const convertirRangoASalario = (rango) => {
-      console.log(`🔍 [Empresas] Convirtiendo rango: "${rango}"`);
-      
+      console.log(`[Empresas] Convirtiendo rango: "${rango}"`);
+
       switch(rango) {
         // Formatos del modelo de la base de datos
         case '0-500k':
         case '$0 - $500.000':
-          console.log('  → 250000');
           return 250000;
         case '500k-1M':
         case '$500.001 - $1.000.000':
-          console.log('  → 750000');
           return 750000;
         case '1M-1.5M':
         case '$1.000.001 - $1.500.000':
-          console.log('  → 1250000');
           return 1250000;
         case '1.5M-2M':
         case '$1.000.001 - $2.000.000':
-          console.log('  → 1500000');
           return 1500000;
         case '2M-3M':
         case '$2.000.001 - $3.000.000':
-          console.log('  → 2500000');
           return 2500000;
         case '3M+':
         case '$3.000.001+':
-          console.log('  → 4000000');
           return 4000000;
         // Formatos adicionales que podrían existir
         case '$0 - $500.001':
         case '$0 - $500.000':
-          console.log('  → 250000');
           return 250000;
         case '$500.000 - $1.000.000':
         case '$500.001 - $1.000.000':
-          console.log('  → 750000');
           return 750000;
         case '$1.000.000 - $1.500.000':
         case '$1.000.001 - $1.500.000':
-          console.log('  → 1250000');
           return 1250000;
         case '$1.500.000 - $2.000.000':
         case '$1.500.001 - $2.000.000':
-          console.log('  → 1750000');
           return 1750000;
         case '$2.000.000 - $3.000.000':
         case '$2.000.001 - $3.000.000':
-          console.log('  → 2500000');
           return 2500000;
         case '$3.000.000+':
         case '$3.000.001+':
-          console.log('  → 4000000');
           return 4000000;
         default:
-          console.log('  → 1000000 (default)');
           return 1000000; // Valor por defecto
       }
     };
@@ -994,61 +968,47 @@ const obtenerEvolucionSalarial = async (req, res) => {
 
     // Función para convertir rango salarial a valor promedio (igual que en distribucion salarial)
     const convertirRangoASalario = (rango) => {
-      console.log(`🔍 [Evolución] Convirtiendo rango: "${rango}"`);
-      
+      console.log(`[Evolución] Convirtiendo rango: "${rango}"`);
+
       switch(rango) {
         // Formatos del modelo de la base de datos
         case '0-500k':
         case '$0 - $500.000':
-          console.log('  → 250000');
           return 250000;
         case '500k-1M':
         case '$500.001 - $1.000.000':
-          console.log('  → 750000');
           return 750000;
         case '1M-1.5M':
         case '$1.000.001 - $1.500.000':
-          console.log('  → 1250000');
           return 1250000;
         case '1.5M-2M':
         case '$1.000.001 - $2.000.000':
-          console.log('  → 1500000');
           return 1500000;
         case '2M-3M':
         case '$2.000.001 - $3.000.000':
-          console.log('  → 2500000');
           return 2500000;
         case '3M+':
         case '$3.000.001+':
-          console.log('  → 4000000');
           return 4000000;
         // Formatos adicionales que podrían existir
         case '$0 - $500.001':
         case '$0 - $500.000':
-          console.log('  → 250000');
           return 250000;
         case '$500.000 - $1.000.000':
         case '$500.001 - $1.000.000':
-          console.log('  → 750000');
           return 750000;
         case '$1.000.000 - $1.500.000':
         case '$1.000.001 - $1.500.000':
-          console.log('  → 1250000');
           return 1250000;
         case '$1.500.000 - $2.000.000':
         case '$1.500.001 - $2.000.000':
-          console.log('  → 1750000');
           return 1750000;
         case '$2.000.000 - $3.000.000':
-        case '$2.000.001 - $3.000.000':
-          console.log('  → 2500000');
           return 2500000;
         case '$3.000.000+':
         case '$3.000.001+':
-          console.log('  → 4000000');
           return 4000000;
         default:
-          console.log('  → 1000000 (default)');
           return 1000000; // Valor por defecto
       }
     };
@@ -1242,7 +1202,7 @@ const obtenerExperienciaVsTecnologias = async (req, res) => {
       attributes: ['años_experiencia', 'especialidad_tecnica']
     });
 
-    console.log(`🔍 Usuarios encontrados para experiencia vs tecnologías: ${usuarios.length}`);
+    console.log(`Usuarios encontrados para experiencia vs tecnologías: ${usuarios.length}`);
 
     if (usuarios.length === 0) {
       console.log('No hay usuarios con especialidad técnica definida');
@@ -1407,13 +1367,13 @@ const obtenerMapaCalorIndustriaSalarial = async (req, res) => {
 
     console.log(`Usuarios encontrados para mapa de calor industria-salario: ${usuarios.length}`);
 
-    // Definir rangos salariales ordenados
+    // Definir rangos salariales ordenados (usar formato formal como en "Rangos Salariales")
     const rangosSalariales = [
-      { id: '$0 - $500.000', label: '$0 - $500k', orden: 1 },
-      { id: '$500.001 - $1.000.000', label: '$500k - $1M', orden: 2 },
-      { id: '$1.000.001 - $2.000.000', label: '$1M - $2M', orden: 3 },
-      { id: '$2.000.001 - $3.000.000', label: '$2M - $3M', orden: 4 },
-      { id: '$3.000.001+', label: '$3M+', orden: 5 }
+      { id: '$0 - $500.000', label: '$0 - $500.000', orden: 1 },
+      { id: '$500.001 - $1.000.000', label: '$500.001 - $1.000.000', orden: 2 },
+      { id: '$1.000.001 - $2.000.000', label: '$1.000.001 - $2.000.000', orden: 3 },
+      { id: '$2.000.001 - $3.000.000', label: '$2.000.001 - $3.000.000', orden: 4 },
+      { id: '$3.000.001+', label: '$3.000.001+', orden: 5 }
     ];
 
     // Obtener todas las industrias únicas
@@ -1437,7 +1397,7 @@ const obtenerMapaCalorIndustriaSalarial = async (req, res) => {
 
         filaDatos.datos.push({
           rangoSalarial: rango.id,
-          rangoLabel: rango.label,
+          rangoLabel: rango.label, // Ahora usa el formato formal
           cantidad: profesionalesEnCelda,
           orden: rango.orden
         });
@@ -1466,16 +1426,38 @@ const obtenerMapaCalorIndustriaSalarial = async (req, res) => {
     });
 
     // Calcular estadísticas adicionales
-    const distribucionPorRango = rangosSalariales.map(rango => {
+    const distribucionPorRangoTemp = rangosSalariales.map(rango => {
       const totalEnRango = usuarios.filter(user => user.rango_salarial === rango.id).length;
-      const porcentaje = usuarios.length > 0 ? Math.round((totalEnRango / usuarios.length) * 100) : 0;
+      const porcentajeExacto = usuarios.length > 0 ? (totalEnRango / usuarios.length) * 100 : 0;
 
       return {
         rango: rango.label,
         cantidad: totalEnRango,
-        porcentaje
+        porcentajeExacto,
+        porcentaje: Math.round(porcentajeExacto)
       };
     }).filter(item => item.cantidad > 0);
+
+    // Ajustar porcentajes para que sumen exactamente 100%
+    const totalPorcentajeRedondeado = distribucionPorRangoTemp.reduce((sum, item) => sum + item.porcentaje, 0);
+    const diferencia = 100 - totalPorcentajeRedondeado;
+
+    // Si hay diferencia, ajustar el elemento con mayor parte decimal
+    if (diferencia !== 0) {
+      const elementoConMayorDecimal = distribucionPorRangoTemp.reduce((max, item) => {
+        const decimal = item.porcentajeExacto - item.porcentaje;
+        const maxDecimal = max.porcentajeExacto - max.porcentaje;
+        return decimal > maxDecimal ? item : max;
+      });
+
+      elementoConMayorDecimal.porcentaje += diferencia;
+    }
+
+    const distribucionPorRango = distribucionPorRangoTemp.map(item => ({
+      rango: item.rango,
+      cantidad: item.cantidad,
+      porcentaje: item.porcentaje
+    }));
 
     const industriaMasComun = mapaCalorData.length > 0 ? mapaCalorData[0] : null;
 
@@ -1595,7 +1577,7 @@ const obtenerDisponibilidadCambioTrabajo = async (req, res) => {
       }
     };
 
-    console.log('🚀 RESPUESTA FINAL enviada al frontend:', JSON.stringify(respuesta, null, 2));
+    console.log('RESPUESTA FINAL enviada al frontend:', JSON.stringify(respuesta, null, 2));
     res.json(respuesta);
 
   } catch (error) {

@@ -49,7 +49,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
     private messageService: MessageService
   ) {
     this.initializeForm();
-    
+
     // Suscribirse a cambios en el formulario para detección de cambios
     this.adminForm.valueChanges.subscribe(() => {
       this.detectFormChanges();
@@ -339,11 +339,11 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
     });
 
     this.adminForm.updateValueAndValidity();
-    
+
     // Resetear estado de cambios
     this.initialFormStateSaved = false;
     this.hasFormChanges = false;
-    
+
     this.displayDialog = true;
 
     // Guardar estado inicial después de que el formulario esté configurado
@@ -434,7 +434,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
             this.cargarAdministradores(this.currentPage, this.searchText);
             // Resetear estado de cambios después de actualizar exitosamente
             this.saveInitialFormState();
-            
+
             // Mostrar toast de éxito
             this.messageService.add({
               severity: 'success',
@@ -471,7 +471,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
             this.cargarAdministradores(this.currentPage, this.searchText);
             // Resetear estado de cambios después de crear exitosamente
             this.saveInitialFormState();
-            
+
             // Mostrar toast de éxito
             this.messageService.add({
               severity: 'success',
@@ -522,7 +522,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
 
   confirmarEliminacion() {
     if (!this.adminParaEliminar) return;
-    
+
     this.deleting = true;
     this.adminService.desactivarAdministrador(this.adminParaEliminar.id).subscribe({
       next: (resp) => {
@@ -531,7 +531,7 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
           this.displayDeleteDialog = false;
           this.adminParaEliminar = null;
           this.cargarAdministradores(this.currentPage, this.searchText);
-          
+
           // Mostrar toast de éxito
           this.messageService.add({
             severity: 'success',
@@ -591,8 +591,8 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
       this.formInitialValue = { ...this.adminForm.value };
       this.hasFormChanges = false;
       this.initialFormStateSaved = true;
-      
-      console.log('🔧 Estado inicial del formulario guardado:', this.formInitialValue);
+
+      console.log('Estado inicial del formulario guardado:', this.formInitialValue);
     }
   }
 
@@ -605,8 +605,8 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
     const currentValue = { ...this.adminForm.value };
     const hasChanges = this.hasRealChanges(this.formInitialValue, currentValue);
     this.hasFormChanges = hasChanges;
-    
-    console.log('🔧 Detección de cambios:', {
+
+    console.log('Detección de cambios:', {
       hasChanges: hasChanges,
       initialValue: this.formInitialValue,
       currentValue: currentValue
@@ -615,23 +615,23 @@ export class ViewAdminComponent implements OnInit, OnDestroy {
 
   private hasRealChanges(initial: any, current: any): boolean {
     const fieldsToCompare = ['nombre_usuario', 'apellido', 'email_usuario', 'contrasenia'];
-    
+
     for (const field of fieldsToCompare) {
       const initialValue = initial[field];
       const currentValue = current[field];
-      
+
       if (field === 'contrasenia') {
         // Para contraseña, solo considerar cambio si hay valor nuevo
         if (currentValue && currentValue.trim() !== '') {
-          console.log(`🔧 Campo ${field} cambió (contraseña):`, { initial: '***', current: '***' });
+          console.log(`Campo ${field} cambió (contraseña):`, { initial: '***', current: '***' });
           return true;
         }
       } else if (initialValue !== currentValue) {
-        console.log(`🔧 Campo ${field} cambió:`, { initial: initialValue, current: currentValue });
+        console.log(`Campo ${field} cambió:`, { initial: initialValue, current: currentValue });
         return true;
       }
     }
-    
+
     return false;
   }
 

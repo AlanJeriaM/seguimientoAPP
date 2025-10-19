@@ -194,8 +194,8 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private cdr: ChangeDetectorRef
   ) {
-    console.log('🔧 EditUserProfileComponent constructor llamado');
-    console.log('🔧 hasFormChanges inicial:', this.hasFormChanges);
+    console.log('EditUserProfileComponent constructor llamado');
+    console.log('hasFormChanges inicial:', this.hasFormChanges);
     this.initializeForm();
   }
 
@@ -215,12 +215,12 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnChanges() {
-    console.log('🔧 ngOnChanges llamado:', {
+    console.log('ngOnChanges llamado:', {
       usuario: this.usuario,
       visible: this.visible
     });
     if (this.usuario && this.visible) {
-      console.log('🔧 Llamando a cargarPerfil');
+      console.log('Llamando a cargarPerfil');
       this.cargarPerfil();
     }
   }
@@ -251,9 +251,9 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
   }
 
   cargarPerfil() {
-    console.log('🔧 cargarPerfil llamado');
+    console.log('cargarPerfil llamado');
     if (!this.usuario) {
-      console.log('🔧 No hay usuario, retornando');
+      console.log('No hay usuario, retornando');
       return;
     }
 
@@ -306,7 +306,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
   private populateForm() {
     if (this.perfil) {
       // Debug: Log de opciones personalizadas
-      console.log('🔍 Opciones personalizadas antes de cargar:', {
+      console.log('Opciones personalizadas antes de cargar:', {
         educacion: this.perfil.opciones_personalizadas_educacion,
         tecnologias: this.perfil.opciones_personalizadas_tecnologias,
         nivel_educacion: this.perfil.nivel_educacion,
@@ -337,7 +337,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       this.reconstruirListaIndustrias();
 
       // Debug: Log de listas reconstruidas
-      console.log('🔍 Listas reconstruidas:', {
+      console.log('Listas reconstruidas:', {
         nivelesEducacion: this.nivelesEducacion,
         especialidadesTecnicas: this.especialidadesTecnicas,
         opcionesPersonalizadasEducacion: this.opcionesPersonalizadasEducacion,
@@ -345,7 +345,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       });
 
       // Verificar que las listas tengan el contenido correcto
-      console.log('🔍 Verificación de listas:', {
+      console.log('Verificación de listas:', {
         nivelesEducacionLength: this.nivelesEducacion.length,
         especialidadesTecnicasLength: this.especialidadesTecnicas.length,
         nivelesEducacionBaseLength: this.nivelesEducacionBase.length,
@@ -378,46 +378,46 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
         if (this.perfil) {
           // NO filtrar valores - mostrar todos los valores que tiene el usuario
           // Esto permite que se muestren valores que no están en las opciones del dropdown
-          console.log('🔧 Estableciendo nivel_educacion sin filtrar:', this.perfil.nivel_educacion);
-          console.log('🔧 Opciones disponibles nivel educación:', this.nivelesEducacion);
+          console.log('Estableciendo nivel_educacion sin filtrar:', this.perfil.nivel_educacion);
+          console.log('Opciones disponibles nivel educación:', this.nivelesEducacion);
           this.perfilForm.get('nivel_educacion')?.setValue(this.perfil.nivel_educacion || []);
-          
-          console.log('🔧 Estableciendo especialidad_tecnica sin filtrar:', this.perfil.especialidad_tecnica);
-          console.log('🔧 Opciones disponibles especialidad técnica:', this.especialidadesTecnicas);
+
+          console.log('Estableciendo especialidad_tecnica sin filtrar:', this.perfil.especialidad_tecnica);
+          console.log('Opciones disponibles especialidad técnica:', this.especialidadesTecnicas);
           this.perfilForm.get('especialidad_tecnica')?.setValue(this.perfil.especialidad_tecnica || []);
-          
-          console.log('🔧 Estableciendo tecnologias_principales con setTimeout:', this.perfil.tecnologias_principales);
+
+          console.log('Estableciendo tecnologias_principales con setTimeout:', this.perfil.tecnologias_principales);
           this.perfilForm.get('tecnologias_principales')?.setValue(this.perfil.tecnologias_principales || []);
         }
 
         // Forzar actualización después de establecer los arrays
         this.cdr.detectChanges();
-        
+
         // Log final para verificar
-        console.log('🔧 Valores finales después de setTimeout:', {
+        console.log('Valores finales después de setTimeout:', {
           nivel_educacion: this.perfilForm.get('nivel_educacion')?.value,
           especialidad_tecnica: this.perfilForm.get('especialidad_tecnica')?.value
         });
       }, 100);
 
       // Debug: Log de valores del formulario después del patchValue
-      console.log('🔍 Valores del formulario después del patchValue:', {
+      console.log('Valores del formulario después del patchValue:', {
         nivel_educacion: this.perfilForm.get('nivel_educacion')?.value,
         especialidad_tecnica: this.perfilForm.get('especialidad_tecnica')?.value
       });
 
       // Debug: Verificar que los valores del perfil sean correctos
-      console.log('🔍 Valores del perfil que se están usando:', {
+      console.log('Valores del perfil que se están usando:', {
         nivel_educacion_perfil: this.perfil.nivel_educacion,
         especialidad_tecnica_perfil: this.perfil.especialidad_tecnica,
         nivel_educacion_type: typeof this.perfil.nivel_educacion,
         especialidad_tecnica_type: typeof this.perfil.especialidad_tecnica
       });
     }
-    
+
     // Forzar actualización de la vista
     this.cdr.detectChanges();
-    
+
     // Guardar estado inicial del formulario DESPUÉS de que todos los valores estén establecidos
     setTimeout(() => {
       this.saveInitialFormState();
@@ -435,9 +435,9 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
       };
       this.hasFormChanges = false;
       this.initialFormStateSaved = true;
-      
+
       // Debug: Log del estado inicial guardado
-      console.log('🔧 Estado inicial guardado:', {
+      console.log('Estado inicial guardado:', {
         formInitialValue: this.formInitialValue,
         hasFormChanges: this.hasFormChanges,
         initialFormStateSaved: this.initialFormStateSaved
@@ -461,9 +461,9 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
     const hasChanges = this.hasRealChanges(this.formInitialValue, currentValue);
     this.hasFormChanges = hasChanges;
-    
+
     // Debug: Log de detección de cambios
-    console.log('🔧 Detección de cambios:', {
+    console.log('Detección de cambios:', {
       hasChanges: hasChanges,
       initialValue: this.formInitialValue,
       currentValue: currentValue
@@ -477,13 +477,13 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
   private parseArrayField(field: any): any[] {
     console.log('Parsing field:', field, 'Type:', typeof field);
-    
+
     // Si el campo es null, undefined o string vacío, retornar array vacío
     if (!field || field === null || field === undefined || field === '') {
       console.log('Field is null/undefined/empty, returning empty array');
       return [];
     }
-    
+
     // Si es un string, intentar parsearlo como JSON
     if (typeof field === 'string') {
       try {
@@ -498,13 +498,13 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
         return [];
       }
     }
-    
+
     // Si ya es un array, retornarlo
     if (Array.isArray(field)) {
       console.log('Field is already array:', field);
       return field;
     }
-    
+
     // Si no es ninguno de los casos anteriores, retornar array vacío
     console.log('Field type not recognized, returning empty array');
     return [];
@@ -524,11 +524,11 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
       if (Array.isArray(initialValue) && Array.isArray(currentValue)) {
         if (initialValue.length !== currentValue.length || !initialValue.every((val: any, index: number) => val === currentValue[index])) {
-          console.log(`🔧 Campo ${field} cambió (array):`, { initial: initialValue, current: currentValue });
+          console.log(`Campo ${field} cambió (array):`, { initial: initialValue, current: currentValue });
           return true;
         }
       } else if (initialValue !== currentValue) {
-        console.log(`🔧 Campo ${field} cambió:`, { initial: initialValue, current: currentValue });
+        console.log(`Campo ${field} cambió:`, { initial: initialValue, current: currentValue });
         return true;
       }
     }
@@ -537,28 +537,28 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     const initialOpcionesEducacion = initial.opciones_personalizadas_educacion || [];
     const currentOpcionesEducacion = current.opciones_personalizadas_educacion || [];
     if (initialOpcionesEducacion.length !== currentOpcionesEducacion.length || !initialOpcionesEducacion.every((val: any, index: number) => val === currentOpcionesEducacion[index])) {
-      console.log('🔧 Opciones personalizadas educación cambió:', { initial: initialOpcionesEducacion, current: currentOpcionesEducacion });
+      console.log('Opciones personalizadas educación cambió:', { initial: initialOpcionesEducacion, current: currentOpcionesEducacion });
       return true;
     }
 
     const initialOpcionesTecnologias = initial.opciones_personalizadas_tecnologias || [];
     const currentOpcionesTecnologias = current.opciones_personalizadas_tecnologias || [];
     if (initialOpcionesTecnologias.length !== currentOpcionesTecnologias.length || !initialOpcionesTecnologias.every((val: any, index: number) => val === currentOpcionesTecnologias[index])) {
-      console.log('🔧 Opciones personalizadas tecnologías cambió:', { initial: initialOpcionesTecnologias, current: currentOpcionesTecnologias });
+      console.log('Opciones personalizadas tecnologías cambió:', { initial: initialOpcionesTecnologias, current: currentOpcionesTecnologias });
       return true;
     }
 
     const initialOpcionesAreaInteres = initial.opciones_personalizadas_area_interes || [];
     const currentOpcionesAreaInteres = current.opciones_personalizadas_area_interes || [];
     if (initialOpcionesAreaInteres.length !== currentOpcionesAreaInteres.length || !initialOpcionesAreaInteres.every((val: any, index: number) => val === currentOpcionesAreaInteres[index])) {
-      console.log('🔧 Opciones personalizadas área interés cambió:', { initial: initialOpcionesAreaInteres, current: currentOpcionesAreaInteres });
+      console.log('Opciones personalizadas área interés cambió:', { initial: initialOpcionesAreaInteres, current: currentOpcionesAreaInteres });
       return true;
     }
 
     const initialOpcionesIndustria = initial.opciones_personalizadas_industria || [];
     const currentOpcionesIndustria = current.opciones_personalizadas_industria || [];
     if (initialOpcionesIndustria.length !== currentOpcionesIndustria.length || !initialOpcionesIndustria.every((val: any, index: number) => val === currentOpcionesIndustria[index])) {
-      console.log('🔧 Opciones personalizadas industria cambió:', { initial: initialOpcionesIndustria, current: currentOpcionesIndustria });
+      console.log('Opciones personalizadas industria cambió:', { initial: initialOpcionesIndustria, current: currentOpcionesIndustria });
       return true;
     }
 
@@ -567,25 +567,25 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
   // Métodos para manejar opciones personalizadas (copiados de mi-perfil)
   reconstruirListaNivelesEducacion() {
-    console.log('🔧 reconstruirListaNivelesEducacion llamado');
-    console.log('🔧 nivelesEducacionBase:', this.nivelesEducacionBase);
-    console.log('🔧 opcionesPersonalizadasEducacion:', this.opcionesPersonalizadasEducacion);
-    
+    console.log('reconstruirListaNivelesEducacion llamado');
+    console.log('nivelesEducacionBase:', this.nivelesEducacionBase);
+    console.log('opcionesPersonalizadasEducacion:', this.opcionesPersonalizadasEducacion);
+
     // Solo usar opciones base + opciones personalizadas (igual que en mi-perfil)
     this.nivelesEducacion = [...this.nivelesEducacionBase, ...this.opcionesPersonalizadasEducacion];
-    
-    console.log('🔧 nivelesEducacion final:', this.nivelesEducacion);
+
+    console.log('nivelesEducacion final:', this.nivelesEducacion);
   }
 
   reconstruirListaTecnologias() {
-    console.log('🔧 reconstruirListaTecnologias llamado');
-    console.log('🔧 especialidadesTecnicasBase:', this.especialidadesTecnicasBase);
-    console.log('🔧 opcionesPersonalizadasTecnologias:', this.opcionesPersonalizadasTecnologias);
-    
+    console.log('reconstruirListaTecnologias llamado');
+    console.log('especialidadesTecnicasBase:', this.especialidadesTecnicasBase);
+    console.log('opcionesPersonalizadasTecnologias:', this.opcionesPersonalizadasTecnologias);
+
     // Solo usar opciones base + opciones personalizadas (igual que en mi-perfil)
     this.especialidadesTecnicas = [...this.especialidadesTecnicasBase, ...this.opcionesPersonalizadasTecnologias];
-    
-    console.log('🔧 especialidadesTecnicas final:', this.especialidadesTecnicas);
+
+    console.log('especialidadesTecnicas final:', this.especialidadesTecnicas);
   }
 
   reconstruirListaAreasInteres() {
@@ -610,9 +610,9 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     if (index > -1) {
       this.opcionesPersonalizadasEducacion.splice(index, 1);
     }
-    
+
     this.reconstruirListaNivelesEducacion();
-    
+
     const valorActual = this.perfilForm.get('nivel_educacion')?.value || [];
     const nuevoValor = valorActual.filter((v: string) => v !== option);
     this.perfilForm.get('nivel_educacion')?.setValue(nuevoValor);
@@ -630,7 +630,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
   agregarNivelEducacion() {
     const nuevaOpcion = this.nuevaNivelEducacion.trim();
-    
+
     if (!nuevaOpcion) {
       this.messageService.add({
         severity: 'warn',
@@ -646,10 +646,10 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     if (!this.nivelesEducacionBase.includes(opcionNormalizada) && !this.opcionesPersonalizadasEducacion.includes(opcionNormalizada)) {
       this.opcionesPersonalizadasEducacion.push(opcionNormalizada);
       this.reconstruirListaNivelesEducacion();
-      
+
       const valorActual = this.perfilForm.get('nivel_educacion')?.value || [];
       this.perfilForm.get('nivel_educacion')?.setValue([...valorActual, opcionNormalizada]);
-      
+
       this.nuevaNivelEducacion = '';
       this.showAddNivelEducacionDialog = false;
 
@@ -719,9 +719,9 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     if (index > -1) {
       this.opcionesPersonalizadasTecnologias.splice(index, 1);
     }
-    
+
     this.reconstruirListaTecnologias();
-    
+
     const valorActual = this.perfilForm.get('especialidad_tecnica')?.value || [];
     const nuevoValor = valorActual.filter((v: string) => v !== option);
     this.perfilForm.get('especialidad_tecnica')?.setValue(nuevoValor);
@@ -736,7 +736,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
   agregarTecnologia() {
     const nuevaOpcion = this.nuevaTecnologia.trim();
-    
+
     if (!nuevaOpcion) {
       this.messageService.add({
         severity: 'warn',
@@ -752,10 +752,10 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     if (!this.especialidadesTecnicasBase.includes(opcionNormalizada) && !this.opcionesPersonalizadasTecnologias.includes(opcionNormalizada)) {
       this.opcionesPersonalizadasTecnologias.push(opcionNormalizada);
       this.reconstruirListaTecnologias();
-      
+
       const valorActual = this.perfilForm.get('especialidad_tecnica')?.value || [];
       this.perfilForm.get('especialidad_tecnica')?.setValue([...valorActual, opcionNormalizada]);
-      
+
       this.nuevaTecnologia = '';
       this.showAddTecnologiaDialog = false;
 
@@ -814,9 +814,9 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     if (index > -1) {
       this.opcionesPersonalizadasAreaInteres.splice(index, 1);
     }
-    
+
     this.reconstruirListaAreasInteres();
-    
+
     const valorActual = this.perfilForm.get('area_interes')?.value || '';
     if (valorActual === option) {
       this.perfilForm.get('area_interes')?.setValue('');
@@ -832,7 +832,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
   agregarAreaInteres() {
     const nuevaOpcion = this.nuevaAreaInteres.trim();
-    
+
     if (!nuevaOpcion) {
       this.messageService.add({
         severity: 'warn',
@@ -903,9 +903,9 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
     if (index > -1) {
       this.opcionesPersonalizadasIndustria.splice(index, 1);
     }
-    
+
     this.reconstruirListaIndustrias();
-    
+
     const valorActual = this.perfilForm.get('industria')?.value || '';
     if (valorActual === option) {
       this.perfilForm.get('industria')?.setValue('');
@@ -921,7 +921,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
 
   agregarIndustria() {
     const nuevaOpcion = this.nuevaIndustria.trim();
-    
+
     if (!nuevaOpcion) {
       this.messageService.add({
         severity: 'warn',
@@ -1036,7 +1036,7 @@ export class EditUserProfileComponent implements OnInit, OnDestroy {
           if (response.ok) {
             // Resetear estado de cambios después de guardar exitosamente
             this.saveInitialFormState();
-            
+
             // Emitir evento para notificar que el usuario fue actualizado
             this.usuarioActualizado.emit(response.usuario);
             this.cerrarDialog();
