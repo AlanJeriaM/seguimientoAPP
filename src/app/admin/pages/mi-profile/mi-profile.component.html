@@ -1,277 +1,224 @@
 <!-- Loading State -->
 <div *ngIf="loading" class="flex justify-content-center align-items-center" style="min-height: 60vh;">
   <div class="text-center">
-    <p-progressSpinner
-      strokeWidth="4"
-      fill="transparent"
-      animationDuration="1s">
-    </p-progressSpinner>
-    <h3 class="mt-4 text-primary font-medium">Cargando perfil...</h3>
+    <p-progressSpinner strokeWidth="4" animationDuration="1s"></p-progressSpinner>
+    <p class="mt-3 text-600">Cargando perfil...</p>
   </div>
 </div>
 
 <!-- Error State -->
-<div *ngIf="error && !loading" class="flex flex-column justify-content-center align-items-center text-center p-4" style="min-height: 50vh;">
-  <p-message
-    severity="error"
-    [text]="error"
-    styleClass="w-full max-w-30rem">
-  </p-message>
-  <p-button
-    label="Reintentar"
-    icon="pi pi-refresh"
-    (onClick)="cargarPerfil()"
-    styleClass="mt-3">
-  </p-button>
+<div *ngIf="error && !loading" class="flex flex-column justify-content-center align-items-center p-4" style="min-height: 50vh;">
+  <p-message severity="error" [text]="error" styleClass="w-full"></p-message>
+  <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="cargarPerfil()" styleClass="mt-3"></p-button>
 </div>
 
 <!-- Main Profile Content -->
-<div *ngIf="!loading && !error && perfil" class="p-4 lg:p-6 max-w-screen-xl mx-auto">
+<div *ngIf="!loading && !error && perfil" class="p-3 sm:p-4 lg:p-5">
 
-  <!-- Header Section -->
-  <div class="mb-6">
-    <p-card styleClass="border-round-lg shadow-4 mb-4">
-      <div class="flex flex-column lg:flex-row justify-content-between align-items-center gap-4 p-2">
+  <!-- Header Card -->
+  <p-card styleClass="mb-4">
+    <div class="flex flex-column sm:flex-row align-items-center sm:align-items-start gap-3">
 
-        <!-- Profile Avatar and Info Section -->
-        <div class="flex flex-column sm:flex-row align-items-center gap-3 text-center sm:text-left w-full lg:w-auto">
+      <!-- Avatar -->
+      <p-avatar
+        [label]="getUserInitials()"
+        size="xlarge"
+        shape="circle"
+        [style]="{'background-color': '#0077b5', 'color': '#ffffff', 'width': '80px', 'height': '80px', 'font-size': '1.8rem'}">
+      </p-avatar>
 
-          <!-- Avatar Container -->
-          <div class="flex-shrink-0">
-            <p-avatar
-              [label]="getUserInitials()"
-              size="xlarge"
-              shape="circle"
-              styleClass="shadow-3"
-              [style]="{'background-color': '#0077b5', 'color': '#ffffff', 'font-size': '2rem'}">
-            </p-avatar>
-          </div>
-
-          <!-- Profile Info -->
-          <div class="flex-1">
-            <h1 class="text-3xl lg:text-4xl font-bold text-900 mb-2 line-height-3">
-              {{ perfil.nombre_usuario }} {{ perfil.apellido || '' }}
-            </h1>
-            <p class="text-lg text-700 mb-3">{{ perfil.email_usuario }}</p>
-
-            <!-- Profile Meta -->
-            <div class="flex flex-column gap-2">
-              <div class="flex align-items-center gap-2 text-600">
-                <i class="pi pi-clock text-primary"></i>
-                <span class="text-sm" *ngIf="perfil.ultimo_acceso; else primerAcceso">
-                  Último acceso: {{ getFormattedDateTime(perfil.ultimo_acceso) }}
-                </span>
-                <ng-template #primerAcceso>
-                  <span class="text-sm">Primer acceso</span>
-                </ng-template>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Profile Actions -->
-        <div class="flex-shrink-0">
-          <p-tag
-            value="Administrador"
-            severity="success"
-            icon="pi pi-user"
-            styleClass="font-semibold">
-          </p-tag>
+      <!-- Profile Info -->
+      <div class="flex-1 text-center sm:text-left">
+        <h1 class="text-2xl sm:text-3xl font-bold text-900 m-0 mb-2">
+          {{ perfil.nombre_usuario }} {{ perfil.apellido || '' }}
+        </h1>
+        <p class="text-600 m-0 mb-2">{{ perfil.email_usuario }}</p>
+        <div class="flex align-items-center justify-content-center sm:justify-content-start gap-2 text-500 text-sm">
+          <i class="pi pi-clock"></i>
+          <span *ngIf="perfil.ultimo_acceso; else primerAcceso">
+            Último acceso: {{ getFormattedDateTime(perfil.ultimo_acceso) }}
+          </span>
+          <ng-template #primerAcceso>
+            <span>Primer acceso</span>
+          </ng-template>
         </div>
       </div>
-    </p-card>
-  </div>
+
+      <!-- Role Badge -->
+      <div class="flex-shrink-0">
+        <p-tag value="Administrador" severity="info" icon="pi pi-shield"></p-tag>
+      </div>
+    </div>
+  </p-card>
 
   <!-- Edit Profile Form -->
-  <div class="profile-form-section">
-    <p-card styleClass="border-round-lg shadow-3">
-      <ng-template pTemplate="header">
-        <div class="text-center p-4 bg-gray-50 border-round-top-lg">
-          <h2 class="text-2xl lg:text-3xl font-semibold text-900 mb-2 flex align-items-center justify-content-center gap-2">
-            <i class="pi pi-user-edit text-primary"></i>
-            Editar Perfil
-          </h2>
-          <p class="text-600 m-0">Actualiza tu información de administrador</p>
-        </div>
-      </ng-template>
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="px-3 py-4 border-bottom-1 surface-border">
+        <h2 class="text-xl sm:text-2xl font-semibold text-900 m-0 flex align-items-center gap-2">
+          <i class="pi pi-user-edit text-primary"></i>
+          Editar Perfil
+        </h2>
+      </div>
+    </ng-template>
 
-      <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()" class="p-4">
+    <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()" class="p-3">
 
-        <!-- Información Personal Section -->
-        <div class="mb-6 pb-4 border-bottom-1 surface-border">
-          <h3 class="flex align-items-center gap-3 mb-4 text-xl font-semibold text-700">
-            <i class="pi pi-user text-primary"></i>
-            Información Personal
-          </h3>
+      <!-- Información Personal -->
+      <div class="mb-5">
+        <h3 class="text-lg font-semibold text-700 mb-3 pb-2 border-bottom-1 surface-border flex align-items-center gap-2">
+          <i class="pi pi-user text-primary"></i>
+          Información Personal
+        </h3>
 
-          <div class="grid">
-            <!-- Nombre -->
-            <div class="col-12 md:col-6">
-              <div class="field mb-4">
-                <label for="nombre_usuario" class="block text-900 font-medium mb-2">
-                  Nombre <span class="text-red-500 font-bold">*</span>
-                </label>
-                <input
-                  pInputText
-                  id="nombre_usuario"
-                  type="text"
-                  formControlName="nombre_usuario"
-                  placeholder="Ingrese su nombre"
-                  [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('nombre_usuario') ? 'p-invalid' : '')"
-                />
-                <small *ngIf="isFieldInvalid('nombre_usuario')" class="p-error block mt-1">
-                  {{ getFieldError('nombre_usuario') }}
-                </small>
-              </div>
-            </div>
+        <div class="grid">
+          <!-- Nombre -->
+          <div class="col-12 sm:col-6">
+            <label for="nombre_usuario" class="block text-900 font-medium mb-2">
+              Nombre <span class="text-red-500">*</span>
+            </label>
+            <input
+              pInputText
+              id="nombre_usuario"
+              formControlName="nombre_usuario"
+              placeholder="Ingrese su nombre"
+              class="w-full"
+              [class.p-invalid]="isFieldInvalid('nombre_usuario')"
+            />
+            <small *ngIf="isFieldInvalid('nombre_usuario')" class="p-error block mt-1">
+              {{ getFieldError('nombre_usuario') }}
+            </small>
+          </div>
 
-            <!-- Apellido -->
-            <div class="col-12 md:col-6">
-              <div class="field mb-4">
-                <label for="apellido" class="block text-900 font-medium mb-2">
-                  Apellido <span class="text-red-500 font-bold">*</span>
-                </label>
-                <input
-                  pInputText
-                  id="apellido"
-                  type="text"
-                  formControlName="apellido"
-                  placeholder="Ingrese su apellido"
-                  [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('apellido') ? 'p-invalid' : '')"
-                />
-                <small *ngIf="isFieldInvalid('apellido')" class="p-error block mt-1">
-                  {{ getFieldError('apellido') }}
-                </small>
-              </div>
-            </div>
+          <!-- Apellido -->
+          <div class="col-12 sm:col-6">
+            <label for="apellido" class="block text-900 font-medium mb-2">
+              Apellido <span class="text-red-500">*</span>
+            </label>
+            <input
+              pInputText
+              id="apellido"
+              formControlName="apellido"
+              placeholder="Ingrese su apellido"
+              class="w-full"
+              [class.p-invalid]="isFieldInvalid('apellido')"
+            />
+            <small *ngIf="isFieldInvalid('apellido')" class="p-error block mt-1">
+              {{ getFieldError('apellido') }}
+            </small>
           </div>
         </div>
+      </div>
 
-        <!-- Información de Acceso Section -->
-        <div class="mb-6 pb-4 border-bottom-1 surface-border">
-          <h3 class="flex align-items-center gap-3 mb-4 text-xl font-semibold text-700">
-            <i class="pi pi-envelope text-primary"></i>
-            Información de Acceso
-          </h3>
+      <!-- Información de Acceso -->
+      <div class="mb-5">
+        <h3 class="text-lg font-semibold text-700 mb-3 pb-2 border-bottom-1 surface-border flex align-items-center gap-2">
+          <i class="pi pi-envelope text-primary"></i>
+          Información de Acceso
+        </h3>
 
-          <div class="grid">
-            <!-- Email -->
-            <div class="col-12">
-              <div class="field mb-4">
-                <label for="email_usuario" class="block text-900 font-medium mb-2">
-                  Correo electrónico <span class="text-red-500 font-bold">*</span>
-                </label>
-                <input
-                  pInputText
-                  id="email_usuario"
-                  type="email"
-                  formControlName="email_usuario"
-                  placeholder="admin@ejemplo.com"
-                  [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('email_usuario') ? 'p-invalid' : '')"
-                />
-                <small *ngIf="isFieldInvalid('email_usuario')" class="p-error block mt-1">
-                  {{ getFieldError('email_usuario') }}
-                </small>
-              </div>
-            </div>
+        <div class="grid">
+          <!-- Email -->
+          <div class="col-12">
+            <label for="email_usuario" class="block text-900 font-medium mb-2">
+              Correo electrónico <span class="text-red-500">*</span>
+            </label>
+            <input
+              pInputText
+              id="email_usuario"
+              type="email"
+              formControlName="email_usuario"
+              placeholder="admin@ejemplo.com"
+              class="w-full"
+              [class.p-invalid]="isFieldInvalid('email_usuario')"
+            />
+            <small *ngIf="isFieldInvalid('email_usuario')" class="p-error block mt-1">
+              {{ getFieldError('email_usuario') }}
+            </small>
           </div>
         </div>
+      </div>
 
-        <!-- Seguridad Section -->
-        <div class="mb-6 pb-4 border-bottom-1 surface-border">
-          <h3 class="flex align-items-center gap-3 mb-4 text-xl font-semibold text-700">
-            <i class="pi pi-lock text-primary"></i>
-            Seguridad
-          </h3>
+      <!-- Seguridad -->
+      <div class="mb-5">
+        <h3 class="text-lg font-semibold text-700 mb-3 pb-2 border-bottom-1 surface-border flex align-items-center gap-2">
+          <i class="pi pi-lock text-primary"></i>
+          Seguridad
+        </h3>
 
-          <div class="grid">
-            <!-- Nueva Contraseña -->
-            <div class="col-12 md:col-6">
-              <div class="field mb-4">
-                <label for="contrasenia" class="block text-900 font-medium mb-2">
-                  Nueva Contraseña
-                </label>
-                <span class="p-input-icon-left p-input-icon-right w-full">
-                  <i class="pi pi-lock"></i>
-                  <input
-                    pInputText
-                    id="contrasenia"
-                    [type]="getPasswordInputType('contrasenia')"
-                    formControlName="contrasenia"
-                    placeholder="Mínimo 6 caracteres"
-                    [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('contrasenia') ? 'p-invalid' : '')"
-                  />
-                  <i class="pi pi-eye cursor-pointer"
-                     [class]="showPassword ? 'pi-eye-slash' : 'pi-eye'"
-                     (click)="togglePasswordVisibility('contrasenia')"></i>
-                </span>
-                <small *ngIf="isFieldInvalid('contrasenia')" class="p-error block mt-1">
-                  {{ getFieldError('contrasenia') }}
-                </small>
-                <small class="text-600 block mt-1">
-                  Deja en blanco para mantener la contraseña actual
-                </small>
-              </div>
-            </div>
+        <div class="grid">
+          <!-- Nueva Contraseña -->
+          <div class="col-12 sm:col-6">
+            <label for="contrasenia" class="block text-900 font-medium mb-2">
+              Nueva Contraseña
+            </label>
+            <p-password
+              id="contrasenia"
+              formControlName="contrasenia"
+              placeholder="Mínimo 6 caracteres"
+              [toggleMask]="true"
+              [feedback]="false"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              [class.p-invalid]="isFieldInvalid('contrasenia')">
+            </p-password>
+            <small *ngIf="isFieldInvalid('contrasenia')" class="p-error block mt-1">
+              {{ getFieldError('contrasenia') }}
+            </small>
+            <small class="text-500 block mt-1 text-sm">
+              Deja en blanco para mantener la contraseña actual
+            </small>
+          </div>
 
-            <!-- Confirmar Contraseña -->
-            <div class="col-12 md:col-6">
-              <div class="field mb-4">
-                <label for="confirmarContrasenia" class="block text-900 font-medium mb-2">
-                  Confirmar Contraseña
-                </label>
-                <span class="p-input-icon-left p-input-icon-right w-full">
-                  <i class="pi pi-lock"></i>
-                  <input
-                    pInputText
-                    id="confirmarContrasenia"
-                    [type]="getPasswordInputType('confirmarContrasenia')"
-                    formControlName="confirmarContrasenia"
-                    placeholder="Repite la contraseña"
-                    [class]="'w-full p-inputtext-lg ' + (isFieldInvalid('confirmarContrasenia') ? 'p-invalid' : '')"
-                  />
-                  <i class="pi pi-eye cursor-pointer"
-                     [class]="showConfirmPassword ? 'pi-eye-slash' : 'pi-eye'"
-                     (click)="togglePasswordVisibility('confirmarContrasenia')"></i>
-                </span>
-                <small *ngIf="perfilForm.hasError('passwordMismatch') && perfilForm.get('confirmarContrasenia')?.touched" class="p-error block mt-1">
-                  Las contraseñas no coinciden
-                </small>
-              </div>
-            </div>
+          <!-- Confirmar Contraseña -->
+          <div class="col-12 sm:col-6">
+            <label for="confirmarContrasenia" class="block text-900 font-medium mb-2">
+              Confirmar Contraseña
+            </label>
+            <p-password
+              id="confirmarContrasenia"
+              formControlName="confirmarContrasenia"
+              placeholder="Repite la contraseña"
+              [toggleMask]="true"
+              [feedback]="false"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              [class.p-invalid]="isFieldInvalid('confirmarContrasenia')">
+            </p-password>
+            <small *ngIf="perfilForm.hasError('passwordMismatch') && perfilForm.get('confirmarContrasenia')?.touched" class="p-error block mt-1">
+              Las contraseñas no coinciden
+            </small>
           </div>
         </div>
+      </div>
 
-        <!-- Submit Buttons -->
-        <div class="flex justify-content-center gap-3">
-          <p-button
-            type="button"
-            label="Descartar"
-            icon="pi pi-refresh"
-            severity="secondary"
-            [disabled]="!hasFormChanges"
-            (click)="descartarCambios()"
-            styleClass="flex-1 sm:flex-initial px-6 py-3 font-semibold">
-          </p-button>
-          <p-button
-            type="button"
-            label="Actualizar"
-            icon="pi pi-save"
-            [loading]="updating"
-            [disabled]="perfilForm.invalid || !hasFormChanges"
-            (click)="onUpdateClick()"
-            styleClass="flex-1 sm:flex-initial px-6 py-3 font-semibold">
-          </p-button>
-        </div>
-      </form>
-    </p-card>
-  </div>
+      <!-- Action Buttons -->
+      <div class="flex flex-column lg:flex-row justify-content-center gap-2 lg:gap-3">
+        <p-button
+          type="button"
+          label="Descartar"
+          icon="pi pi-refresh"
+          severity="secondary"
+          [disabled]="!hasFormChanges"
+          (click)="descartarCambios()"
+          styleClass="w-full lg:w-auto">
+        </p-button>
+        <p-button
+          type="button"
+          label="Actualizar Perfil"
+          icon="pi pi-save"
+          [loading]="updating"
+          [disabled]="perfilForm.invalid || !hasFormChanges"
+          (click)="onUpdateClick()"
+          styleClass="w-full lg:w-auto">
+        </p-button>
+      </div>
+    </form>
+  </p-card>
 </div>
 
-<!-- Toast para mensajes -->
-<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
 
-<!-- Modal para confirmar actualización de perfil -->
+<!-- Confirmation Dialog -->
 <p-dialog
   [(visible)]="displayUpdateDialog"
   header="Confirmar actualización"
@@ -287,8 +234,8 @@
   [responsive]="true"
   [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
   [dismissableMask]="true"
-  (onHide)="cancelarActualizacion()"
->
+  (onHide)="cancelarActualizacion()">
+
   <div class="p-4">
     <!-- Information Section -->
     <div class="mb-6">
