@@ -71,13 +71,13 @@ const obtenerEncuestasDisponibles = async (req, res) => {
         let progresoUsuario = 0;
 
         if (sesion) {
-          console.log(`📋 Encuesta ${encuesta.id} - Sesión encontrada:`, {
+          console.log(`Encuesta ${encuesta.id} - Sesión encontrada:`, {
             sesion_id: sesion.id,
             sesion_estado: sesion.estado,
             sesion_progreso: sesion.progreso,
             total_respuestas: totalRespuestas
           });
-          
+
           if (sesion.estado === 'COMPLETADA') {
             estadoUsuario = 'COMPLETADA';
             progresoUsuario = 100;
@@ -85,8 +85,8 @@ const obtenerEncuestasDisponibles = async (req, res) => {
             estadoUsuario = 'EN_PROGRESO';
             progresoUsuario = sesion.progreso || Math.round((totalRespuestas / totalPreguntas) * 100);
           }
-          
-          console.log(`  ➡️ Estado determinado: ${estadoUsuario} (${progresoUsuario}%)`);
+
+          console.log(`Estado determinado: ${estadoUsuario} (${progresoUsuario}%)`);
         }
 
         return {
@@ -355,7 +355,7 @@ const enviarRespuestas = async (req, res) => {
       }
     });
 
-    console.log('🗑️ Respuestas anteriores eliminadas, guardando respuestas finales...');
+    console.log('Respuestas anteriores eliminadas, guardando respuestas finales...');
 
     // Guardar respuestas finales
     const respuestasGuardadas = [];
@@ -375,13 +375,13 @@ const enviarRespuestas = async (req, res) => {
       }
     }
 
-    console.log(`✅ ${respuestasGuardadas.length} respuestas finales guardadas`);
+    console.log(`${respuestasGuardadas.length} respuestas finales guardadas`);
 
     // Calcular tiempo total: acumulado + tiempo de esta sesión
     const tiempoAcumuladoPrevio = sesion.tiempo_acumulado || 0;
     const tiempoTotalFinal = tiempoAcumuladoPrevio + (tiempo_transcurrido || 0);
 
-    console.log(`⏱️ Tiempo acumulado previo: ${tiempoAcumuladoPrevio}s, Tiempo esta sesión: ${tiempo_transcurrido}s, Total: ${tiempoTotalFinal}s`);
+    console.log(`Tiempo acumulado previo: ${tiempoAcumuladoPrevio}s, Tiempo esta sesión: ${tiempo_transcurrido}s, Total: ${tiempoTotalFinal}s`);
 
     // Actualizar sesión
     await sesion.update({
@@ -430,13 +430,13 @@ const guardarProgresoEncuesta = async (req, res) => {
     const { respuestas, session_token, pregunta_actual, progreso, tiempo_transcurrido } = req.body;
     const usuarioId = req.usuario.id;
 
-    console.log('🔵 guardarProgresoEncuesta - Inicio');
-    console.log('  - Encuesta ID:', id);
-    console.log('  - Usuario ID:', usuarioId);
-    console.log('  - Progreso recibido:', progreso);
-    console.log('  - Pregunta actual:', pregunta_actual);
-    console.log('  - Total respuestas:', respuestas?.length);
-    console.log('  - Tiempo transcurrido:', tiempo_transcurrido, 'segundos');
+    console.log('guardarProgresoEncuesta - Inicio');
+    console.log('Encuesta ID:', id);
+    console.log('Usuario ID:', usuarioId);
+    console.log('Progreso recibido:', progreso);
+    console.log('Pregunta actual:', pregunta_actual);
+    console.log('Total respuestas:', respuestas?.length);
+    console.log('Tiempo transcurrido:', tiempo_transcurrido, 'segundos');
 
     // Verificar que la encuesta esté activa
     const encuesta = await Encuesta.findOne({
@@ -481,14 +481,14 @@ const guardarProgresoEncuesta = async (req, res) => {
         progreso: 0,
         pregunta_actual: 0
       });
-      console.log('✅ Sesión creada con estado EN_PROGRESO:', sesion.id);
+      console.log('Sesión creada con estado EN_PROGRESO:', sesion.id);
     }
 
     // Guardar/actualizar respuestas (sin marcar como completadas)
     if (respuestas && Array.isArray(respuestas) && respuestas.length > 0) {
       let respuestasCreadas = 0;
       let respuestasActualizadas = 0;
-      
+
       for (const respuesta of respuestas) {
         // Verificar si ya existe una respuesta para esta pregunta
         const respuestaExistente = await Respuesta.findOne({
@@ -519,8 +519,8 @@ const guardarProgresoEncuesta = async (req, res) => {
           respuestasCreadas++;
         }
       }
-      
-      console.log(`💾 Respuestas guardadas: ${respuestasCreadas} nuevas, ${respuestasActualizadas} actualizadas`);
+
+      console.log(`Respuestas guardadas: ${respuestasCreadas} nuevas, ${respuestasActualizadas} actualizadas`);
     }
 
     // Recalcular el progreso real basado en las respuestas guardadas en BD
@@ -538,17 +538,17 @@ const guardarProgresoEncuesta = async (req, res) => {
       }
     });
 
-    const progresoReal = totalPreguntasEncuesta > 0 
-      ? Math.round((totalRespuestasGuardadas / totalPreguntasEncuesta) * 100) 
+    const progresoReal = totalPreguntasEncuesta > 0
+      ? Math.round((totalRespuestasGuardadas / totalPreguntasEncuesta) * 100)
       : 0;
 
-    console.log(`📊 Progreso recalculado: ${totalRespuestasGuardadas}/${totalPreguntasEncuesta} = ${progresoReal}%`);
+    console.log(`Progreso recalculado: ${totalRespuestasGuardadas}/${totalPreguntasEncuesta} = ${progresoReal}%`);
 
     // Calcular tiempo acumulado
     const tiempoAcumuladoPrevio = sesion.tiempo_acumulado || 0;
     const nuevoTiempoAcumulado = tiempoAcumuladoPrevio + (tiempo_transcurrido || 0);
 
-    console.log(`⏱️ Actualizando tiempo: ${tiempoAcumuladoPrevio}s + ${tiempo_transcurrido}s = ${nuevoTiempoAcumulado}s`);
+    console.log(`Actualizando tiempo: ${tiempoAcumuladoPrevio}s + ${tiempo_transcurrido}s = ${nuevoTiempoAcumulado}s`);
 
     // Actualizar sesión con el progreso real y tiempo acumulado
     await sesion.update({
@@ -561,7 +561,7 @@ const guardarProgresoEncuesta = async (req, res) => {
 
     // Recargar sesión para confirmar el estado
     await sesion.reload();
-    console.log('📊 Estado final de la sesión:', {
+    console.log('Estado final de la sesión:', {
       id: sesion.id,
       estado: sesion.estado,
       progreso: sesion.progreso,

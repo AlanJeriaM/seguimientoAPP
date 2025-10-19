@@ -385,8 +385,8 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
 
   private renderDistribucionSalarialChart() {
-    console.log('🎨 Intentando renderizar gráfico de distribución salarial...');
-    console.log('📊 Datos disponibles:', this.distribucionSalarial?.length, this.distribucionSalarial);
+    console.log('Intentando renderizar gráfico de distribución salarial...');
+    console.log('Datos disponibles:', this.distribucionSalarial?.length, this.distribucionSalarial);
 
     const ctx = document.getElementById('distribucionSalarialChart') as HTMLCanvasElement;
     if (!ctx) {

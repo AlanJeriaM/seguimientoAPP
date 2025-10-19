@@ -74,7 +74,7 @@ const obtenerUsuarios = async (req, res) => {
     // Formatear datos para mejor visualización
     const usuariosFormateados = users.rows.map(user => {
       // Debug: Log de datos antes del formateo
-      console.log('🔍 Usuario antes del formateo:', {
+      console.log('Usuario antes del formateo:', {
         id: user.id,
         nombre: user.nombre,
         nivel_educacion: user.nivel_educacion,
@@ -252,7 +252,7 @@ const obtenerMiPerfil = async (req, res) => {
   try {
     const user = req.user; // Viene del middleware
 
-    console.log('📋 Datos completos del usuario desde middleware:', {
+    console.log('Datos completos del usuario desde middleware:', {
       id: user.id,
       nombre: user.nombre,
       created_at: user.created_at,
@@ -263,7 +263,7 @@ const obtenerMiPerfil = async (req, res) => {
 
     // Debug de fecha de registro
     const fechaRegistro = user.created_at || user.createdAt || new Date();
-    console.log('🗓️ Fecha de registro calculada:', {
+    console.log('Fecha de registro calculada:', {
       created_at: user.created_at,
       createdAt: user.createdAt,
       fechaRegistro: fechaRegistro,
@@ -381,14 +381,14 @@ const actualizarMiPerfil = async (req, res) => {
     let nivelEducacionFinal = nivel_educacion;
     if (Array.isArray(nivel_educacion) && nivel_educacion.includes('Otra especialización') && nivel_educacion_otro?.trim()) {
       // Reemplazar "Otra especialización" con el valor personalizado
-      nivelEducacionFinal = nivel_educacion.map(nivel => 
+      nivelEducacionFinal = nivel_educacion.map(nivel =>
         nivel === 'Otra especialización' ? nivel_educacion_otro.trim() : nivel
       );
     }
 
     // Verificar si el nombre cambió para marcar como editado manualmente
     const nombreCambio = user.nombre !== nombre.trim();
-    
+
     // Actualizar datos del usuario con normalización
     const datosActualizados = {
       nombre: nombre.trim(),
@@ -433,7 +433,7 @@ const actualizarMiPerfil = async (req, res) => {
     // Marcar nombre como editado manualmente si cambió
     if (nombreCambio) {
       datosActualizados.nombre_editado_manual = true;
-      console.log(`📝 Nombre editado manualmente por usuario ${user.id}: "${user.nombre}" → "${nombre.trim()}"`);
+      console.log(`Nombre editado manualmente por usuario ${user.id}: "${user.nombre}" → "${nombre.trim()}"`);
     }
 
     console.log('Datos que se van a guardar en BD:', datosActualizados);
@@ -549,7 +549,7 @@ const actualizarUsuario = async (req, res) => {
 
     // Verificar si el nombre cambió para marcar como editado manualmente
     const nombreCambio = user.nombre !== nombre.trim();
-    
+
     // Actualizar datos del usuario con normalización
     const datosActualizados = {
       nombre: nombre.trim(),
@@ -575,7 +575,7 @@ const actualizarUsuario = async (req, res) => {
     // Marcar nombre como editado manualmente si cambió
     if (nombreCambio) {
       datosActualizados.nombre_editado_manual = true;
-      console.log(`📝 Nombre editado manualmente para usuario ${user.id}: "${user.nombre}" → "${nombre.trim()}"`);
+      console.log(`Nombre editado manualmente para usuario ${user.id}: "${user.nombre}" → "${nombre.trim()}"`);
     }
 
     await user.update(datosActualizados);

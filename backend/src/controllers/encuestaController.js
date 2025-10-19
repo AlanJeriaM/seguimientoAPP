@@ -4,14 +4,14 @@ const { Op } = require('sequelize');
 // Crear nueva encuesta
 const crearEncuesta = async (req, res) => {
   try {
-    const { 
-      titulo, 
-      descripcion, 
-      estado, 
-      fecha_inicio, 
-      fecha_fin, 
+    const {
+      titulo,
+      descripcion,
+      estado,
+      fecha_inicio,
+      fecha_fin,
       es_anonima,
-      preguntas 
+      preguntas
     } = req.body;
 
     const adminId = req.usuario.id;
@@ -53,7 +53,7 @@ const crearEncuesta = async (req, res) => {
 
     // Si la encuesta está activa, crear notificaciones para todos los usuarios
     if (estado === 'ACTIVA') {
-      const usuarios = await User.findAll({ 
+      const usuarios = await User.findAll({
         where: { activo: true },
         attributes: ['id']
       });
@@ -121,19 +121,19 @@ const obtenerEncuestas = async (req, res) => {
         { titulo: { [Op.like]: `%${search}%` } },
         { descripcion: { [Op.like]: `%${search}%` } }
       ];
-      
+
       // Si es un número, buscar también por ID
       if (!isNaN(search)) {
         searchConditions.push({ id: parseInt(search) });
       }
-      
+
       // Buscar por estado si coincide
       const estadosBusqueda = ['BORRADOR', 'ACTIVA'];
       const estadoMatch = estadosBusqueda.find(e => e.toLowerCase().includes(searchLower));
       if (estadoMatch) {
         searchConditions.push({ estado: estadoMatch });
       }
-      
+
       whereClause[Op.or] = searchConditions;
     }
 
@@ -159,7 +159,7 @@ const obtenerEncuestas = async (req, res) => {
     if (estado === 'PROXIMAMENTE' || estado === 'EXPIRADA' || estado === 'ACTIVA') {
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
-      
+
       encuestasFiltradas = encuestas.filter(encuesta => {
         if (estado === 'EXPIRADA') {
           // Encuesta expirada: tiene fecha_fin y ya pasó
@@ -188,7 +188,7 @@ const obtenerEncuestas = async (req, res) => {
                 return false; // Es próxima, no activa
               }
             }
-            
+
             // Verificar si no expiró
             if (encuesta.fecha_fin) {
               const fechaFin = new Date(encuesta.fecha_fin);
@@ -197,7 +197,7 @@ const obtenerEncuestas = async (req, res) => {
                 return false; // Expiró, no activa
               }
             }
-            
+
             return true; // Es realmente activa
           }
           return false;
@@ -211,7 +211,7 @@ const obtenerEncuestas = async (req, res) => {
       encuestasFiltradas.map(async (encuesta) => {
         // Contar usuarios únicos que completaron la encuesta
         const usuariosCompletaron = await SesionEncuesta.count({
-          where: { 
+          where: {
             encuesta_id: encuesta.id,
             estado: 'COMPLETADA'
           },
@@ -220,7 +220,7 @@ const obtenerEncuestas = async (req, res) => {
         });
 
         const totalPreguntas = await Pregunta.count({
-          where: { 
+          where: {
             encuesta_id: encuesta.id,
             activo: true
           }
@@ -259,8 +259,8 @@ const obtenerEncuestas = async (req, res) => {
     }
 
     // Calcular el total correcto considerando filtros por estados calculados
-    const totalFinal = (estado === 'PROXIMAMENTE' || estado === 'EXPIRADA' || estado === 'ACTIVA') ? 
-      encuestasConStats.length : 
+    const totalFinal = (estado === 'PROXIMAMENTE' || estado === 'EXPIRADA' || estado === 'ACTIVA') ?
+      encuestasConStats.length :
       (search ? encuestasConStats.length : totalCount);
 
     res.json({
@@ -289,7 +289,7 @@ const obtenerEncuestaPorId = async (req, res) => {
     const adminId = req.usuario.id;
 
     const encuesta = await Encuesta.findOne({
-      where: { 
+      where: {
         id: id,
         activo: true
       },
@@ -331,7 +331,7 @@ const obtenerEncuestaPorId = async (req, res) => {
             pregunta.opciones = pregunta.opciones.split(',').map(opt => opt.trim()).filter(opt => opt);
           }
         }
-        
+
         if (pregunta.configuracion && typeof pregunta.configuracion === 'string') {
           try {
             pregunta.configuracion = JSON.parse(pregunta.configuracion);
@@ -360,21 +360,21 @@ const obtenerEncuestaPorId = async (req, res) => {
 const actualizarEncuesta = async (req, res) => {
   try {
     const { id } = req.params;
-    const { 
-      titulo, 
-      descripcion, 
-      estado, 
-      fecha_inicio, 
-      fecha_fin, 
+    const {
+      titulo,
+      descripcion,
+      estado,
+      fecha_inicio,
+      fecha_fin,
       es_anonima,
-      preguntas 
+      preguntas
     } = req.body;
 
     const adminId = req.usuario.id;
 
     // Permitir que cualquier admin pueda actualizar cualquier encuesta
     const encuesta = await Encuesta.findOne({
-      where: { 
+      where: {
         id: id,
         activo: true
       }
@@ -393,7 +393,7 @@ const actualizarEncuesta = async (req, res) => {
       // Verificar si se están modificando las fechas de inicio o fin
       const fechaInicioCambiada = fecha_inicio && new Date(fecha_inicio).getTime() !== new Date(encuesta.fecha_inicio || 0).getTime();
       const fechaFinCambiada = fecha_fin && new Date(fecha_fin).getTime() !== new Date(encuesta.fecha_fin || 0).getTime();
-      
+
       // Si no se están modificando las fechas, no permitir activar
       if (!fechaInicioCambiada && !fechaFinCambiada) {
         return res.status(400).json({
@@ -438,7 +438,7 @@ const actualizarEncuesta = async (req, res) => {
 
     // Si se activa la encuesta, crear notificaciones
     if (estado === 'ACTIVA' && encuesta.estado !== 'ACTIVA') {
-      const usuarios = await User.findAll({ 
+      const usuarios = await User.findAll({
         where: { activo: true },
         attributes: ['id']
       });
@@ -479,7 +479,7 @@ const eliminarEncuesta = async (req, res) => {
 
     // Permitir que cualquier admin elimine cualquier encuesta (super admin)
     const encuesta = await Encuesta.findOne({
-      where: { 
+      where: {
         id: id,
         activo: true
       }
@@ -495,7 +495,7 @@ const eliminarEncuesta = async (req, res) => {
     // Verificar si tiene respuestas (solo para información)
     const tieneRespuestas = await Respuesta.count({ where: { encuesta_id: id } });
     let mensaje = 'Encuesta eliminada correctamente';
-    
+
     if (tieneRespuestas > 0) {
       mensaje = `Encuesta eliminada correctamente (${tieneRespuestas} respuesta(s) preservadas)`;
     }
@@ -544,7 +544,7 @@ const obtenerEncuestasEliminadas = async (req, res) => {
         { titulo: { [Op.like]: `%${search}%` } },
         { descripcion: { [Op.like]: `%${search}%` } }
       ];
-      
+
       // Si es un número, buscar también por ID
       if (!isNaN(search)) {
         whereClause[Op.or].push({ id: parseInt(search) });
@@ -590,7 +590,7 @@ const reactivarEncuesta = async (req, res) => {
 
     // Permitir que cualquier admin pueda reactivar cualquier encuesta
     const encuesta = await Encuesta.findOne({
-      where: { 
+      where: {
         id: id,
         activo: false
       }
@@ -653,7 +653,7 @@ const eliminarEncuestaPermanentemente = async (req, res) => {
 
     // Permitir que cualquier admin elimine cualquier encuesta (super admin)
     const encuesta = await Encuesta.findOne({
-      where: { 
+      where: {
         id: id,
         activo: false
       }
@@ -673,7 +673,7 @@ const eliminarEncuestaPermanentemente = async (req, res) => {
 
     // El parámetro force_delete=true permite eliminar incluso con respuestas
     const forceDelete = req.query.force_delete === 'true';
-    
+
     if (tieneRespuestas > 0 && !forceDelete) {
       return res.status(200).json({
         ok: false,
@@ -690,32 +690,32 @@ const eliminarEncuestaPermanentemente = async (req, res) => {
 
     // Eliminar todos los datos relacionados en orden correcto
     console.log(`Eliminación permanente iniciada para encuesta: ${encuesta.titulo} (ID: ${id})`);
-    
+
     // 1. Eliminar respuestas
     if (tieneRespuestas > 0) {
       await Respuesta.destroy({ where: { encuesta_id: id } });
-      console.log(`- ${tieneRespuestas} respuestas eliminadas`);
+      console.log(`${tieneRespuestas} respuestas eliminadas`);
     }
-    
+
     // 2. Eliminar sesiones
     if (totalSesiones > 0) {
       await SesionEncuesta.destroy({ where: { encuesta_id: id } });
-      console.log(`- ${totalSesiones} sesiones eliminadas`);
+      console.log(`${totalSesiones} sesiones eliminadas`);
     }
-    
+
     // 3. Eliminar notificaciones
     if (totalNotificaciones > 0) {
       await Notificacion.destroy({ where: { encuesta_id: id } });
-      console.log(`- ${totalNotificaciones} notificaciones eliminadas`);
+      console.log(`${totalNotificaciones} notificaciones eliminadas`);
     }
-    
+
     // 4. Eliminar preguntas
     await Pregunta.destroy({ where: { encuesta_id: id } });
-    console.log(`- Preguntas eliminadas`);
-    
+    console.log(`Preguntas eliminadas`);
+
     // 5. Eliminar encuesta
     await encuesta.destroy();
-    console.log(`- Encuesta eliminada`);
+    console.log(`Encuesta eliminada`);
 
     console.log(`Encuesta eliminada permanentemente: ${encuesta.titulo} (ID: ${id})`);
 

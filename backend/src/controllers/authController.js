@@ -197,7 +197,7 @@ const linkedinCallback = async (req, res) => {
         console.log('Usuario creado con ID:', user.id);
       } else {
         console.log('Actualizando usuario existente...');
-        
+
         // Solo actualizar campos que están vacíos o null para preservar datos editados por el usuario
         const datosParaActualizar = {
           // Solo actualizar correo y datos de LinkedIn (siempre necesarios)
@@ -229,8 +229,8 @@ const linkedinCallback = async (req, res) => {
           datosParaActualizar.industria = normalizeText(linkedinData.industria);
         }
 
-        console.log('📋 Datos que se actualizarán:', datosParaActualizar);
-        
+        console.log('Datos que se actualizarán:', datosParaActualizar);
+
         await user.update(datosParaActualizar);
         console.log('Usuario actualizado');
       }

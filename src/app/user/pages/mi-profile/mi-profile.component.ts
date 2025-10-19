@@ -97,12 +97,12 @@ export class MiProfileComponent implements OnInit, OnDestroy {
   // Método para parsear campos que pueden venir como string JSON o array
   parseArrayField(field: any): any[] {
     if (!field) return [];
-    
+
     // Si ya es un array, retornarlo
     if (Array.isArray(field)) {
       return field.filter(item => item !== null && item !== undefined && item !== '');
     }
-    
+
     // Si es string, intentar parsearlo como JSON
     if (typeof field === 'string') {
       try {
@@ -117,7 +117,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         return field.trim() ? [field.trim()] : [];
       }
     }
-    
+
     return [];
   }
 
@@ -347,11 +347,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Comparar opciones personalizadas de educación
     const initialOpcionesEducacion = initial.opciones_personalizadas_educacion || [];
     const currentOpcionesEducacion = this.opcionesPersonalizadasEducacion || [];
-    
+
     if (initialOpcionesEducacion.length !== currentOpcionesEducacion.length) {
       return true;
     }
-    
+
     for (let i = 0; i < initialOpcionesEducacion.length; i++) {
       if (initialOpcionesEducacion[i] !== currentOpcionesEducacion[i]) {
         return true;
@@ -361,11 +361,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Comparar opciones personalizadas de tecnologías
     const initialOpcionesTecnologias = initial.opciones_personalizadas_tecnologias || [];
     const currentOpcionesTecnologias = this.opcionesPersonalizadasTecnologias || [];
-    
+
     if (initialOpcionesTecnologias.length !== currentOpcionesTecnologias.length) {
       return true;
     }
-    
+
     for (let i = 0; i < initialOpcionesTecnologias.length; i++) {
       if (initialOpcionesTecnologias[i] !== currentOpcionesTecnologias[i]) {
         return true;
@@ -375,11 +375,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Comparar opciones personalizadas de área de interés
     const initialOpcionesAreaInteres = initial.opciones_personalizadas_area_interes || [];
     const currentOpcionesAreaInteres = this.opcionesPersonalizadasAreaInteres || [];
-    
+
     if (initialOpcionesAreaInteres.length !== currentOpcionesAreaInteres.length) {
       return true;
     }
-    
+
     for (let i = 0; i < initialOpcionesAreaInteres.length; i++) {
       if (initialOpcionesAreaInteres[i] !== currentOpcionesAreaInteres[i]) {
         return true;
@@ -389,11 +389,11 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Comparar opciones personalizadas de industria
     const initialOpcionesIndustria = initial.opciones_personalizadas_industria || [];
     const currentOpcionesIndustria = this.opcionesPersonalizadasIndustria || [];
-    
+
     if (initialOpcionesIndustria.length !== currentOpcionesIndustria.length) {
       return true;
     }
-    
+
     for (let i = 0; i < initialOpcionesIndustria.length; i++) {
       if (initialOpcionesIndustria[i] !== currentOpcionesIndustria[i]) {
         return true;
@@ -500,41 +500,41 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-    
+
     console.log('Eliminando opción personalizada de tecnología:', option);
-    
+
     // Verificar que la opción existe antes de eliminar
     if (!this.opcionesPersonalizadasTecnologias.includes(option)) {
       console.log('Opción no encontrada en opciones personalizadas de tecnologías');
       return;
     }
-    
+
     // Remover de opciones personalizadas
     const index = this.opcionesPersonalizadasTecnologias.indexOf(option);
     if (index > -1) {
       this.opcionesPersonalizadasTecnologias.splice(index, 1);
       console.log('Opción removida de opciones personalizadas de tecnologías');
     }
-    
+
     // Reconstruir la lista completa sin la opción eliminada
     this.reconstruirListaTecnologias();
     console.log('Lista de tecnologías reconstruida:', this.especialidadesTecnicas);
-    
+
     // Deseleccionar si estaba seleccionada
     const valoresActuales = this.perfilForm.get('especialidad_tecnica')?.value || [];
     const valoresSinEliminada = valoresActuales.filter((valor: string) => valor !== option);
     this.perfilForm.get('especialidad_tecnica')?.setValue(valoresSinEliminada);
     console.log('Valores de tecnologías actualizados:', valoresSinEliminada);
-    
+
     // Forzar detección de cambios
     this.cdr.detectChanges();
-    
+
     // Guardar cambios
     this.guardarOpcionesPersonalizadasTecnologias();
-    
+
     // Detectar cambios después de eliminar opción
     this.detectFormChanges();
-    
+
     // Mostrar mensaje de confirmación
     this.messageService.add({
       severity: 'success',
@@ -620,7 +620,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       // Verificar que no exista ya (comparar con versiones normalizadas)
       const nivelesBaseNormalizados = this.nivelesEducacionBase.map(n => this.normalizeText(n));
       const opcionesPersonalizadasNormalizadas = this.opcionesPersonalizadasEducacion.map(n => this.normalizeText(n));
-      
+
       if (!nivelesBaseNormalizados.includes(opcionNormalizada) && !opcionesPersonalizadasNormalizadas.includes(opcionNormalizada)) {
         // Agregar a opciones personalizadas (guardar normalizado)
         this.opcionesPersonalizadasEducacion.push(opcionNormalizada);
@@ -676,7 +676,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       // Verificar que no exista ya (comparar con versiones normalizadas)
       const especialidadesBaseNormalizadas = this.especialidadesTecnicasBase.map(t => this.normalizeText(t));
       const opcionesPersonalizadasNormalizadas = this.opcionesPersonalizadasTecnologias.map(t => this.normalizeText(t));
-      
+
       if (!especialidadesBaseNormalizadas.includes(opcionNormalizada) && !opcionesPersonalizadasNormalizadas.includes(opcionNormalizada)) {
         // Agregar a opciones personalizadas (guardar normalizado)
         this.opcionesPersonalizadasTecnologias.push(opcionNormalizada);
@@ -735,39 +735,39 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-    
+
     console.log('Eliminando opción personalizada de área de interés:', option);
-    
+
     // Verificar que la opción existe antes de eliminar
     if (!this.opcionesPersonalizadasAreaInteres.includes(option)) {
       console.log('Opción no encontrada en opciones personalizadas de área de interés');
       return;
     }
-    
+
     // Remover de opciones personalizadas
     const index = this.opcionesPersonalizadasAreaInteres.indexOf(option);
     if (index > -1) {
       this.opcionesPersonalizadasAreaInteres.splice(index, 1);
       console.log('Opción removida de opciones personalizadas de área de interés');
     }
-    
+
     // Reconstruir la lista completa sin la opción eliminada
     this.reconstruirListaAreasInteres();
     console.log('Lista de áreas de interés reconstruida:', this.areasInteres);
-    
+
     // Deseleccionar si estaba seleccionada
     const valorActual = this.perfilForm.get('area_interes')?.value || '';
     if (valorActual === option) {
       this.perfilForm.get('area_interes')?.setValue('');
       console.log('Área de interés deseleccionada');
     }
-    
+
     // Forzar detección de cambios
     this.cdr.detectChanges();
-    
+
     // Guardar cambios
     this.guardarOpcionesPersonalizadasAreaInteres();
-    
+
     // Mostrar mensaje de confirmación
     this.messageService.add({
       severity: 'success',
@@ -778,7 +778,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   agregarAreaInteres() {
     const nuevaOpcion = this.nuevaAreaInteres.trim();
-    
+
     if (!nuevaOpcion) {
       this.messageService.add({
         severity: 'warn',
@@ -794,7 +794,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Verificar que no existe ya (comparar con versiones normalizadas)
     const areasInteresBaseNormalizadas = this.areasInteresBase.map(a => this.normalizeText(a));
     const opcionesPersonalizadasNormalizadas = this.opcionesPersonalizadasAreaInteres.map(a => this.normalizeText(a));
-    
+
     if (!areasInteresBaseNormalizadas.includes(opcionNormalizada) && !opcionesPersonalizadasNormalizadas.includes(opcionNormalizada)) {
       // Agregar a opciones personalizadas (guardar normalizado)
       this.opcionesPersonalizadasAreaInteres.push(opcionNormalizada);
@@ -891,24 +891,24 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     event.stopImmediatePropagation();
 
     console.log('Eliminando opción personalizada de industria:', option);
-    
+
     // Verificar que la opción existe antes de eliminar
     if (!this.opcionesPersonalizadasIndustria.includes(option)) {
       console.log('Opción no encontrada en opciones personalizadas de industria');
       return;
     }
-    
+
     // Remover de opciones personalizadas
     const index = this.opcionesPersonalizadasIndustria.indexOf(option);
     if (index > -1) {
       this.opcionesPersonalizadasIndustria.splice(index, 1);
       console.log('Opción removida de opciones personalizadas de industria');
     }
-    
+
     // Reconstruir la lista completa sin la opción eliminada
     this.reconstruirListaIndustrias();
     console.log('Lista de industrias reconstruida:', this.industriasOpciones);
-    
+
     // Deseleccionar si estaba seleccionada
     const valorActual = this.perfilForm.get('industria')?.value || '';
     if (valorActual === option) {
@@ -928,7 +928,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
   agregarIndustria() {
     const nuevaOpcion = this.nuevaIndustria.trim();
-    
+
     if (!nuevaOpcion) {
       this.messageService.add({
         severity: 'warn',
@@ -945,7 +945,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     // Verificar que no existe ya (comparar con versiones normalizadas)
     const industriasBaseNormalizadas = this.industriasBase.map(i => this.normalizeText(i));
     const opcionesPersonalizadasNormalizadas = this.opcionesPersonalizadasIndustria.map(i => this.normalizeText(i));
-    
+
     if (!industriasBaseNormalizadas.includes(opcionNormalizada) && !opcionesPersonalizadasNormalizadas.includes(opcionNormalizada)) {
       // Agregar a opciones personalizadas (guardar normalizado)
       this.opcionesPersonalizadasIndustria.push(opcionNormalizada);
@@ -1145,7 +1145,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('📡 Respuesta del servidor:', response);
+          console.log('Respuesta del servidor:', response);
           if (response.ok) {
             this.perfil = response.usuario;
             console.log('Perfil cargado:', this.perfil);
@@ -1210,7 +1210,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       const especialidadTecnicaParsed = this.parseArrayField(this.perfil.especialidad_tecnica) || [];
       const tecnologiasPrincipalesParsed = this.parseArrayField(this.perfil.tecnologias_principales) || [];
 
-      console.log('🔍 Debug - Campos parseados del backend:', {
+      console.log('Debug - Campos parseados del backend:', {
         nivel_educacion_raw: this.perfil.nivel_educacion,
         nivel_educacion_parsed: nivelEducacionParsed,
         especialidad_tecnica_raw: this.perfil.especialidad_tecnica,
@@ -1296,7 +1296,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
           if (response.ok) {
             // Preservar fecha_registro del perfil anterior si no viene en la respuesta
             const fechaRegistroAnterior = this.perfil?.fecha_registro;
-            
+
             this.perfil = response.usuario;
             if (this.perfil) {
               // Si la fecha_registro no viene en la respuesta o es null, usar la anterior
@@ -1304,7 +1304,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
                 this.perfil.fecha_registro = fechaRegistroAnterior;
                 console.log('Fecha de registro preservada:', this.perfil.fecha_registro);
               }
-              
+
               console.log('Perfil actualizado recibido:', {
                 posicion_actual: this.perfil.posicion_actual,
                 empresa_actual: this.perfil.empresa_actual,
@@ -1337,7 +1337,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
             // Resetear el estado de cambios después de guardar exitosamente
             this.saveInitialFormState();
-            
+
             // Si estábamos en modo de completar perfil, verificar si ahora está completo
             if (this.isCompletionMode) {
               this.verificarPerfilYRedirigir();
@@ -1449,7 +1449,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.populateForm();
     this.hasFormChanges = false;
     this.displayDiscardDialog = false;
-    
+
     this.messageService.add({
       severity: 'info',
       summary: 'Cambios descartados',
