@@ -39,7 +39,7 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.destruirGraficos();
+    this.destruirTodosLosGraficos();
   }
 
   cargarEstadisticasGenerales(): void {
@@ -50,6 +50,10 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.ok) {
           this.estadisticasGenerales = response.data;
+          // Renderizar gráficos solo una vez después de cargar los datos
+          setTimeout(() => {
+            this.renderizarGraficosPrincipales();
+          }, 300);
         } else {
           this.messageService.add({
             severity: 'error',
@@ -103,13 +107,13 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
   }
 
   verReporteEncuesta(encuestaId: number): void {
-    // Destruir gráficos anteriores y resetear flag
-    this.destruirGraficos();
+    // Destruir solo los gráficos del modal anterior
+    this.destruirGraficosModal();
     this.chartsRendered = false;
-    
+
     this.encuestaIdSeleccionada = encuestaId;
     this.loadingReporte = true;
-    
+
     this.encuestaService.obtenerReporteEncuesta(encuestaId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -117,7 +121,7 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
         if (response.ok) {
           this.reporteEncuesta = response.data;
           this.displayReporteDialog = true;
-          
+
           console.log('📊 Reporte cargado:', this.reporteEncuesta);
           console.log('   - Tiene preguntas:', !!this.reporteEncuesta.preguntas);
           console.log('   - Total preguntas:', this.reporteEncuesta.preguntas?.length);
@@ -182,11 +186,11 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
    */
   private generarExcelReporte(data: any): void {
     const workbook = XLSX.utils.book_new();
-    
+
     // Información de la encuesta
     const encuestaInfo = data.encuesta || {};
     const respuestas = data.datos || [];
-    
+
     // Crear hoja de resumen
     const resumenData = [
       ['REPORTE DE ENCUESTA'],
@@ -198,28 +202,28 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
       ['Fecha de exportación:', new Date().toLocaleDateString('es-ES')],
       []
     ];
-    
+
     const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
-    
+
     // Estilos para el resumen
     wsResumen['!cols'] = [{ width: 25 }, { width: 50 }];
-    
+
     XLSX.utils.book_append_sheet(workbook, wsResumen, 'Resumen');
-    
+
     // Crear hoja de respuestas detalladas (estilo Google Forms)
     if (respuestas.length > 0) {
       // Preparar datos en formato de tabla
       const respuestasFormateadas: any[] = [];
-      
+
       respuestas.forEach((respuesta: any, index: number) => {
         const fila: any = {
           'N°': index + 1,
-          'Marca temporal': respuesta.fecha_respuesta 
+          'Marca temporal': respuesta.fecha_respuesta
             ? new Date(respuesta.fecha_respuesta).toLocaleString('es-ES')
             : 'N/A',
           'Usuario': respuesta.usuario_nombre || 'Anónimo'
         };
-        
+
         // Agregar cada pregunta como columna
         if (respuesta.respuestas && Array.isArray(respuesta.respuestas)) {
           respuesta.respuestas.forEach((resp: any) => {
@@ -227,19 +231,19 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
             fila[preguntaTexto] = resp.respuesta || '';
           });
         }
-        
+
         respuestasFormateadas.push(fila);
       });
-      
+
       const wsRespuestas = XLSX.utils.json_to_sheet(respuestasFormateadas);
-      
+
       // Ajustar ancho de columnas
       const columnWidths = [
         { width: 5 },  // N°
         { width: 20 }, // Marca temporal
         { width: 25 }  // Usuario
       ];
-      
+
       // Ancho automático para columnas de preguntas
       if (respuestasFormateadas.length > 0) {
         const firstRow = respuestasFormateadas[0];
@@ -249,24 +253,24 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
           }
         });
       }
-      
+
       wsRespuestas['!cols'] = columnWidths;
-      
+
       XLSX.utils.book_append_sheet(workbook, wsRespuestas, 'Respuestas');
     }
-    
+
     // Crear hoja de estadísticas por pregunta
     if (data.preguntas && data.preguntas.length > 0) {
       const estadisticasData: any[] = [];
-      
+
       estadisticasData.push(['ESTADÍSTICAS POR PREGUNTA']);
       estadisticasData.push([]);
-      
+
       data.preguntas.forEach((pregunta: any, index: number) => {
         estadisticasData.push([`Pregunta ${index + 1}:`, pregunta.texto]);
         estadisticasData.push(['Tipo:', this.getTipoPreguntaLabel(pregunta.tipo)]);
         estadisticasData.push(['Total respuestas:', pregunta.total_respuestas]);
-        
+
         if (pregunta.analisis) {
           // Análisis de opciones
           if (pregunta.analisis.opciones_count) {
@@ -277,14 +281,14 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
               estadisticasData.push([opcion, cantidad, `${porcentaje}%`]);
             });
           }
-          
+
           // Análisis de escala
           if (pregunta.analisis.promedio !== undefined) {
             estadisticasData.push(['']);
             estadisticasData.push(['Promedio:', pregunta.analisis.promedio]);
             estadisticasData.push(['Total valores:', pregunta.analisis.total_valores]);
           }
-          
+
           // Análisis numérico
           if (pregunta.analisis.minimo !== undefined) {
             estadisticasData.push(['']);
@@ -293,7 +297,7 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
             estadisticasData.push(['Máximo:', pregunta.analisis.maximo]);
             estadisticasData.push(['Valores válidos:', pregunta.analisis.valores_validos]);
           }
-          
+
           // Análisis de texto
           if (pregunta.analisis.respuestas_unicas !== undefined) {
             estadisticasData.push(['']);
@@ -301,17 +305,17 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
             estadisticasData.push(['Total respuestas:', pregunta.analisis.total_respuestas]);
           }
         }
-        
+
         estadisticasData.push([]);
         estadisticasData.push([]);
       });
-      
+
       const wsEstadisticas = XLSX.utils.aoa_to_sheet(estadisticasData);
       wsEstadisticas['!cols'] = [{ width: 30 }, { width: 40 }, { width: 15 }];
-      
+
       XLSX.utils.book_append_sheet(workbook, wsEstadisticas, 'Estadísticas');
     }
-    
+
     // Generar y descargar el archivo
     const nombreArchivo = `Reporte_${encuestaInfo.titulo || 'Encuesta'}_${new Date().toISOString().split('T')[0]}.xlsx`;
     XLSX.writeFile(workbook, nombreArchivo);
@@ -321,7 +325,8 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     this.displayReporteDialog = false;
     this.reporteEncuesta = {};
     this.encuestaIdSeleccionada = null;
-    this.destruirGraficos();
+    // Solo destruir gráficos del modal
+    this.destruirGraficosModal();
     this.chartsRendered = false;
   }
 
@@ -335,8 +340,8 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
     if (event.index === 1) {
       console.log('Cambiando a pestaña de gráficos');
 
-      // Destruir gráficos anteriores antes de renderizar nuevos
-      this.destruirGraficos();
+      // Destruir solo gráficos del modal antes de renderizar nuevos
+      this.destruirGraficosModal();
       this.chartsRendered = false;
 
       // Esperar a que el DOM esté listo
@@ -480,31 +485,31 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
   // Métodos auxiliares para resúmenes de datos
   getOpcionMasSeleccionada(opcionesCount: any): string {
     if (!opcionesCount) return 'N/A';
-    
+
     let maxCount = 0;
     let opcionMasSeleccionada = '';
-    
+
     Object.entries(opcionesCount).forEach(([opcion, cantidad]) => {
       if (Number(cantidad) > maxCount) {
         maxCount = Number(cantidad);
         opcionMasSeleccionada = opcion;
       }
     });
-    
+
     return opcionMasSeleccionada || 'N/A';
   }
 
   getCantidadOpcionMasSeleccionada(opcionesCount: any): number {
     if (!opcionesCount) return 0;
-    
+
     let maxCount = 0;
-    
+
     Object.entries(opcionesCount).forEach(([opcion, cantidad]) => {
       if (Number(cantidad) > maxCount) {
         maxCount = Number(cantidad);
       }
     });
-    
+
     return maxCount;
   }
 
@@ -519,10 +524,10 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
 
   getDistribucionNumerica(minimo: number, maximo: number, promedio: number): string {
     if (!minimo && !maximo && !promedio) return 'Sin datos';
-    
+
     const rango = maximo - minimo;
     const posicionPromedio = ((promedio - minimo) / rango) * 100;
-    
+
     if (posicionPromedio >= 80) return 'Distribución alta';
     if (posicionPromedio >= 60) return 'Distribución media-alta';
     if (posicionPromedio >= 40) return 'Distribución media';
@@ -532,13 +537,13 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
 
   getFechaMinima(fechas: string[]): Date {
     if (!fechas || fechas.length === 0) return new Date();
-    
+
     return new Date(Math.min(...fechas.map(fecha => new Date(fecha).getTime())));
   }
 
   getFechaMaxima(fechas: string[]): Date {
     if (!fechas || fechas.length === 0) return new Date();
-    
+
     return new Date(Math.max(...fechas.map(fecha => new Date(fecha).getTime())));
   }
 
@@ -593,6 +598,18 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
 
   asNumber(value: unknown): number {
     return Number(value) || 0;
+  }
+
+  /**
+   * Renderiza los gráficos principales (Estado y Usuarios)
+   * Solo se llama una vez al cargar la página
+   */
+  private renderizarGraficosPrincipales(): void {
+    // Solo renderizar si no existen ya
+    if (!this.charts['estadoEncuestas'] && !this.charts['usuariosParticipacion']) {
+      this.renderEstadosEncuestasChart();
+      this.renderUsuariosParticipacionChart();
+    }
   }
 
   /**
@@ -930,15 +947,165 @@ export class ViewEncuestasResultadosComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Destruye todos los gráficos activos
+   * Renderiza el gráfico de estado de encuestas (Total, Activas, Expiradas)
    */
-  private destruirGraficos(): void {
-    Object.values(this.charts).forEach(chart => {
-      if (chart) {
-        chart.destroy();
+  private renderEstadosEncuestasChart(): void {
+    const ctx = document.getElementById('estadoEncuestasChart') as HTMLCanvasElement;
+    if (!ctx || !this.estadisticasGenerales) return;
+
+    // Solo destruir si el gráfico existe
+    if (this.charts['estadoEncuestas']) {
+      this.charts['estadoEncuestas'].destroy();
+      delete this.charts['estadoEncuestas'];
+    }
+
+    // Verificar que el canvas esté visible antes de renderizar
+    if (ctx.offsetParent === null) return;
+
+    // Preparar datos para el gráfico
+    const datos = {
+      total: this.estadisticasGenerales.total_encuestas || 0,
+      activas: this.estadisticasGenerales.encuestas_activas || 0,
+      expiradas: this.estadisticasGenerales.encuestas_expiradas || 0
+    };
+
+    this.charts['estadoEncuestas'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Total', 'Activas', 'Expiradas'],
+        datasets: [{
+          label: 'Encuestas',
+          data: [datos.total, datos.activas, datos.expiradas],
+          backgroundColor: ['#5DB3E0', '#8BE28B', '#FF6B6B'],
+          borderWidth: 0,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context: any) {
+                return `${context.label}: ${context.parsed.y}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
       }
     });
-    this.charts = {};
+  }
+
+  /**
+   * Renderiza el gráfico de usuarios y participación
+   */
+  private renderUsuariosParticipacionChart(): void {
+    const ctx = document.getElementById('usuariosParticipacionChart') as HTMLCanvasElement;
+    if (!ctx || !this.estadisticasGenerales) return;
+
+    // Solo destruir si el gráfico existe
+    if (this.charts['usuariosParticipacion']) {
+      this.charts['usuariosParticipacion'].destroy();
+      delete this.charts['usuariosParticipacion'];
+    }
+
+    // Verificar que el canvas esté visible antes de renderizar
+    if (ctx.offsetParent === null) return;
+
+    const totalUsuarios = this.estadisticasGenerales.total_usuarios || 0;
+    const usuariosActivos = this.estadisticasGenerales.usuarios_activos || 0;
+    const tasaParticipacion = this.estadisticasGenerales.tasa_participacion || 0;
+
+    this.charts['usuariosParticipacion'] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Total Usuarios', 'Participación de usuarios', 'Tasa Participación'],
+        datasets: [{
+          data: [totalUsuarios, usuariosActivos, tasaParticipacion],
+          backgroundColor: ['#A78BFA', '#00a0b0', '#FF9B73'],
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+        plugins: {
+          legend: {
+            position: 'bottom' as const,
+            labels: {
+              padding: 8,
+              usePointStyle: true,
+              font: {
+                size: 11,
+                family: "'Inter', sans-serif"
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context: any) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                if (label === 'Tasa Participación') {
+                  return `${label}: ${value}%`;
+                }
+                return `${label}: ${value}`;
+              }
+            }
+          }
+        },
+        elements: {
+          arc: {
+            borderWidth: 0
+          }
+        },
+        animation: {
+          animateRotate: true,
+          animateScale: false
+        }
+      }
+    });
+  }
+
+  /**
+   * Destruye solo los gráficos del modal (preguntas)
+   */
+  private destruirGraficosModal(): void {
+    Object.keys(this.charts).forEach(key => {
+      // Solo destruir gráficos que no son los principales
+      if (key !== 'estadoEncuestas' && key !== 'usuariosParticipacion') {
+        if (this.charts[key]) {
+          this.charts[key].destroy();
+          delete this.charts[key];
+        }
+      }
+    });
+  }
+
+  /**
+   * Destruye todos los gráficos (solo al destruir el componente)
+   */
+  private destruirTodosLosGraficos(): void {
+    Object.keys(this.charts).forEach(key => {
+      if (this.charts[key]) {
+        this.charts[key].destroy();
+        delete this.charts[key];
+      }
+    });
   }
 }
-

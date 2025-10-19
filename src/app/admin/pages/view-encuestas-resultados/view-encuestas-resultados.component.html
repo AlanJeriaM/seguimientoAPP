@@ -2,85 +2,126 @@
   <div class="col-12">
     <p-card class="text-center" header="Reportes y analíticas de Encuestas">
 
-      <!-- Estadísticas Generales -->
-      <div class="grid mb-4">
-        <div class="col-12">
-          <h3 class="text-xl font-semibold text-900 mb-3">Estadísticas Generales</h3>
-        </div>
-
-        <div class="col-12 sm:col-6 lg:col-3">
-          <div class="stats-card">
-            <div class="stats-icon">
-              <i class="pi pi-clipboard text-blue-500"></i>
+      <!-- Estadísticas de Encuestas con Gráfico -->
+      <div class="stats-chart-container mb-4 md:mb-5 lg:mb-6">
+        <!-- Estadísticas principales -->
+        <div class="stats-grid">
+          <div class="stat-card-wrapper">
+            <div class="surface-card shadow-2 border-round p-4 md:p-5 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #5DB3E0 0%, #2493cf 100%) !important; color: #ffffff;">
+              <div class="flex align-items-center mb-4">
+                <div class="flex align-items-center justify-content-center border-circle" style="width: 4rem; height: 4rem; background-color: rgba(255, 255, 255, 0.2);">
+                  <i class="pi pi-clipboard text-white text-2xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white m-0 mb-3">{{ estadisticasGenerales.total_encuestas || 0 }}</h3>
+                <p class="text-sm md:text-base text-white m-0" style="opacity: 0.9;">Total Encuestas</p>
+              </div>
             </div>
-            <div class="stats-content">
-              <div class="stats-value">{{ estadisticasGenerales.total_encuestas || 0 }}</div>
-              <div class="stats-label">Total Encuestas</div>
+          </div>
+
+          <div class="stat-card-wrapper">
+            <div class="surface-card shadow-2 border-round p-4 md:p-5 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #8BE28B 0%, #3DC173 100%) !important; color: #ffffff;">
+              <div class="flex align-items-center mb-4">
+                <div class="flex align-items-center justify-content-center border-circle" style="width: 4rem; height: 4rem; background-color: rgba(255, 255, 255, 0.2);">
+                  <i class="pi pi-check-circle text-white text-2xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white m-0 mb-3">{{ estadisticasGenerales.encuestas_activas || 0 }}</h3>
+                <p class="text-sm md:text-base text-white m-0" style="opacity: 0.9;">Encuestas Activas</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card-wrapper">
+            <div class="surface-card shadow-2 border-round p-4 md:p-5 h-full flex flex-column justify-content-between" style="background-color: #00a0b0 !important; color: #ffffff;">
+              <div class="flex align-items-center mb-4">
+                <div class="flex align-items-center justify-content-center border-circle" style="width: 4rem; height: 4rem; background-color: rgba(255, 255, 255, 0.2);">
+                  <i class="pi pi-users text-white text-2xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white m-0 mb-3">{{ estadisticasGenerales.usuarios_activos || 0 }}</h3>
+                <p class="text-sm md:text-base text-white m-0" style="opacity: 0.9;">Participación de usuarios</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card-wrapper">
+            <div class="surface-card shadow-2 border-round p-4 md:p-5 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #FF9B73 0%, #ff6b35 100%) !important; color: #ffffff;">
+              <div class="flex align-items-center mb-4">
+                <div class="flex align-items-center justify-content-center border-circle" style="width: 4rem; height: 4rem; background-color: rgba(255, 255, 255, 0.2);">
+                  <i class="pi pi-percentage text-white text-2xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white m-0 mb-3">{{ estadisticasGenerales.tasa_participacion || 0 }}%</h3>
+                <p class="text-sm md:text-base text-white m-0" style="opacity: 0.9;">Tasa Participación</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card-wrapper">
+            <div class="surface-card shadow-2 border-round p-4 md:p-5 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%) !important; color: #ffffff;">
+              <div class="flex align-items-center mb-4">
+                <div class="flex align-items-center justify-content-center border-circle" style="width: 4rem; height: 4rem; background-color: rgba(255, 255, 255, 0.2);">
+                  <i class="pi pi-user text-white text-2xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white m-0 mb-3">{{ estadisticasGenerales.total_usuarios || 0 }}</h3>
+                <p class="text-sm md:text-base text-white m-0" style="opacity: 0.9;">Total Usuarios</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card-wrapper">
+            <div class="surface-card shadow-2 border-round p-4 md:p-5 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #FDE047 0%, #F59E0B 100%) !important; color: #ffffff;">
+              <div class="flex align-items-center mb-4">
+                <div class="flex align-items-center justify-content-center border-circle" style="width: 4rem; height: 4rem; background-color: rgba(255, 255, 255, 0.2);">
+                  <i class="pi pi-clock text-white text-2xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white m-0 mb-3">{{ estadisticasGenerales.tiempo_promedio_minutos || 0 }} min</h3>
+                <p class="text-sm md:text-base text-white m-0" style="opacity: 0.9;">Tiempo Promedio</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="col-12 sm:col-6 lg:col-3">
-          <div class="stats-card">
-            <div class="stats-icon">
-              <i class="pi pi-check-circle text-green-500"></i>
-            </div>
-            <div class="stats-content">
-              <div class="stats-value">{{ estadisticasGenerales.encuestas_activas || 0 }}</div>
-              <div class="stats-label">Encuestas Activas</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 sm:col-6 lg:col-3">
-          <div class="stats-card">
-            <div class="stats-icon">
-              <i class="pi pi-users text-orange-500"></i>
-            </div>
-            <div class="stats-content">
-              <div class="stats-value">{{ estadisticasGenerales.usuarios_activos || 0 }}</div>
-              <div class="stats-label">Usuarios Activos</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 sm:col-6 lg:col-3">
-          <div class="stats-card">
-            <div class="stats-icon">
-              <i class="pi pi-percentage text-purple-500"></i>
-            </div>
-            <div class="stats-content">
-              <div class="stats-value">{{ estadisticasGenerales.tasa_participacion || 0 }}%</div>
-              <div class="stats-label">Tasa Participación</div>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- Estadísticas Adicionales -->
+
+      <!-- Gráficos Adicionales -->
       <div class="grid mb-4">
-        <div class="col-12 sm:col-6 lg:col-6">
-          <div class="stats-card">
-            <div class="stats-icon">
-              <i class="pi pi-user text-cyan-500"></i>
+        <div class="col-12 lg:col-6">
+          <p-card styleClass="h-full">
+            <ng-template pTemplate="header">
+              <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+                <h3 class="text-base md:text-lg font-semibold text-900 m-0">Estado de Encuestas</h3>
+                <p-tag value="Distribución" severity="info"></p-tag>
+              </div>
+            </ng-template>
+            <div class="chart-wrapper">
+              <canvas id="estadoEncuestasChart"></canvas>
             </div>
-            <div class="stats-content">
-              <div class="stats-value">{{ estadisticasGenerales.total_usuarios || 0 }}</div>
-              <div class="stats-label">Total Usuarios</div>
-            </div>
-          </div>
+          </p-card>
         </div>
 
-        <div class="col-12 sm:col-6 lg:col-6">
-          <div class="stats-card">
-            <div class="stats-icon">
-              <i class="pi pi-clock text-amber-500"></i>
+        <div class="col-12 lg:col-6">
+          <p-card styleClass="h-full">
+            <ng-template pTemplate="header">
+              <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+                <h3 class="text-base md:text-lg font-semibold text-900 m-0">Usuarios y Participación</h3>
+                <p-tag value="Métricas" severity="success"></p-tag>
+              </div>
+            </ng-template>
+            <div class="chart-wrapper">
+              <canvas id="usuariosParticipacionChart"></canvas>
             </div>
-            <div class="stats-content">
-              <div class="stats-value">{{ estadisticasGenerales.tiempo_promedio_minutos || 0 }} min</div>
-              <div class="stats-label">Tiempo Promedio</div>
-            </div>
-          </div>
+          </p-card>
         </div>
       </div>
 
@@ -326,7 +367,7 @@
             <div class="mb-3 pb-3 border-bottom-1 border-200">
               <h3 class="text-xl font-bold text-primary-600 mb-0">Pregunta N° {{ i + 1 }}</h3>
             </div>
-            
+
             <div class="pregunta-header">
               <h4 class="text-lg font-medium text-900">{{ pregunta.texto }}</h4>
               <div class="pregunta-meta">
@@ -481,7 +522,7 @@
               <div class="mb-3 pb-3 border-bottom-1 border-200">
                 <h3 class="text-xl font-bold text-primary-600 mb-0">Pregunta N° {{ i + 1 }}</h3>
               </div>
-              
+
               <!-- Header de la pregunta -->
               <div class="mb-3">
                 <h4 class="text-lg font-semibold text-900 mb-2">{{ pregunta.texto }}</h4>
@@ -541,7 +582,7 @@
                           Total de opciones: <span class="text-xl font-bold text-primary">{{ getOpcionesCount(pregunta.analisis.opciones_count) }}</span>
                         </div>
                       </div>
-                      
+
                       <div class="mb-3">
                         <div class="text-sm text-600 mb-2">Opción más seleccionada:</div>
                         <div class="p-2 surface-50 border-round">
@@ -567,7 +608,7 @@
                         <div class="text-sm text-600 mb-1">Puntuación promedio:</div>
                         <div class="text-2xl font-bold text-primary">{{ pregunta.analisis.promedio | number:'1.1-1' }}</div>
                       </div>
-                      
+
                       <div class="mb-3">
                         <div class="text-sm text-600 mb-1">Total de respuestas:</div>
                         <div class="text-lg font-semibold text-900">{{ pregunta.analisis.total_valores }}</div>
@@ -588,7 +629,7 @@
                           Respuestas únicas: <span class="text-xl font-bold text-primary">{{ pregunta.analisis.respuestas_unicas || pregunta.analisis.total_respuestas }}</span>
                         </div>
                       </div>
-                      
+
                       <div class="mb-3">
                         <div class="text-sm text-600 mb-2">Respuesta más frecuente:</div>
                         <div class="p-2 surface-50 border-round">
@@ -611,7 +652,7 @@
                           <div class="text-lg font-semibold text-900">{{ pregunta.analisis.minimo }} - {{ pregunta.analisis.maximo }}</div>
                         </div>
                       </div>
-                      
+
                       <div class="mb-3">
                         <div class="text-sm text-600">
                           Valores válidos: <span class="text-xl font-bold text-primary">{{ pregunta.analisis.valores_validos }}</span>
@@ -632,7 +673,7 @@
                         <div class="text-sm text-600 mb-1">Fechas únicas:</div>
                         <div class="text-xl font-bold text-primary">{{ pregunta.analisis.fechas_unicas }}</div>
                       </div>
-                      
+
                       <div class="mb-3">
                         <div class="text-sm text-600 mb-1">Total respuestas:</div>
                         <div class="text-lg font-semibold text-900">{{ pregunta.analisis.total_respuestas }}</div>
