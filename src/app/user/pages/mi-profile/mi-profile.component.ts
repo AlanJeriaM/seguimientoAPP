@@ -1313,11 +1313,15 @@ export class MiProfileComponent implements OnInit, OnDestroy {
                 fecha_registro: this.perfil.fecha_registro
               });
             }
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Perfil actualizado correctamente'
-            });
+            
+            // Solo mostrar mensaje de actualización si NO está en modo completar perfil
+            if (!this.isCompletionMode) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Éxito',
+                detail: 'Perfil actualizado correctamente'
+              });
+            }
 
             // Actualizar solo los campos específicos que pueden haber cambiado
             if (this.perfil) {

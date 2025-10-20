@@ -25,8 +25,8 @@
           </div>
         </div>
         <div class="action-section">
-          <p-button 
-            label="Salir" 
+          <p-button
+            label="Salir"
             icon="pi pi-times"
             [outlined]="true"
             severity="secondary"
@@ -43,8 +43,8 @@
           <span class="progress-text">Pregunta {{ getPreguntaActualTexto() }}</span>
           <span class="progress-percentage">{{ progreso }}% completado</span>
         </div>
-        <p-progressBar 
-          [value]="progreso" 
+        <p-progressBar
+          [value]="progreso"
           [showValue]="false"
           styleClass="progress-bar"
         ></p-progressBar>
@@ -56,8 +56,8 @@
       <div class="pregunta-container">
         <!-- Pregunta actual - Usar ngFor con trackBy para forzar recreación del DOM -->
         <ng-container *ngFor="let idx of [preguntaActual]; trackBy: trackByPreguntaIndex">
-          <div 
-            *ngIf="encuesta.preguntas[idx] as pregunta" 
+          <div
+            *ngIf="encuesta.preguntas[idx] as pregunta"
             class="pregunta-card active"
           >
             <div class="pregunta-header">
@@ -69,12 +69,12 @@
 
             <div class="respuesta-input" [formGroupName]="'respuestas'">
               <div [formGroupName]="idx">
-                
+
                 <!-- TEXTO CORTO -->
                 <div *ngIf="pregunta.tipo === 'TEXTO_CORTO'">
-                  <input 
-                    type="text" 
-                    pInputText 
+                  <input
+                    type="text"
+                    pInputText
                     formControlName="respuesta"
                     placeholder="Escribe tu respuesta..."
                     class="w-full"
@@ -85,8 +85,8 @@
 
                 <!-- TEXTO LARGO -->
                 <div *ngIf="pregunta.tipo === 'TEXTO_LARGO'">
-                  <textarea 
-                    pInputTextarea 
+                  <textarea
+                    pInputTextarea
                     formControlName="respuesta"
                     placeholder="Escribe tu respuesta detallada..."
                     rows="4"
@@ -100,7 +100,7 @@
               <div *ngIf="pregunta.tipo === 'OPCION_UNICA'" class="opciones-container">
                 <div *ngIf="pregunta.opciones && pregunta.opciones.length > 0; else noOpciones">
                   <div *ngFor="let opcion of pregunta.opciones; let j = index" class="opcion-item">
-                    <p-radioButton 
+                    <p-radioButton
                       [inputId]="'radio_pregunta_' + pregunta.id + '_opcion_' + j"
                       [value]="opcion"
                       formControlName="respuesta"
@@ -121,7 +121,7 @@
               <div *ngIf="pregunta.tipo === 'OPCION_MULTIPLE'" class="opciones-container" [formGroup]="getPreguntaControl(idx)">
                 <div *ngIf="pregunta.opciones && pregunta.opciones.length > 0; else noOpcionesMultiple" formArrayName="selecciones">
                   <div *ngFor="let opcion of pregunta.opciones; let j = index" class="opcion-item">
-                    <p-checkbox 
+                    <p-checkbox
                       [inputId]="'check_pregunta_' + pregunta.id + '_opcion_' + j"
                       [binary]="true"
                       [formControlName]="j"
@@ -145,7 +145,7 @@
                   <span>{{ pregunta.configuracion?.min_label || 'Mínimo' }}</span>
                   <span>{{ pregunta.configuracion?.max_label || 'Máximo' }}</span>
                 </div>
-                <p-slider 
+                <p-slider
                   formControlName="respuesta"
                   [min]="pregunta.configuracion?.min_value || 1"
                   [max]="pregunta.configuracion?.max_value || 10"
@@ -159,7 +159,7 @@
 
               <!-- NÚMERO -->
               <div *ngIf="pregunta.tipo === 'NUMERO'">
-                <p-inputNumber 
+                <p-inputNumber
                   formControlName="respuesta"
                   placeholder="Ingresa un número..."
                   [min]="pregunta.configuracion?.min_value"
@@ -172,7 +172,7 @@
 
               <!-- FECHA -->
               <div *ngIf="pregunta.tipo === 'FECHA'">
-                <p-calendar 
+                <p-calendar
                   formControlName="respuesta"
                   placeholder="Selecciona una fecha..."
                   [showIcon]="true"
@@ -182,8 +182,8 @@
               </div>
 
               <!-- Mensaje de error -->
-              <small 
-                class="error-message" 
+              <small
+                class="error-message"
                 *ngIf="getPreguntaControl(idx).get('respuesta')?.invalid && getPreguntaControl(idx).get('respuesta')?.touched"
               >
                 <i class="pi pi-exclamation-circle"></i>
@@ -198,7 +198,7 @@
       <!-- Navegación entre preguntas -->
       <div class="navegacion-container">
         <div class="navegacion-buttons">
-          <p-button 
+          <p-button
             label="Anterior"
             icon="pi pi-chevron-left"
             [outlined]="true"
@@ -211,7 +211,7 @@
             <span class="pregunta-contador">{{ getPreguntaActualTexto() }}</span>
           </div>
 
-          <p-button 
+          <p-button
             *ngIf="preguntaActual < totalPreguntas - 1"
             label="Siguiente"
             icon="pi pi-chevron-right"
@@ -221,7 +221,7 @@
             styleClass="w-full lg:w-auto"
           ></p-button>
 
-          <p-button 
+          <p-button
             *ngIf="preguntaActual === totalPreguntas - 1"
             label="Enviar Respuestas"
             icon="pi pi-check"
@@ -242,8 +242,8 @@
     <i class="pi pi-exclamation-triangle text-6xl text-orange-500"></i>
     <h3>Encuesta no encontrada</h3>
     <p>La encuesta que intentas responder no existe o no está disponible.</p>
-    <p-button 
-      label="Volver a encuestas" 
+    <p-button
+      label="Volver a encuestas"
       icon="pi pi-arrow-left"
       (click)="salir()"
       styleClass="w-full lg:w-auto"
@@ -278,7 +278,7 @@
             <i class="pi pi-check text-xl"></i>
           </div>
         </div>
-        
+
         <p class="text-600 text-lg mb-0">
           ¿Estás seguro de enviar tus respuestas? No podrás modificarlas después.
         </p>
@@ -306,7 +306,7 @@
           [disabled]="enviando">
         </p-button>
       </div>
-      
+
       <!-- En pantallas grandes: Cancelar izquierda, Enviar derecha -->
       <div class="hidden sm:flex gap-2">
         <p-button
@@ -356,7 +356,7 @@
             <i class="pi pi-save text-xl"></i>
           </div>
         </div>
-        
+
         <p class="text-600 text-lg mb-3">
           Tienes un {{ progreso }}% de progreso completado.
         </p>
@@ -394,7 +394,7 @@
           [disabled]="guardandoProgreso">
         </p-button>
       </div>
-      
+
       <!-- En pantallas grandes: Cancelar, Salir sin guardar, Guardar -->
       <div class="hidden sm:flex gap-2">
         <p-button
@@ -424,5 +424,8 @@
   </ng-template>
 </p-dialog>
 
-<!-- Confirmaciones (el toast ya está en el navbar-shared) -->
+<!-- Toast para notificaciones -->
+<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
+
+<!-- Confirmaciones -->
 <p-confirmDialog></p-confirmDialog>
