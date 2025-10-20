@@ -198,7 +198,7 @@
           <div class="col-12 lg:col-6">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Nombre Completo</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.nombre || 'No especificado' }}</div>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">{{ selectedUser.nombre || 'No especificado' }}</div>
             </div>
           </div>
 
@@ -206,7 +206,7 @@
           <div class="col-12 lg:col-6">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.correo || 'No especificado' }}</div>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">{{ selectedUser.correo || 'No especificado' }}</div>
             </div>
           </div>
 
@@ -214,7 +214,7 @@
           <div class="col-12 lg:col-6">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Empresa Actual</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.empresa_actual || 'No especificado' }}</div>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">{{ selectedUser.empresa_actual || 'No especificado' }}</div>
             </div>
           </div>
 
@@ -222,7 +222,7 @@
           <div class="col-12 lg:col-6">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Posición Actual</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.posicion_actual || 'No especificado' }}</div>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">{{ selectedUser.posicion_actual || 'No especificado' }}</div>
             </div>
           </div>
 
@@ -230,7 +230,7 @@
           <div class="col-12 lg:col-6">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Ubicación</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.ubicacion || 'No especificado' }}</div>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">{{ selectedUser.ubicacion || 'No especificado' }}</div>
             </div>
           </div>
 
@@ -238,7 +238,7 @@
           <div class="col-12 lg:col-6">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Industria</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ selectedUser.industria || 'No especificado' }}</div>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">{{ selectedUser.industria || 'No especificado' }}</div>
             </div>
           </div>
         </div>
@@ -343,12 +343,12 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex justify-content-end gap-2">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
       <p-button
         label="Cerrar"
         icon="pi pi-times"
         (click)="cerrarDialog()"
-        styleClass="p-button-text">
+        styleClass="p-button-primary w-full sm:w-auto">
       </p-button>
     </div>
   </ng-template>
@@ -391,7 +391,7 @@
           <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Usuario a eliminar</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">
                 {{ usuarioParaEliminar.nombre || 'No especificado' }}
               </div>
             </div>
@@ -401,7 +401,7 @@
           <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">
                 {{ usuarioParaEliminar.correo || 'No especificado' }}
               </div>
             </div>

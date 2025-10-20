@@ -1,5 +1,5 @@
 <!-- Toast para notificaciones -->
-<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
+<!-- <p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast> -->
 
 <div class="grid">
   <div class="col-12">
@@ -386,10 +386,10 @@
           </div>
 
           <!-- Email -->
-          <div class="col-12 lg:col-6">
+          <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ adminParaVer.email_usuario || 'No especificado' }}</div>
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">{{ adminParaVer.email_usuario || 'No especificado' }}</div>
             </div>
           </div>
 
@@ -433,12 +433,12 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex justify-content-end gap-2">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
       <p-button
         label="Cerrar"
         icon="pi pi-times"
         (click)="cerrarViewDialog()"
-        styleClass="p-button-text">
+        styleClass="p-button-primary w-full sm:w-auto">
       </p-button>
     </div>
   </ng-template>
@@ -491,7 +491,7 @@
           <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">
                 {{ adminParaEliminar.email_usuario || 'No especificado' }}
               </div>
             </div>

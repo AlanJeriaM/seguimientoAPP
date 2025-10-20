@@ -1,5 +1,5 @@
 <!-- Toast para notificaciones -->
-<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
+<!-- <p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast> -->
 
 <div class="grid">
   <div class="col-12">
@@ -199,7 +199,7 @@
           <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">
                 {{ usuarioParaReactivar.correo || 'No especificado' }}
               </div>
             </div>
@@ -209,7 +209,7 @@
           <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Empresa actual</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">
                 {{ usuarioParaReactivar.empresa_actual || 'Sin empresa' }}
               </div>
             </div>
@@ -312,7 +312,7 @@
           <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Correo electrónico</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">
                 {{ usuarioParaEliminar.correo || 'No especificado' }}
               </div>
             </div>
@@ -322,7 +322,7 @@
           <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Empresa actual</label>
-              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">
+              <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900" style="word-break: break-all; overflow-wrap: break-word;">
                 {{ usuarioParaEliminar.empresa_actual || 'Sin empresa' }}
               </div>
             </div>
@@ -366,7 +366,7 @@
                 <div>
                   <p class="text-red-700 font-semibold mb-1">Advertencia crítica</p>
                   <p class="text-red-600 text-sm mb-0">
-                    Esta acción eliminará permanentemente al usuario del sistema. 
+                    Esta acción eliminará permanentemente al usuario del sistema.
                     Todos los datos asociados serán eliminados y no se podrán recuperar.
                   </p>
                 </div>
