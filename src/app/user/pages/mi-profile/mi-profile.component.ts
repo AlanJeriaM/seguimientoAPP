@@ -643,6 +643,14 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
         // Detectar cambios después de agregar opción
         this.detectFormChanges();
+
+        // Mostrar mensaje de éxito
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Opción agregada',
+          detail: `"${opcionNormalizada}" ha sido agregada y seleccionada`,
+          life: 3000
+        });
       } else {
         // Mostrar mensaje de que ya existe
         this.messageService.add({
@@ -696,6 +704,14 @@ export class MiProfileComponent implements OnInit, OnDestroy {
 
         // Detectar cambios después de agregar opción
         this.detectFormChanges();
+
+        // Mostrar mensaje de éxito
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Opción agregada',
+          detail: `"${opcionNormalizada}" ha sido agregada y seleccionada`,
+          life: 3000
+        });
       } else {
         // Mostrar mensaje de que ya existe
         this.messageService.add({
@@ -919,7 +935,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
     this.guardarOpcionesPersonalizadasIndustria();
 
     this.messageService.add({
-      severity: 'info',
+      severity: 'success',
       summary: 'Opción eliminada',
       detail: `"${option}" ha sido eliminada de las opciones personalizadas`,
       life: 3000
@@ -1313,7 +1329,7 @@ export class MiProfileComponent implements OnInit, OnDestroy {
                 fecha_registro: this.perfil.fecha_registro
               });
             }
-            
+
             // Solo mostrar mensaje de actualización si NO está en modo completar perfil
             if (!this.isCompletionMode) {
               this.messageService.add({
