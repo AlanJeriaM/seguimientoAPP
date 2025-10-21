@@ -92,8 +92,10 @@ export class CreateEncuestaComponent implements OnInit {
       this.detectarCambios();
     });
 
-    // Agregar primera pregunta por defecto
-    this.addQuestion();
+    // Agregar primera pregunta por defecto solo si NO estamos en modo edición
+    if (!this.editMode) {
+      this.addQuestion();
+    }
   }
 
   get questions(): FormArray {
