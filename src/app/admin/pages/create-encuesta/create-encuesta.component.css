@@ -1,144 +1,43 @@
-/* Estilos para campos requeridos */
+/* Campo requerido */
 .required-field::after {
   content: ' *';
   color: #ef4444;
-  font-weight: bold;
-}
-
-/* Mejoras de accesibilidad y UX */
-:host ::ng-deep .p-card {
-  border: 1px solid var(--surface-border);
-}
-
-:host ::ng-deep .p-card .p-card-header {
-  background: var(--primary-color);
-  color: var(--primary-color-text);
-  text-align: center;
   font-weight: 600;
-  font-size: 1.25rem;
-  padding: 1.5rem;
+  margin-left: 2px;
 }
 
-:host ::ng-deep .p-card .p-card-body {
-  padding: 2rem;
-}
-
-/* Responsive padding para dispositivos móviles */
+/* Responsive: Padding del contenedor principal */
 @media (max-width: 768px) {
   :host ::ng-deep .p-card .p-card-body {
     padding: 1rem;
   }
-
-  :host ::ng-deep .p-card .p-card-header {
-    padding: 1rem;
-    font-size: 1.1rem;
-  }
 }
 
-/* Estilos para los fieldsets de configuración */
-:host ::ng-deep .p-fieldset {
-  border: 1px solid var(--surface-border);
-  border-radius: 5px;
-}
-
-:host ::ng-deep .p-fieldset .p-fieldset-legend {
-  background: var(--surface-ground);
-  border-radius: 5px;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-:host ::ng-deep .p-fieldset .p-fieldset-content {
-  padding: 1rem;
-}
-
-/* Estilos para las preguntas */
-.surface-card {
-  background: var(--surface-card);
-  border: 1px solid var(--surface-border);
-}
-
-/* Mejora visual para opciones de respuesta */
-:host ::ng-deep .field-radiobutton .pi {
-  font-size: 0.8rem;
-  margin-right: 0.5rem;
-}
-
-/* Estilos para botones en dispositivos móviles */
-@media (max-width: 576px) {
-  :host ::ng-deep .p-button {
-    justify-content: center;
-  }
-
-  /* Asegurar que los botones de acción sean full width en móvil */
-  .flex.flex-column.sm\\:flex-row .p-button {
-    width: 100%;
-  }
-}
-
-/* Mejoras para inputs en dispositivos móviles */
+/* Prevenir zoom en iOS */
 @media (max-width: 768px) {
   :host ::ng-deep .p-inputtext,
   :host ::ng-deep .p-dropdown,
-  :host ::ng-deep .p-inputnumber,
-  :host ::ng-deep .p-calendar {
-    font-size: 16px; /* Previene zoom en iOS */
+  :host ::ng-deep .p-calendar input,
+  :host ::ng-deep textarea {
+    font-size: 16px !important;
   }
 }
 
-/* Estilos para mejorar la legibilidad */
-:host ::ng-deep .p-divider .p-divider-content {
-  background: var(--surface-ground);
-  color: var(--text-color);
-  font-weight: 600;
+/* Cursor pointer */
+.cursor-pointer {
+  cursor: pointer;
 }
 
-/* Animaciones suaves */
-.surface-card {
+/* Mejorar alineación de iconos en inputs */
+:host ::ng-deep .p-input-icon-left > i {
+  color: #6c757d;
+}
+
+/* Transiciones suaves */
+:host ::ng-deep .surface-card {
   transition: all 0.2s ease;
 }
 
-.surface-card:hover {
-  box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* Mejoras de contraste para mejor accesibilidad */
-:host ::ng-deep .p-error {
-  font-weight: 500;
-}
-
-/* Estilos para tooltips en móvil */
-@media (max-width: 768px) {
-  :host ::ng-deep .p-tooltip {
-    max-width: 250px;
-    font-size: 0.875rem;
-  }
-}
-
-/* Mejor espaciado para checkboxes */
-:host ::ng-deep .p-checkbox {
-  vertical-align: top;
-}
-
-/* Estilos responsive para las opciones de respuesta */
-@media (max-width: 576px) {
-  .flex.align-items-center.gap-2 {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .flex.align-items-center.gap-2 .flex-1 {
-    flex-basis: 100%;
-    order: 2;
-  }
-
-  .flex.align-items-center.gap-2 .field-radiobutton {
-    order: 1;
-  }
-
-  .flex.align-items-center.gap-2 .p-button {
-    order: 3;
-    margin-left: auto;
-  }
+:host ::ng-deep .surface-card:hover {
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075);
 }
