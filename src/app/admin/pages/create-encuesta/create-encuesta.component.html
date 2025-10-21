@@ -1,329 +1,402 @@
-<div class="grid">
-  <div class="col-12">
-    <p-card
-      [header]="editMode ? 'Editar Encuesta' : 'Crear Nueva Encuesta'"
-      styleClass="shadow-2 border-round-lg">
+<div class="grid m-0">
+  <div class="col-12 p-0 xl:p-3">
+    <div class="surface-ground">
+      <!-- Header moderno -->
+      <div class="text-center py-5 px-4 bg-blue-300">
+        <div class="inline-flex align-items-center justify-content-center bg-white border-circle w-4rem h-4rem mb-3">
+          <i class="pi pi-file-edit text-primary text-3xl"></i>
+        </div>
+        <h1 class="text-white font-bold mb-2 text-3xl">
+          {{ editMode ? 'Editar Encuesta' : 'Nueva Encuesta' }}
+        </h1>
+        <p class="text-white text-opacity-90 mt-0 mb-0 line-height-3">
+          {{ editMode ? 'Modifique los datos de su encuesta' : 'Complete el formulario para crear una nueva encuesta' }}
+        </p>
+      </div>
 
       <form [formGroup]="encuestaForm" (ngSubmit)="saveSurvey()">
+        <div class="surface-card shadow-2">
+          <div class="p-3 xl:p-5">
 
-        <!-- Información básica de la encuesta -->
-        <div class="formgrid grid mb-4">
-          <div class="field col-12 lg:col-8">
-            <label for="titulo" class="block text-900 font-semibold mb-2 required-field">
-              Título de la Encuesta
-            </label>
-            <input
-              pInputText
-              id="titulo"
-              type="text"
-              formControlName="titulo"
-              placeholder="Ingrese el título de la encuesta"
-              class="w-full"
-              [class.p-invalid]="isValidField(encuestaForm, 'titulo')"
-            />
-            <small
-              *ngIf="isValidField(encuestaForm, 'titulo')"
-              class="p-error block mt-1">
-              {{ getFieldError(encuestaForm, 'titulo') }}
-            </small>
-          </div>
-
-          <div class="field col-12 lg:col-4">
-            <label for="estado" class="block text-900 font-semibold mb-2 required-field">
-              Estado
-            </label>
-            <p-dropdown
-              id="estado"
-              formControlName="estado"
-              [options]="estados"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Seleccione el estado"
-              class="w-full"
-              [showClear]="false"
-            ></p-dropdown>
-          </div>
-        </div>
-
-        <div class="formgrid grid mb-4">
-          <div class="field col-12">
-            <label for="descripcion" class="block text-900 font-semibold mb-2">
-              Descripción
-            </label>
-            <textarea
-              pInputTextarea
-              id="descripcion"
-              formControlName="descripcion"
-              placeholder="Describa el propósito y objetivos de la encuesta"
-              rows="4"
-              class="w-full"
-              [autoResize]="true"
-            ></textarea>
-          </div>
-        </div>
-
-        <!-- Configuración de la encuesta -->
-        <div class="formgrid grid mb-4">
-          <div class="field col-12">
-            <div class="flex align-items-center h-full">
-              <p-checkbox
-                inputId="es_anonima"
-                formControlName="es_anonima"
-                [binary]="true"
-                class="mr-2"
-              ></p-checkbox>
-              <label for="es_anonima" class="text-900 font-medium">
-                Encuesta Anónima
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Fechas de inicio y fin -->
-        <div class="formgrid grid mb-5">
-          <div class="field col-12 md:col-6">
-            <label for="fecha_inicio" class="block text-900 font-semibold mb-2 required-field">
-              Fecha de Inicio
-            </label>
-            <p-calendar
-              inputId="fecha_inicio"
-              formControlName="fecha_inicio"
-              dateFormat="dd/mm/yy"
-              placeholder="Seleccione fecha de inicio"
-              class="w-full"
-              [showIcon]="true"
-              [showButtonBar]="true"
-              [minDate]="today"
-              [class.p-invalid]="isValidField(encuestaForm, 'fecha_inicio')"
-            ></p-calendar>
-            <small
-              *ngIf="isValidField(encuestaForm, 'fecha_inicio')"
-              class="p-error block mt-1">
-              {{ getFieldError(encuestaForm, 'fecha_inicio') }}
-            </small>
-          </div>
-
-          <div class="field col-12 md:col-6">
-            <label for="fecha_fin" class="block text-900 font-semibold mb-2 required-field">
-              Fecha de Fin
-            </label>
-            <p-calendar
-              inputId="fecha_fin"
-              formControlName="fecha_fin"
-              dateFormat="dd/mm/yy"
-              placeholder="Seleccione fecha de fin"
-              class="w-full"
-              [showIcon]="true"
-              [showButtonBar]="true"
-              [minDate]="encuestaForm.get('fecha_inicio')?.value || today"
-              [class.p-invalid]="isValidField(encuestaForm, 'fecha_fin')"
-            ></p-calendar>
-            <small
-              *ngIf="isValidField(encuestaForm, 'fecha_fin')"
-              class="p-error block mt-1">
-              {{ getFieldError(encuestaForm, 'fecha_fin') }}
-            </small>
-          </div>
-        </div>
-
-        <!-- Sección de preguntas -->
-        <p-divider align="left">
-          <div class="inline-flex align-items-center">
-            <i class="pi pi-question-circle mr-2"></i>
-            <b>Configuración de Preguntas</b>
-          </div>
-        </p-divider>
-
-        <div class="mb-4">
-          <div class="flex flex-column sm:flex-row justify-content-between align-items-start sm:align-items-center mb-4 gap-2">
-            <h4 class="text-xl font-bold text-900 m-0">Preguntas de la Encuesta</h4>
-            <p-button
-              label="Agregar Pregunta"
-              icon="pi pi-plus"
-              styleClass="p-button-success p-button-sm w-full sm:w-auto"
-              (click)="addQuestion()"
-              pTooltip="Agregar nueva pregunta"
-              tooltipPosition="left"
-            ></p-button>
-          </div>
-
-          <div formArrayName="preguntas">
-            <div
-              *ngFor="let question of questions.controls; let i = index"
-              [formGroupName]="i"
-              class="surface-card border-round-lg p-4 mb-4 shadow-1"
-            >
-              <!-- Encabezado de la pregunta -->
-              <div class="flex justify-content-between align-items-center mb-3">
-                <h5 class="text-primary font-bold m-0">
-                  <i class="pi pi-list mr-2"></i>
-                  Pregunta {{ i + 1 }}
-                </h5>
-                <div class="flex gap-1">
-                  <p-button
-                    icon="pi pi-arrow-up"
-                    styleClass="p-button-sm p-button-text p-button-rounded"
-                    (click)="moveUp(i)"
-                    pTooltip="Mover arriba"
-                    [disabled]="i === 0"
-                  ></p-button>
-                  <p-button
-                    icon="pi pi-arrow-down"
-                    styleClass="p-button-sm p-button-text p-button-rounded"
-                    (click)="moveDown(i)"
-                    pTooltip="Mover abajo"
-                    [disabled]="i === questions.length - 1"
-                  ></p-button>
-                  <p-button
-                    icon="pi pi-trash"
-                    styleClass="p-button-sm p-button-danger p-button-text p-button-rounded"
-                    (click)="removeQuestion(i)"
-                    pTooltip="Eliminar pregunta"
-                    [disabled]="questions.length <= 1"
-                  ></p-button>
+            <!-- Sección 1: Datos Principales -->
+            <div class="mb-5">
+              <div class="flex align-items-center mb-4">
+                <div class="flex align-items-center justify-content-center bg-blue-100 border-circle w-3rem h-3rem mr-3">
+                  <span class="text-blue-600 font-bold text-xl">1</span>
+                </div>
+                <div>
+                  <h2 class="text-900 font-semibold m-0 text-xl">Datos Principales</h2>
+                  <p class="text-600 m-0 text-sm">Información básica de la encuesta</p>
                 </div>
               </div>
 
-              <div class="formgrid grid">
-                <!-- Texto de la pregunta -->
-                <div class="field col-12 lg:col-8">
-                  <label [for]="'pregunta_' + i" class="block text-900 font-semibold mb-2 required-field">
-                    Enunciado de la Pregunta
-                  </label>
-                  <input
-                    pInputText
-                    [id]="'pregunta_' + i"
-                    type="text"
-                    formControlName="texto"
-                    [placeholder]="'Ingrese el enunciado de la pregunta ' + (i + 1)"
-                    class="w-full"
-                    [class.p-invalid]="isValidField(question, 'texto')"
-                  />
-                  <small
-                    *ngIf="isValidField(question, 'texto')"
-                    class="p-error block mt-1">
-                    {{ getFieldError(question, 'texto') }}
-                  </small>
-                </div>
-
-                <!-- Tipo de pregunta -->
-                <div class="field col-12 lg:col-4">
-                  <label [for]="'tipo_' + i" class="block text-900 font-semibold mb-2 required-field">
-                    Tipo de Pregunta
-                  </label>
-                  <p-dropdown
-                    [id]="'tipo_' + i"
-                    formControlName="tipo"
-                    [options]="questionTypes"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Seleccione el tipo"
-                    class="w-full"
-                    (onChange)="onQuestionTypeChange(i)"
-                    [showClear]="false"
-                  ></p-dropdown>
-                </div>
-              </div>
-
-              <!-- Opciones para preguntas de selección -->
-              <div *ngIf="canShowOpciones(question.get('tipo')?.value)" class="mt-4">
-                <p-fieldset legend="Opciones de Respuesta" [toggleable]="false">
-                  <div formArrayName="opciones">
-                    <div
-                      *ngFor="let option of getOptions(i).controls; let j = index"
-                      [formGroupName]="j"
-                      class="flex align-items-center gap-2 mb-2"
-                    >
-                      <span class="field-radiobutton">
-                        <i class="pi pi-circle text-300"
-                           *ngIf="question.get('tipo')?.value === 'OPCION_UNICA'"></i>
-                        <i class="pi pi-stop text-300"
-                           *ngIf="question.get('tipo')?.value === 'OPCION_MULTIPLE'"></i>
-                      </span>
+              <div class="surface-50 border-round-lg p-4">
+                <div class="grid">
+                  <div class="col-12 lg:col-8 mb-3">
+                    <label for="titulo" class="block text-900 font-semibold mb-2 required-field">
+                      Título de la Encuesta
+                    </label>
+                    <span class="p-input-icon-left w-full">
+                      <i class="pi pi-pencil"></i>
                       <input
                         pInputText
+                        id="titulo"
                         type="text"
-                        formControlName="value"
-                        [placeholder]="'Opción ' + (j + 1)"
-                        class="flex-1"
-                        [class.p-invalid]="getOptions(i).at(j).get('value')?.invalid && getOptions(i).at(j).get('value')?.touched"
+                        formControlName="titulo"
+                        placeholder="Ej: Encuesta de Satisfacción Académica 2025"
+                        class="w-full"
+                        [class.p-invalid]="isValidField(encuestaForm, 'titulo')"
                       />
-                      <small
-                        *ngIf="getOptions(i).at(j).get('value')?.invalid && getOptions(i).at(j).get('value')?.touched"
-                        class="p-error block mt-1">
-                        {{ getFieldError(getOptions(i).at(j), 'value') }}
-                      </small>
-                      <p-button
-                        icon="pi pi-times"
-                        styleClass="p-button-sm p-button-danger p-button-text p-button-rounded"
-                        (click)="removeOption(i, j)"
-                        pTooltip="Eliminar opción"
-                        [disabled]="getOptions(i).length <= 1"
-                      ></p-button>
-                    </div>
+                    </span>
+                    <small
+                      *ngIf="isValidField(encuestaForm, 'titulo')"
+                      class="p-error block mt-1">
+                      {{ getFieldError(encuestaForm, 'titulo') }}
+                    </small>
+                  </div>
 
-                    <div *ngIf="getOptions(i).length < 10" class="mt-3">
-                      <p-button
-                        label="Agregar Opción"
-                        icon="pi pi-plus"
-                        styleClass="p-button-sm p-button-outlined w-full sm:w-auto"
-                        (click)="addOption(i)"
-                        pTooltip="Agregar nueva opción"
-                      ></p-button>
+                  <div class="col-12 lg:col-4 mb-3">
+                    <label for="estado" class="block text-900 font-semibold mb-2 required-field">
+                      Estado
+                    </label>
+                    <p-dropdown
+                      id="estado"
+                      formControlName="estado"
+                      [options]="estados"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Seleccionar"
+                      styleClass="w-full"
+                      [showClear]="false"
+                    >
+                      <ng-template let-item pTemplate="selectedItem">
+                        <div class="flex align-items-center" *ngIf="item">
+                          <span>{{ item.label }}</span>
+                        </div>
+                      </ng-template>
+                    </p-dropdown>
+                  </div>
+
+                  <div class="col-12 mb-3">
+                    <label for="descripcion" class="block text-900 font-semibold mb-2">
+                      Descripción
+                    </label>
+                    <textarea
+                      pInputTextarea
+                      id="descripcion"
+                      formControlName="descripcion"
+                      placeholder="Describa el objetivo, alcance y propósito de esta encuesta..."
+                      rows="4"
+                      class="w-full"
+                      [autoResize]="true"
+                    ></textarea>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="surface-card border-1 surface-border border-round p-3">
+                      <div class="flex align-items-center">
+                        <p-checkbox
+                          inputId="es_anonima"
+                          formControlName="es_anonima"
+                          [binary]="true"
+                          class="mr-3"
+                        ></p-checkbox>
+                        <div>
+                          <label for="es_anonima" class="text-900 font-semibold mb-1 block">
+                            Encuesta Anónima
+                          </label>
+                          <p class="text-600 text-sm m-0">Las respuestas no registrarán información del participante</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </p-fieldset>
-              </div>
-
-
-              <!-- Configuración para número -->
-              <div *ngIf="canShowNumero(question.get('tipo')?.value)" class="mt-4">
-                <p-fieldset legend="Configuración de Número" [toggleable]="false">
-                  <div class="text-600">
-                    <i class="pi pi-info-circle mr-2"></i>
-                    Los usuarios podrán ingresar un valor numérico.
-                  </div>
-                </p-fieldset>
-              </div>
-
-              <!-- Configuración adicional de la pregunta -->
-              <div class="flex justify-content-between align-items-center mt-4 pt-3 border-top-1 border-200">
-                <div class="flex align-items-center">
-                  <p-checkbox
-                    [inputId]="'requerida_' + i"
-                    formControlName="es_requerida"
-                    [binary]="true"
-                    class="mr-2"
-                  ></p-checkbox>
-                  <label [for]="'requerida_' + i" class="text-900 font-medium">
-                    <i class="pi pi-exclamation-triangle text-orange-500 mr-1"></i>
-                    Pregunta Obligatoria
-                  </label>
                 </div>
               </div>
             </div>
+
+            <!-- Sección 2: Periodo de Aplicación -->
+            <div class="mb-5">
+              <div class="flex align-items-center mb-4">
+                <div class="flex align-items-center justify-content-center bg-green-100 border-circle w-3rem h-3rem mr-3">
+                  <span class="text-green-600 font-bold text-xl">2</span>
+                </div>
+                <div>
+                  <h2 class="text-900 font-semibold m-0 text-xl">Periodo de Aplicación</h2>
+                  <p class="text-600 m-0 text-sm">Defina cuándo estará activa la encuesta</p>
+                </div>
+              </div>
+
+              <div class="surface-50 border-round-lg p-4">
+                <div class="grid">
+                  <div class="col-12 md:col-6 mb-3 md:mb-0">
+                    <label for="fecha_inicio" class="block text-900 font-semibold mb-2 required-field">
+                      Fecha de Inicio
+                    </label>
+                    <p-calendar
+                      inputId="fecha_inicio"
+                      formControlName="fecha_inicio"
+                      dateFormat="dd/mm/yy"
+                      placeholder="dd/mm/aaaa"
+                      styleClass="w-full"
+                      [showIcon]="true"
+                      [showButtonBar]="true"
+                      [minDate]="today"
+                      [class.p-invalid]="isValidField(encuestaForm, 'fecha_inicio')"
+                      appendTo="body"
+                    ></p-calendar>
+                    <small
+                      *ngIf="isValidField(encuestaForm, 'fecha_inicio')"
+                      class="p-error block mt-1">
+                      {{ getFieldError(encuestaForm, 'fecha_inicio') }}
+                    </small>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <label for="fecha_fin" class="block text-900 font-semibold mb-2 required-field">
+                      Fecha de Finalización
+                    </label>
+                    <p-calendar
+                      inputId="fecha_fin"
+                      formControlName="fecha_fin"
+                      dateFormat="dd/mm/yy"
+                      placeholder="dd/mm/aaaa"
+                      styleClass="w-full"
+                      [showIcon]="true"
+                      [showButtonBar]="true"
+                      [minDate]="encuestaForm.get('fecha_inicio')?.value || today"
+                      [class.p-invalid]="isValidField(encuestaForm, 'fecha_fin')"
+                      appendTo="body"
+                    ></p-calendar>
+                    <small
+                      *ngIf="isValidField(encuestaForm, 'fecha_fin')"
+                      class="p-error block mt-1">
+                      {{ getFieldError(encuestaForm, 'fecha_fin') }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección 3: Preguntas -->
+            <div class="mb-5">
+              <div class="mb-4">
+                <div class="flex flex-column xl:flex-row justify-content-between align-items-start xl:align-items-center gap-3">
+                  <div class="flex align-items-center">
+                    <div class="flex align-items-center justify-content-center bg-orange-100 border-circle w-3rem h-3rem mr-3">
+                      <span class="text-orange-600 font-bold text-xl">3</span>
+                    </div>
+                    <div>
+                      <h2 class="text-900 font-semibold m-0 text-xl">Preguntas</h2>
+                      <p class="text-600 m-0 text-sm">Configure las preguntas de su encuesta</p>
+                    </div>
+                  </div>
+                  <div class="w-full xl:w-auto">
+                    <p-button
+                      label="Nueva Pregunta"
+                      icon="pi pi-plus"
+                      styleClass="p-button-success w-full"
+                      (click)="addQuestion()"
+                    ></p-button>
+                  </div>
+                </div>
+              </div>
+
+              <div formArrayName="preguntas" class="flex flex-column gap-3">
+                <div
+                  *ngFor="let question of questions.controls; let i = index"
+                  [formGroupName]="i"
+                  class="surface-card border-1 surface-border border-round-lg overflow-hidden"
+                >
+                  <!-- Header de pregunta -->
+                  <div class="bg-gray-50 px-4 py-3 border-bottom-1 surface-border">
+                    <div class="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3">
+                      <div class="flex align-items-center gap-2">
+                        <span class="bg-primary text-white border-circle flex align-items-center justify-content-center font-bold"
+                              style="width: 32px; height: 32px; font-size: 14px;">
+                          {{ i + 1 }}
+                        </span>
+                        <span class="text-900 font-semibold text-lg">Pregunta {{ i + 1 }}</span>
+                      </div>
+                      <div class="flex gap-2 w-full md:w-auto">
+                        <p-button
+                          icon="pi pi-angle-up"
+                          styleClass="p-button-rounded p-button-outlined p-button-sm flex-1 md:flex-none"
+                          (click)="moveUp(i)"
+                          [disabled]="i === 0"
+                          pTooltip="Mover arriba"
+                        ></p-button>
+                        <p-button
+                          icon="pi pi-angle-down"
+                          styleClass="p-button-rounded p-button-outlined p-button-sm flex-1 md:flex-none"
+                          (click)="moveDown(i)"
+                          [disabled]="i === questions.length - 1"
+                          pTooltip="Mover abajo"
+                        ></p-button>
+                        <p-button
+                          icon="pi pi-trash"
+                          styleClass="p-button-rounded p-button-outlined p-button-danger p-button-sm flex-1 md:flex-none"
+                          (click)="removeQuestion(i)"
+                          [disabled]="questions.length <= 1"
+                          pTooltip="Eliminar"
+                        ></p-button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="p-4">
+                    <div class="grid">
+                      <div class="col-12 lg:col-8 mb-3">
+                        <label [for]="'pregunta_' + i" class="block text-900 font-semibold mb-2 required-field">
+                          Enunciado
+                        </label>
+                        <input
+                          pInputText
+                          [id]="'pregunta_' + i"
+                          type="text"
+                          formControlName="texto"
+                          placeholder="Escriba aquí su pregunta"
+                          class="w-full"
+                          [class.p-invalid]="isValidField(question, 'texto')"
+                        />
+                        <small
+                          *ngIf="isValidField(question, 'texto')"
+                          class="p-error block mt-1">
+                          {{ getFieldError(question, 'texto') }}
+                        </small>
+                      </div>
+
+                      <div class="col-12 lg:col-4 mb-3">
+                        <label [for]="'tipo_' + i" class="block text-900 font-semibold mb-2 required-field">
+                          Tipo de Respuesta
+                        </label>
+                        <p-dropdown
+                          [id]="'tipo_' + i"
+                          formControlName="tipo"
+                          [options]="questionTypes"
+                          optionLabel="label"
+                          optionValue="value"
+                          placeholder="Seleccionar"
+                          styleClass="w-full"
+                          (onChange)="onQuestionTypeChange(i)"
+                          [showClear]="false"
+                        ></p-dropdown>
+                      </div>
+
+                      <!-- Opciones -->
+                      <div *ngIf="canShowOpciones(question.get('tipo')?.value)" class="col-12">
+                        <div class="bg-blue-50 border-round-lg p-3 border-1 border-blue-200">
+                          <div class="flex align-items-center mb-3">
+                            <i class="pi pi-list text-blue-600 mr-2"></i>
+                            <span class="font-semibold text-900">Opciones de Respuesta</span>
+                          </div>
+
+                          <div formArrayName="opciones">
+                            <div
+                              *ngFor="let option of getOptions(i).controls; let j = index"
+                              [formGroupName]="j"
+                              class="flex align-items-start gap-2 mb-2"
+                            >
+                              <div class="flex align-items-center" style="padding-top: 12px;">
+                                <i [class]="question.get('tipo')?.value === 'OPCION_UNICA' ? 'pi pi-circle' : 'pi pi-stop'"
+                                   class="text-500"></i>
+                              </div>
+                              <div class="flex-1">
+                                <input
+                                  pInputText
+                                  type="text"
+                                  formControlName="value"
+                                  [placeholder]="'Opción ' + (j + 1)"
+                                  class="w-full"
+                                  [class.p-invalid]="getOptions(i).at(j).get('value')?.invalid && getOptions(i).at(j).get('value')?.touched"
+                                />
+                                <small
+                                  *ngIf="getOptions(i).at(j).get('value')?.invalid && getOptions(i).at(j).get('value')?.touched"
+                                  class="p-error block mt-1">
+                                  {{ getFieldError(getOptions(i).at(j), 'value') }}
+                                </small>
+                              </div>
+                              <p-button
+                                icon="pi pi-times"
+                                styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
+                                (click)="removeOption(i, j)"
+                                [disabled]="getOptions(i).length <= 1"
+                              ></p-button>
+                            </div>
+
+                            <div *ngIf="getOptions(i).length < 10" class="mt-3">
+                              <p-button
+                                label="Añadir Opción"
+                                icon="pi pi-plus-circle"
+                                styleClass="p-button-text w-full"
+                                (click)="addOption(i)"
+                              ></p-button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Info número -->
+                      <div *ngIf="canShowNumero(question.get('tipo')?.value)" class="col-12">
+                        <div class="bg-cyan-50 border-round-lg p-3 border-1 border-cyan-200">
+                          <div class="flex align-items-center text-cyan-900">
+                            <i class="pi pi-info-circle mr-2"></i>
+                            <span class="text-sm">Respuesta numérica libre</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Pregunta obligatoria -->
+                      <div class="col-12">
+                        <div class="surface-100 border-round p-3 mt-2">
+                          <div class="flex align-items-center">
+                            <p-checkbox
+                              [inputId]="'requerida_' + i"
+                              formControlName="es_requerida"
+                              [binary]="true"
+                              class="mr-3"
+                            ></p-checkbox>
+                            <label [for]="'requerida_' + i" class="text-900 font-medium cursor-pointer">
+                              <i class="pi pi-shield text-orange-500 mr-2"></i>
+                              Respuesta obligatoria
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Estado vacío -->
+                <div *ngIf="questions.length === 0" class="text-center py-6">
+                  <i class="pi pi-inbox text-400" style="font-size: 3rem;"></i>
+                  <p class="text-600 mt-3">No hay preguntas. Agregue al menos una pregunta.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="pt-4 border-top-1 surface-border">
+              <div class="flex flex-column-reverse md:flex-row gap-3 justify-content-end">
+                <p-button
+                  label="Cancelar"
+                  icon="pi pi-times"
+                  (click)="cancel()"
+                  styleClass="p-button-outlined p-button-secondary w-full md:w-auto"
+                ></p-button>
+                <p-button
+                  [label]="editMode ? 'Guardar Cambios' : 'Crear Encuesta'"
+                  [icon]="editMode ? 'pi pi-save' : 'pi pi-check'"
+                  type="submit"
+                  [loading]="loading"
+                  [disabled]="encuestaForm.invalid || (editMode && !hasChanges)"
+                  [styleClass]="'p-button-success w-full md:w-auto'"
+                ></p-button>
+              </div>
+            </div>
+
           </div>
         </div>
-
-        <!-- Botones de acción -->
-        <p-divider></p-divider>
-        <div class="flex flex-column sm:flex-row gap-3 justify-content-end pt-3">
-          <p-button
-            label="Cancelar"
-            icon="pi pi-times"
-            (click)="cancel()"
-            styleClass="p-button-secondary p-button-outlined w-full sm:w-auto"
-          ></p-button>
-          <p-button
-            [label]="editMode ? 'Actualizar Encuesta' : 'Crear Encuesta'"
-            [icon]="editMode ? 'pi pi-refresh' : 'pi pi-check'"
-            type="submit"
-            [loading]="loading"
-            [disabled]="encuestaForm.invalid || (editMode && !hasChanges)"
-            [styleClass]="(editMode ? 'p-button-warning' : 'p-button-success') + ' w-full sm:w-auto'"
-          ></p-button>
-        </div>
       </form>
-    </p-card>
+    </div>
   </div>
 </div>
