@@ -3,8 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { MessageService } from 'primeng/api';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { ProfileCompletionGuard } from '../../../core/guards/profile-completion.guard';
+import { filter } from 'rxjs/operators';
 
 export interface PerfilUsuario {
   id: number;
@@ -269,6 +270,23 @@ export class MiProfileComponent implements OnInit, OnDestroy {
         });
       }
     });
+
+    // Detectar cambios de navegación para verificar perfil
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event: NavigationEnd) => {
+        // Solo verificar si estamos en la ruta de mi-perfil
+        if (event.url.includes('/user/mi-perfil')) {
+          console.log('Navegación detectada a mi-perfil:', event.url);
+          // Agregar un pequeño delay para asegurar que la navegación se complete
+          setTimeout(() => {
+            this.verificarPerfilCompletoYRedirigir();
+          }, 100);
+        }
+      });
 
     // Agregar un pequeño delay para asegurar que todo esté inicializado
     setTimeout(() => {
@@ -1168,6 +1186,9 @@ export class MiProfileComponent implements OnInit, OnDestroy {
             console.log('Opciones personalizadas de tecnologías en respuesta:', this.perfil?.opciones_personalizadas_tecnologias);
             this.populateForm();
             this.updateProgress();
+            
+            // Verificar si el perfil está completo y redirigir si es necesario
+            this.verificarPerfilCompletoYRedirigir();
           } else {
             this.error = response.msj || 'Error al cargar el perfil';
             console.log('Error en respuesta:', this.error);
@@ -1388,6 +1409,32 @@ export class MiProfileComponent implements OnInit, OnDestroy {
       const control = this.perfilForm.get(key);
       control?.markAsTouched();
     });
+  }
+
+  private verificarPerfilCompletoYRedirigir() {
+    // Solo verificar si NO estamos ya en modo completar perfil
+    if (!this.isCompletionMode) {
+      this.authService.verificarPerfilCompleto()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.ok && !response.perfil_completo) {
+              // Perfil incompleto, redirigir a modo completar perfil
+              console.log('Perfil incompleto detectado, redirigiendo...');
+              this.router.navigate(['/user/mi-perfil'], {
+                queryParams: {
+                  completar: 'true',
+                  mensaje: 'Completa tu perfil para acceder al dashboard'
+                }
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error verificando perfil completo:', error);
+            // En caso de error, no hacer nada para no interrumpir la experiencia
+          }
+        });
+    }
   }
 
   private verificarPerfilYRedirigir() {
