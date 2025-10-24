@@ -1,10 +1,54 @@
+/* Placeholders más pequeños usando clase personalizada */
+:host ::ng-deep .placeholder-sm::placeholder {
+  font-size: 0.875rem !important; /* 14px */
+}
 
+/* Placeholders aún más pequeños en móviles */
+@media (max-width: 576px) {
+  :host ::ng-deep .placeholder-sm::placeholder {
+    font-size: 0.8125rem !important; /* 13px */
+  }
+}
+
+/* Responsive: Padding del contenedor principal */
+@media (max-width: 768px) {
+  :host ::ng-deep .p-card .p-card-body {
+    padding: 1rem;
+  }
+}
+
+/* Prevenir zoom en iOS - manteniendo tamaño mínimo 16px */
+@media (max-width: 768px) {
+  :host ::ng-deep .p-inputtext,
+  :host ::ng-deep .p-dropdown,
+  :host ::ng-deep .p-calendar input,
+  :host ::ng-deep textarea,
+  :host ::ng-deep .p-password input {
+    font-size: 16px !important;
+  }
+}
+
+/* Mejorar alineación de iconos en inputs */
+:host ::ng-deep .p-input-icon-left > i {
+  color: #6c757d;
+}
+
+/* Transiciones suaves */
+:host ::ng-deep .surface-card {
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .surface-card:hover {
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075);
+}
 
 /* Asegurar que p-password ocupe todo el ancho */
-::ng-deep .p-password {
+:host ::ng-deep .p-password,
+:host ::ng-deep .password-field {
   width: 100%;
 }
 
-::ng-deep .p-password input {
+:host ::ng-deep .p-password input,
+:host ::ng-deep .password-field input {
   width: 100%;
 }
