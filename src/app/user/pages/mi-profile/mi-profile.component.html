@@ -148,7 +148,7 @@
           <i class="pi pi-user-edit text-lg"></i>
         </div>
         <div class="flex-1">
-          <h2 class="text-2xl lg:text-3xl font-bold text-900 mb-1">Editar Perfil</h2>
+          <h2 class="text-2xl lg:text-3xl font-bold text-900 mb-1">Editar perfil</h2>
           <p class="text-600 mb-0 text-sm lg:text-base">Mantenga actualizada su información profesional</p>
         </div>
       </div>
@@ -170,7 +170,7 @@
 
             <div class="flex-1 w-full">
               <div class="flex flex-column lg:flex-row lg:align-items-center lg:justify-content-between gap-3 mb-3">
-                <h3 class="text-xl font-bold text-900 mb-0">Progreso de Completitud</h3>
+                <h3 class="text-xl font-bold text-900 mb-0">Progreso de completitud</h3>
                 <div class="flex align-items-center gap-3">
                   <span class="text-xl font-bold"
                         [ngStyle]="{'color': profileProgress === 100 ? '#10b981' : profileProgress >= 80 ? '#f59e0b' : '#ef4444'}">
@@ -211,7 +211,7 @@
           <div class="bg-blue-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
             <i class="pi pi-user text-base"></i>
           </div>
-          <h3 class="text-xl font-semibold text-900 mb-0">Información Personal</h3>
+          <h3 class="text-xl font-semibold text-900 mb-0">Información personal</h3>
         </div>
 
         <div class="grid">
@@ -219,7 +219,7 @@
           <div class="col-12 lg:col-6">
             <div class="field">
               <label for="nombre" class="block text-900 font-semibold mb-2">
-                <span class="text-red-500 mr-1">*</span>Nombre Completo
+                <span class="text-red-500 mr-1">*</span>Nombre completo
               </label>
               <input
                 pInputText
@@ -263,14 +263,15 @@
           <div class="bg-purple-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
             <i class="pi pi-briefcase text-base"></i>
           </div>
-          <h3 class="text-xl font-semibold text-900 mb-0">Información Profesional</h3>
+          <h3 class="text-xl font-semibold text-900 mb-0">Información profesional</h3>
         </div>
 
         <div class="grid">
           <!-- Posición Actual -->
           <div class="col-12 lg:col-6">
             <div class="field">
-              <label for="posicion_actual" class="block text-900 font-semibold mb-2"><span class="text-red-500 mr-1">*</span>Posición Actual</label>
+              <label for="posicion_actual" class="block text-900 font-semibold mb-2">
+                <span class="text-red-500 mr-1">*</span>Posición actual</label>
               <input
                 pInputText
                 id="posicion_actual"
@@ -289,7 +290,7 @@
           <!-- Empresa Actual -->
           <div class="col-12 lg:col-6">
             <div class="field">
-              <label for="empresa_actual" class="block text-900 font-semibold mb-2"><span class="text-red-500 mr-1">*</span>Empresa Actual</label>
+              <label for="empresa_actual" class="block text-900 font-semibold mb-2"><span class="text-red-500 mr-1">*</span>Empresa actual</label>
               <input
                 pInputText
                 id="empresa_actual"
@@ -393,13 +394,12 @@
 
       <!-- Metrics Information Section -->
       <div class="mb-6">
-        <div class="surface-50 border-round-lg p-4">
           <div class="flex align-items-center gap-3 mb-4">
             <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
               <i class="pi pi-chart-bar text-base"></i>
             </div>
             <div class="flex-1">
-              <h3 class="text-xl font-semibold text-900 mb-1">Información para Métricas</h3>
+              <h3 class="text-xl font-semibold text-900 mb-1">Información complementaria</h3>
               <p class="text-600 mb-0 text-sm">Datos necesarios para generar estadísticas precisas del mercado laboral</p>
             </div>
           </div>
@@ -411,7 +411,7 @@
               <div class="field">
                 <label for="nivel_educacion" class="flex items-center gap-2 text-900 font-semibold mb-2">
                   <span class="text-red-500 mr-1">*</span>
-                  <span>Nivel de Educación</span>
+                  <span>Especialización</span>
                   <small class="text-600 font-normal">(Puedes seleccionar múltiples opciones)</small>
                 </label>
                 <div class="flex gap-2">
@@ -495,7 +495,7 @@
               <div class="field">
                 <label for="especialidad_tecnica" class="flex items-center gap-2 text-900 font-semibold mb-2">
                   <span class="text-red-500 mr-1">*</span>
-                  <span>Tecnologías Dominadas</span>
+                  <span>Tecnologías dominadas</span>
                   <small class="text-600 font-normal">(Puedes seleccionar múltiples opciones)</small>
                 </label>
                 <div class="flex gap-2">
@@ -577,7 +577,7 @@
               <div class="col-12 lg:col-6">
                 <div class="field">
                   <label for="años_experiencia" class="block text-900 font-semibold mb-2">
-                    <span class="text-red-500 mr-1">*</span>Años de Experiencia
+                    <span class="text-red-500 mr-1">*</span>Años de experiencia
                   </label>
                   <p-inputNumber
                     id="años_experiencia"
@@ -598,7 +598,7 @@
             <div class="col-12 lg:col-6">
               <div class="field">
                 <label for="tipo_empleo_actual" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Situación Laboral Actual
+                  <span class="text-red-500 mr-1">*</span>Situación laboral actual
                 </label>
                 <p-dropdown
                   id="tipo_empleo_actual"
@@ -619,7 +619,7 @@
             <div class="col-12 lg:col-6">
               <div class="field">
                 <label for="area_interes" class="text-900 font-semibold mb-2 flex items-center gap-2">
-                  <span class="text-red-500 mr-1">*</span>Área de Interés Principal
+                  <span class="text-red-500 mr-1">*</span>Área de interés principal
                   <span class="text-600 text-sm">(Puedes agregar una opción personalizada)</span>
                 </label>
 
@@ -702,7 +702,7 @@
             <div class="col-12 lg:col-6">
               <div class="field">
                 <label for="disponibilidad_cambio" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Disponibilidad para Cambio
+                  <span class="text-red-500 mr-1">*</span>Disponibilidad para cambio
                 </label>
                 <p-dropdown
                   id="disponibilidad_cambio"
@@ -717,29 +717,12 @@
                 </small>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Complementary Information Section -->
-      <div class="mb-6">
-        <div class="surface-50 p-4 border-round-lg">
-          <div class="flex align-items-center gap-3 mb-4">
-            <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
-              <i class="pi pi-exclamation-triangle text-base"></i>
-            </div>
-            <div class="flex-1">
-              <h3 class="text-xl font-semibold text-900 mb-1">Información Complementaria</h3>
-              <p class="text-600 mb-0 text-sm">Datos confidenciales para análisis estadístico del mercado laboral</p>
-            </div>
-          </div>
-
-          <div class="grid">
             <!-- Rango Salarial -->
             <div class="col-12 lg:col-6">
               <div class="field">
                 <label for="rango_salarial" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Rango Salarial (CLP mensual)
+                  <span class="text-red-500 mr-1">*</span>Rango salarial (CLP mensual)
                 </label>
                 <p-dropdown
                   id="rango_salarial"
@@ -759,11 +742,11 @@
               </div>
             </div>
 
-            <!-- Satisfacción Laboral -->
+                        <!-- Satisfacción Laboral -->
             <div class="col-12 lg:col-6">
               <div class="field">
                 <label for="satisfaccion_laboral" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Satisfacción Laboral Actual
+                  <span class="text-red-500 mr-1">*</span>Satisfacción laboral actual
                 </label>
                 <div class="flex justify-content-center lg:justify-content-start">
                   <p-rating
@@ -785,10 +768,9 @@
               </div>
             </div>
           </div>
-        </div>
       </div>
 
-      <!-- Form Actions -->
+      <!-- Botones finales -->
       <div class="border-top-1 surface-border pt-4">
         <div class="flex flex-column sm:flex-row gap-3 justify-content-center">
           <p-button
@@ -826,11 +808,7 @@
 </div>
 
 <!-- Toast Messages -->
-<p-toast
-  position="top-right"
-  preventOpenDuplicates="true"
-  styleClass="w-full sm:w-25rem max-w-screen">
-</p-toast>
+<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
 
 <!-- Modal para confirmar guardar cambios -->
 <p-dialog

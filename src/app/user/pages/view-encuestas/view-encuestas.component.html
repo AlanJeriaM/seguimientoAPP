@@ -13,21 +13,21 @@
     <div class="search-wrapper">
       <span class="p-input-icon-left w-full">
         <i class="pi pi-search"></i>
-        <input 
-          type="text" 
-          pInputText 
-          placeholder="Buscar encuestas..." 
+        <input
+          type="text"
+          pInputText
+          placeholder="Buscar encuestas..."
           [(ngModel)]="searchText"
           class="w-full"
         />
       </span>
     </div>
-    
+
     <div class="filter-wrapper">
-      <p-dropdown 
-        [options]="estados" 
-        [(ngModel)]="estadoFiltro" 
-        optionLabel="label" 
+      <p-dropdown
+        [options]="estados"
+        [(ngModel)]="estadoFiltro"
+        optionLabel="label"
         optionValue="value"
         placeholder="Filtrar por estado"
         [showClear]="false"
@@ -59,7 +59,7 @@
     </div>
 
     <!-- Cards de encuestas -->
-    <div *ngFor="let encuesta of encuestasFiltradas" 
+    <div *ngFor="let encuesta of encuestasFiltradas"
          class="encuesta-card"
          [ngClass]="{'encuesta-destacada': isEncuestaDestacada(encuesta)}">
       <p-card styleClass="h-full">
@@ -68,7 +68,7 @@
           <div class="card-header">
             <div class="header-info">
               <h4 class="encuesta-titulo">{{ encuesta.titulo }}</h4>
-              <span 
+              <span
                 [class]="'estado-badge ' + getEstadoBadgeClass(getEstadoEncuesta(encuesta))"
               >
                 {{ getEstadoLabel(getEstadoEncuesta(encuesta)) }}
@@ -80,7 +80,7 @@
         <!-- Contenido de la card -->
         <div class="card-content">
           <p class="encuesta-descripcion">{{ encuesta.descripcion }}</p>
-          
+
           <div class="encuesta-meta">
             <div class="meta-item">
               <i class="pi pi-calendar" [ngClass]="isEncuestaExpirada(encuesta) ? 'text-red-500' : 'text-green-500'"></i>
@@ -118,8 +118,8 @@
               <span class="progress-label">Progreso:</span>
               <span class="progress-percentage">{{ encuesta.progreso }}%</span>
             </div>
-            <p-progressBar 
-              [value]="encuesta.progreso" 
+            <p-progressBar
+              [value]="encuesta.progreso"
               [showValue]="false"
               styleClass="progress-bar"
             ></p-progressBar>
@@ -143,13 +143,13 @@
         <!-- Footer de la card -->
         <ng-template pTemplate="footer">
           <div class="card-footer">
-            <p-button 
+            <p-button
               [label]="getBotonTexto(encuesta)"
               [icon]="getBotonIcono(encuesta)"
               [severity]="getBotonSeverity(encuesta)"
               [disabled]="isBotonDeshabilitado(encuesta)"
-              (click)="encuesta.estado_usuario === 'EN_PROGRESO' ? continuarEncuesta(encuesta) : 
-                       encuesta.estado_usuario === 'COMPLETADA' ? verResultados(encuesta) : 
+              (click)="encuesta.estado_usuario === 'EN_PROGRESO' ? continuarEncuesta(encuesta) :
+                       encuesta.estado_usuario === 'COMPLETADA' ? verResultados(encuesta) :
                        iniciarEncuesta(encuesta)"
               styleClass="w-full"
             ></p-button>
@@ -160,5 +160,4 @@
   </div>
 </div>
 
-<!-- Toast para mensajes -->
-<p-toast></p-toast>
+<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
