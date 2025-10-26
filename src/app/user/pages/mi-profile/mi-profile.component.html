@@ -309,45 +309,46 @@
           <!-- Industria -->
           <div class="col-12">
             <div class="field">
-              <label for="industria" class="text-900 font-semibold mb-2 flex items-center gap-2">
-                <span class="text-red-500 mr-1">*</span>Industria
-                <span class="text-600 text-sm">(Puedes agregar una opción personalizada)</span>
+              <label for="industria" class="text-900 font-semibold mb-2 flex flex-column lg:flex-row lg:align-items-center gap-2">
+                <span><span class="text-red-500 mr-1">*</span>Industria</span>
+                <span class="text-600 text-sm font-normal">(Puedes agregar una opción personalizada)</span>
               </label>
 
-              <div class="flex gap-2">
-                <p-dropdown
-                  id="industria"
-                  formControlName="industria"
-                  [options]="industriasOpciones"
-                  placeholder="Seleccione su industria"
-                  [class]="'w-full ' + (isFieldInvalid('industria') ? 'ng-invalid ng-dirty' : '')"
-                  [showClear]="true"
-                  styleClass="w-full p-dropdown-lg">
-
-                  <ng-template pTemplate="item" let-option>
-                    <div class="industria-item" (click)="$event.stopPropagation()">
-                      <span>{{ option }}</span>
-                      <p-button
-                        *ngIf="esOpcionPersonalizadaIndustria(option)"
-                        icon="pi pi-times"
-                        severity="danger"
-                        [rounded]="true"
-                        size="small"
-                        styleClass="btn-eliminar-opcion"
-                        (click)="eliminarOpcionPersonalizadaIndustria(option, $event)"
-                        (mousedown)="$event.stopPropagation()"
-                        (mouseup)="$event.stopPropagation()"
-                        pTooltip="Eliminar opción personalizada"
-                        tooltipPosition="top">
-                      </p-button>
-                    </div>
-                  </ng-template>
-                </p-dropdown>
+              <div class="flex flex-column lg:flex-row gap-2">
+                <div class="flex-1 w-full">
+                  <p-dropdown
+                    id="industria"
+                    formControlName="industria"
+                    [options]="industriasOpciones"
+                    placeholder="Seleccione su industria"
+                    [class]="'w-full ' + (isFieldInvalid('industria') ? 'ng-invalid ng-dirty' : '')"
+                    appendTo="body"
+                    styleClass="w-full p-dropdown-lg">
+                    <ng-template pTemplate="item" let-option>
+                      <div class="industria-item" (click)="$event.stopPropagation()">
+                        <span>{{ option }}</span>
+                        <p-button
+                          *ngIf="esOpcionPersonalizadaIndustria(option)"
+                          icon="pi pi-times"
+                          severity="danger"
+                          [rounded]="true"
+                          size="small"
+                          styleClass="btn-eliminar-opcion"
+                          (click)="eliminarOpcionPersonalizadaIndustria(option, $event)"
+                          (mousedown)="$event.stopPropagation()"
+                          (mouseup)="$event.stopPropagation()"
+                          pTooltip="Eliminar opción personalizada"
+                          tooltipPosition="top">
+                        </p-button>
+                      </div>
+                    </ng-template>
+                  </p-dropdown>
+                </div>
 
                 <p-button
                   [icon]="showAddIndustriaDialog ? 'pi pi-minus' : 'pi pi-plus'"
-                  [styleClass]="showAddIndustriaDialog ? 'p-button-danger' : 'p-button-success'"
-                  [style]="{'min-height': '36px', 'width': '36px'}"
+                  [styleClass]="showAddIndustriaDialog ? 'p-button-danger w-full lg:w-auto' : 'p-button-success w-full lg:w-auto'"
+                  [style]="{'min-height': '36px', 'min-width': '36px'}"
                   (onClick)="toggleAddIndustria()"
                   [pTooltip]="showAddIndustriaDialog ? 'Cerrar' : 'Agregar opción personalizada'"
                   tooltipPosition="top">
@@ -367,19 +368,19 @@
                   placeholder="Escriba el nombre de la industria"
                   class="w-full mb-3">
 
-                <div class="flex gap-2">
+                <div class="flex flex-column lg:flex-row gap-2">
                   <p-button
                     label="Agregar"
                     icon="pi pi-plus"
                     (onClick)="agregarIndustria()"
                     [disabled]="!isNuevaIndustriaValid"
-                    styleClass="p-button-success">
+                    styleClass="p-button-success w-full lg:w-auto">
                   </p-button>
                   <p-button
                     label="Cancelar"
                     icon="pi pi-times"
                     (onClick)="cancelarAgregarIndustria()"
-                    styleClass="p-button-text p-button-danger">
+                    styleClass="p-button-text p-button-danger w-full lg:w-auto">
                   </p-button>
                 </div>
               </div>
@@ -392,415 +393,416 @@
         </div>
       </div>
 
-      <!-- Metrics Information Section -->
-      <div class="mb-6">
-          <div class="flex align-items-center gap-3 mb-4">
-            <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
-              <i class="pi pi-chart-bar text-base"></i>
-            </div>
-            <div class="flex-1">
-              <h3 class="text-xl font-semibold text-900 mb-1">Información complementaria</h3>
-              <p class="text-600 mb-0 text-sm">Datos necesarios para generar estadísticas precisas del mercado laboral</p>
-            </div>
+<!-- Metrics Information Section -->
+<div class="mb-6">
+  <div class="flex align-items-center gap-3 mb-4 pb-3 border-bottom-1 surface-border">
+    <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
+      <i class="pi pi-chart-bar text-base"></i>
+    </div>
+    <div class="flex-1">
+      <h3 class="text-xl font-semibold text-900 mb-1">Información complementaria</h3>
+      <p class="text-600 mb-0 text-sm">Datos necesarios para generar estadísticas precisas del mercado laboral</p>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- Nivel de Educación -->
+    <div class="col-12 lg:col-6">
+      <div class="field">
+        <label for="nivel_educacion" class="flex flex-column lg:flex-row lg:align-items-center gap-2 text-900 font-semibold mb-2">
+          <span><span class="text-red-500 mr-1">*</span>Especialización</span>
+          <small class="text-600 font-normal">(Puedes seleccionar múltiples opciones)</small>
+        </label>
+        <div class="flex flex-column lg:flex-row gap-2">
+          <p-multiSelect
+            id="nivel_educacion"
+            formControlName="nivel_educacion"
+            [options]="nivelesEducacion"
+            placeholder="Seleccione sus niveles de educación"
+            selectedItemsLabel="{0} elementos seleccionados"
+            [class]="'flex-1 w-full ' + (isFieldInvalid('nivel_educacion') ? 'ng-invalid ng-dirty' : '')"
+            styleClass="w-full"
+            (onChange)="onNivelEducacionChange($event.value)">
+            <ng-template let-option pTemplate="item">
+              <div class="nivel-educacion-item" (click)="$event.stopPropagation()">
+                <span>{{ option }}</span>
+                <p-button
+                *ngIf="esOpcionPersonalizada(option)"
+                (click)="eliminarOpcionPersonalizada(option, $event)"
+                (mousedown)="$event.stopPropagation()"
+                (mouseup)="$event.stopPropagation()"
+                icon="pi pi-times"
+                [rounded]="true"
+                severity="danger"
+                [styleClass]="'btn-eliminar-opcion'">
+              </p-button>
+              </div>
+            </ng-template>
+          </p-multiSelect>
+
+          <p-button
+            [icon]="showAddNivelEducacionDialog ? 'pi pi-minus' : 'pi pi-plus'"
+            [styleClass]="showAddNivelEducacionDialog ? 'p-button-danger w-full lg:w-auto lg:flex-shrink-0' : 'p-button-success w-full lg:w-auto lg:flex-shrink-0'"
+            [style]="{'min-height': '36px', 'min-width': '36px'}"
+            (onClick)="toggleAddNivelEducacion()"
+            [pTooltip]="showAddNivelEducacionDialog ? 'Cerrar opción personalizada' : 'Agregar opción personalizada'"
+            tooltipPosition="top">
+        </p-button>
+        </div>
+
+        <!-- Custom Option Dialog -->
+        <div *ngIf="showAddNivelEducacionDialog" class="surface-100 border-1 surface-border border-round-lg p-4 mt-3">
+          <div class="flex align-items-center gap-2 mb-3">
+            <i class="pi pi-plus-circle text-primary"></i>
+            <h5 class="font-semibold text-900 mb-0">Agregar opción personalizada</h5>
           </div>
 
-          <div class="grid">
-
-            <!-- Nivel de Educación -->
-            <div class="col-12 lg:col-6">
-              <div class="field">
-                <label for="nivel_educacion" class="flex items-center gap-2 text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>
-                  <span>Especialización</span>
-                  <small class="text-600 font-normal">(Puedes seleccionar múltiples opciones)</small>
-                </label>
-                <div class="flex gap-2">
-                  <p-multiSelect
-                    id="nivel_educacion"
-                    formControlName="nivel_educacion"
-                    [options]="nivelesEducacion"
-                    placeholder="Seleccione sus niveles de educación"
-                    selectedItemsLabel="{0} elementos seleccionados"
-                    [class]="'flex-1 ' + (isFieldInvalid('nivel_educacion') ? 'ng-invalid ng-dirty' : '')"
-                    styleClass="w-full"
-                    (onChange)="onNivelEducacionChange($event.value)">
-                    <ng-template let-option pTemplate="item">
-                      <div class="nivel-educacion-item" (click)="$event.stopPropagation()">
-                        <span>{{ option }}</span>
-                        <p-button
-                        *ngIf="esOpcionPersonalizada(option)"
-                        (click)="eliminarOpcionPersonalizada(option, $event)"
-                        (mousedown)="$event.stopPropagation()"
-                        (mouseup)="$event.stopPropagation()"
-                        icon="pi pi-times"
-                        [rounded]="true"
-                        severity="danger"
-                        [styleClass]="'btn-eliminar-opcion'">
-                      </p-button>
-
-                      </div>
-                    </ng-template>
-                  </p-multiSelect>
-
-                  <p-button
-                    [icon]="showAddNivelEducacionDialog ? 'pi pi-minus' : 'pi pi-plus'"
-                    [styleClass]="showAddNivelEducacionDialog ? 'p-button-danger flex-shrink-0' : 'p-button-success flex-shrink-0'"
-                    [style]="{'min-height': '36px', 'width': '36px'}"
-                    (onClick)="toggleAddNivelEducacion()"
-                    [pTooltip]="showAddNivelEducacionDialog ? 'Cerrar opción personalizada' : 'Agregar opción personalizada'"
-                    tooltipPosition="top">
-                </p-button>
-                </div>
-
-                <!-- Custom Option Dialog -->
-                <div *ngIf="showAddNivelEducacionDialog" class="surface-100 border-1 surface-border border-round-lg p-4 mt-3">
-                  <div class="flex align-items-center gap-2 mb-3">
-                    <i class="pi pi-plus-circle text-primary"></i>
-                    <h5 class="font-semibold text-900 mb-0">Agregar opción personalizada</h5>
-                  </div>
-
-                  <div class="flex gap-2">
-                    <input
-                      pInputText
-                      id="nueva_nivel_educacion"
-                      [value]="nuevaNivelEducacion"
-                      (input)="onNuevaNivelEducacionChange($event)"
-                      placeholder="Escriba la nueva opción de educación"
-                      class="flex-1"
-                      type="text">
-                    <p-button
-                      label="Agregar"
-                      icon="pi pi-check"
-                      styleClass="p-button-success"
-                      (onClick)="agregarNivelEducacion()"
-                      [disabled]="!isNuevaNivelEducacionValid">
-                    </p-button>
-                    <p-button
-                    label="Cancelar"
-                      icon="pi pi-times"
-                      styleClass="p-button-text p-button-danger"
-                      (onClick)="cancelarAgregarNivelEducacion()">
-                    </p-button>
-                  </div>
-                </div>
-
-                <small *ngIf="isFieldInvalid('nivel_educacion')" class="p-error block mt-2">
-                  <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('nivel_educacion') }}
-                </small>
-              </div>
-            </div>
-
-            <!-- Especialidad Técnica -->
-            <div class="col-12 lg:col-6">
-              <div class="field">
-                <label for="especialidad_tecnica" class="flex items-center gap-2 text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>
-                  <span>Tecnologías dominadas</span>
-                  <small class="text-600 font-normal">(Puedes seleccionar múltiples opciones)</small>
-                </label>
-                <div class="flex gap-2">
-                  <p-multiSelect
-                    id="especialidad_tecnica"
-                    formControlName="especialidad_tecnica"
-                    [options]="especialidadesTecnicas"
-                    placeholder="Seleccione las tecnologías que domina"
-                    selectedItemsLabel="{0} tecnologías seleccionadas"
-                    [class]="'flex-1 ' + (isFieldInvalid('especialidad_tecnica') ? 'ng-invalid ng-dirty' : '')"
-                    styleClass="w-full"
-                    (onChange)="onEspecialidadChange($event.value)">
-                    <ng-template let-option pTemplate="item">
-                      <div class="tecnologia-item" (click)="$event.stopPropagation()">
-                        <span>{{ option }}</span>
-                        <p-button
-                        *ngIf="esOpcionPersonalizadaTecnologia(option)"
-                        (click)="eliminarOpcionPersonalizadaTecnologia(option, $event)"
-                        (mousedown)="$event.stopPropagation()"
-                        (mouseup)="$event.stopPropagation()"
-                        icon="pi pi-times"
-                        [rounded]="true"
-                        severity="danger"
-                        [styleClass]="'btn-eliminar-opcion'">
-                      </p-button>
-                      </div>
-                    </ng-template>
-                  </p-multiSelect>
-
-                  <p-button
-                    [icon]="showAddTecnologiaDialog ? 'pi pi-minus' : 'pi pi-plus'"
-                    [styleClass]="showAddTecnologiaDialog ? 'p-button-danger flex-shrink-0' : 'p-button-success flex-shrink-0'"
-                    [style]="{'min-height': '36px', 'width': '36px'}"
-                    (onClick)="toggleAddTecnologia()"
-                    [pTooltip]="showAddTecnologiaDialog ? 'Cerrar opción personalizada' : 'Agregar opción personalizada'"
-                    tooltipPosition="top">
-                </p-button>
-                </div>
-
-                <!-- Custom Option Dialog -->
-                <div *ngIf="showAddTecnologiaDialog" class="surface-100 border-1 surface-border border-round-lg p-4 mt-3">
-                  <div class="flex align-items-center gap-2 mb-3">
-                    <i class="pi pi-plus-circle text-primary"></i>
-                    <h5 class="font-semibold text-900 mb-0">Agregar opción personalizada</h5>
-                  </div>
-
-                  <div class="flex gap-2">
-                    <input
-                      pInputText
-                      id="nueva_tecnologia"
-                      [value]="nuevaTecnologia"
-                      (input)="onNuevaTecnologiaChange($event)"
-                      placeholder="Escriba la nueva tecnología"
-                      class="flex-1"
-                      type="text">
-                    <p-button
-                      label="Agregar"
-                      icon="pi pi-check"
-                      styleClass="p-button-success"
-                      (onClick)="agregarTecnologia()"
-                      [disabled]="!isNuevaTecnologiaValid">
-                    </p-button>
-                    <p-button
-                      label="Cancelar"
-                      icon="pi pi-times"
-                      styleClass="p-button-text p-button-danger"
-                      (onClick)="cancelarAgregarTecnologia()">
-                    </p-button>
-                  </div>
-                </div>
-
-                <small *ngIf="isFieldInvalid('especialidad_tecnica')" class="p-error block mt-2">
-                  <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('especialidad_tecnica') }}
-                </small>
-              </div>
-            </div>
-
-              <!-- Años de Experiencia -->
-              <div class="col-12 lg:col-6">
-                <div class="field">
-                  <label for="años_experiencia" class="block text-900 font-semibold mb-2">
-                    <span class="text-red-500 mr-1">*</span>Años de experiencia
-                  </label>
-                  <p-inputNumber
-                    id="años_experiencia"
-                    formControlName="años_experiencia"
-                    placeholder="Ej: 5"
-                    [min]="0"
-                    [max]="60"
-                    [class]="'w-full ' + (isFieldInvalid('años_experiencia') ? 'ng-invalid ng-dirty' : '')"
-                    styleClass="w-full">
-                  </p-inputNumber>
-                  <small *ngIf="isFieldInvalid('años_experiencia')" class="p-error block mt-2">
-                    <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('años_experiencia') }}
-                  </small>
-                </div>
-              </div>
-
-            <!-- Tipo de Empleo -->
-            <div class="col-12 lg:col-6">
-              <div class="field">
-                <label for="tipo_empleo_actual" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Situación laboral actual
-                </label>
-                <p-dropdown
-                  id="tipo_empleo_actual"
-                  formControlName="tipo_empleo_actual"
-                  [options]="tiposEmpleo"
-                  placeholder="Seleccione su situación laboral actual"
-                  [class]="'w-full ' + (isFieldInvalid('tipo_empleo_actual') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full p-dropdown-lg">
-                </p-dropdown>
-
-                <small *ngIf="isFieldInvalid('tipo_empleo_actual')" class="p-error block mt-2">
-                  <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('tipo_empleo_actual') }}
-                </small>
-              </div>
-            </div>
-
-            <!-- Área de Interés -->
-            <div class="col-12 lg:col-6">
-              <div class="field">
-                <label for="area_interes" class="text-900 font-semibold mb-2 flex items-center gap-2">
-                  <span class="text-red-500 mr-1">*</span>Área de interés principal
-                  <span class="text-600 text-sm">(Puedes agregar una opción personalizada)</span>
-                </label>
-
-                <div class="flex gap-2">
-                  <p-dropdown
-                    id="area_interes"
-                    formControlName="area_interes"
-                    [options]="areasInteres"
-                    placeholder="Seleccione su área de interés principal"
-                    [class]="'w-full ' + (isFieldInvalid('area_interes') ? 'ng-invalid ng-dirty' : '')"
-                    styleClass="w-full p-dropdown-lg">
-
-                    <ng-template pTemplate="item" let-option>
-                      <div class="area-interes-item" (click)="$event.stopPropagation()">
-                        <span>{{ option }}</span>
-                        <p-button
-                          *ngIf="esOpcionPersonalizadaAreaInteres(option)"
-                          icon="pi pi-times"
-                          severity="danger"
-                          [rounded]="true"
-                          size="small"
-                          styleClass="btn-eliminar-opcion"
-                          (click)="eliminarOpcionPersonalizadaAreaInteres(option, $event)"
-                          (mousedown)="$event.stopPropagation()"
-                          (mouseup)="$event.stopPropagation()"
-                          pTooltip="Eliminar opción personalizada"
-                          tooltipPosition="top">
-                        </p-button>
-                      </div>
-                    </ng-template>
-                  </p-dropdown>
-
-                  <p-button
-                    [icon]="showAddAreaInteresDialog ? 'pi pi-minus' : 'pi pi-plus'"
-                    [styleClass]="showAddAreaInteresDialog ? 'p-button-danger' : 'p-button-success'"
-                    [style]="{'min-height': '36px', 'width': '36px'}"
-                    (onClick)="toggleAddAreaInteres()"
-                    [pTooltip]="showAddAreaInteresDialog ? 'Cerrar' : 'Agregar opción personalizada'"
-                    tooltipPosition="top">
-                  </p-button>
-                </div>
-
-                <!-- Dialog para agregar nueva área de interés -->
-                <div *ngIf="showAddAreaInteresDialog" class="surface-100 border-1 surface-border border-round-lg p-3 mt-3">
-                  <label for="nueva_area_interes" class="block text-900 font-semibold mb-2">
-                    <span class="text-red-500 mr-1">*</span>Nueva área de interés
-                  </label>
-                  <input
-                    pInputText
-                    id="nueva_area_interes"
-                    [value]="nuevaAreaInteres"
-                    (input)="onNuevaAreaInteresChange($event)"
-                    placeholder="Escriba el nombre del área de interés"
-                    class="w-full mb-3">
-
-                  <div class="flex gap-2">
-                    <p-button
-                      label="Agregar"
-                      icon="pi pi-plus"
-                      (onClick)="agregarAreaInteres()"
-                      [disabled]="!isNuevaAreaInteresValid"
-                      styleClass="p-button-success">
-                    </p-button>
-                    <p-button
-                      label="Cancelar"
-                      icon="pi pi-times"
-                      (onClick)="cancelarAgregarAreaInteres()"
-                      styleClass="p-button-text p-button-danger">
-                    </p-button>
-                  </div>
-                </div>
-
-                <small *ngIf="isFieldInvalid('area_interes')" class="p-error block mt-2">
-                  <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('area_interes') }}
-                </small>
-              </div>
-            </div>
-
-            <!-- Disponibilidad para Cambio -->
-            <div class="col-12 lg:col-6">
-              <div class="field">
-                <label for="disponibilidad_cambio" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Disponibilidad para cambio
-                </label>
-                <p-dropdown
-                  id="disponibilidad_cambio"
-                  formControlName="disponibilidad_cambio"
-                  [options]="disponibilidadOpciones"
-                  placeholder="Seleccione su disponibilidad"
-                  [class]="'w-full ' + (isFieldInvalid('disponibilidad_cambio') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full p-dropdown-lg">
-                </p-dropdown>
-                <small *ngIf="isFieldInvalid('disponibilidad_cambio')" class="p-error block mt-2">
-                  <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('disponibilidad_cambio') }}
-                </small>
-              </div>
-            </div>
-
-            <!-- Rango Salarial -->
-            <div class="col-12 lg:col-6">
-              <div class="field">
-                <label for="rango_salarial" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Rango salarial (CLP mensual)
-                </label>
-                <p-dropdown
-                  id="rango_salarial"
-                  formControlName="rango_salarial"
-                  [options]="rangosSalariales"
-                  placeholder="Seleccione su rango salarial"
-                  [class]="'w-full ' + (isFieldInvalid('rango_salarial') ? 'ng-invalid ng-dirty' : '')"
-                  styleClass="w-full p-dropdown-lg">
-                </p-dropdown>
-                <small *ngIf="isFieldInvalid('rango_salarial')" class="p-error block mt-2">
-                  <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('rango_salarial') }}
-                </small>
-                <div class="flex align-items-center gap-2 text-600 text-xs mt-2">
-                  <i class="pi pi-shield"></i>
-                  <span>Esta información es completamente anónima y se usa solo para estadísticas generales</span>
-                </div>
-              </div>
-            </div>
-
-                        <!-- Satisfacción Laboral -->
-            <div class="col-12 lg:col-6">
-              <div class="field">
-                <label for="satisfaccion_laboral" class="block text-900 font-semibold mb-2">
-                  <span class="text-red-500 mr-1">*</span>Satisfacción laboral actual
-                </label>
-                <div class="flex justify-content-center lg:justify-content-start">
-                  <p-rating
-                    id="satisfaccion_laboral"
-                    formControlName="satisfaccion_laboral"
-                    [stars]="5"
-                    [cancel]="false"
-                    [class]="isFieldInvalid('satisfaccion_laboral') ? 'ng-invalid ng-dirty' : ''"
-                    [style]="{'font-size': '1.5rem'}">
-                  </p-rating>
-                </div>
-                <small *ngIf="isFieldInvalid('satisfaccion_laboral')" class="p-error block mt-2 text-center lg:text-left">
-                  <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('satisfaccion_laboral') }}
-                </small>
-                <div class="flex align-items-center gap-2 text-600 text-xs mt-2 justify-content-center lg:justify-content-start">
-                  <i class="pi pi-info-circle"></i>
-                  <span>Califique del 1 al 5 estrellas su nivel de satisfacción en su trabajo actual</span>
-                </div>
-              </div>
-            </div>
+          <div class="flex flex-column lg:flex-row gap-2">
+            <input
+              pInputText
+              id="nueva_nivel_educacion"
+              [value]="nuevaNivelEducacion"
+              (input)="onNuevaNivelEducacionChange($event)"
+              placeholder="Escriba la nueva opción de educación"
+              class="flex-1 w-full"
+              type="text">
+            <p-button
+              label="Agregar"
+              icon="pi pi-check"
+              styleClass="p-button-success w-full lg:w-auto"
+              (onClick)="agregarNivelEducacion()"
+              [disabled]="!isNuevaNivelEducacionValid">
+            </p-button>
+            <p-button
+            label="Cancelar"
+              icon="pi pi-times"
+              styleClass="p-button-text p-button-danger w-full lg:w-auto"
+              (onClick)="cancelarAgregarNivelEducacion()">
+            </p-button>
           </div>
+        </div>
+
+        <small *ngIf="isFieldInvalid('nivel_educacion')" class="p-error block mt-2">
+          <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('nivel_educacion') }}
+        </small>
+      </div>
+    </div>
+
+    <!-- Especialidad Técnica -->
+    <div class="col-12 lg:col-6">
+      <div class="field">
+        <label for="especialidad_tecnica" class="flex flex-column lg:flex-row lg:align-items-center gap-2 text-900 font-semibold mb-2">
+          <span><span class="text-red-500 mr-1">*</span>Tecnologías dominadas</span>
+          <small class="text-600 font-normal">(Puedes seleccionar múltiples opciones)</small>
+        </label>
+        <div class="flex flex-column lg:flex-row gap-2">
+          <p-multiSelect
+            id="especialidad_tecnica"
+            formControlName="especialidad_tecnica"
+            [options]="especialidadesTecnicas"
+            placeholder="Seleccione las tecnologías que domina"
+            selectedItemsLabel="{0} tecnologías seleccionadas"
+            [class]="'flex-1 w-full ' + (isFieldInvalid('especialidad_tecnica') ? 'ng-invalid ng-dirty' : '')"
+            styleClass="w-full"
+            (onChange)="onEspecialidadChange($event.value)">
+            <ng-template let-option pTemplate="item">
+              <div class="tecnologia-item" (click)="$event.stopPropagation()">
+                <span>{{ option }}</span>
+                <p-button
+                *ngIf="esOpcionPersonalizadaTecnologia(option)"
+                (click)="eliminarOpcionPersonalizadaTecnologia(option, $event)"
+                (mousedown)="$event.stopPropagation()"
+                (mouseup)="$event.stopPropagation()"
+                icon="pi pi-times"
+                [rounded]="true"
+                severity="danger"
+                [styleClass]="'btn-eliminar-opcion'">
+              </p-button>
+              </div>
+            </ng-template>
+          </p-multiSelect>
+
+          <p-button
+            [icon]="showAddTecnologiaDialog ? 'pi pi-minus' : 'pi pi-plus'"
+            [styleClass]="showAddTecnologiaDialog ? 'p-button-danger w-full lg:w-auto lg:flex-shrink-0' : 'p-button-success w-full lg:w-auto lg:flex-shrink-0'"
+            [style]="{'min-height': '36px', 'min-width': '36px'}"
+            (onClick)="toggleAddTecnologia()"
+            [pTooltip]="showAddTecnologiaDialog ? 'Cerrar opción personalizada' : 'Agregar opción personalizada'"
+            tooltipPosition="top">
+        </p-button>
+        </div>
+
+        <!-- Custom Option Dialog -->
+        <div *ngIf="showAddTecnologiaDialog" class="surface-100 border-1 surface-border border-round-lg p-4 mt-3">
+          <div class="flex align-items-center gap-2 mb-3">
+            <i class="pi pi-plus-circle text-primary"></i>
+            <h5 class="font-semibold text-900 mb-0">Agregar opción personalizada</h5>
+          </div>
+
+          <div class="flex flex-column lg:flex-row gap-2">
+            <input
+              pInputText
+              id="nueva_tecnologia"
+              [value]="nuevaTecnologia"
+              (input)="onNuevaTecnologiaChange($event)"
+              placeholder="Escriba la nueva tecnología"
+              class="flex-1 w-full"
+              type="text">
+            <p-button
+              label="Agregar"
+              icon="pi pi-check"
+              styleClass="p-button-success w-full lg:w-auto"
+              (onClick)="agregarTecnologia()"
+              [disabled]="!isNuevaTecnologiaValid">
+            </p-button>
+            <p-button
+              label="Cancelar"
+              icon="pi pi-times"
+              styleClass="p-button-text p-button-danger w-full lg:w-auto"
+              (onClick)="cancelarAgregarTecnologia()">
+            </p-button>
+          </div>
+        </div>
+
+        <small *ngIf="isFieldInvalid('especialidad_tecnica')" class="p-error block mt-2">
+          <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('especialidad_tecnica') }}
+        </small>
+      </div>
+    </div>
+
+      <!-- Años de Experiencia -->
+      <div class="col-12 lg:col-6">
+        <div class="field">
+          <label for="años_experiencia" class="block text-900 font-semibold mb-2">
+            <span class="text-red-500 mr-1">*</span>Años de experiencia
+          </label>
+          <p-inputNumber
+            id="años_experiencia"
+            formControlName="años_experiencia"
+            placeholder="Ej: 5"
+            [min]="0"
+            [max]="60"
+            [class]="'w-full ' + (isFieldInvalid('años_experiencia') ? 'ng-invalid ng-dirty' : '')"
+            styleClass="w-full">
+          </p-inputNumber>
+          <small *ngIf="isFieldInvalid('años_experiencia')" class="p-error block mt-2">
+            <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('años_experiencia') }}
+          </small>
+        </div>
       </div>
 
+    <!-- Tipo de Empleo -->
+    <div class="col-12 lg:col-6">
+      <div class="field">
+        <label for="tipo_empleo_actual" class="block text-900 font-semibold mb-2">
+          <span class="text-red-500 mr-1">*</span>Situación laboral actual
+        </label>
+        <p-dropdown
+          id="tipo_empleo_actual"
+          formControlName="tipo_empleo_actual"
+          [options]="tiposEmpleo"
+          placeholder="Seleccione su situación laboral actual"
+          [class]="'w-full ' + (isFieldInvalid('tipo_empleo_actual') ? 'ng-invalid ng-dirty' : '')"
+          styleClass="w-full p-dropdown-lg">
+        </p-dropdown>
+
+        <small *ngIf="isFieldInvalid('tipo_empleo_actual')" class="p-error block mt-2">
+          <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('tipo_empleo_actual') }}
+        </small>
+      </div>
+    </div>
+
+    <!-- Área de Interés -->
+    <div class="col-12 lg:col-6">
+      <div class="field">
+        <label for="area_interes" class="text-900 font-semibold mb-2 flex flex-column lg:flex-row lg:align-items-center gap-2">
+          <span><span class="text-red-500 mr-1">*</span>Área de interés principal</span>
+          <span class="text-600 text-sm font-normal">(Puedes agregar una opción personalizada)</span>
+        </label>
+
+        <div class="flex flex-column lg:flex-row gap-2">
+          <p-dropdown
+            id="area_interes"
+            formControlName="area_interes"
+            [options]="areasInteres"
+            placeholder="Seleccione su área de interés principal"
+            [class]="'w-full flex-1 ' + (isFieldInvalid('area_interes') ? 'ng-invalid ng-dirty' : '')"
+            styleClass="w-full p-dropdown-lg">
+
+            <ng-template pTemplate="item" let-option>
+              <div class="area-interes-item" (click)="$event.stopPropagation()">
+                <span>{{ option }}</span>
+                <p-button
+                  *ngIf="esOpcionPersonalizadaAreaInteres(option)"
+                  icon="pi pi-times"
+                  severity="danger"
+                  [rounded]="true"
+                  size="small"
+                  styleClass="btn-eliminar-opcion"
+                  (click)="eliminarOpcionPersonalizadaAreaInteres(option, $event)"
+                  (mousedown)="$event.stopPropagation()"
+                  (mouseup)="$event.stopPropagation()"
+                  pTooltip="Eliminar opción personalizada"
+                  tooltipPosition="top">
+                </p-button>
+              </div>
+            </ng-template>
+          </p-dropdown>
+
+          <p-button
+            [icon]="showAddAreaInteresDialog ? 'pi pi-minus' : 'pi pi-plus'"
+            [styleClass]="showAddAreaInteresDialog ? 'p-button-danger w-full lg:w-auto' : 'p-button-success w-full lg:w-auto'"
+            [style]="{'min-height': '36px', 'min-width': '36px'}"
+            (onClick)="toggleAddAreaInteres()"
+            [pTooltip]="showAddAreaInteresDialog ? 'Cerrar' : 'Agregar opción personalizada'"
+            tooltipPosition="top">
+          </p-button>
+        </div>
+
+        <!-- Dialog para agregar nueva área de interés -->
+        <div *ngIf="showAddAreaInteresDialog" class="surface-100 border-1 surface-border border-round-lg p-3 mt-3">
+          <label for="nueva_area_interes" class="block text-900 font-semibold mb-2">
+            <span class="text-red-500 mr-1">*</span>Nueva área de interés
+          </label>
+          <input
+            pInputText
+            id="nueva_area_interes"
+            [value]="nuevaAreaInteres"
+            (input)="onNuevaAreaInteresChange($event)"
+            placeholder="Escriba el nombre del área de interés"
+            class="w-full mb-3">
+
+          <div class="flex flex-column lg:flex-row gap-2">
+            <p-button
+              label="Agregar"
+              icon="pi pi-plus"
+              (onClick)="agregarAreaInteres()"
+              [disabled]="!isNuevaAreaInteresValid"
+              styleClass="p-button-success w-full lg:w-auto">
+            </p-button>
+            <p-button
+              label="Cancelar"
+              icon="pi pi-times"
+              (onClick)="cancelarAgregarAreaInteres()"
+              styleClass="p-button-text p-button-danger w-full lg:w-auto">
+            </p-button>
+          </div>
+        </div>
+
+        <small *ngIf="isFieldInvalid('area_interes')" class="p-error block mt-2">
+          <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('area_interes') }}
+        </small>
+      </div>
+    </div>
+
+    <!-- Disponibilidad para Cambio -->
+    <div class="col-12 lg:col-6">
+      <div class="field">
+        <label for="disponibilidad_cambio" class="block text-900 font-semibold mb-2">
+          <span class="text-red-500 mr-1">*</span>Disponibilidad para cambio
+        </label>
+        <p-dropdown
+          id="disponibilidad_cambio"
+          formControlName="disponibilidad_cambio"
+          [options]="disponibilidadOpciones"
+          placeholder="Seleccione su disponibilidad"
+          [class]="'w-full ' + (isFieldInvalid('disponibilidad_cambio') ? 'ng-invalid ng-dirty' : '')"
+          styleClass="w-full p-dropdown-lg">
+        </p-dropdown>
+        <small *ngIf="isFieldInvalid('disponibilidad_cambio')" class="p-error block mt-2">
+          <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('disponibilidad_cambio') }}
+        </small>
+      </div>
+    </div>
+
+    <!-- Rango Salarial -->
+    <div class="col-12 lg:col-6">
+      <div class="field">
+        <label for="rango_salarial" class="block text-900 font-semibold mb-2">
+          <span class="text-red-500 mr-1">*</span>Rango salarial (CLP mensual)
+        </label>
+        <p-dropdown
+          id="rango_salarial"
+          formControlName="rango_salarial"
+          [options]="rangosSalariales"
+          placeholder="Seleccione su rango salarial"
+          [class]="'w-full ' + (isFieldInvalid('rango_salarial') ? 'ng-invalid ng-dirty' : '')"
+          styleClass="w-full p-dropdown-lg">
+        </p-dropdown>
+        <small *ngIf="isFieldInvalid('rango_salarial')" class="p-error block mt-2">
+          <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('rango_salarial') }}
+        </small>
+        <div class="flex align-items-center gap-2 text-600 text-xs mt-2">
+          <i class="pi pi-shield"></i>
+          <span>Esta información es completamente anónima y se usa solo para estadísticas generales</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Satisfacción Laboral -->
+    <div class="col-12 lg:col-6">
+      <div class="field">
+        <label for="satisfaccion_laboral" class="block text-900 font-semibold mb-2">
+          <span class="text-red-500 mr-1">*</span>Satisfacción laboral actual
+        </label>
+        <div class="flex justify-content-center lg:justify-content-start">
+          <p-rating
+            id="satisfaccion_laboral"
+            formControlName="satisfaccion_laboral"
+            [stars]="5"
+            [cancel]="false"
+            [class]="isFieldInvalid('satisfaccion_laboral') ? 'ng-invalid ng-dirty' : ''"
+            [style]="{'font-size': '1.5rem'}">
+          </p-rating>
+        </div>
+        <small *ngIf="isFieldInvalid('satisfaccion_laboral')" class="p-error block mt-2 text-center lg:text-left">
+          <i class="pi pi-exclamation-triangle mr-1"></i>{{ getFieldError('satisfaccion_laboral') }}
+        </small>
+        <div class="flex align-items-center gap-2 text-600 text-xs mt-2 justify-content-center lg:justify-content-start">
+          <i class="pi pi-info-circle"></i>
+          <span>Califique del 1 al 5 estrellas su nivel de satisfacción en su trabajo actual</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
       <!-- Botones finales -->
-      <div class="border-top-1 surface-border pt-4">
-        <div class="flex flex-column sm:flex-row gap-3 justify-content-center">
+      <div class="border-top-1 surface-border pt-5">
+        <div class="flex flex-column lg:flex-row gap-3 justify-content-center align-items-stretch">
           <p-button
             type="button"
-            label="Descartar"
+            label="Descartar cambios"
             icon="pi pi-refresh"
             severity="secondary"
-            styleClass="flex-1 sm:flex-initial px-6 py-3 font-semibold"
+            [outlined]="true"
+            styleClass="w-full lg:flex-1"
+            [style]="{'min-height': '48px', 'max-width': '250px'}"
             (onClick)="resetForm()"
             [disabled]="!hasFormChanges || saving">
           </p-button>
 
           <p-button
             type="submit"
-            label="Guardar"
-            icon="pi pi-save"
-            severity="primary"
-            styleClass="flex-1 sm:flex-initial px-6 py-3 font-bold text-lg shadow-3"
+            label="Guardar cambios"
+            icon="pi pi-check"
+            severity="success"
+            styleClass="w-full lg:flex-1"
+            [style]="{'min-height': '48px', 'max-width': '250px'}"
             [loading]="saving"
-            [disabled]="!hasFormChanges || perfilForm.invalid || saving"
-            [style]="{'min-width': '200px'}">
+            [disabled]="!hasFormChanges || perfilForm.invalid || saving">
           </p-button>
         </div>
 
         <!-- Form Status -->
         <div class="text-center mt-4">
-          <small class="text-600">
-            <i class="pi pi-info-circle mr-1"></i>
-            Los campos marcados con <span class="text-red-500 font-bold">*</span> son obligatorios
-          </small>
+          <div class="inline-flex align-items-center gap-2 surface-100 border-round-lg px-4 py-2">
+            <i class="pi pi-info-circle text-primary"></i>
+            <small class="text-700">
+              Los campos marcados con <span class="text-red-500 font-bold">*</span> son obligatorios
+            </small>
+          </div>
         </div>
       </div>
     </form>
