@@ -12,6 +12,8 @@
   object-fit: cover;
 }
 
+
+
 /* Responsive Typography */
 @media (max-width: 576px) {
   .text-4xl { font-size: 2rem !important; }
@@ -94,7 +96,7 @@
   background: #dc3545;
   color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 5px;
   width: 18px;
   height: 18px;
   display: flex;
@@ -167,7 +169,7 @@
   padding: 0.5rem 1rem !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
-  border-radius: 0.375rem !important;
+  border-radius: 5px !important;
 }
 
 /* Responsive: Mobile - SweetAlert2 vertical */
