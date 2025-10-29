@@ -49,6 +49,7 @@ import { SliderModule } from 'primeng/slider';
 import { DividerModule } from 'primeng/divider';
 import { StepsModule } from 'primeng/steps';
 import { ScrollTopModule } from 'primeng/scrolltop';
+import { SkeletonModule } from 'primeng/skeleton';
 
 
 
@@ -100,7 +101,8 @@ const primeNgModules = [
   SliderModule,
   DividerModule,
   StepsModule,
-  ScrollTopModule
+  ScrollTopModule,
+  SkeletonModule
 
   // PaginatorModule
 ]

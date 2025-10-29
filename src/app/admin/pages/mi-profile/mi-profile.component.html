@@ -215,24 +215,25 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex flex-column sm:flex-row justify-content-center gap-2 sm:gap-3">
+      <div class="flex flex-column lg:flex-row justify-content-center gap-2 sm:gap-3 align-items-stretch">
         <p-button
           type="button"
-          label="Descartar"
+          label="Descartar cambios"
           icon="pi pi-refresh"
           severity="secondary"
           [disabled]="!hasFormChanges"
           (click)="descartarCambios()"
-          styleClass="w-full sm:w-auto text-sm">
+          styleClass="w-full lg:w-auto">
         </p-button>
         <p-button
           type="button"
-          label="Actualizar Perfil"
+          label="Guardar cambios"
+          severity="success"
           icon="pi pi-save"
           [loading]="updating"
           [disabled]="perfilForm.invalid || !hasFormChanges"
           (click)="onUpdateClick()"
-          styleClass="w-full sm:w-auto text-sm">
+          styleClass="w-full lg:w-auto">
         </p-button>
       </div>
     </form>

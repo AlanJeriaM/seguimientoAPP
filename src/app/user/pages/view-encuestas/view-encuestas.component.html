@@ -1,163 +1,212 @@
-<div class="encuestas-container">
-  <!-- Header -->
-  <div class="page-header">
-    <h2 class="page-title">
-      <i class="pi pi-file-text mr-2"></i>
-      Mis Encuestas
-    </h2>
-    <p class="page-subtitle">Completa las encuestas disponibles y contribuye con tu feedback</p>
-  </div>
+<div class="surface-ground min-h-screen py-4 px-3 md:px-5">
+  <div class="mx-auto" style="max-width: 1400px;">
 
-  <!-- Controles y filtros -->
-  <div class="controls-section">
-    <div class="search-wrapper">
-      <span class="p-input-icon-left w-full">
-        <i class="pi pi-search"></i>
-        <input
-          type="text"
-          pInputText
-          placeholder="Buscar encuestas..."
-          [(ngModel)]="searchText"
-          class="w-full"
-        />
-      </span>
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <div class="flex align-items-center justify-content-center gap-2 mb-3">
+        <i class="pi pi-file-text text-5xl text-primary"></i>
+      </div>
+      <h1 class="text-4xl font-bold text-900 m-0 mb-2">Mis Encuestas</h1>
+      <p class="text-xl text-600 m-0">Completa las encuestas disponibles y contribuye con tu feedback</p>
     </div>
 
-    <div class="filter-wrapper">
-      <p-dropdown
-        [options]="estados"
-        [(ngModel)]="estadoFiltro"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Filtrar por estado"
-        [showClear]="false"
-        class="filter-dropdown"
-      ></p-dropdown>
+    <!-- Controles y Filtros -->
+    <div class="surface-card shadow-2 border-round-lg p-4 mb-4">
+      <div class="grid">
+        <div class="col-12 md:col-8 lg:col-9">
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              placeholder="Buscar encuestas..."
+              [(ngModel)]="searchText"
+              class="w-full"
+            />
+          </span>
+        </div>
+        <div class="col-12 md:col-4 lg:col-3">
+          <p-dropdown
+            [options]="estados"
+            [(ngModel)]="estadoFiltro"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Filtrar por estado"
+            [showClear]="false"
+            styleClass="w-full"
+          >
+            <ng-template let-option pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <i [class]="getEstadoIcono(option.value)"></i>
+                <span>{{ option.label }}</span>
+              </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="loading-container">
-    <p-progressSpinner></p-progressSpinner>
-    <p class="loading-text">Cargando encuestas disponibles...</p>
-  </div>
-
-  <!-- Lista de encuestas -->
-  <div *ngIf="!loading" class="encuestas-grid">
-    <!-- Mensaje cuando no hay encuestas -->
-    <div *ngIf="encuestasFiltradas.length === 0" class="empty-state">
-      <i class="pi pi-inbox text-6xl text-400"></i>
-      <h3 class="empty-title">No hay encuestas disponibles</h3>
-      <p class="empty-message">
-        <span *ngIf="searchText || estadoFiltro !== 'TODAS'">
-          No se encontraron encuestas que coincidan con tus filtros.
-        </span>
-        <span *ngIf="!searchText && estadoFiltro === 'TODAS'">
-          En este momento no tienes encuestas pendientes por completar.
-        </span>
-      </p>
+    <!-- Loading con Skeleton -->
+    <div *ngIf="loading" class="grid">
+      <div *ngFor="let item of [1,2,3,4,5,6]" class="col-12 md:col-6 lg:col-4">
+        <div class="surface-card shadow-2 border-round-lg p-4">
+          <div class="flex align-items-center justify-content-between mb-3">
+            <p-skeleton width="60%" height="1.5rem"></p-skeleton>
+            <p-skeleton width="5rem" height="1.5rem" borderRadius="1rem"></p-skeleton>
+          </div>
+          <p-skeleton width="100%" height="4rem" class="mb-3"></p-skeleton>
+          <div class="flex align-items-center gap-2 mb-3">
+            <p-skeleton shape="circle" size="2rem"></p-skeleton>
+            <p-skeleton width="70%" height="1rem"></p-skeleton>
+          </div>
+          <p-skeleton width="100%" height="3rem" borderRadius="0.5rem"></p-skeleton>
+        </div>
+      </div>
     </div>
 
-    <!-- Cards de encuestas -->
-    <div *ngFor="let encuesta of encuestasFiltradas"
-         class="encuesta-card"
-         [ngClass]="{'encuesta-destacada': isEncuestaDestacada(encuesta)}">
-      <p-card styleClass="h-full">
-        <!-- Header de la card -->
-        <ng-template pTemplate="header">
-          <div class="card-header">
-            <div class="header-info">
-              <h4 class="encuesta-titulo">{{ encuesta.titulo }}</h4>
-              <span
-                [class]="'estado-badge ' + getEstadoBadgeClass(getEstadoEncuesta(encuesta))"
-              >
-                {{ getEstadoLabel(getEstadoEncuesta(encuesta)) }}
-              </span>
-            </div>
-          </div>
-        </ng-template>
+    <!-- Grid de Encuestas -->
+    <div *ngIf="!loading">
+      <!-- Empty State -->
+      <div *ngIf="encuestasFiltradas.length === 0" class="surface-card shadow-2 border-round-lg p-6 text-center">
+        <i class="pi pi-inbox text-6xl text-400 mb-4"></i>
+        <h3 class="text-2xl font-semibold text-700 mb-3">No hay encuestas disponibles</h3>
+        <p class="text-lg text-600 m-0 line-height-3">
+          <span *ngIf="searchText || estadoFiltro !== 'TODAS'">
+            No se encontraron encuestas que coincidan con tus filtros. <br>
+            Intenta ajustar los criterios de búsqueda.
+          </span>
+          <span *ngIf="!searchText && estadoFiltro === 'TODAS'">
+            En este momento no tienes encuestas pendientes por completar. <br>
+            Vuelve más tarde para ver nuevas encuestas disponibles.
+          </span>
+        </p>
+      </div>
 
-        <!-- Contenido de la card -->
-        <div class="card-content">
-          <p class="encuesta-descripcion">{{ encuesta.descripcion }}</p>
+      <!-- Cards de Encuestas -->
+      <div class="grid">
+        <div *ngFor="let encuesta of encuestasFiltradas"
+             class="col-12 md:col-6 lg:col-4">
+          <div class="surface-card shadow-2 border-round-lg overflow-hidden h-full flex flex-column transition-all transition-duration-300 hover:shadow-4"
+               [class.border-2]="isEncuestaDestacada(encuesta)"
+               [class.border-primary]="isEncuestaDestacada(encuesta)"
+               [style.animation]="isEncuestaDestacada(encuesta) ? 'pulse 2s ease-in-out' : 'none'">
 
-          <div class="encuesta-meta">
-            <div class="meta-item">
-              <i class="pi pi-calendar" [ngClass]="isEncuestaExpirada(encuesta) ? 'text-red-500' : 'text-green-500'"></i>
-              <span [ngClass]="isEncuestaExpirada(encuesta) ? 'text-red-500' : ''">
-                Hasta: {{ encuesta.fecha_fin | date:'dd/MM/yyyy' }}
-              </span>
-            </div>
-          </div>
+            <!-- Header -->
+            <div class="p-4 pb-3">
+              <div class="flex align-items-start justify-content-between gap-3 mb-3">
+                <h3 class="text-xl font-bold text-900 m-0 line-height-3 flex-1" style="word-break: break-word;">
+                  {{ encuesta.titulo }}
+                </h3>
+                <p-tag
+                  [value]="getEstadoLabel(getEstadoEncuesta(encuesta))"
+                  [severity]="$any(getEstadoSeverity(getEstadoEncuesta(encuesta)))"
+                  [icon]="getEstadoIcono(getEstadoEncuesta(encuesta))"
+                  styleClass="white-space-nowrap">
+                </p-tag>
+              </div>
 
-          <!-- Mensaje para encuestas próximas -->
-          <div *ngIf="isEncuestaProxima(encuesta)" class="upcoming-section">
-            <div class="upcoming-info">
-              <i class="pi pi-calendar-plus text-blue-500 mr-2"></i>
-              <span class="upcoming-text">Esta encuesta estará disponible próximamente</span>
+              <p class="text-600 m-0 line-height-3" style="display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ encuesta.descripcion }}
+              </p>
             </div>
-            <small class="upcoming-note">
-              Disponible a partir del {{ encuesta.fecha_inicio | date:'dd/MM/yyyy' }}
-            </small>
-          </div>
 
-          <!-- Mensaje para encuestas expiradas -->
-          <div *ngIf="isEncuestaExpirada(encuesta)" class="expired-section">
-            <div class="expired-info">
-              <i class="pi pi-exclamation-triangle text-red-500 mr-2"></i>
-              <span class="expired-text">Esta encuesta ha expirado</span>
-            </div>
-            <small class="expired-note">
-              Ya no es posible responder esta encuesta
-            </small>
-          </div>
+            <!-- Divider -->
+            <p-divider styleClass="m-0"></p-divider>
 
-          <!-- Barra de progreso para encuestas en progreso -->
-          <div *ngIf="encuesta.estado_usuario === 'EN_PROGRESO'" class="progress-section">
-            <div class="progress-info">
-              <span class="progress-label">Progreso:</span>
-              <span class="progress-percentage">{{ encuesta.progreso }}%</span>
-            </div>
-            <p-progressBar
-              [value]="encuesta.progreso"
-              [showValue]="false"
-              styleClass="progress-bar"
-            ></p-progressBar>
-            <small class="progress-note">
-              Última respuesta: {{ encuesta.ultima_respuesta | date:'dd/MM/yyyy HH:mm' }}
-            </small>
-          </div>
+            <!-- Body -->
+            <div class="p-4 flex-1 flex flex-column gap-3">
 
-          <!-- Mensaje para encuestas completadas -->
-          <div *ngIf="encuesta.estado_usuario === 'COMPLETADA'" class="completed-section">
-            <div class="completed-info">
-              <i class="pi pi-check-circle text-green-500 mr-2"></i>
-              <span class="completed-text">¡Encuesta completada!</span>
+              <!-- Fecha límite -->
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-calendar"
+                   [class.text-red-500]="isEncuestaExpirada(encuesta)"
+                   [class.text-green-600]="!isEncuestaExpirada(encuesta)"></i>
+                <span class="text-sm font-medium"
+                      [class.text-red-500]="isEncuestaExpirada(encuesta)"
+                      [class.text-600]="!isEncuestaExpirada(encuesta)">
+                  {{ isEncuestaExpirada(encuesta) ? 'Expiró' : 'Disponible hasta' }}:
+                  {{ encuesta.fecha_fin | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+
+              <!-- Encuesta Próxima -->
+              <div *ngIf="isEncuestaProxima(encuesta)"
+                   class="bg-blue-50 border-1 border-blue-200 border-round p-3 flex-1">
+                <div class="flex align-items-center gap-2 mb-2">
+                  <i class="pi pi-calendar-plus text-blue-500"></i>
+                  <span class="font-semibold text-blue-700">Encuesta próxima</span>
+                </div>
+                <p class="text-sm text-blue-600 m-0">
+                  Disponible a partir del {{ encuesta.fecha_inicio | date:'dd/MM/yyyy' }}
+                </p>
+              </div>
+
+              <!-- Encuesta Expirada -->
+              <div *ngIf="isEncuestaExpirada(encuesta)"
+                   class="bg-red-50 border-1 border-red-200 border-round p-3 flex-1">
+                <div class="flex align-items-center gap-2 mb-2">
+                  <i class="pi pi-exclamation-triangle text-red-500"></i>
+                  <span class="font-semibold text-red-700">Encuesta expirada</span>
+                </div>
+                <p class="text-sm text-red-600 m-0">
+                  Ya no es posible responder esta encuesta
+                </p>
+              </div>
+
+              <!-- Progreso (En Progreso) -->
+              <div *ngIf="encuesta.estado_usuario === 'EN_PROGRESO'"
+                   class="bg-orange-50 border-1 border-orange-200 border-round p-3 flex-1">
+                <div class="flex align-items-center justify-content-between mb-2">
+                  <span class="font-semibold text-orange-700">Progreso actual</span>
+                  <p-tag [value]="encuesta.progreso + '%'" severity="warning"></p-tag>
+                </div>
+                <p-progressBar
+                  [value]="encuesta.progreso"
+                  [showValue]="false"
+                  styleClass="mb-2">
+                </p-progressBar>
+                <p class="text-xs text-orange-600 m-0">
+                  <i class="pi pi-clock mr-1"></i>
+                  Última respuesta: {{ encuesta.ultima_respuesta | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </div>
+
+              <!-- Completada -->
+              <div *ngIf="encuesta.estado_usuario === 'COMPLETADA'"
+                   class="bg-green-50 border-1 border-green-200 border-round p-3 flex-1">
+                <div class="flex align-items-center gap-2 mb-2">
+                  <i class="pi pi-check-circle text-green-500"></i>
+                  <span class="font-semibold text-green-700">¡Encuesta completada!</span>
+                </div>
+                <p class="text-sm text-green-600 m-0">
+                  <i class="pi pi-calendar-check mr-1"></i>
+                  Completada el: {{ encuesta.ultima_respuesta | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </div>
+
             </div>
-            <small class="completion-date">
-              Completada el: {{ encuesta.ultima_respuesta | date:'dd/MM/yyyy HH:mm' }}
-            </small>
+
+            <!-- Footer -->
+            <div class="p-4 pt-0">
+              <p-button
+                [label]="getBotonTexto(encuesta)"
+                [icon]="getBotonIcono(encuesta)"
+                [severity]="getBotonSeverity(encuesta)"
+                [disabled]="isBotonDeshabilitado(encuesta)"
+                (click)="encuesta.estado_usuario === 'EN_PROGRESO' ? continuarEncuesta(encuesta) :
+                         encuesta.estado_usuario === 'COMPLETADA' ? verResultados(encuesta) :
+                         iniciarEncuesta(encuesta)"
+                styleClass="w-full"
+                [raised]="!isBotonDeshabilitado(encuesta)">
+              </p-button>
+            </div>
+
           </div>
         </div>
-
-        <!-- Footer de la card -->
-        <ng-template pTemplate="footer">
-          <div class="card-footer">
-            <p-button
-              [label]="getBotonTexto(encuesta)"
-              [icon]="getBotonIcono(encuesta)"
-              [severity]="getBotonSeverity(encuesta)"
-              [disabled]="isBotonDeshabilitado(encuesta)"
-              (click)="encuesta.estado_usuario === 'EN_PROGRESO' ? continuarEncuesta(encuesta) :
-                       encuesta.estado_usuario === 'COMPLETADA' ? verResultados(encuesta) :
-                       iniciarEncuesta(encuesta)"
-              styleClass="w-full"
-            ></p-button>
-          </div>
-        </ng-template>
-      </p-card>
+      </div>
     </div>
+
   </div>
 </div>
 
-<p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
+<p-toast position="top-right" [style]="{ width: '90vw', maxWidth: '400px' }"></p-toast>
