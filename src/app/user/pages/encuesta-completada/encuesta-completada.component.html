@@ -323,6 +323,332 @@
     </div>
   </div>
 
+
+  <!-- Vista de detalles de encuesta -->
+<div class="p-3 lg:p-5">
+  <!-- Vista de lista de encuestas -->
+  <div *ngIf="!mostrarDetalles">
+    <!-- Header -->
+    <div class="mb-4 lg:mb-5">
+      <div class="flex flex-column lg:flex-row justify-content-between align-items-start lg:align-items-center gap-3">
+        <div class="flex-1">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-check-circle text-4xl text-green-500"></i>
+            <h1 class="text-3xl lg:text-4xl font-bold text-900 m-0">Encuestas Completadas</h1>
+          </div>
+          <p class="text-lg text-600 m-0 line-height-3">Revisa las encuestas que has completado y accede a tus resultados</p>
+        </div>
+        <div class="w-full lg:w-auto">
+          <p-button
+            label="Ver Encuestas Disponibles"
+            icon="pi pi-arrow-left"
+            [outlined]="true"
+            severity="secondary"
+            (click)="navegarAEncuestas()"
+            styleClass="w-full lg:w-auto">
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card con buscador solo para pantallas XL -->
+    <p-card *ngIf="!loading" styleClass="shadow-2 hidden xl:block" [style]="{'border-radius': '5px'}">
+      <ng-template pTemplate="header">
+        <div class="p-3 surface-50 border-bottom-1 surface-border">
+          <div class="flex gap-3 align-items-center">
+            <div class="flex-1">
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon bg-white">
+                  <i class="pi pi-search text-600"></i>
+                </span>
+                <input
+                  type="text"
+                  pInputText
+                  placeholder="Buscar encuestas..."
+                  [(ngModel)]="searchText"
+                  class="w-full"
+                  [disabled]="encuestasCompletadas.length === 0"
+                />
+                <p-button
+                  icon="pi pi-filter-slash"
+                  [outlined]="true"
+                  severity="secondary"
+                  (click)="limpiarFiltro()"
+                  pTooltip="Limpiar filtro"
+                  tooltipPosition="bottom"
+                  [disabled]="!searchText">
+                </p-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <div class="p-3">
+        <p-table
+          [value]="encuestasFiltradas"
+          [paginator]="true"
+          [rows]="pageSize"
+          [totalRecords]="totalEncuestas"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} encuestas"
+          [rowsPerPageOptions]="[5, 10, 20]"
+          (onPage)="onPageChange($event)"
+          styleClass="p-datatable-striped"
+          responsiveLayout="scroll"
+        >
+          <ng-template pTemplate="caption">
+            <div class="flex justify-content-end">
+              <p-button
+                label="Actualizar"
+                icon="pi pi-refresh"
+                [loading]="loading"
+                (click)="actualizar()"
+                severity="info">
+              </p-button>
+            </div>
+          </ng-template>
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th class="white-space-nowrap">Encuesta</th>
+              <th class="white-space-nowrap">Fecha Completada</th>
+              <th class="white-space-nowrap">Tiempo Invertido</th>
+              <th class="white-space-nowrap">Progreso</th>
+              <th class="white-space-nowrap">Estado</th>
+              <th class="white-space-nowrap text-center" style="width: 120px">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-encuesta>
+            <tr class="hover:surface-hover transition-colors transition-duration-150">
+              <td>
+                <div style="max-width: 350px">
+                  <div class="font-semibold text-900 text-base mb-1 line-height-3">{{ encuesta.titulo }}</div>
+                  <div class="text-600 text-sm line-height-3">
+                    {{ (encuesta.descripcion || 'Sin descripción') | slice:0:100 }}{{ encuesta.descripcion && encuesta.descripcion.length > 100 ? '...' : '' }}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="flex flex-column gap-1">
+                  <div class="flex align-items-center gap-2">
+                    <i class="pi pi-calendar text-blue-500"></i>
+                    <span class="font-medium text-900">{{ encuesta.fecha_completada | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                  <div class="text-600 text-sm pl-4">{{ encuesta.fecha_completada | date:'HH:mm' }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-clock text-orange-500"></i>
+                  <span class="font-medium text-900">{{ getTiempoInvertidoTexto(encuesta.tiempo_invertido) }}</span>
+                </div>
+              </td>
+              <td>
+                <div style="min-width: 150px">
+                  <div class="flex align-items-center gap-2 mb-2">
+                    <p-progressBar [value]="encuesta.porcentaje_completado" [showValue]="false" styleClass="flex-1" [style]="{'height': '8px'}"></p-progressBar>
+                    <span class="font-bold text-primary text-sm" style="min-width: 40px">{{ encuesta.porcentaje_completado }}%</span>
+                  </div>
+                  <div class="text-600 text-sm">{{ encuesta.total_respuestas }}/{{ encuesta.total_preguntas }} preguntas</div>
+                </div>
+              </td>
+              <td>
+                <p-tag severity="success" icon="pi pi-check-circle" value="COMPLETADA" [style]="{'border-radius': '5px'}"></p-tag>
+              </td>
+              <td class="text-center">
+                <p-button
+                  icon="pi pi-eye"
+                  [outlined]="true"
+                  severity="info"
+                  size="small"
+                  (click)="verDetalles(encuesta)"
+                  pTooltip="Ver detalles"
+                  tooltipPosition="left">
+                </p-button>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6">
+                <div class="text-center py-6">
+                  <i class="pi pi-info-circle text-6xl text-400 mb-3"></i>
+                  <div class="text-2xl font-semibold text-900 mb-2">No hay encuestas completadas</div>
+                  <p class="text-600 mb-3 line-height-3" *ngIf="searchText">
+                    No se encontraron encuestas que coincidan con tu búsqueda.
+                  </p>
+                  <p class="text-600 mb-3 line-height-3" *ngIf="!searchText">
+                    Aún no has completado ninguna encuesta.
+                  </p>
+                  <p-button
+                    *ngIf="!searchText"
+                    label="Ver encuestas disponibles"
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
+                    (click)="navegarAEncuestas()">
+                  </p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </p-card>
+
+    <!-- Loading Skeleton -->
+    <div *ngIf="loading">
+      <div *ngFor="let item of [1,2,3,4,5]" class="mb-3">
+        <div class="flex flex-column lg:flex-row gap-3 p-3 surface-50 shadow-1" style="border-radius: 5px">
+          <div class="flex-1">
+            <p-skeleton width="60%" height="1.5rem" styleClass="mb-2"></p-skeleton>
+            <p-skeleton width="90%" height="1rem" styleClass="mb-2"></p-skeleton>
+            <p-skeleton width="40%" height="0.8rem"></p-skeleton>
+          </div>
+          <div class="flex flex-row lg:flex-column gap-2 align-items-center lg:align-items-end">
+            <p-skeleton width="8rem" height="2rem"></p-skeleton>
+            <p-skeleton width="8rem" height="2rem"></p-skeleton>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buscador para pantallas pequeñas y medianas -->
+    <div *ngIf="!loading" class="block xl:hidden mb-3">
+      <div class="p-inputgroup mb-3">
+        <span class="p-inputgroup-addon bg-white">
+          <i class="pi pi-search text-600"></i>
+        </span>
+        <input
+          type="text"
+          pInputText
+          placeholder="Buscar encuestas..."
+          [(ngModel)]="searchText"
+          class="w-full"
+          [disabled]="encuestasCompletadas.length === 0"
+        />
+        <p-button
+          icon="pi pi-filter-slash"
+          [outlined]="true"
+          severity="secondary"
+          (click)="limpiarFiltro()"
+          pTooltip="Limpiar filtro"
+          tooltipPosition="bottom"
+          [disabled]="!searchText">
+        </p-button>
+      </div>
+
+      <div class="mb-3 flex justify-content-end">
+        <p-button
+          label="Actualizar"
+          icon="pi pi-refresh"
+          [loading]="loading"
+          (click)="actualizar()"
+          severity="info"
+          styleClass="w-full sm:w-auto">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- Vista de Cards para pantallas pequeñas y medianas -->
+    <div *ngIf="!loading" class="block xl:hidden">
+      <!-- Cards -->
+      <div *ngFor="let encuesta of encuestasFiltradas" class="mb-3 p-3 surface-card border-1 surface-border shadow-1" style="border-radius: 5px">
+        <div class="flex flex-column gap-3">
+          <!-- Título y descripción -->
+          <div class="pb-3 border-bottom-1 surface-border">
+            <h3 class="text-lg lg:text-xl font-semibold text-900 mb-2 line-height-3 overflow-hidden" style="word-break: break-word;">{{ encuesta.titulo }}</h3>
+            <p class="text-600 text-xs sm:text-sm line-height-3 m-0 overflow-hidden" style="word-break: break-word;">
+              {{ (encuesta.descripcion || 'Sin descripción') | slice:0:150 }}{{ encuesta.descripcion && encuesta.descripcion.length > 150 ? '...' : '' }}
+            </p>
+          </div>
+
+          <!-- Estado -->
+          <div class="flex flex-column sm:flex-row sm:justify-content-between sm:align-items-center gap-2 pb-3 border-bottom-1 surface-border">
+            <span class="font-semibold text-700 text-sm lg:text-base">Estado:</span>
+            <p-tag severity="success" icon="pi pi-check-circle" value="COMPLETADA" [style]="{'border-radius': '5px', 'font-size': '0.75rem'}"></p-tag>
+          </div>
+
+          <!-- Fecha -->
+          <div class="flex flex-column sm:flex-row sm:justify-content-between sm:align-items-center gap-2 pb-3 border-bottom-1 surface-border">
+            <span class="font-semibold text-700 white-space-nowrap text-sm lg:text-base">Fecha Completada:</span>
+            <div class="flex flex-column align-items-start sm:align-items-end gap-1">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-calendar text-blue-500 text-sm"></i>
+                <span class="font-medium text-900 text-sm">{{ encuesta.fecha_completada | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <span class="text-600 text-xs">{{ encuesta.fecha_completada | date:'HH:mm' }}</span>
+            </div>
+          </div>
+
+          <!-- Tiempo -->
+          <div class="flex flex-column sm:flex-row sm:justify-content-between sm:align-items-center gap-2 pb-3 border-bottom-1 surface-border">
+            <span class="font-semibold text-700 white-space-nowrap text-sm lg:text-base">Tiempo Invertido:</span>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-clock text-orange-500 text-sm"></i>
+              <span class="font-medium text-900 text-sm">{{ getTiempoInvertidoTexto(encuesta.tiempo_invertido) }}</span>
+            </div>
+          </div>
+
+          <!-- Progreso -->
+          <div class="pb-3 border-bottom-1 surface-border">
+            <div class="font-semibold text-700 mb-2 text-sm lg:text-base">Progreso:</div>
+            <div class="flex align-items-center gap-2 mb-2">
+              <p-progressBar [value]="encuesta.porcentaje_completado" [showValue]="false" styleClass="flex-1" [style]="{'height': '8px'}"></p-progressBar>
+              <span class="font-bold text-primary white-space-nowrap text-sm">{{ encuesta.porcentaje_completado }}%</span>
+            </div>
+            <div class="text-600 text-xs sm:text-sm">{{ encuesta.total_respuestas }}/{{ encuesta.total_preguntas }} preguntas completadas</div>
+          </div>
+
+          <!-- Botón de acción -->
+          <div class="pt-2">
+            <p-button
+              label="Ver Detalles"
+              icon="pi pi-eye"
+              [outlined]="true"
+              severity="info"
+              (click)="verDetalles(encuesta)"
+              styleClass="w-full"
+              [style]="{'font-size': '0.875rem'}">
+            </p-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paginador para cards -->
+      <p-paginator
+        *ngIf="encuestasFiltradas.length > 0"
+        [rows]="pageSize"
+        [totalRecords]="totalEncuestas"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        (onPageChange)="onPageChange($event)"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} encuestas">
+      </p-paginator>
+
+      <!-- Empty state para cards -->
+      <div *ngIf="encuestasFiltradas.length === 0" class="text-center py-6">
+        <i class="pi pi-info-circle text-6xl text-400 mb-3"></i>
+        <div class="text-2xl font-semibold text-900 mb-2">No hay encuestas completadas</div>
+        <p class="text-600 mb-3 line-height-3" *ngIf="searchText">
+          No se encontraron encuestas que coincidan con tu búsqueda.
+        </p>
+        <p class="text-600 mb-3 line-height-3" *ngIf="!searchText">
+          Aún no has completado ninguna encuesta.
+        </p>
+        <p-button
+          *ngIf="!searchText"
+          label="Ver encuestas disponibles"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          (click)="navegarAEncuestas()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
   <!-- Vista de detalles de encuesta -->
   <div *ngIf="mostrarDetalles && encuestaSeleccionada">
     <!-- Header detalles -->
@@ -330,10 +656,10 @@
       <div class="flex flex-column lg:flex-row justify-content-between align-items-start lg:align-items-center gap-3">
         <div class="flex-1">
           <div class="flex align-items-center gap-2 mb-2">
-            <i class="pi pi-file-text text-4xl text-primary"></i>
-            <h1 class="text-3xl lg:text-4xl font-bold text-900 m-0">{{ encuestaSeleccionada.titulo }}</h1>
+            <i class="pi pi-file-text text-3xl lg:text-4xl text-primary"></i>
+            <h1 class="text-2xl lg:text-4xl font-bold text-900 m-0 line-height-3" style="word-break: break-word;">{{ encuestaSeleccionada.titulo }}</h1>
           </div>
-          <p class="text-lg text-600 m-0 line-height-3">Detalles de encuesta completada</p>
+          <p class="text-base lg:text-lg text-600 m-0 line-height-3">Detalles de encuesta completada</p>
         </div>
         <div class="w-full lg:w-auto">
           <p-button
@@ -348,8 +674,8 @@
       </div>
     </div>
 
-    <!-- Card de detalles con loading -->
-    <p-card styleClass="shadow-2" [style]="{'border-radius': '5px'}">
+    <!-- Card de detalles SOLO para pantallas XL -->
+    <p-card *ngIf="!loading" styleClass="shadow-2 hidden xl:block" [style]="{'border-radius': '5px'}">
       <ng-template pTemplate="header">
         <div class="p-3 surface-50 border-bottom-1 surface-border">
           <div class="flex flex-column sm:flex-row justify-content-between align-items-start sm:align-items-center gap-3">
@@ -363,21 +689,7 @@
       </ng-template>
 
       <div class="p-3 lg:p-4">
-        <!-- Loading skeleton para detalles -->
-        <div *ngIf="loading" class="grid">
-          <div class="col-12 lg:col-6" *ngFor="let item of [1,2]">
-            <div class="surface-50 p-4" style="border-radius: 5px">
-              <p-skeleton width="50%" height="1.5rem" styleClass="mb-3"></p-skeleton>
-              <div *ngFor="let row of [1,2,3]" class="mb-3">
-                <p-skeleton width="40%" height="1rem" styleClass="mb-2"></p-skeleton>
-                <p-skeleton width="70%" height="1rem"></p-skeleton>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Información en grid -->
-        <div *ngIf="!loading" class="grid">
+        <div class="grid">
           <!-- Card Información General -->
           <div class="col-12 lg:col-6">
             <div class="surface-50 p-4 h-full border-1 surface-border" style="border-radius: 5px">
@@ -448,12 +760,120 @@
             icon="pi pi-list"
             [outlined]="true"
             (click)="navegarAEncuestas()"
-            styleClass="w-full sm:w-auto">
+            styleClass="w-auto">
           </p-button>
         </div>
       </div>
     </p-card>
+
+    <!-- Loading skeleton para detalles -->
+    <div *ngIf="loading" class="grid">
+      <div class="col-12 lg:col-6" *ngFor="let item of [1,2]">
+        <div class="surface-50 p-3 shadow-1 border-1 surface-border" style="border-radius: 5px">
+          <p-skeleton width="50%" height="1.5rem" styleClass="mb-3"></p-skeleton>
+          <div *ngFor="let row of [1,2,3]" class="mb-3">
+            <p-skeleton width="40%" height="1rem" styleClass="mb-2"></p-skeleton>
+            <p-skeleton width="70%" height="1rem"></p-skeleton>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista SIN p-card para pantallas S, M, L -->
+    <div *ngIf="!loading" class="block xl:hidden">
+      <!-- Estado y fecha -->
+      <div class="mb-3 p-3 surface-card border-1 surface-border shadow-1" style="border-radius: 5px">
+        <div class="flex flex-column gap-3">
+          <div class="flex justify-content-between align-items-center">
+            <span class="font-semibold text-700 text-sm">Estado:</span>
+            <p-tag severity="success" icon="pi pi-check-circle" value="COMPLETADA" [style]="{'border-radius': '5px', 'font-size': '0.75rem'}"></p-tag>
+          </div>
+          <div class="flex justify-content-between align-items-center">
+            <span class="font-semibold text-700 text-sm">Fecha de completado:</span>
+            <div class="flex align-items-center gap-2 text-600">
+              <i class="pi pi-calendar text-sm"></i>
+              <span class="text-sm">{{ encuestaSeleccionada.fecha_completada | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información General -->
+      <div class="mb-3 p-3 surface-card border-1 surface-border shadow-1" style="border-radius: 5px">
+        <div class="flex align-items-center gap-2 mb-3">
+          <i class="pi pi-info-circle text-xl text-blue-500"></i>
+          <h3 class="text-lg font-semibold text-900 m-0">Información General</h3>
+        </div>
+
+        <div class="flex flex-column gap-3">
+          <div class="pb-3 border-bottom-1 surface-border">
+            <div class="font-semibold text-900 mb-2 text-sm">Descripción:</div>
+            <div class="text-600 text-xs sm:text-sm line-height-3" style="word-break: break-word;">{{ encuestaSeleccionada.descripcion || 'Sin descripción' }}</div>
+          </div>
+
+          <div class="pb-3">
+            <div class="font-semibold text-900 mb-2 text-sm">Período de la encuesta:</div>
+            <div class="flex flex-column sm:flex-row sm:align-items-center gap-2 text-600 text-xs sm:text-sm">
+              <span>{{ encuestaSeleccionada.fecha_inicio_encuesta | date:'dd/MM/yyyy' }}</span>
+              <i class="pi pi-arrow-right text-xs hidden sm:block"></i>
+              <span class="block sm:hidden">hasta</span>
+              <span>{{ encuestaSeleccionada.fecha_fin_encuesta | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="mb-3 p-3 surface-card border-1 surface-border shadow-1" style="border-radius: 5px">
+        <div class="flex align-items-center gap-2 mb-3">
+          <i class="pi pi-chart-bar text-xl text-green-500"></i>
+          <h3 class="text-lg font-semibold text-900 m-0">Estadísticas</h3>
+        </div>
+
+        <div class="flex flex-column gap-3">
+          <div class="pb-3 border-bottom-1 surface-border">
+            <div class="flex justify-content-between align-items-center">
+              <span class="font-semibold text-900 text-sm">Total de preguntas:</span>
+              <p-tag [value]="encuestaSeleccionada.total_preguntas.toString()" severity="info" [style]="{'border-radius': '5px', 'font-size': '0.75rem'}"></p-tag>
+            </div>
+          </div>
+
+          <div class="pb-3 border-bottom-1 surface-border">
+            <div class="flex justify-content-between align-items-center">
+              <span class="font-semibold text-900 text-sm">Respuestas completadas:</span>
+              <p-tag [value]="encuestaSeleccionada.total_respuestas.toString()" severity="success" [style]="{'border-radius': '5px', 'font-size': '0.75rem'}"></p-tag>
+            </div>
+          </div>
+
+          <div class="pb-3">
+            <div class="flex justify-content-between align-items-center">
+              <span class="font-semibold text-900 text-sm">Tiempo invertido:</span>
+              <div class="flex align-items-center gap-2 text-orange-500 font-medium">
+                <i class="pi pi-clock text-sm"></i>
+                <span class="text-sm">{{ getTiempoInvertidoTexto(encuestaSeleccionada.tiempo_invertido) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón de acción -->
+      <div class="p-3 surface-card border-1 surface-border shadow-1" style="border-radius: 5px">
+        <p-button
+          label="Ver Más Encuestas"
+          icon="pi pi-list"
+          [outlined]="true"
+          (click)="navegarAEncuestas()"
+          styleClass="w-full"
+          [style]="{'font-size': '0.875rem'}">
+        </p-button>
+      </div>
+    </div>
   </div>
+</div>
+
+
+
 </div>
 
 <!-- Toast para mensajes -->
