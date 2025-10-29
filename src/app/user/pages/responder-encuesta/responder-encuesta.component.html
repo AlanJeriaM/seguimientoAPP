@@ -54,7 +54,7 @@
     <!-- Formulario de respuestas -->
     <form [formGroup]="formularioRespuestas" (ngSubmit)="enviarRespuestas()" *ngIf="formularioRespuestas" [class.form-disabled]="formularioDeshabilitado">
       <div class="pregunta-container">
-        <!-- Pregunta actual - Usar ngFor con trackBy para forzar recreación del DOM -->
+        <!-- Pregunta actual -->
         <ng-container *ngFor="let idx of [preguntaActual]; trackBy: trackByPreguntaIndex">
           <div
             *ngIf="encuesta.preguntas[idx] as pregunta"
@@ -251,145 +251,22 @@
   </div>
 </div>
 
-<!-- Modal para confirmar envío -->
-<p-dialog
+<!-- Modales modularizados -->
+<app-confirm-submit-modal
   [(visible)]="displayConfirmDialog"
-  header="Confirmar envío"
-  [modal]="true"
-  [style]="{width: '90vw', maxWidth: '500px'}"
-  [contentStyle]="{'padding': '0'}"
-  [draggable]="false"
-  [resizable]="false"
-  [appendTo]="'body'"
-  [baseZIndex]="1000"
-  [closable]="true"
-  [closeOnEscape]="true"
-  [responsive]="true"
-  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
-  [dismissableMask]="true"
-  (onHide)="cancelarEnvio()"
->
-  <div class="p-4">
-    <!-- Information Section -->
-    <div class="surface-50 p-4 border-round-lg">
-      <div class="text-center">
-        <div class="flex justify-content-center mb-4">
-          <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
-            <i class="pi pi-check text-xl"></i>
-          </div>
-        </div>
+  [loading]="enviando"
+  (onConfirm)="onConfirmarEnvio()"
+  (onCancel)="onCancelarEnvio()"
+></app-confirm-submit-modal>
 
-        <p class="text-600 text-lg mb-0">
-          ¿Estás seguro de enviar tus respuestas? No podrás modificarlas después.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
-      <!-- En pantallas pequeñas: Enviar arriba, Cancelar abajo -->
-      <div class="flex flex-column sm:hidden gap-2 w-full">
-        <p-button
-          label="Enviar respuestas"
-          icon="pi pi-check"
-          (click)="confirmarEnvio()"
-          styleClass="p-button-success w-full"
-          [loading]="enviando"
-          [disabled]="enviando">
-        </p-button>
-        <p-button
-          label="Cancelar"
-          icon="pi pi-times"
-          (click)="cancelarEnvio()"
-          styleClass="p-button-text w-full"
-          [disabled]="enviando">
-        </p-button>
-      </div>
-
-      <!-- En pantallas grandes: Cancelar izquierda, Enviar derecha -->
-      <div class="hidden sm:flex gap-2">
-        <p-button
-          label="Cancelar"
-          icon="pi pi-times"
-          (click)="cancelarEnvio()"
-          styleClass="p-button-text"
-          [disabled]="enviando">
-        </p-button>
-        <p-button
-          label="Enviar respuestas"
-          icon="pi pi-check"
-          (click)="confirmarEnvio()"
-          styleClass="p-button-success"
-          [loading]="enviando"
-          [disabled]="enviando">
-        </p-button>
-      </div>
-    </div>
-  </ng-template>
-</p-dialog>
-
-<!-- Modal para confirmar salida y guardar progreso -->
-<p-dialog
+<app-save-progress-modal
   [(visible)]="displayExitDialog"
-  header="Guardar progreso"
-  [modal]="true"
-  [style]="{width: '90vw', maxWidth: '500px'}"
-  [contentStyle]="{'padding': '0'}"
-  [draggable]="false"
-  [resizable]="false"
-  [appendTo]="'body'"
-  [baseZIndex]="1000"
-  [closable]="true"
-  [closeOnEscape]="true"
-  [responsive]="true"
-  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
-  [dismissableMask]="true"
-  (onHide)="cancelarSalida()"
->
-  <div class="p-4">
-    <!-- Information Section -->
-    <div class="surface-50 p-4 border-round-lg">
-      <div class="text-center">
-        <div class="flex justify-content-center mb-4">
-          <div class="bg-orange-500 text-white border-circle flex align-items-center justify-content-center" style="width: 3rem; height: 3rem;">
-            <i class="pi pi-save text-xl"></i>
-          </div>
-        </div>
-
-        <p class="text-600 text-lg mb-3">
-          Tienes un {{ progreso }}% de progreso completado.
-        </p>
-        <p class="text-600 mb-0">
-          ¿Deseas guardar tu progreso antes de salir?
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <div
-      class="flex flex-column xl:flex-row flex-wrap gap-2 justify-content-end w-full">
-      <p-button
-        label="Salir sin guardar"
-        icon="pi pi-sign-out"
-        (click)="salirSinGuardar()"
-        styleClass="p-button-danger w-full xl:w-auto order-2 sm:order-2"
-        [disabled]="guardandoProgreso">
-      </p-button>
-
-      <p-button
-        label="Guardar y salir"
-        icon="pi pi-save"
-        (click)="guardarYSalir()"
-        styleClass="p-button-success w-full xl:w-auto order-1 sm:order-3"
-        [loading]="guardandoProgreso"
-        [disabled]="guardandoProgreso">
-      </p-button>
-
-    </div>
-  </ng-template>
-</p-dialog>
+  [progress]="progreso"
+  [saving]="guardandoProgreso"
+  (onSaveAndExit)="onGuardarYSalir()"
+  (onExitWithoutSaving)="onSalirSinGuardar()"
+  (onCancel)="onCancelarSalida()"
+></app-save-progress-modal>
 
 <!-- Toast para notificaciones -->
 <p-toast preventOpenDuplicates="true" [style]="{ width: '90vw', maxWidth: '350px' }"></p-toast>
