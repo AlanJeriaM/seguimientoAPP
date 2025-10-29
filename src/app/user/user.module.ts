@@ -13,6 +13,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { EncuestaCompletadaComponent } from './pages/encuesta-completada/encuesta-completada.component';
 import { SharedModule } from '../shared/shared.module';
 import { ResponderEncuestaComponent } from './pages/responder-encuesta/responder-encuesta.component';
+import { ConfirmSubmitModalComponent } from './components/confirm-submit-modal/confirm-submit-modal.component';
+import { SaveProgressModalComponent } from './components/save-progress-modal/save-progress-modal.component';
 
 
 
@@ -22,7 +24,9 @@ import { ResponderEncuestaComponent } from './pages/responder-encuesta/responder
     MiProfileComponent,
     ViewEncuestasComponent,
     EncuestaCompletadaComponent,
-    ResponderEncuestaComponent
+    ResponderEncuestaComponent,
+    ConfirmSubmitModalComponent,
+    SaveProgressModalComponent
   ],
   imports: [
     CommonModule,

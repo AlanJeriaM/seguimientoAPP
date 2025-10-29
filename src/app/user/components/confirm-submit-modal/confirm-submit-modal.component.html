@@ -1,0 +1,76 @@
+<p-dialog
+  [(visible)]="visible"
+  header="Confirmar envío"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '500px'}"
+  [contentStyle]="{'padding': '0'}"
+  [draggable]="false"
+  [resizable]="false"
+  [appendTo]="'body'"
+  [baseZIndex]="1000"
+  [closable]="true"
+  [closeOnEscape]="true"
+  [responsive]="true"
+  [breakpoints]="{'960px': '95vw', '640px': '98vw'}"
+  [dismissableMask]="true"
+  (onHide)="handleHide()"
+>
+  <div class="p-4">
+    <div class="surface-50 p-4 border-round-lg">
+      <div class="text-center">
+        <div class="flex justify-content-center mb-4">
+          <div class="bg-green-500 text-white border-circle flex align-items-center justify-content-center"
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-check text-xl"></i>
+          </div>
+        </div>
+
+        <p class="text-600 text-lg mb-0">
+          ¿Estás seguro de enviar tus respuestas? No podrás modificarlas después.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+      <!-- En pantallas pequeñas: Enviar arriba, Cancelar abajo -->
+      <div class="flex flex-column sm:hidden gap-2 w-full">
+        <p-button
+          label="Enviar respuestas"
+          icon="pi pi-check"
+          (click)="handleConfirm()"
+          styleClass="p-button-success w-full"
+          [loading]="loading"
+          [disabled]="loading">
+        </p-button>
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          (click)="handleCancel()"
+          styleClass="p-button-text w-full"
+          [disabled]="loading">
+        </p-button>
+      </div>
+
+      <!-- En pantallas grandes: Cancelar izquierda, Enviar derecha -->
+      <div class="hidden sm:flex gap-2">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          (click)="handleCancel()"
+          styleClass="p-button-text"
+          [disabled]="loading">
+        </p-button>
+        <p-button
+          label="Enviar respuestas"
+          icon="pi pi-check"
+          (click)="handleConfirm()"
+          styleClass="p-button-success"
+          [loading]="loading"
+          [disabled]="loading">
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
