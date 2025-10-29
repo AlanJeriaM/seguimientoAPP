@@ -279,6 +279,7 @@
                           styleClass="w-full"
                           (onChange)="onQuestionTypeChange(i)"
                           [showClear]="false"
+                          appendTo="body"
                         ></p-dropdown>
                       </div>
 
@@ -376,12 +377,12 @@
 
             <!-- Botones de acción -->
             <div class="pt-4 border-top-1 surface-border">
-              <div class="flex flex-column-reverse md:flex-row gap-3 justify-content-end">
+              <div class="flex flex-column-reverse xl:flex-row gap-3 justify-content-end">
                 <p-button
                   label="Cancelar"
                   icon="pi pi-times"
                   (click)="cancel()"
-                  styleClass="p-button-outlined p-button-secondary w-full md:w-auto"
+                  styleClass="p-button-outlined p-button-secondary w-full xl:w-auto"
                 ></p-button>
                 <p-button
                   [label]="editMode ? 'Guardar Cambios' : 'Crear Encuesta'"
@@ -389,7 +390,7 @@
                   type="submit"
                   [loading]="loading"
                   [disabled]="encuestaForm.invalid || (editMode && !hasChanges)"
-                  [styleClass]="'p-button-success w-full md:w-auto'"
+                  [styleClass]="'p-button-success w-full xl:w-auto'"
                 ></p-button>
               </div>
             </div>

@@ -315,14 +315,13 @@
               </label>
 
               <div class="flex flex-column lg:flex-row gap-2">
-                <div class="flex-1 w-full">
+                <div class="flex-1 w-full " style="position: relative;">
                   <p-dropdown
                     id="industria"
                     formControlName="industria"
                     [options]="industriasOpciones"
                     placeholder="Seleccione su industria"
                     [class]="'w-full ' + (isFieldInvalid('industria') ? 'ng-invalid ng-dirty' : '')"
-                    appendTo="body"
                     styleClass="w-full p-dropdown-lg">
                     <ng-template pTemplate="item" let-option>
                       <div class="industria-item" (click)="$event.stopPropagation()">
@@ -753,7 +752,7 @@
             [stars]="5"
             [cancel]="false"
             [class]="isFieldInvalid('satisfaccion_laboral') ? 'ng-invalid ng-dirty' : ''"
-            [style]="{'font-size': '1.5rem'}">
+            >
           </p-rating>
         </div>
         <small *ngIf="isFieldInvalid('satisfaccion_laboral')" class="p-error block mt-2 text-center lg:text-left">
@@ -777,8 +776,7 @@
             icon="pi pi-refresh"
             severity="secondary"
             [outlined]="true"
-            styleClass="w-full lg:flex-1"
-            [style]="{'min-height': '48px', 'max-width': '250px'}"
+            styleClass="w-full lg:w-auto"
             (onClick)="resetForm()"
             [disabled]="!hasFormChanges || saving">
           </p-button>
@@ -788,8 +786,7 @@
             label="Guardar cambios"
             icon="pi pi-check"
             severity="success"
-            styleClass="w-full lg:flex-1"
-            [style]="{'min-height': '48px', 'max-width': '250px'}"
+            styleClass="w-full lg:w-auto"
             [loading]="saving"
             [disabled]="!hasFormChanges || perfilForm.invalid || saving">
           </p-button>
@@ -846,19 +843,19 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex flex-column lg:flex-row gap-2 justify-content-end">
       <p-button
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelarGuardar()"
-        styleClass="p-button-text w-full sm:w-auto"
+        styleClass="p-button-text w-full lg:w-auto"
         [disabled]="savingChanges">
       </p-button>
       <p-button
         label="Guardar"
         icon="pi pi-save"
         (click)="confirmarGuardar()"
-        styleClass="p-button-success w-full sm:w-auto"
+        styleClass="p-button-success w-full lg:w-auto"
         [loading]="savingChanges"
         [disabled]="savingChanges">
       </p-button>

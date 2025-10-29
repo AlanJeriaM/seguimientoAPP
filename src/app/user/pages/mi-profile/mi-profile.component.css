@@ -12,6 +12,42 @@
   object-fit: cover;
 }
 
+/* Limitar ancho de los items del dropdown de Industria */
+::ng-deep .p-dropdown-panel .industria-item {
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+::ng-deep .p-dropdown-panel .industria-item > span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  min-width: 0;
+}
+
+/* Asegurar que el botón de eliminar mantenga su tamaño */
+::ng-deep .p-dropdown-panel .industria-item .btn-eliminar-opcion {
+  flex-shrink: 0;
+  min-width: 40px;
+  max-width: 5px;
+}
+
+/* Limitar el ancho del panel del dropdown */
+::ng-deep #industria + .p-dropdown-panel {
+  max-width: 90vw !important;
+}
+
+@media (min-width: 768px) {
+  ::ng-deep #industria + .p-dropdown-panel {
+    max-width: 500px !important;
+  }
+}
+
 
 
 /* Responsive Typography */
@@ -228,4 +264,7 @@
   ::ng-deep .my-swal-actions .swal2-cancel {
     order: 1;
   }
+
+
+
 }

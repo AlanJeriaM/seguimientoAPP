@@ -98,28 +98,28 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     if (this.estadoFiltro !== 'TODAS') {
       if (this.estadoFiltro === 'PENDIENTES') {
         // Filtrar encuestas pendientes: NO_INICIADA o EN_PROGRESO (sin expiradas)
-        filtradas = filtradas.filter(encuesta => 
-          (encuesta.estado_usuario === 'NO_INICIADA' || encuesta.estado_usuario === 'EN_PROGRESO') 
+        filtradas = filtradas.filter(encuesta =>
+          (encuesta.estado_usuario === 'NO_INICIADA' || encuesta.estado_usuario === 'EN_PROGRESO')
           && !this.isEncuestaExpirada(encuesta)
         );
       } else if (this.estadoFiltro === 'EXPIRADA') {
         // Filtrar solo encuestas expiradas que NO estén completadas
-        filtradas = filtradas.filter(encuesta => 
+        filtradas = filtradas.filter(encuesta =>
           this.isEncuestaExpirada(encuesta) && encuesta.estado_usuario !== 'COMPLETADA'
         );
       } else if (this.estadoFiltro === 'NO_INICIADA') {
         // Filtrar solo encuestas no iniciadas que NO estén expiradas
-        filtradas = filtradas.filter(encuesta => 
+        filtradas = filtradas.filter(encuesta =>
           encuesta.estado_usuario === 'NO_INICIADA' && !this.isEncuestaExpirada(encuesta)
         );
       } else if (this.estadoFiltro === 'EN_PROGRESO') {
         // Filtrar solo encuestas en progreso que NO estén expiradas
-        filtradas = filtradas.filter(encuesta => 
+        filtradas = filtradas.filter(encuesta =>
           encuesta.estado_usuario === 'EN_PROGRESO' && !this.isEncuestaExpirada(encuesta)
         );
       } else if (this.estadoFiltro === 'COMPLETADA') {
         // Filtrar solo encuestas completadas (sin importar si están expiradas)
-        filtradas = filtradas.filter(encuesta => 
+        filtradas = filtradas.filter(encuesta =>
           encuesta.estado_usuario === 'COMPLETADA'
         );
       } else {
@@ -312,6 +312,37 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     }
   }
 
+  getEstadoSeverity(estado: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {
+    switch (estado) {
+      case 'NO_INICIADA':
+        return 'info';
+      case 'EN_PROGRESO':
+        return 'warning';
+      case 'COMPLETADA':
+        return 'success';
+      case 'EXPIRADA':
+        return 'danger';
+      default:
+        return 'info';
+    }
+  }
+
+  getEstadoIcono(estado: string): string {
+    switch (estado) {
+      case 'NO_INICIADA':
+      case 'TODAS':
+        return 'pi pi-circle';
+      case 'EN_PROGRESO':
+        return 'pi pi-spinner';
+      case 'COMPLETADA':
+        return 'pi pi-check-circle';
+      case 'EXPIRADA':
+        return 'pi pi-times-circle';
+      default:
+        return 'pi pi-circle';
+    }
+  }
+
   /**
    * Obtiene el estado correcto de la encuesta considerando expiración
    */
@@ -320,12 +351,12 @@ export class ViewEncuestasComponent implements OnInit, OnDestroy {
     if (encuesta.estado_usuario === 'COMPLETADA') {
       return 'COMPLETADA';
     }
-    
+
     // Si la encuesta está expirada (y no está completada), ese estado tiene prioridad
     if (this.isEncuestaExpirada(encuesta)) {
       return 'EXPIRADA';
     }
-    
+
     // Si no está expirada ni completada, retornar el estado del usuario
     return encuesta.estado_usuario || 'NO_INICIADA';
   }
