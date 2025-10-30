@@ -13,7 +13,7 @@
 ::ng-deep .custom-sidebar-push .p-sidebar-header {
   background: #ebebeb !important;
   border-bottom: 1px solid #e2e8f0 !important;
-  padding: 1rem !important;
+  padding: 0.7rem !important;
 }
 
 ::ng-deep .custom-sidebar-push .p-sidebar-content {
@@ -181,11 +181,20 @@
   ::ng-deep .custom-sidebar-push {
     width: 320px !important;
   }
+
+  ::ng-deep .custom-sidebar-push .p-sidebar-header {
+    padding: 0.3rem !important;
+  }
 }
+
 
 @media (max-width: 576px) {
   ::ng-deep .custom-sidebar-push {
     width: 90vw !important;
     max-width: 320px !important;
+  }
+
+  ::ng-deep .custom-sidebar-push .p-sidebar-header {
+    padding: 0.3rem !important;
   }
 }

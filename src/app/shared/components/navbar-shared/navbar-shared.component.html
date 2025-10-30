@@ -34,6 +34,7 @@
           class="notification-btn"
           [badge]="contadorNoLeidas > 0 ? contadorNoLeidas.toString() : undefined"
           badgeClass="notification-badge"
+          appendTo="body"
         ></p-button>
 
         <p-overlayPanel #notificationPanel [showCloseIcon]="true" [style]="{'width': '400px', 'max-height': '500px'}" appendTo="body">
