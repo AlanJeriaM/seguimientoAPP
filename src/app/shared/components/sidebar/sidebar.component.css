@@ -4,6 +4,10 @@
 ::ng-deep .custom-sidebar-push {
   background: #f8fafc !important;
   border-right: 1px solid #e2e8f0 !important;
+  top: 8px !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 ::ng-deep .custom-sidebar-push .p-sidebar-header {
@@ -16,6 +20,7 @@
   padding: 0 !important;
   height: 100% !important;
   overflow: hidden !important;
+  transition: opacity 0.2s ease-out !important;
 }
 
 /* Scrollbar personalizado */
@@ -35,6 +40,52 @@
 
 ::ng-deep .custom-sidebar-push .p-sidebar-content::-webkit-scrollbar-thumb:hover {
   background: #64748b;
+}
+
+::ng-deep .custom-sidebar-push.p-sidebar-leaving {
+  opacity: 0 !important;
+  transform: translateX(-100%) !important;
+}
+
+/* Animación para ocultar el sidebar */
+::ng-deep .p-sidebar.hiding {
+  animation: hideSidebar 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  pointer-events: none !important;
+}
+
+@keyframes hideSidebar {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+}
+
+/* Asegurar que el sidebar esté oculto después de la animación */
+::ng-deep .p-sidebar.hiding .p-sidebar-content {
+  opacity: 0;
+  transition: opacity 0.2s ease-out !important;
+}
+
+/* Clase para ocultar el sidebar inmediatamente sin animación */
+::ng-deep .p-sidebar.instant-hide {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Remover transiciones durante el logout */
+::ng-deep .logging-out .custom-sidebar-push,
+::ng-deep .logging-out .p-sidebar-content,
+::ng-deep .logging-out .p-sidebar {
+  transition: none !important;
+  animation: none !important;
 }
 
 /* ========================================

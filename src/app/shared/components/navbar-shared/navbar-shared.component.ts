@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { NotificacionService, Notificacion } from '../../../core/services/notificacion/notificacion.service';
@@ -33,7 +33,8 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private notificacionService: NotificacionService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private renderer: Renderer2
   ) { }
 
   ngOnInit(): void {
@@ -135,28 +136,31 @@ export class NavbarSharedComponent implements OnInit, OnDestroy {
   // Confirmar cerrar sesión
   confirmarCerrarSesion() {
     this.loggingOut = true;
-    
-    try {
-      this.authService.logOut();
-      this.router.navigate(['auth']);
-      
+
+    // Ocultar el sidebar inmediatamente
+    this.renderer.removeClass(document.body, 'sidebar-open');
+    const sidebarElement = document.querySelector('.p-sidebar') as HTMLElement;
+    if (sidebarElement) {
+      this.renderer.setStyle(sidebarElement, 'display', 'none');
+      this.renderer.setStyle(sidebarElement, 'visibility', 'hidden');
+      this.renderer.setStyle(sidebarElement, 'opacity', '0');
+    }
+
+    // Cerrar sesión inmediatamente
+    this.authService.logOut();
+
+    // Navegar inmediatamente
+    this.router.navigate(['auth']).then(() => {
       this.messageService.add({
         severity: 'success',
         summary: 'Sesión cerrada',
         detail: 'Has cerrado sesión correctamente',
         life: 3000
       });
-    } catch (error) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Error al cerrar sesión',
-        life: 5000
-      });
-    } finally {
-      this.loggingOut = false;
-      this.displayLogoutDialog = false;
-    }
+    });
+
+    this.displayLogoutDialog = false;
+    this.loggingOut = false;
   }
 
   // Cancelar cerrar sesión

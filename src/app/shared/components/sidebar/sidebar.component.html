@@ -3,7 +3,6 @@
   type="button"
   pButton
   icon="pi pi-bars"
-
   [style]="{'background': '#1960a6', 'border': 'none', 'color': 'white'}"
   (click)="toggleSidebar()">
 </button>
@@ -16,7 +15,8 @@
   [showCloseIcon]="false"
   [baseZIndex]="isModalMode() ? 1000 : 1"
   [style]="{'width': '320px', 'border-radius': '0 5px 5px 0'}"
-  styleClass="custom-sidebar-push">
+  styleClass="custom-sidebar-push"
+  (onHide)="removeBodyClass()">
 
   <!-- Header -->
   <ng-template pTemplate="header">
