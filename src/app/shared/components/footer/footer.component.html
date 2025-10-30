@@ -1,15 +1,68 @@
-<footer class="footer p-d-flex p-jc-between p-ai-center p-py-3 p-border-top">
-  <div class="footer-center p-d-flex p-jc-center p-ai-center">
-    <span class="p-text-secondary">{{customDate | date: 'YYYY' }} - Alan J. ©</span>
-  </div>
-  <div class="footer-center p-d-flex p-jc-center p-ai-center">
-    <a href="https://www.linkedin.com/in/alan-jeria-medina-0210141b8/" target="_blank"
-       class="icon-link p-mx-2 p-text-secondary p-d-flex p-ai-center p-jc-center">
-      <i class="pi pi-linkedin p-p-2"></i>
-    </a>
-    <a href="https://github.com/AlanJeriaM" target="_blank"
-       class="icon-link p-mx-2 p-text-secondary p-d-flex p-ai-center p-jc-center">
-      <i class="pi pi-github p-p-2"></i>
-    </a>
+<footer class=" border-top-1 surface-border py-4 transition-all transition-duration-300">
+  <div class="container-fluid px-4">
+    <div class="grid align-items-center">
+
+      <!-- Copyright - Columna izquierda en desktop, arriba en mobile -->
+      <div class="col-12 md:col-4 text-center md:text-left mb-3 md:mb-0">
+        <div class="flex align-items-center justify-content-center md:justify-content-start gap-2">
+          <i class="pi pi-copyright text-500" style="font-size: 0.875rem;"></i>
+          <span class="text-600 font-medium">
+            {{ customDate | date: 'yyyy' }} Alan J.
+          </span>
+        </div>
+      </div>
+
+      <!-- Logo/Título - Centro en desktop, medio en mobile -->
+      <div class="col-12 md:col-4 text-center mb-3 md:mb-0">
+        <div class="flex align-items-center justify-content-center gap-2">
+          <img
+            src="assets/icons/logouv2.png"
+            alt="UV Logo"
+            style="height: 32px; width: auto;" />
+          <span class="text-700 font-semibold hidden sm:inline">
+            Seguimiento Egresados
+          </span>
+        </div>
+      </div>
+
+      <!-- Redes sociales - Columna derecha en desktop, abajo en mobile -->
+      <div class="col-12 md:col-4 text-center md:text-right">
+        <div class="flex align-items-center justify-content-center md:justify-content-end gap-2">
+          <span class="text-600 text-sm mr-2 hidden sm:inline">Sígueme en:</span>
+
+          <a
+            href="https://www.linkedin.com/in/alan-jeria-medina-0210141b8/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex align-items-center justify-content-center text-white no-underline transition-all transition-duration-300 hover:shadow-3"
+            style="width: 2.5rem; height: 2.5rem; background: #0077b5; border-radius: 5px;"
+            pTooltip="LinkedIn"
+            tooltipPosition="top">
+            <i class="pi pi-linkedin" style="font-size: 1.125rem;"></i>
+          </a>
+
+          <a
+            href="https://github.com/AlanJeriaM"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex align-items-center justify-content-center text-white no-underline transition-all transition-duration-300 hover:shadow-3"
+            style="width: 2.5rem; height: 2.5rem; background: #333; border-radius: 5px;"
+            pTooltip="GitHub"
+            tooltipPosition="top">
+            <i class="pi pi-github" style="font-size: 1.125rem;"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Línea divisoria y texto adicional (opcional) -->
+    <div class="border-top-1 surface-border mt-3 pt-3">
+      <div class="text-center">
+        <span class="text-500 text-sm">
+          Todos los derechos reservados. ©
+        </span>
+      </div>
+    </div>
   </div>
 </footer>

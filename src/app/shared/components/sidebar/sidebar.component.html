@@ -1,75 +1,95 @@
-<!-- Botón para abrir el sidebar -->
+<!-- Botón para abrir/cerrar el sidebar -->
 <button
   type="button"
   pButton
   icon="pi pi-bars"
-  class="sidebar-toggle-btn"
+
+  [style]="{'background': '#1960a6', 'border': 'none', 'color': 'white'}"
   (click)="toggleSidebar()">
 </button>
 
-<!-- Sidebar -->
+<!-- Sidebar sin modal en desktop, con modal en tablet/mobile -->
 <p-sidebar
   [(visible)]="visibleSidebar"
   [position]="'left'"
-  [modal]="true"
+  [modal]="isModalMode()"
   [showCloseIcon]="false"
-  [style]="{'width': '320px'}"
-  styleClass="custom-sidebar">
+  [baseZIndex]="isModalMode() ? 1000 : 1"
+  [style]="{'width': '320px', 'border-radius': '0 5px 5px 0'}"
+  styleClass="custom-sidebar-push">
 
-  <!-- Header con diseño mejorado -->
+  <!-- Header -->
   <ng-template pTemplate="header">
-    <div class="sidebar-header-content">
-      <div class="header-text">
-        <i class="pi" [ngClass]="isAdmin ? 'pi-shield' : 'pi-user'" style="font-size: 1.2rem; margin-right: 0.5rem;"></i>
-        <span class="header-title">{{ isAdmin ? 'Administrador' : 'Panel usuario' }}</span>
+    <div class="flex align-items-center justify-content-between w-full px-3 py-2">
+      <div class="flex align-items-center gap-2">
+        <i class="pi" [ngClass]="isAdmin ? 'pi-shield' : 'pi-user'" style="font-size: 1.2rem;"></i>
+        <span class="font-semibold">{{ isAdmin ? 'Administrador' : 'Panel usuario' }}</span>
       </div>
       <button
         type="button"
         pButton
         icon="pi pi-times"
-        class="p-button-rounded p-button-text header-close-btn"
+        class="p-button-rounded p-button-text p-button-sm"
         (click)="toggleSidebar()">
       </button>
     </div>
   </ng-template>
 
   <!-- Contenido principal -->
-  <div class="sidebar-main-content">
+  <div class="flex flex-column gap-3 px-3 py-2 h-full">
 
     <!-- Card de perfil -->
-    <div class="profile-card" (click)="goToPerfil()">
-      <div class="profile-background"></div>
+    <div
+      class="surface-card border-round shadow-2 cursor-pointer transition-all transition-duration-300 hover:shadow-4"
+      style="border-radius: 5px; overflow: hidden;"
+      (click)="goToPerfil()">
 
-      <div class="profile-content">
+      <!-- Background header -->
+      <div class="h-5rem relative" style="background: linear-gradient(135deg, #1960a6 0%, #0A66C2 100%);"></div>
+
+      <!-- Contenido del perfil -->
+      <div class="flex flex-column align-items-center px-3 pb-3" style="margin-top: -2.5rem;">
+
         <!-- Avatar -->
-        <div class="avatar-container">
+        <div class="relative mb-2">
           <img
             *ngIf="!isAdmin && perfilImagenUrl && !imageError"
             [src]="perfilImagenUrl"
             alt="Perfil"
-            class="avatar-image"
+            class="border-circle border-3 border-white shadow-3"
+            style="width: 5rem; height: 5rem; object-fit: cover;"
             (error)="handleImageError($event)" />
 
           <div
             *ngIf="!isAdmin && (!perfilImagenUrl || imageError)"
-            class="avatar-fallback">
+            class="border-circle border-3 border-white shadow-3 flex align-items-center justify-content-center text-white font-bold text-2xl"
+            style="width: 5rem; height: 5rem; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">
             <span>{{ getUserInitials() }}</span>
           </div>
 
           <img
             *ngIf="isAdmin"
-            class="avatar-image"
+            class="border-circle border-3 border-white shadow-3"
+            style="width: 5rem; height: 5rem; object-fit: cover;"
             [src]="'assets/icons/admin4.png'"
             alt="Admin" />
 
-          <div class="avatar-status"></div>
+          <!-- Indicador de estado -->
+          <div
+            class="absolute border-circle border-2 border-white"
+            style="width: 1rem; height: 1rem; bottom: 0.25rem; right: 0.25rem; background: #10b981;">
+          </div>
         </div>
 
         <!-- Nombre y rol -->
-        <div class="profile-info">
-          <h3 class="profile-username">{{ nameUser }}</h3>
-          <span class="profile-role">
-            <i class="pi pi-circle-fill" style="font-size: 0.4rem; margin-right: 0.4rem;"></i>
+        <div class="flex flex-column align-items-center gap-2 w-full">
+          <h3 class="m-0 font-bold text-900 text-center line-height-3" style="font-size: 1.1rem;">
+            {{ nameUser }}
+          </h3>
+          <span
+            class="inline-flex align-items-center gap-2 px-3 py-1 surface-100 text-600 font-semibold text-sm"
+            style="border-radius: 5px;">
+            <i class="pi pi-circle-fill" style="font-size: 0.4rem;"></i>
             {{ isAdmin ? 'Administrador' : 'Egresado' }}
           </span>
         </div>
@@ -77,17 +97,19 @@
     </div>
 
     <!-- Navegación -->
-    <nav class="sidebar-navigation">
+    <nav class="flex-grow-1 overflow-y-auto">
       <p-panelMenu
         [model]="itemsPanelMenu"
-        styleClass="custom-panel-menu">
+        styleClass="custom-panel-menu-push">
       </p-panelMenu>
     </nav>
 
     <!-- Footer info -->
-    <div class="sidebar-footer">
-      <div class="footer-item">
-        <i class="pi pi-shield"></i>
+    <div
+      class="surface-card border-round px-3 py-2 shadow-1"
+      style="border-radius: 5px;">
+      <div class="flex align-items-center justify-content-center gap-2 text-600 text-sm font-medium">
+        <i class="pi pi-shield text-green-500"></i>
         <span>Seguimiento de egresados</span>
       </div>
     </div>

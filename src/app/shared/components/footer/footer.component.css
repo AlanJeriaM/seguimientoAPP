@@ -1,48 +1,28 @@
-.footer {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem;
-  background-color: white;
-  z-index: 1000;
+/* Footer se adapta cuando el sidebar está abierto - SOLO EN DESKTOP (>1280px) */
+footer {
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.footer-center {
-  flex-grow: 1;
-  text-align: center;
+@media (min-width: 1281px) {
+  :host-context(body.sidebar-open) footer {
+    margin-left: 320px;
+  }
 }
 
-.icon-link {
-  background-color: #0077b5;
-  margin-left: 10px;
-  color: #f0f0f0;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  border-radius: 5px;
-  border: none;
-  padding: 8px;
-  align-items: center !important;
-  justify-content: center !important;
-  text-decoration: none;
+/* En tablet, laptop pequeño y móvil, el footer NO se mueve */
+@media (max-width: 1280px) {
+  :host-context(body.sidebar-open) footer {
+    margin-left: 0;
+  }
 }
 
-.icon-link:hover {
-  background-color: #005582;
+/* Estilos para los íconos sociales */
+a[href*="linkedin"]:hover {
+  background: #005582 !important;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .footer {
-    flex-direction: column;
-    padding: 1.5rem 1rem;
-    gap: 1rem;
-  }
-
-  .footer-center {
-    flex-grow: 0;
-  }
+a[href*="github"]:hover {
+  background: #24292e !important;
+  transform: translateY(-2px);
 }

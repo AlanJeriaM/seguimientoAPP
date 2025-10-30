@@ -1,5 +1,4 @@
-
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Renderer2 } from '@angular/core';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { Router } from '@angular/router';
 
@@ -8,27 +7,42 @@ import { Router } from '@angular/router';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
 
-  @Input() nameUser!: string; //Propiedad que recibe un valor del componente padre, en este caso el nombre del usuario.
-  @Input() isAdmin: boolean = false; //Propiedad que indica si el usuario es administrador (true) o no (false). Por defecto, es false.
-  @Input() perfilImagenUrl?: string; //Propiedad que recibe la URL de la imagen de perfil de LinkedIn
+  @Input() nameUser!: string;
+  @Input() isAdmin: boolean = false;
+  @Input() perfilImagenUrl?: string;
 
+  visibleSidebar: boolean = false; // Cambiado a false por defecto
+  itemsPanelMenu: MenuItem[] = [];
+  imageError: boolean = false;
 
-  visibleSidebar: boolean = true; //Propiedad que controla la visibilidad del sidebar. Inicialmente, es true, lo que significa que el sidebar está visible.
-  itemsPanelMenu: MenuItem[] = []; //Array que almacena los ítems del menú que se mostrarán en el sidebar.
-  imageError: boolean = false; //Propiedad para manejar errores de carga de imagen
-
-  constructor(private primengConfig: PrimeNGConfig, private router: Router) {}
+  constructor(
+    private primengConfig: PrimeNGConfig,
+    private router: Router,
+    private renderer: Renderer2
+  ) {}
 
   ngOnInit(): void {
     this.primengConfig.ripple = true;
-    this.itemsPanelMenu = this.isAdmin ? this.getAdminMenuItems() : this.getUserMenuItems(); //Dependiendo del valor de isAdmin, se asignan los ítems del menú correspondientes.
+    this.itemsPanelMenu = this.isAdmin ? this.getAdminMenuItems() : this.getUserMenuItems();
   }
 
-  //Método que invierte el valor de visibleSidebar para alternar la visibilidad del sidebar.
+  // Determinar si el sidebar debe ser modal basado en el tamaño de pantalla
+  // Solo en desktop (>1280px) empuja el contenido, resto es modal
+  isModalMode(): boolean {
+    return window.innerWidth <= 1280;
+  }
+
   toggleSidebar() {
     this.visibleSidebar = !this.visibleSidebar;
+
+    // Agregar o quitar clase al body para controlar el margen del contenido
+    if (this.visibleSidebar) {
+      this.renderer.addClass(document.body, 'sidebar-open');
+    } else {
+      this.renderer.removeClass(document.body, 'sidebar-open');
+    }
   }
 
   goToPerfil() {
@@ -37,15 +51,14 @@ export class SidebarComponent {
     } else {
       this.router.navigate(['/user/mi-perfil']);
     }
-    this.visibleSidebar = false; // cerrar el sidebar al navegar
+    this.visibleSidebar = false;
+    this.renderer.removeClass(document.body, 'sidebar-open');
   }
 
-  //Método para manejar errores de carga de imagen
   handleImageError(event: any) {
     this.imageError = true;
   }
 
-  //Método para obtener las iniciales del usuario
   getUserInitials(): string {
     if (!this.nameUser) return 'U';
     const names = this.nameUser.trim().split(' ');
@@ -55,35 +68,28 @@ export class SidebarComponent {
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
   }
 
-  //Método para navegar a un gráfico específico en el dashboard
   navigateToChart(chartId: string): void {
-    // Cerrar el sidebar primero
     this.visibleSidebar = false;
+    this.renderer.removeClass(document.body, 'sidebar-open');
 
-    // Determinar la ruta del dashboard según el tipo de usuario
     const dashboardRoute = this.isAdmin ? '/admin/dashboard' : '/user/dashboard';
 
-    // Verificar si ya estamos en el dashboard correspondiente
     if (this.router.url === dashboardRoute) {
-      // Si ya estamos en el dashboard, hacer scroll directamente
       this.scrollToElement(chartId);
     } else {
-      // Si no estamos en el dashboard, navegar primero
       this.router.navigate([dashboardRoute]).then(() => {
         this.scrollToElement(chartId);
       });
     }
   }
 
-  //Método auxiliar para hacer scroll a un elemento
   private scrollToElement(elementId: string): void {
     setTimeout(() => {
       const element = document.getElementById(elementId);
       if (element) {
-        // Calcular la altura real del navbar sticky
         const navbar = document.querySelector('.custom-toolbar') as HTMLElement;
         const navbarHeight = navbar ? navbar.offsetHeight : 100;
-        const navbarOffset = navbarHeight + 20; // Altura del navbar + margen extra
+        const navbarOffset = navbarHeight + 20;
 
         const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
@@ -95,11 +101,8 @@ export class SidebarComponent {
       } else {
         console.warn(`Elemento con ID '${elementId}' no encontrado`);
       }
-    }, 300); // Tiempo reducido para mejor UX
+    }, 300);
   }
-
-
-  //Métodos privado que retorna un array de MenuItem[] con los ítems del menú para admin o user
 
   private getAdminMenuItems(): MenuItem[] {
     return [
@@ -141,8 +144,7 @@ export class SidebarComponent {
       { label: 'Administradores', icon: 'pi pi-user-edit', items: [
         { label: 'Administradores activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-admin' },
         { label: 'Administradores eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-admin' }
-      ]
-    },
+      ]},
 
       { label: 'Usuarios', icon: 'pi pi-users', items: [
           { label: 'Usuarios activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-users' },
@@ -201,7 +203,4 @@ export class SidebarComponent {
       }
     ];
   }
-
-
-
 }

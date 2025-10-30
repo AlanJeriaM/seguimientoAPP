@@ -79,10 +79,9 @@
 }
 
 ::ng-deep .my-swal-actions {
-  flex-direction: column-reverse !important; /* En móviles: confirmar arriba */
+  flex-direction: column-reverse !important;
 }
 
-/* En escritorio se mantiene en fila con confirm a la derecha */
 @media (min-width: 768px) {
   ::ng-deep .my-swal-actions {
     flex-direction: row !important;
@@ -102,6 +101,21 @@
   border-bottom: 1px solid var(--surface-border);
   background: var(--surface-ground);
   padding: 0.75rem 1rem;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cuando el sidebar está abierto - SOLO EN DESKTOP (>1280px) */
+@media (min-width: 1281px) {
+  :host-context(body.sidebar-open) ::ng-deep .custom-toolbar {
+    margin-left: 320px;
+  }
+}
+
+/* En tablet, laptop pequeño y móvil, el navbar NO se mueve */
+@media (max-width: 1280px) {
+  :host-context(body.sidebar-open) ::ng-deep .custom-toolbar {
+    margin-left: 0;
+  }
 }
 
 /* Contenido izquierdo */
@@ -124,7 +138,7 @@
   color: var(--text-color);
   gap: 0.75rem;
   padding: 0.25rem;
-  border-radius: var(--border-radius);
+  border-radius: 5px;
   transition: background-color 0.2s ease;
 }
 
@@ -160,7 +174,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (max-width: 1280px) {
   ::ng-deep .custom-toolbar {
     padding: 0.5rem;
   }
@@ -177,7 +191,6 @@
     font-size: 1rem;
   }
 
-  /* En móviles muy pequeños, ocultar el texto si es necesario */
   @media (max-width: 480px) {
     .brand-text {
       display: none;
@@ -386,7 +399,6 @@
   padding: 0.75rem 1rem;
 }
 
-/* Hover rojo para el botón "Cerrar sesión" */
 ::ng-deep .p-tieredmenu .p-menuitem:last-child .p-menuitem-link:hover {
   background-color: #fee2e2 !important;
   color: #dc2626 !important;

@@ -1,257 +1,60 @@
 /* ========================================
-   BOTÓN TOGGLE PRINCIPAL
+   SIDEBAR - EMPUJA CONTENIDO
 ======================================== */
-.sidebar-toggle-btn {
-  position: relative;
-  background: #1960a6;
-  border: none !important;
-  border-radius: 5px !important;
-  color: white !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  padding: 10px 22px;
-  font-size: 17px;
-}
-
-
-
-.sidebar-toggle-btn::before {
-  position: absolute;
-  top: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
-}
-
-.sidebar-toggle-btn:hover {
-  background: #0A66C2;
-}
-
-
-
-/* ========================================
-   SIDEBAR CONTENEDOR
-======================================== */
-::ng-deep .custom-sidebar {
+::ng-deep .custom-sidebar-push {
   background: #f8fafc !important;
+  border-right: 1px solid #e2e8f0 !important;
 }
 
-::ng-deep .custom-sidebar .p-sidebar-header {
-  background: #ebebeb;
-  padding: 1.35rem 1.5rem;
-  border-bottom: none;
+::ng-deep .custom-sidebar-push .p-sidebar-header {
+  background: #ebebeb !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding: 1rem !important;
 }
 
-::ng-deep .custom-sidebar .p-sidebar-content {
-  padding: 0;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+::ng-deep .custom-sidebar-push .p-sidebar-content {
+  padding: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
 }
 
 /* Scrollbar personalizado */
-::ng-deep .custom-sidebar .p-sidebar-content::-webkit-scrollbar {
+::ng-deep .custom-sidebar-push .p-sidebar-content::-webkit-scrollbar {
   width: 6px;
 }
 
-::ng-deep .custom-sidebar .p-sidebar-content::-webkit-scrollbar-track {
+::ng-deep .custom-sidebar-push .p-sidebar-content::-webkit-scrollbar-track {
   background: #e2e8f0;
   border-radius: 5px;
 }
 
-::ng-deep .custom-sidebar .p-sidebar-content::-webkit-scrollbar-thumb {
+::ng-deep .custom-sidebar-push .p-sidebar-content::-webkit-scrollbar-thumb {
   background: #94a3b8;
   border-radius: 5px;
 }
 
-::ng-deep .custom-sidebar .p-sidebar-content::-webkit-scrollbar-thumb:hover {
+::ng-deep .custom-sidebar-push .p-sidebar-content::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
 
-
-
 /* ========================================
-   HEADER DEL SIDEBAR
+   PANEL MENU PERSONALIZADO
 ======================================== */
-.sidebar-header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+::ng-deep .custom-panel-menu-push {
+  border: none !important;
 }
 
-.header-text {
-  display: flex;
-  align-items: center;
+::ng-deep .custom-panel-menu-push .p-panelmenu-panel {
+  margin-bottom: 0.5rem !important;
+  border-radius: 5px !important;
+  overflow: hidden !important;
 }
 
-.header-title {
-  font-size: 1rem;
-  font-weight: 600;
+::ng-deep .custom-panel-menu-push .p-panelmenu-header {
+  background: transparent !important;
 }
 
-.header-close-btn {
-  color: rgb(0, 0, 0) !important;
-  transition: all 0.3s ease;
-}
-
-.header-close-btn:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
-  transform: rotate(90deg);
-}
-
-/* ========================================
-   CONTENIDO PRINCIPAL
-======================================== */
-.sidebar-main-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 1.5rem 1.25rem;
-  gap: 1.5rem;
-}
-
-/* ========================================
-   CARD DE PERFIL
-======================================== */
-.profile-card {
-  position: relative;
-  background: white;
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.profile-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-}
-
-.profile-background {
-  height: 80px;
-  background: #0A66C2;
-  position: relative;
-  overflow: hidden;
-}
-
-.profile-background::before {
-  position: absolute;
-  background-size: 20px 20px;
-  animation: backgroundMove 20s linear infinite;
-}
-
-@keyframes backgroundMove {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(20px, 20px); }
-}
-
-.profile-content {
-  position: relative;
-  padding: 0 1.5rem 1.5rem;
-  text-align: center;
-}
-
-/* Avatar */
-.avatar-container {
-  position: relative;
-  display: inline-block;
-  margin-top: -40px;
-  margin-bottom: 1rem;
-}
-
-.avatar-image,
-.avatar-fallback {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  border: 4px solid white;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-}
-
-.avatar-image {
-  object-fit: cover;
-}
-
-.avatar-fallback {
-  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.avatar-status {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  background: #10b981;
-  border: 3px solid white;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.profile-card:hover .avatar-image,
-.profile-card:hover .avatar-fallback {
-  transform: scale(1.05);
-}
-
-/* Info del perfil */
-.profile-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.profile-username {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0;
-  line-height: 1.3;
-  word-break: break-word;
-}
-
-.profile-role {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.813rem;
-  font-weight: 600;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 0.375rem 0.875rem;
-  border-radius: 5px;
-  align-self: center;
-}
-
-/* ========================================
-   NAVEGACIÓN
-======================================== */
-.sidebar-navigation {
-  flex: 1;
-}
-
-::ng-deep .custom-panel-menu {
-  border: none;
-}
-
-::ng-deep .custom-panel-menu .p-panelmenu-panel {
-  margin-bottom: 0.5rem;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-::ng-deep .custom-panel-menu .p-panelmenu-header {
-  background: transparent;
-}
-
-::ng-deep .custom-panel-menu .p-panelmenu-header-link {
+::ng-deep .custom-panel-menu-push .p-panelmenu-header-link {
   background: white !important;
   border: none !important;
   border-radius: 5px !important;
@@ -260,195 +63,78 @@
   font-weight: 600 !important;
   font-size: 0.938rem !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
-::ng-deep .custom-panel-menu .p-panelmenu-header-link:hover {
+::ng-deep .custom-panel-menu-push .p-panelmenu-header-link:hover {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
   color: white !important;
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transform: translateX(4px) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
 }
 
-::ng-deep .custom-panel-menu .p-panelmenu-header-link:hover .pi {
+::ng-deep .custom-panel-menu-push .p-panelmenu-header-link:hover .pi {
   color: white !important;
 }
 
-::ng-deep .custom-panel-menu .p-panelmenu-header-link .pi {
-  color: #0A66C2;
-  font-size: 1.1rem;
-  transition: color 0.3s ease;
+::ng-deep .custom-panel-menu-push .p-panelmenu-header-link .pi {
+  color: #0A66C2 !important;
+  font-size: 1.1rem !important;
+  transition: color 0.3s ease !important;
 }
 
-::ng-deep .custom-panel-menu .p-panelmenu-content {
+::ng-deep .custom-panel-menu-push .p-panelmenu-content {
   background: white !important;
   border: none !important;
   padding: 0.5rem 0 !important;
-  margin-top: 0.25rem;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 0.25rem !important;
+  border-radius: 5px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
 }
 
-
-
-
-::ng-deep .custom-panel-menu .p-menuitem-link .pi {
-  color: #b6c0ce;
-  font-size: 0.875rem;
-  transition: color 0.3s ease;
+::ng-deep .custom-panel-menu-push .p-menuitem-link {
+  padding: 0.625rem 1rem 0.625rem 2.75rem !important;
+  color: #475569 !important;
+  font-size: 0.875rem !important;
+  transition: all 0.3s ease !important;
+  border-radius: 5px !important;
 }
 
-::ng-deep .custom-panel-menu .p-menuitem-link:hover .pi {
+::ng-deep .custom-panel-menu-push .p-menuitem-link:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%) !important;
+  color: #1e40af !important;
+  transform: translateX(4px) !important;
+}
+
+::ng-deep .custom-panel-menu-push .p-menuitem-link .pi {
+  color: #b6c0ce !important;
+  font-size: 0.875rem !important;
+  transition: color 0.3s ease !important;
+}
+
+::ng-deep .custom-panel-menu-push .p-menuitem-link:hover .pi {
   color: #2563eb !important;
 }
 
-/* ========================================
-   FOOTER
-======================================== */
-.sidebar-footer {
-  padding: 1rem;
-  background: white;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.footer-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  color: #64748b;
-  font-size: 0.813rem;
-  font-weight: 500;
-}
-
-.footer-item .pi {
-  color: #10b981;
-  font-size: 1rem;
+/* Separadores */
+::ng-deep .custom-panel-menu-push .p-menuitem-separator {
+  margin: 0.5rem 0 !important;
+  border-top: 1px solid #e5e7eb !important;
 }
 
 /* ========================================
    RESPONSIVE
 ======================================== */
-@media (max-width: 768px) {
-  ::ng-deep .custom-sidebar {
-    width: 280px !important;
-  }
-
-  .sidebar-main-content {
-    padding: 1.25rem 1rem;
-    gap: 1.25rem;
-  }
-
-  .profile-background {
-    height: 70px;
-  }
-
-  .avatar-image,
-  .avatar-fallback {
-    width: 75px;
-    height: 75px;
-    font-size: 1.75rem;
-  }
-
-  .avatar-container {
-    margin-top: -35px;
-  }
-
-  .profile-username {
-    font-size: 1rem;
-  }
-
-  .profile-role {
-    font-size: 0.75rem;
+/* En laptop pequeño, tablet y móvil, el sidebar actúa como modal (no empuja contenido) */
+@media (max-width: 1280px) {
+  ::ng-deep .custom-sidebar-push {
+    width: 320px !important;
   }
 }
 
 @media (max-width: 576px) {
-  ::ng-deep .custom-sidebar {
+  ::ng-deep .custom-sidebar-push {
     width: 90vw !important;
     max-width: 320px !important;
   }
-
-  .sidebar-toggle-btn {
-    padding: 8px 18px;
-    font-size: 17px;
-  }
-
-  .sidebar-main-content {
-    padding: 1rem 0.875rem;
-    gap: 1rem;
-  }
-
-  .profile-background {
-    height: 60px;
-  }
-
-  .avatar-image,
-  .avatar-fallback {
-    width: 70px;
-    height: 70px;
-    font-size: 1.5rem;
-  }
-
-  .avatar-container {
-    margin-top: -30px;
-    margin-bottom: 0.75rem;
-  }
-
-  .profile-content {
-    padding: 0 1.25rem 1.25rem;
-  }
-
-  .profile-username {
-    font-size: 0.938rem;
-  }
-
-  .header-title {
-    font-size: 1.1rem;
-  }
-
-  ::ng-deep .custom-panel-menu .p-panelmenu-header-link {
-    padding: 0.75rem 0.875rem !important;
-    font-size: 0.875rem !important;
-  }
-
-  ::ng-deep .custom-panel-menu .p-menuitem-link {
-    padding: 0.625rem 0.875rem 0.625rem 2.5rem !important;
-    font-size: 0.813rem !important;
-  }
-}
-
-/* ========================================
-   MEJORAS PARA EL SUBMENU DE REPORTE EGRESADOS
-======================================== */
-
-/* Estilos para separadores */
-::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem-separator {
-  margin: 0.5rem 0;
-  border-top: 1px solid #e5e7eb;
-  opacity: 0.5;
-}
-
-/* Mejoras visuales para el submenu de Reporte Egresados */
-::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem .p-menuitem-content .p-menuitem-link .p-menuitem-text {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* Efecto hover mejorado para items del submenu */
-::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem .p-menuitem-content:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
-  transform: translateX(4px);
-}
-
-/* Animación suave para el texto del menú */
-::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem .p-menuitem-content .p-menuitem-link .p-menuitem-text {
-  transition: all 0.3s ease;
-}
-
-::ng-deep .custom-panel-menu .p-panelmenu-content .p-menuitem .p-menuitem-content:hover .p-menuitem-text {
-  color: #1e40af;
-  font-weight: 600;
 }
