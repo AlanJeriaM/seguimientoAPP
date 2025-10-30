@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Renderer2 } from '@angular/core';
+import { Component, Input, OnInit, Renderer2, OnDestroy } from '@angular/core';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { Router } from '@angular/router';
 
@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
 
   @Input() nameUser!: string;
   @Input() isAdmin: boolean = false;
@@ -28,6 +28,31 @@ export class SidebarComponent implements OnInit {
     this.itemsPanelMenu = this.isAdmin ? this.getAdminMenuItems() : this.getUserMenuItems();
   }
 
+  ngOnDestroy(): void {
+    // Asegurarse de que el sidebar esté completamente oculto
+    this.removeBodyClass();
+    const sidebarElement = document.querySelector('.p-sidebar');
+    if (sidebarElement) {
+      sidebarElement.classList.add('hiding');
+    }
+    this.visibleSidebar = false;
+  }
+
+  // Hacer público el método para remover la clase del sidebar
+  public removeBodyClass(): void {
+    this.renderer.removeClass(document.body, 'sidebar-open');
+  }
+
+  // Método para ocultar el sidebar inmediatamente
+  public hideImmediately(): void {
+    this.visibleSidebar = false;
+    this.removeBodyClass();
+    const sidebarElement = document.querySelector('.p-sidebar');
+    if (sidebarElement) {
+      sidebarElement.classList.add('instant-hide');
+    }
+  }
+
   // Determinar si el sidebar debe ser modal basado en el tamaño de pantalla
   // Solo en desktop (>1280px) empuja el contenido, resto es modal
   isModalMode(): boolean {
@@ -37,12 +62,16 @@ export class SidebarComponent implements OnInit {
   toggleSidebar() {
     this.visibleSidebar = !this.visibleSidebar;
 
-    // Agregar o quitar clase al body para controlar el margen del contenido
-    if (this.visibleSidebar) {
-      this.renderer.addClass(document.body, 'sidebar-open');
-    } else {
-      this.renderer.removeClass(document.body, 'sidebar-open');
-    }
+    // Usar setTimeout para asegurar que el cambio de estado sea consistente
+    setTimeout(() => {
+      if (this.visibleSidebar) {
+        this.renderer.addClass(document.body, 'sidebar-open');
+      } else {
+        this.renderer.removeClass(document.body, 'sidebar-open');
+      }
+      // Forzar un reflow del DOM
+      window.dispatchEvent(new Event('resize'));
+    }, 0);
   }
 
   goToPerfil() {
