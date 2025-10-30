@@ -1,4 +1,18 @@
 .main-content {
-  margin-bottom: 6rem; /* Ajusta según la altura total del footer (2rem de padding + el contenido) */
+  margin-bottom: 6rem;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Cuando el sidebar está abierto - SOLO EN DESKTOP (>1280px) */
+@media (min-width: 1281px) {
+  :host-context(body.sidebar-open) .main-content {
+    margin-left: 320px;
+  }
+}
+
+/* En tablet, laptop pequeño y móvil, el contenido NO se mueve */
+@media (max-width: 1280px) {
+  :host-context(body.sidebar-open) .main-content {
+    margin-left: 0;
+  }
+}
