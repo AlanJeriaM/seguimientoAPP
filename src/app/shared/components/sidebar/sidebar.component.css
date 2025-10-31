@@ -5,9 +5,20 @@
   background: #f8fafc !important;
   border-right: 1px solid #e2e8f0 !important;
   top: 8px !important;
+  z-index: 1100 !important;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
               visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Overlay del sidebar en modo modal */
+::ng-deep .p-sidebar-mask {
+  z-index: 1099 !important;
+}
+
+/* Asegurar que el sidebar esté por encima de todo */
+::ng-deep .p-sidebar {
+  z-index: 1100 !important;
 }
 
 ::ng-deep .custom-sidebar-push .p-sidebar-header {

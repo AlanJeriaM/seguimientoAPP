@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Renderer2, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, Renderer2, OnDestroy, HostListener } from '@angular/core';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { Router } from '@angular/router';
 
@@ -13,9 +13,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   @Input() isAdmin: boolean = false;
   @Input() perfilImagenUrl?: string;
 
-  visibleSidebar: boolean = false; // Cambiado a false por defecto
+  visibleSidebar: boolean = false;
   itemsPanelMenu: MenuItem[] = [];
   imageError: boolean = false;
+  private currentScreenWidth: number = 0;
 
   constructor(
     private primengConfig: PrimeNGConfig,
@@ -23,13 +24,28 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private renderer: Renderer2
   ) {}
 
+  // Detectar cambios de tamaño de ventana
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    const newWidth = window.innerWidth;
+    const oldIsModal = this.currentScreenWidth <= 1280;
+    const newIsModal = newWidth <= 1280;
+
+    // Solo actuar si hubo un cambio real en el modo (cruzó el breakpoint de 1280px)
+    if (oldIsModal !== newIsModal && this.visibleSidebar) {
+      this.handleModeChange(newIsModal);
+    }
+
+    this.currentScreenWidth = newWidth;
+  }
+
   ngOnInit(): void {
     this.primengConfig.ripple = true;
     this.itemsPanelMenu = this.isAdmin ? this.getAdminMenuItems() : this.getUserMenuItems();
+    this.currentScreenWidth = window.innerWidth;
   }
 
   ngOnDestroy(): void {
-    // Asegurarse de que el sidebar esté completamente oculto
     this.removeBodyClass();
     const sidebarElement = document.querySelector('.p-sidebar');
     if (sidebarElement) {
@@ -38,12 +54,31 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.visibleSidebar = false;
   }
 
-  // Hacer público el método para remover la clase del sidebar
+  // Manejar cambio de modo (modal <-> push)
+  private handleModeChange(isModal: boolean): void {
+    // Cerrar sidebar
+    this.visibleSidebar = false;
+    this.removeBodyClass();
+
+    // Limpiar overlay si existe
+    const overlay = document.querySelector('.p-sidebar-mask');
+    if (overlay) {
+      overlay.remove();
+    }
+
+    // Reabrir sidebar con el nuevo modo después de un breve delay
+    setTimeout(() => {
+      this.visibleSidebar = true;
+      setTimeout(() => {
+        this.renderer.addClass(document.body, 'sidebar-open');
+      }, 50);
+    }, 150);
+  }
+
   public removeBodyClass(): void {
     this.renderer.removeClass(document.body, 'sidebar-open');
   }
 
-  // Método para ocultar el sidebar inmediatamente
   public hideImmediately(): void {
     this.visibleSidebar = false;
     this.removeBodyClass();
@@ -51,10 +86,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (sidebarElement) {
       sidebarElement.classList.add('instant-hide');
     }
+    // Limpiar overlay si existe
+    const overlay = document.querySelector('.p-sidebar-mask');
+    if (overlay) {
+      overlay.remove();
+    }
   }
 
-  // Determinar si el sidebar debe ser modal basado en el tamaño de pantalla
-  // Solo en desktop (>1280px) empuja el contenido, resto es modal
   isModalMode(): boolean {
     return window.innerWidth <= 1280;
   }
@@ -62,16 +100,24 @@ export class SidebarComponent implements OnInit, OnDestroy {
   toggleSidebar() {
     this.visibleSidebar = !this.visibleSidebar;
 
-    // Usar setTimeout para asegurar que el cambio de estado sea consistente
-    setTimeout(() => {
-      if (this.visibleSidebar) {
+    if (this.visibleSidebar) {
+      // Sidebar se está abriendo
+      setTimeout(() => {
         this.renderer.addClass(document.body, 'sidebar-open');
-      } else {
-        this.renderer.removeClass(document.body, 'sidebar-open');
-      }
-      // Forzar un reflow del DOM
-      window.dispatchEvent(new Event('resize'));
-    }, 0);
+        window.dispatchEvent(new Event('resize'));
+      }, 0);
+    } else {
+      // Sidebar se está cerrando
+      this.removeBodyClass();
+
+      // Limpiar overlay si existe
+      setTimeout(() => {
+        const overlay = document.querySelector('.p-sidebar-mask');
+        if (overlay) {
+          overlay.remove();
+        }
+      }, 50);
+    }
   }
 
   goToPerfil() {
@@ -95,6 +141,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
       return names[0].charAt(0).toUpperCase();
     }
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  }
+
+  // Aplicar solo si necesito hacer click en un item del menú para cerrar el sidebar.
+  private closeSidebarOnNavigate(): void {
+    this.visibleSidebar = false;
+    this.renderer.removeClass(document.body, 'sidebar-open');
   }
 
   navigateToChart(chartId: string): void {
@@ -140,7 +192,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         icon: 'pi pi-chart-bar',
         iconStyle: {'color': '#3B82F6'},
         items: [
-          { label: 'Dashboard principal', icon: 'pi pi-fw pi-home', routerLink: '/admin/dashboard' },
+          { label: 'Dashboard principal', icon: 'pi pi-fw pi-home', routerLink: '/admin/dashboard', command: () => this.closeSidebarOnNavigate()  },
           {
             label: 'Análisis laboral',
             icon: 'pi pi-fw pi-briefcase',
@@ -170,20 +222,24 @@ export class SidebarComponent implements OnInit, OnDestroy {
         ]
       },
 
-      { label: 'Administradores', icon: 'pi pi-user-edit', items: [
-        { label: 'Administradores activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-admin' },
-        { label: 'Administradores eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-admin' }
-      ]},
-
-      { label: 'Usuarios', icon: 'pi pi-users', items: [
-          { label: 'Usuarios activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-users' },
-          { label: 'Usuarios eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-users' }
+      { label: 'Administradores', icon: 'pi pi-user-edit',
+        items: [
+            { label: 'Administradores activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-admin', command: () => this.closeSidebarOnNavigate()  },
+            { label: 'Administradores eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-admin', command: () => this.closeSidebarOnNavigate()  }
         ]
       },
-      { label: 'Encuestas', icon: 'pi pi-book', items: [
-          { label: 'Crear', icon: 'pi pi-fw pi-bookmark', routerLink: '/admin/create-encuesta' },
-          { label: 'Mis encuestas', icon: 'pi pi-fw pi-bookmark-fill', routerLink: '/admin/view-encuesta' },
-          { label: 'Resultados', icon: 'pi pi-fw pi-chart-bar', routerLink: '/admin/view-encuestas-resultados' }
+
+      { label: 'Usuarios', icon: 'pi pi-users',
+        items: [
+          { label: 'Usuarios activos', icon: 'pi pi-fw pi-users', routerLink: '/admin/view-users', command: () => this.closeSidebarOnNavigate()  },
+          { label: 'Usuarios eliminados', icon: 'pi pi-fw pi-trash', routerLink: '/admin/view-deleted-users', command: () => this.closeSidebarOnNavigate()  }
+        ]
+      },
+      { label: 'Encuestas', icon: 'pi pi-book',
+        items: [
+          { label: 'Crear', icon: 'pi pi-fw pi-bookmark', routerLink: '/admin/create-encuesta', command: () => this.closeSidebarOnNavigate()  },
+          { label: 'Mis encuestas', icon: 'pi pi-fw pi-bookmark-fill', routerLink: '/admin/view-encuesta' , command: () => this.closeSidebarOnNavigate()  },
+          { label: 'Resultados', icon: 'pi pi-fw pi-chart-bar', routerLink: '/admin/view-encuestas-resultados', command: () => this.closeSidebarOnNavigate()  }
         ]
       }
     ];
@@ -196,7 +252,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         icon: 'pi pi-chart-bar',
         iconStyle: {'color': '#3B82F6'},
         items: [
-          { label: 'Dashboard principal', icon: 'pi pi-fw pi-home', routerLink: '/user/dashboard' },
+          { label: 'Dashboard principal', icon: 'pi pi-fw pi-home', routerLink: '/user/dashboard', command: () => this.closeSidebarOnNavigate() },
           {
             label: 'Análisis laboral',
             icon: 'pi pi-fw pi-briefcase',
@@ -226,8 +282,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
         ]
       },
       { label: 'Encuestas', icon: 'pi pi-users', items: [
-          { label: 'Mis encuestas', icon: 'pi pi-file-edit', routerLink: '/user/view-encuestas' },
-          { label: 'Encuestas completadas', icon: 'pi pi-check', routerLink: '/user/encuesta-completada' }
+          { label: 'Mis encuestas', icon: 'pi pi-file-edit', routerLink: '/user/view-encuestas', command: () => this.closeSidebarOnNavigate()   },
+          { label: 'Encuestas completadas', icon: 'pi pi-check', routerLink: '/user/encuesta-completada', command: () => this.closeSidebarOnNavigate()  }
         ]
       }
     ];

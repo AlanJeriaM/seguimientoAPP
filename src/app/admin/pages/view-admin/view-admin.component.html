@@ -331,14 +331,14 @@
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelarDialog()"
-        styleClass="p-button-danger w-full sm:w-auto"
+        styleClass="p-button-danger w-full xl:w-auto"
       ></p-button>
       <p-button
       [label]="editMode ? 'Actualizar' : 'Crear'"
       icon="pi pi-check"
       [disabled]="adminForm.invalid || (editMode && !hasFormChanges)"
       (click)="guardarAdministrador()"
-      [styleClass]="(editMode ? 'p-button-warning' : 'p-button-success') + ' w-full sm:w-auto'"
+      [styleClass]="(editMode ? 'p-button-warning' : 'p-button-success') + ' w-full xl:w-auto'"
     ></p-button>
     </div>
   </ng-template>
@@ -438,7 +438,7 @@
         label="Cerrar"
         icon="pi pi-times"
         (click)="cerrarViewDialog()"
-        styleClass="p-button-primary w-full sm:w-auto">
+        styleClass="p-button-primary w-full xl:w-auto">
       </p-button>
     </div>
   </ng-template>
@@ -522,14 +522,14 @@
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelarEliminacion()"
-        styleClass="p-button-text w-full sm:w-auto"
+        styleClass="p-button-text w-full xl:w-auto"
         [disabled]="deleting">
       </p-button>
       <p-button
         label="Eliminar Administrador"
         icon="pi pi-trash"
         (click)="confirmarEliminacion()"
-        styleClass="p-button-danger w-full sm:w-auto"
+        styleClass="p-button-danger w-full xl:w-auto"
         [loading]="deleting"
         [disabled]="deleting">
       </p-button>
