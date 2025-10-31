@@ -161,7 +161,7 @@
   [(visible)]="displayDialog"
   [header]="editMode ? 'Editar Administrador' : 'Nuevo Administrador'"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [style]="{width: '95vw', maxWidth: '600px'}"
   [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
@@ -349,7 +349,7 @@
   [(visible)]="displayViewDialog"
   header="Ver Administrador"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [style]="{width: '95vw', maxWidth: '600px'}"
   [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
@@ -378,7 +378,7 @@
 
         <div class="grid">
           <!-- Nombre Completo -->
-          <div class="col-12 lg:col-6">
+          <div class="col-12">
             <div class="field">
               <label class="block text-900 font-semibold mb-2">Nombre Completo</label>
               <div class="p-3 surface-100 border-round border-1 border-gray-400 text-900">{{ adminParaVer.nombre_completo || 'No especificado' }}</div>
@@ -449,8 +449,8 @@
   [(visible)]="displayDeleteDialog"
   header="Eliminar Administrador"
   [modal]="true"
-  [style]="{width: '90vw', maxWidth: '500px'}"
-  [contentStyle]="{'padding': '0'}"
+  [style]="{width: '95vw', maxWidth: '600px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
   [appendTo]="'body'"

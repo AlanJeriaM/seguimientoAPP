@@ -596,12 +596,12 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex flex-column lg:flex-row gap-2 justify-content-end">
       <p-button
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelar()"
-        styleClass="p-button-text p-button-danger w-full sm:w-auto">
+        styleClass="p-button-text p-button-danger w-full lg:w-auto">
       </p-button>
       <p-button
         label="Guardar Cambios"
@@ -609,7 +609,7 @@
         (click)="guardarPerfil()"
         [loading]="saving"
         [disabled]="perfilForm.invalid || !hasFormChanges"
-        styleClass="p-button-success w-full sm:w-auto">
+        styleClass="p-button-success w-full lg:w-auto">
       </p-button>
     </div>
   </ng-template>

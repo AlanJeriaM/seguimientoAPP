@@ -233,7 +233,7 @@
   [(visible)]="displayReporteDialog"
   header="Ver Reporte de Encuesta"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [style]="{width: '95vw', maxWidth: '900px'}"
   [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
@@ -711,19 +711,19 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex flex-column lg:flex-row gap-2 justify-content-end">
       <p-button
         label="Cerrar"
         icon="pi pi-times"
         (click)="cerrarReporteDialog()"
-        styleClass="p-button-text w-full sm:w-auto"
+        styleClass="p-button-text w-full lg:w-auto"
       ></p-button>
       <p-button
         *ngIf="encuestaIdSeleccionada"
         label="Exportar Datos"
         icon="pi pi-download"
         (click)="encuestaIdSeleccionada && exportarDatosEncuesta(encuestaIdSeleccionada)"
-        styleClass="p-button-success w-full sm:w-auto"
+        styleClass="p-button-success w-full lg:w-auto"
       ></p-button>
     </div>
   </ng-template>

@@ -157,8 +157,8 @@
   [(visible)]="displayReactivateDialog"
   header="Reactivar Usuario"
   [modal]="true"
-  [style]="{width: '90vw', maxWidth: '500px'}"
-  [contentStyle]="{'padding': '0'}"
+  [style]="{width: '95vw', maxWidth: '600px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
   [appendTo]="'body'"
@@ -245,19 +245,19 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex flex-column lg:flex-row gap-2 justify-content-end">
       <p-button
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelarReactivacion()"
-        styleClass="p-button-text w-full sm:w-auto"
+        styleClass="p-button-text w-full lg:w-auto"
         [disabled]="reactivating">
       </p-button>
       <p-button
         label="Reactivar Usuario"
         icon="pi pi-refresh"
         (click)="confirmarReactivacion()"
-        styleClass="p-button-success w-full sm:w-auto"
+        styleClass="p-button-success w-full lg:w-auto"
         [loading]="reactivating"
         [disabled]="reactivating">
       </p-button>
@@ -270,8 +270,8 @@
   [(visible)]="displayDeleteDialog"
   header="Eliminar permanentemente"
   [modal]="true"
-  [style]="{width: '90vw', maxWidth: '600px'}"
-  [contentStyle]="{'padding': '0'}"
+  [style]="{width: '95vw', maxWidth: '600px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
   [appendTo]="'body'"
@@ -379,19 +379,19 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex flex-column lg:flex-row gap-2 justify-content-end">
       <p-button
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelarEliminacionPermanente()"
-        styleClass="p-button-text w-full sm:w-auto"
+        styleClass="p-button-text w-full lg:w-auto"
         [disabled]="deleting">
       </p-button>
       <p-button
         label="Eliminar permanentemente"
         icon="pi pi-trash"
         (click)="confirmarEliminacionPermanente()"
-        styleClass="p-button-danger w-full sm:w-auto"
+        styleClass="p-button-danger w-full lg:w-auto"
         [loading]="deleting"
         [disabled]="deleting || confirmText !== 'ELIMINAR'">
       </p-button>
