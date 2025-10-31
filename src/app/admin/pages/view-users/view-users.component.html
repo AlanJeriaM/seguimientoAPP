@@ -166,7 +166,7 @@
   [(visible)]="displayDialog"
   header="Ver Usuario"
   [modal]="true"
-  [style]="{width: '95vw', maxWidth: '1200px'}"
+  [style]="{width: '95vw', maxWidth: '900px'}"
   [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
@@ -343,12 +343,12 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex flex-column lg:flex-row gap-2 justify-content-end">
       <p-button
         label="Cerrar"
         icon="pi pi-times"
         (click)="cerrarDialog()"
-        styleClass="p-button-primary w-full sm:w-auto">
+        styleClass="p-button-primary w-full lg:w-auto">
       </p-button>
     </div>
   </ng-template>
@@ -359,8 +359,8 @@
   [(visible)]="displayDeleteDialog"
   header="Eliminar Usuario"
   [modal]="true"
-  [style]="{width: '90vw', maxWidth: '500px'}"
-  [contentStyle]="{'padding': '0'}"
+  [style]="{width: '95vw', maxWidth: '600px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
   [appendTo]="'body'"
@@ -427,19 +427,19 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex flex-column xl:flex-row gap-2 justify-content-end">
       <p-button
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelarEliminacion()"
-        styleClass="p-button-text w-full sm:w-auto"
+        styleClass="p-button-text w-full xl:w-auto"
         [disabled]="deleting">
       </p-button>
       <p-button
         label="Eliminar Usuario"
         icon="pi pi-trash"
         (click)="confirmarEliminacion()"
-        styleClass="p-button-danger w-full sm:w-auto"
+        styleClass="p-button-danger w-full xl:w-auto"
         [loading]="deleting"
         [disabled]="deleting">
       </p-button>
