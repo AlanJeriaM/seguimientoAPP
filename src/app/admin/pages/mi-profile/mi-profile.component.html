@@ -246,8 +246,8 @@
   [(visible)]="displayUpdateDialog"
   header="Confirmar actualización"
   [modal]="true"
-  [style]="{width: '90vw', maxWidth: '500px'}"
-  [contentStyle]="{'padding': '0'}"
+  [style]="{width: '95vw', maxWidth: '600px'}"
+  [contentStyle]="{'padding': '0', 'overflow-y': 'auto', 'max-height': '90vh'}"
   [draggable]="false"
   [resizable]="false"
   [appendTo]="'body'"
@@ -325,19 +325,19 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex flex-column sm:flex-row gap-2 justify-content-end">
+    <div class="flex flex-column lg:flex-row gap-2 justify-content-end">
       <p-button
         label="Cancelar"
         icon="pi pi-times"
         (click)="cancelarActualizacion()"
-        styleClass="p-button-text w-full sm:w-auto text-sm"
+        styleClass="p-button-text w-full lg:w-auto text-sm"
         [disabled]="updating">
       </p-button>
       <p-button
         label="Actualizar Perfil"
         icon="pi pi-check"
         (click)="confirmarActualizacion()"
-        styleClass="p-button-success w-full sm:w-auto text-sm"
+        styleClass="p-button-success w-full lg:w-auto text-sm"
         [loading]="updating"
         [disabled]="updating">
       </p-button>
