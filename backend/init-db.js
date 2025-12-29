@@ -26,7 +26,7 @@ const initializeDatabase = async () => {
       });
       console.log('Admin creado: admin@admin.com / admin123');
     } else {
-      console.log('ℹAdmin ya existe');
+      console.log('Admin ya existe');
     }
 
     // Crear usuario de prueba
@@ -46,7 +46,7 @@ const initializeDatabase = async () => {
       });
       console.log('Usuario de prueba creado');
     } else {
-      console.log('ℹUsuario de prueba ya existe');
+      console.log('Usuario de prueba ya existe');
     }
 
     console.log('Base de datos inicializada correctamente');

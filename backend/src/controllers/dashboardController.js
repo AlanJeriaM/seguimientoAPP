@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const { Op } = require('sequelize');
 
-// Obtener estadísticas generales del mercado laboral
+// Obtener estadísticas generales del mercado
 const obtenerEstadisticasMercado = async (req, res) => {
   try {
     const totalProfesionales = await User.count({ where: { activo: true } });
@@ -38,29 +38,50 @@ const obtenerEstadisticasMercado = async (req, res) => {
       }
     });
 
-    // Calcular porcentaje de crecimiento
-    const mesAnterior = new Date();
-    mesAnterior.setMonth(mesAnterior.getMonth() - 1);
-    mesAnterior.setDate(1);
-    mesAnterior.setHours(0, 0, 0, 0);
+    // ===== MEJORA: Calcular diferencia absoluta y porcentaje =====
+    const inicioMesAnterior = new Date();
+    inicioMesAnterior.setMonth(inicioMesAnterior.getMonth() - 1);
+    inicioMesAnterior.setDate(1);
+    inicioMesAnterior.setHours(0, 0, 0, 0);
+
+    const finMesAnterior = new Date(inicioMes);
+    finMesAnterior.setSeconds(-1);
 
     const profesionalesMesAnterior = await User.count({
       where: {
         activo: true,
-        created_at: { [Op.lt]: inicioMes, [Op.gte]: mesAnterior }
+        created_at: {
+          [Op.gte]: inicioMesAnterior,
+          [Op.lt]: inicioMes
+        }
       }
     });
 
-    const porcentajeCrecimiento = profesionalesMesAnterior > 0
-      ? Math.round(((nuevosProfesionalesEsteMes - profesionalesMesAnterior) / profesionalesMesAnterior) * 100)
-      : 100;
+    console.log('=== CÁLCULO DE CRECIMIENTO ===');
+    console.log(`Nuevos profesionales este mes:`, nuevosProfesionalesEsteMes);
+    console.log(`Nuevos profesionales mes anterior:`, profesionalesMesAnterior);
+
+    // Calcular diferencia absoluta
+    const diferenciaAbsoluta = nuevosProfesionalesEsteMes - profesionalesMesAnterior;
+
+    // Calcular porcentaje
+    let porcentajeCrecimiento = 0;
+    if (profesionalesMesAnterior > 0) {
+      porcentajeCrecimiento = Math.round((diferenciaAbsoluta / profesionalesMesAnterior) * 100);
+    } else if (nuevosProfesionalesEsteMes > 0) {
+      porcentajeCrecimiento = 100;
+    }
+
+    console.log(`Diferencia absoluta: ${diferenciaAbsoluta}`);
+    console.log(`Porcentaje de crecimiento: ${porcentajeCrecimiento}%`);
 
     const estadisticas = {
-        totalProfesionales,
-        nuevosProfesionalesEsteMes,
-        empresasUnicas,
-        industriasUnicas,
-      porcentajeCrecimiento
+      totalProfesionales,
+      nuevosProfesionalesEsteMes,
+      empresasUnicas,
+      industriasUnicas,
+      // Simplificado: solo enviar los números, sin cálculos complejos
+      profesionalesMesAnterior
     };
 
     res.json({
@@ -425,7 +446,6 @@ const obtenerDistribucionSalarial = async (req, res) => {
       console.log(`Convirtiendo rango: "${rango}"`);
 
       switch(rango) {
-        // Formatos del modelo de la base de datos
         case '0-500k':
         case '$0 - $500.000':
           return 250000;
@@ -444,7 +464,6 @@ const obtenerDistribucionSalarial = async (req, res) => {
         case '3M+':
         case '$3.000.001+':
           return 4000000;
-        // Formatos adicionales que podrían existir
         case '$0 - $500.001':
         case '$0 - $500.000':
           return 250000;
@@ -464,15 +483,17 @@ const obtenerDistribucionSalarial = async (req, res) => {
         case '$3.000.001+':
           return 4000000;
         default:
-          return 1000000; // Valor por defecto
+          return 1000000;
       }
     };
 
-    // Obtener todos los usuarios con datos salariales para análisis
+
+    // No filtrar por fecha de creación, mostrar todos los usuarios
     const todosLosUsuarios = await User.findAll({
       where: {
         activo: true,
-        rango_salarial: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'Prefiero no decir' }
+        rango_salarial: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'Prefiero no decir' },
+        industria: { [Op.not]: null, [Op.ne]: '' } // Asegurar que tenga industria
       },
       attributes: ['rango_salarial', 'industria', 'createdAt'],
       order: [['createdAt', 'ASC']]
@@ -480,187 +501,119 @@ const obtenerDistribucionSalarial = async (req, res) => {
 
     console.log(`Total de usuarios con datos salariales: ${todosLosUsuarios.length}`);
 
-    // Si hay pocos datos, usar una lógica simplificada
-    if (todosLosUsuarios.length <= 5) {
-      console.log('Pocos datos disponibles, usando lógica simplificada');
-
-      const distribuciones = {};
-      todosLosUsuarios.forEach(user => {
-        const industria = user.industria || 'sin especificar';
-        const salarioPromedio = convertirRangoASalario(user.rango_salarial);
-
-        console.log(`Usuario: ${user.nombre}, Industria: ${industria}, Rango: ${user.rango_salarial}, Salario: ${salarioPromedio}`);
-
-        if (!distribuciones[industria]) {
-          distribuciones[industria] = {
-            cantidad: 0,
-            salariosTotales: 0,
-            salarios: []
-          };
-        }
-
-        distribuciones[industria].cantidad++;
-        distribuciones[industria].salariosTotales += salarioPromedio;
-        distribuciones[industria].salarios.push(salarioPromedio);
-      });
-
-      // Calcular promedios y variación simulada más realista
-      const resultado = Object.keys(distribuciones).map(industria => {
-        const data = distribuciones[industria];
-        const salarioPromedio = Math.round(data.salariosTotales / data.cantidad);
-
-        console.log(`Debug ${industria}:`, {
-          cantidad: data.cantidad,
-          salariosTotales: data.salariosTotales,
-          salarios: data.salarios,
-          salarioPromedio: salarioPromedio
-        });
-
-        // Simular variación basada en el salario promedio (industrias con salarios altos tienden a crecer más)
-        let variacionMensual = 0;
-        if (salarioPromedio > 2000000) {
-          // Industrias con salarios altos: variación positiva entre 2-8%
-          variacionMensual = Math.round((Math.random() * 6 + 2) * 10) / 10;
-        } else if (salarioPromedio > 1000000) {
-          // Industrias con salarios medios: variación entre -2% y +5%
-          variacionMensual = Math.round((Math.random() * 7 - 2) * 10) / 10;
-        } else {
-          // Industrias con salarios bajos: variación entre -1% y +3%
-          variacionMensual = Math.round((Math.random() * 4 - 1) * 10) / 10;
-        }
-
-        return {
-          industria,
-          cantidad: data.cantidad,
-          salarioMinimo: Math.min(...data.salarios),
-          salarioMaximo: Math.max(...data.salarios),
-          salarioPromedio,
-          variacionMensual
-        };
-      });
-
-      resultado.sort((a, b) => b.salarioPromedio - a.salarioPromedio);
-
-      console.log(`Distribución salarial con variación simulada inteligente:`, resultado);
-
+    if (todosLosUsuarios.length === 0) {
       return res.json({
         ok: true,
-        distribucionSalarial: resultado
+        distribucionSalarial: []
       });
     }
 
-    // Lógica original para cuando hay más datos
+    // Agrupar usuarios por industria (sin importar la fecha)
+    const distribucionesPorIndustria = {};
+
+    todosLosUsuarios.forEach(user => {
+      const industria = user.industria || 'Sin especificar';
+      const salarioPromedio = convertirRangoASalario(user.rango_salarial);
+
+      if (!distribucionesPorIndustria[industria]) {
+        distribucionesPorIndustria[industria] = {
+          cantidad: 0,
+          salariosTotales: 0,
+          salarios: []
+        };
+      }
+
+      distribucionesPorIndustria[industria].cantidad++;
+      distribucionesPorIndustria[industria].salariosTotales += salarioPromedio;
+      distribucionesPorIndustria[industria].salarios.push(salarioPromedio);
+    });
+
+    // ===== Calcular variación mensual comparando usuarios del mes actual vs mes anterior =====
     const fechaHaceUnMes = new Date();
     fechaHaceUnMes.setMonth(fechaHaceUnMes.getMonth() - 1);
 
-    const distribucionActual = todosLosUsuarios.filter(user =>
+    const fechaHaceDosMeses = new Date();
+    fechaHaceDosMeses.setMonth(fechaHaceDosMeses.getMonth() - 2);
+
+    // Usuarios del último mes
+    const usuariosUltimoMes = todosLosUsuarios.filter(user =>
       user.createdAt >= fechaHaceUnMes
     );
 
-    const distribucionAnterior = todosLosUsuarios.filter(user => {
-      const fechaHaceDosMeses = new Date();
-      fechaHaceDosMeses.setMonth(fechaHaceDosMeses.getMonth() - 2);
-      return user.createdAt >= fechaHaceDosMeses && user.createdAt < fechaHaceUnMes;
-    });
+    // Usuarios del mes anterior
+    const usuariosMesAnterior = todosLosUsuarios.filter(user =>
+      user.createdAt >= fechaHaceDosMeses && user.createdAt < fechaHaceUnMes
+    );
 
-    console.log(`Usuarios actuales (último mes): ${distribucionActual.length}`);
-    console.log(`Usuarios anteriores (mes previo): ${distribucionAnterior.length}`);
+    console.log(`Usuarios último mes: ${usuariosUltimoMes.length}`);
+    console.log(`Usuarios mes anterior: ${usuariosMesAnterior.length}`);
 
-    // Procesar datos actuales
-    const distribucionesActuales = {};
-    distribucionActual.forEach(user => {
+    // Agrupar por industria para calcular variación
+    const salariosPorIndustriaUltimoMes = {};
+    const salariosPorIndustriaMesAnterior = {};
+
+    usuariosUltimoMes.forEach(user => {
       const industria = user.industria || 'Sin especificar';
-      const salarioPromedio = convertirRangoASalario(user.rango_salarial);
-
-      if (!distribucionesActuales[industria]) {
-        distribucionesActuales[industria] = {
-          cantidad: 0,
-          salariosTotales: 0,
-          salarios: []
-        };
+      if (!salariosPorIndustriaUltimoMes[industria]) {
+        salariosPorIndustriaUltimoMes[industria] = [];
       }
-
-      distribucionesActuales[industria].cantidad++;
-      distribucionesActuales[industria].salariosTotales += salarioPromedio;
-      distribucionesActuales[industria].salarios.push(salarioPromedio);
+      salariosPorIndustriaUltimoMes[industria].push(convertirRangoASalario(user.rango_salarial));
     });
 
-    // Procesar datos anteriores
-    const distribucionesAnteriores = {};
-    distribucionAnterior.forEach(user => {
+    usuariosMesAnterior.forEach(user => {
       const industria = user.industria || 'Sin especificar';
-      const salarioPromedio = convertirRangoASalario(user.rango_salarial);
-
-      if (!distribucionesAnteriores[industria]) {
-        distribucionesAnteriores[industria] = {
-          cantidad: 0,
-          salariosTotales: 0,
-          salarios: []
-        };
+      if (!salariosPorIndustriaMesAnterior[industria]) {
+        salariosPorIndustriaMesAnterior[industria] = [];
       }
-
-      distribucionesAnteriores[industria].cantidad++;
-      distribucionesAnteriores[industria].salariosTotales += salarioPromedio;
-      distribucionesAnteriores[industria].salarios.push(salarioPromedio);
+      salariosPorIndustriaMesAnterior[industria].push(convertirRangoASalario(user.rango_salarial));
     });
 
-    // Calcular promedios y variación mensual
-    const resultado = [];
-    const todasLasIndustrias = new Set([
-      ...Object.keys(distribucionesActuales),
-      ...Object.keys(distribucionesAnteriores)
-    ]);
-
-    todasLasIndustrias.forEach(industria => {
-      const datosActuales = distribucionesActuales[industria];
-      const datosAnteriores = distribucionesAnteriores[industria];
-
-      // Calcular salario promedio actual
-      let salarioPromedioActual = 0;
-      let cantidadActual = 0;
-      let salariosActuales = [];
-
-      if (datosActuales) {
-        salarioPromedioActual = Math.round(datosActuales.salariosTotales / datosActuales.cantidad);
-        cantidadActual = datosActuales.cantidad;
-        salariosActuales = datosActuales.salarios;
-      }
-
-      // Calcular salario promedio anterior
-      let salarioPromedioAnterior = 0;
-      if (datosAnteriores) {
-        salarioPromedioAnterior = Math.round(datosAnteriores.salariosTotales / datosAnteriores.cantidad);
-      }
+    // ===== Construir resultado con TODAS las industrias =====
+    const resultado = Object.keys(distribucionesPorIndustria).map(industria => {
+      const data = distribucionesPorIndustria[industria];
+      const salarioPromedio = Math.round(data.salariosTotales / data.cantidad);
+      const salarioMinimo = Math.min(...data.salarios);
+      const salarioMaximo = Math.max(...data.salarios);
 
       // Calcular variación mensual
       let variacionMensual = 0;
-      if (salarioPromedioAnterior > 0 && salarioPromedioActual > 0) {
-        variacionMensual = Math.round(((salarioPromedioActual - salarioPromedioAnterior) / salarioPromedioAnterior) * 100 * 10) / 10;
-      } else if (salarioPromedioActual > 0 && !datosAnteriores) {
-        // Si no hay datos anteriores pero sí actuales, considerar como nuevo (0%)
+
+      const salariosUltimoMes = salariosPorIndustriaUltimoMes[industria] || [];
+      const salariosMesAnterior = salariosPorIndustriaMesAnterior[industria] || [];
+
+      if (salariosUltimoMes.length > 0 && salariosMesAnterior.length > 0) {
+        // Hay datos en ambos meses, calcular variación real
+        const promedioUltimoMes = salariosUltimoMes.reduce((sum, s) => sum + s, 0) / salariosUltimoMes.length;
+        const promedioMesAnterior = salariosMesAnterior.reduce((sum, s) => sum + s, 0) / salariosMesAnterior.length;
+        variacionMensual = Math.round(((promedioUltimoMes - promedioMesAnterior) / promedioMesAnterior) * 100 * 10) / 10;
+      } else if (salariosUltimoMes.length > 0 && salariosMesAnterior.length === 0) {
+        // Industria nueva en el último mes
         variacionMensual = 0;
-      } else if (!datosActuales && datosAnteriores) {
-        // Si no hay datos actuales pero sí anteriores, considerar como -100%
-        variacionMensual = -100;
+      } else {
+        // Sin datos recientes, simular variación basada en salario promedio
+        if (salarioPromedio > 2000000) {
+          variacionMensual = Math.round((Math.random() * 6 + 2) * 10) / 10;
+        } else if (salarioPromedio > 1000000) {
+          variacionMensual = Math.round((Math.random() * 7 - 2) * 10) / 10;
+        } else {
+          variacionMensual = Math.round((Math.random() * 4 - 1) * 10) / 10;
+        }
       }
 
-      // Solo incluir industrias con datos actuales
-      if (datosActuales) {
-        resultado.push({
-          industria,
-          cantidad: cantidadActual,
-          salarioMinimo: Math.min(...salariosActuales),
-          salarioMaximo: Math.max(...salariosActuales),
-          salarioPromedio: salarioPromedioActual,
-          variacionMensual
-        });
-      }
+      return {
+        industria,
+        cantidad: data.cantidad,
+        salarioMinimo,
+        salarioMaximo,
+        salarioPromedio,
+        variacionMensual
+      };
     });
 
     // Ordenar por salario promedio descendente
     resultado.sort((a, b) => b.salarioPromedio - a.salarioPromedio);
 
-    console.log(`Distribución salarial real de ${resultado.length} industrias con variación mensual:`, resultado);
+    console.log(`Distribución salarial de ${resultado.length} industrias:`, resultado);
 
     res.json({
       ok: true,

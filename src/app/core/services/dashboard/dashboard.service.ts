@@ -10,7 +10,7 @@ export interface EstadisticasMercado {
   nuevosProfesionalesEsteMes: number;
   empresasUnicas: number;
   industriasUnicas: number;
-  porcentajeCrecimiento: number;
+  profesionalesMesAnterior: number;
 }
 
 export interface TecnologiaDemandada {
@@ -287,9 +287,9 @@ export class DashboardService {
   obtenerEstadisticasMercado(): Observable<{ ok: boolean; estadisticas?: EstadisticasMercado; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/estadisticas-mercado`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener estadísticas del mercado' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener estadísticas del mercado'
         }))
       );
   }
@@ -298,9 +298,9 @@ export class DashboardService {
   obtenerTecnologiasMasDemandadas(): Observable<{ ok: boolean; tecnologias?: TecnologiaDemandada[]; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/tecnologias-demandadas`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener tecnologías demandadas' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener tecnologías demandadas'
         }))
       );
   }
@@ -309,9 +309,9 @@ export class DashboardService {
   obtenerDistribucionSalarial(): Observable<{ ok: boolean; distribucionSalarial?: DistribucionSalarial[]; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/distribucion-salarial`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener distribución salarial' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener distribución salarial'
         }))
       );
   }
@@ -320,9 +320,9 @@ export class DashboardService {
   obtenerEmpresasQueContratanMas(): Observable<{ ok: boolean; empresas?: EmpresaContratante[]; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/empresas-contratan`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener empresas que contratan' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener empresas que contratan'
         }))
       );
   }
@@ -331,9 +331,9 @@ export class DashboardService {
   obtenerTendenciasMercado(): Observable<{ ok: boolean; tendencias?: TendenciasMercado; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/tendencias-mercado`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener tendencias del mercado' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener tendencias del mercado'
         }))
       );
   }
@@ -354,17 +354,17 @@ export class DashboardService {
       if (rol === 'ADMIN-USER') {
         return this.http.get<any>(`${this.url}/api/admins/mi-perfil`, { headers: this.getHeaders() })
           .pipe(
-            catchError(err => of({ 
-              ok: false, 
-              msj: err.error?.msj || 'Error al obtener perfil del administrador' 
+            catchError(err => of({
+              ok: false,
+              msj: err.error?.msj || 'Error al obtener perfil del administrador'
             }))
           );
       } else {
         return this.http.get<any>(`${this.url}/api/users/mi-perfil`, { headers: this.getHeaders() })
           .pipe(
-            catchError(err => of({ 
-              ok: false, 
-              msj: err.error?.msj || 'Error al obtener perfil del usuario' 
+            catchError(err => of({
+              ok: false,
+              msj: err.error?.msj || 'Error al obtener perfil del usuario'
             }))
           );
       }
@@ -373,9 +373,9 @@ export class DashboardService {
       // Fallback a la ruta de usuarios si no se puede decodificar el token
       return this.http.get<any>(`${this.url}/api/users/mi-perfil`, { headers: this.getHeaders() })
         .pipe(
-          catchError(err => of({ 
-            ok: false, 
-            msj: err.error?.msj || 'Error al obtener perfil del usuario' 
+          catchError(err => of({
+            ok: false,
+            msj: err.error?.msj || 'Error al obtener perfil del usuario'
           }))
         );
     }
@@ -411,7 +411,7 @@ export class DashboardService {
         tendenciasResp,
         perfilResp
       ]) => {
-        
+
         if (estadisticasResp?.ok) {
           resultados.estadisticasMercado = estadisticasResp.estadisticas;
         } else {
@@ -453,8 +453,8 @@ export class DashboardService {
 
       }).catch(error => {
         console.error('Error general en obtenerDatosDashboard:', error);
-        observer.next({ 
-          errores: ['Error general al cargar datos del dashboard'] 
+        observer.next({
+          errores: ['Error general al cargar datos del dashboard']
         });
         observer.complete();
       });
@@ -465,9 +465,9 @@ export class DashboardService {
   obtenerMetricasAvanzadas(): Observable<{ ok: boolean; metricas?: MetricasAvanzadas; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/metricas-avanzadas`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener métricas avanzadas' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener métricas avanzadas'
         }))
       );
   }
@@ -476,9 +476,9 @@ export class DashboardService {
   obtenerSatisfaccionLaboral(): Observable<{ ok: boolean; satisfaccion?: SatisfaccionLaboral; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/satisfaccion-laboral`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener satisfacción laboral' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener satisfacción laboral'
         }))
       );
   }
@@ -487,9 +487,9 @@ export class DashboardService {
   obtenerEvolucionSalarial(): Observable<{ ok: boolean; evolucion?: EvolucionSalarial; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/evolucion-salarial`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener evolución salarial' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener evolución salarial'
         }))
       );
   }
@@ -498,9 +498,9 @@ export class DashboardService {
   obtenerDistribucionExperiencia(): Observable<{ ok: boolean; distribucion?: DistribucionExperienciaData; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/distribucion-experiencia`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener distribución de experiencia' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener distribución de experiencia'
         }))
       );
   }
@@ -509,9 +509,9 @@ export class DashboardService {
   obtenerExperienciaVsTecnologias(): Observable<{ ok: boolean; experienciaVsTecnologias?: ExperienciaVsTecnologiasData; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/experiencia-vs-tecnologias`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener relación experiencia vs tecnologías' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener relación experiencia vs tecnologías'
         }))
       );
   }
@@ -520,9 +520,9 @@ export class DashboardService {
   obtenerMapaCalorIndustriaSalarial(): Observable<{ ok: boolean; mapaCalor?: MapaCalorData; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/mapa-calor-industria-salarial`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener mapa de calor industria vs salario' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener mapa de calor industria vs salario'
         }))
       );
   }
@@ -531,9 +531,9 @@ export class DashboardService {
   obtenerDisponibilidadCambioTrabajo(): Observable<{ ok: boolean; disponibilidadCambio?: DisponibilidadCambioData; msj?: string }> {
     return this.http.get<any>(`${this.url}/api/dashboard/disponibilidad-cambio-trabajo`, { headers: this.getHeaders() })
       .pipe(
-        catchError(err => of({ 
-          ok: false, 
-          msj: err.error?.msj || 'Error al obtener disponibilidad de cambio de trabajo' 
+        catchError(err => of({
+          ok: false,
+          msj: err.error?.msj || 'Error al obtener disponibilidad de cambio de trabajo'
         }))
       );
   }

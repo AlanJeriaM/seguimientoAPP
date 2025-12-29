@@ -1,25 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { Subject, takeUntil } from 'rxjs';
-import {
-  DashboardService,
-  EstadisticasMercado,
-  TecnologiaDemandada,
-  DistribucionSalarial,
-  EmpresaContratante,
-  TendenciasMercado,
-  PerfilUsuario,
-  MetricasAvanzadas,
-  SatisfaccionLaboral,
-  EvolucionSalarial,
-  DistribucionExperienciaData,
-  ExperienciaVsTecnologiasData,
-  MapaCalorData,
-  DisponibilidadCambioData
-} from '../../../core/services/dashboard/dashboard.service';
+import {DashboardService,EstadisticasMercado,TecnologiaDemandada,DistribucionSalarial,EmpresaContratante,TendenciasMercado,PerfilUsuario,MetricasAvanzadas,SatisfaccionLaboral,EvolucionSalarial,DistribucionExperienciaData,ExperienciaVsTecnologiasData,MapaCalorData,DisponibilidadCambioData} from '../../../core/services/dashboard/dashboard.service';
 import { Router } from '@angular/router';
-
 Chart.register(...registerables);
+
+
 
 @Component({
   selector: 'app-linkedin-dashboard',
@@ -46,6 +32,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   experienciaVsTecnologias: ExperienciaVsTecnologiasData | null = null;
   mapaCalorIndustriaSalarial: MapaCalorData | null = null;
   disponibilidadCambioTrabajo: DisponibilidadCambioData | null = null;
+
 
   loading = true;
   error: string | null = null;
@@ -381,6 +368,14 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
   isAdmin(): boolean {
     return this.router.url.startsWith('/admin/dashboard');
+  }
+
+  getNuevosRegistrosEsteMes(): number {
+    return this.estadisticasMercado?.nuevosProfesionalesEsteMes || 0;
+  }
+
+  getRegistrosMesAnterior(): number {
+    return this.estadisticasMercado?.profesionalesMesAnterior || 0;
   }
 
 
