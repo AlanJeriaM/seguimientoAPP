@@ -67,13 +67,6 @@ canvas {
   }
 }
 
-
-
-
-
-
-
-/* Stats Chart Container - CSS Grid para alineación perfecta */
 .stats-chart-container {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -327,7 +320,6 @@ img {
   padding: 1.25rem 1.5rem;
   text-align: center;
   min-width: 180px;
-  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.15);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;

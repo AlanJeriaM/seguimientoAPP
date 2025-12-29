@@ -2,11 +2,11 @@
 <div *ngIf="loading" class="flex align-items-center justify-content-center" style="min-height: 80vh;">
   <div class="text-center">
     <p-progressSpinner
-      strokeWidth="4"
+      strokeWidth="2"
       fill="transparent"
       animationDuration="1s">
     </p-progressSpinner>
-    <h3 class="mt-4 text-primary">Cargando datos del mercado laboral...</h3>
+    <p class="mt-4 text-primary">Cargando datos</p>
   </div>
 </div>
 
@@ -90,18 +90,22 @@
         <p class="text-sm md:text-base text-700 m-0">Información y estadísticas del mercado tecnológico</p>
       </div>
 
-      <!-- Market Growth Badge - Rediseñado -->
+
       <div class="w-full lg:w-auto">
         <div class="market-growth-badge">
           <div class="flex align-items-center gap-2 mb-2">
-            <i class="pi pi-chart-line text-green-500 text-xl"></i>
-            <span class="text-xs text-600 font-semibold text-uppercase">Crecimiento</span>
+            <i class="pi pi-user-plus text-primary text-xl"></i>
+            <span class="text-xs text-600 font-semibold text-uppercase">Nuevos Registros</span>
           </div>
-          <div class="flex align-items-baseline gap-1">
-            <span class="text-3xl md:text-4xl font-bold text-green-500">+{{ (estadisticasMercado?.porcentajeCrecimiento || 0) }}</span>
-            <span class="text-xl font-bold text-green-500">%</span>
+          <div class="flex align-items-baseline gap-2">
+            <span class="text-3xl md:text-4xl font-bold text-primary">
+              {{ getNuevosRegistrosEsteMes() }}
+            </span>
+            <span class="text-xl font-medium text-600">este mes</span>
           </div>
-          <span class="block text-xs text-600 mt-1">vs. mes anterior</span>
+          <span class="block text-xs text-600 mt-2">
+            {{ getRegistrosMesAnterior() }} el mes anterior
+          </span>
         </div>
       </div>
     </div>
