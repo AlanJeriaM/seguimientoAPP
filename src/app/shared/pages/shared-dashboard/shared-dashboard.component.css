@@ -76,9 +76,23 @@ canvas {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   align-items: stretch;
+}
+
+/* Grid para ADMIN: 4 cards (2x2) */
+.stats-grid.admin-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Grid para USUARIO: 3 cards (2 arriba, 1 abajo ancho completo) */
+.stats-grid.user-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* La tercera card (Industrias) ocupa todo el ancho en modo usuario */
+.stats-grid.user-grid .stat-card-wrapper:nth-child(3) {
+  grid-column: 1 / -1;
 }
 
 .stat-card-wrapper {
@@ -349,9 +363,19 @@ img {
     gap: 1rem;
   }
 
-  .stats-grid {
+  .stats-grid.admin-grid {
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
+  }
+
+  .stats-grid.user-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  /* La tercera card sigue ocupando todo el ancho en tablets para usuarios */
+  .stats-grid.user-grid .stat-card-wrapper:nth-child(3) {
+    grid-column: 1 / -1;
   }
 
   .market-growth-badge {
@@ -364,6 +388,18 @@ img {
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  /* En móvil siempre 1 columna para AMBOS roles */
+  .stats-grid.admin-grid,
+  .stats-grid.user-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  /* En móvil la tercera card también es auto (100% ancho) */
+  .stats-grid.user-grid .stat-card-wrapper:nth-child(3) {
+    grid-column: auto;
   }
 
   /* Ajustar altura de gráficos en tablets */

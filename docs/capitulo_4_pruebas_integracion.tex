@@ -1,0 +1,73 @@
+\subsection{Pruebas de Integración}
+
+Una vez finalizadas las pruebas unitarias, se proceden a ejecutar las pruebas de integración, las cuales buscan probar que todas las funcionalidades unitarias que componen la herramienta funcionen correctamente abordándolas en grupo. Estas pruebas se centran principalmente en validar la comunicación entre los componentes y la correcta integración de capas HTTP, controladores, servicios y modelos de datos.\\
+
+Se utilizará la técnica ``Bottom Up''~\cite{bottomup}, cuya principal característica es probar los módulos desde los más simples (nivel base) hacia los más complejos, a medida de que se integren nuevos módulos según necesite la herramienta. Al detectar un error, este procedimiento se detiene, se reporta el error y se corrige.\\
+
+A continuación, en la Tabla~\ref{tab:pruebas_integracion_bottomup}, se presentan los niveles que se abordarán para cada uno de los módulos de acuerdo a la arquitectura del sistema, partiendo desde los accesos principales (autenticación) hasta las vistas específicas de analítica y gestión.
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|c|l|l|l|l|}
+\hline
+\textbf{Nivel} & \textbf{Módulo} & \textbf{ID} & \textbf{Dependencia} & \textbf{Estado} \\ \hline
+\multicolumn{5}{|c|}{\textbf{NIVEL 1: Autenticación y Conectividad}} \\ \hline
+1 & Login Egresado (LinkedIn OAuth) & PI01 & - & Correcto \\ \hline
+1 & Login Administrador (Email + Contraseña) & PI02 & - & Correcto \\ \hline
+\multicolumn{5}{|c|}{\textbf{NIVEL 2: Navegación, Perfiles y Menús por Rol}} \\ \hline
+2 & Acceso a Perfil Egresado & PI03 & PI01 & Correcto \\ \hline
+2 & Acceso a Menú Egresado & PI04 & PI01 & Correcto \\ \hline
+2 & Acceso a Perfil Administrador & PI05 & PI02 & Correcto \\ \hline
+2 & Acceso a Menú Administrador & PI06 & PI02 & Correcto \\ \hline
+\multicolumn{5}{|c|}{\textbf{NIVEL 3: Módulos Funcionales}} \\ \hline
+3 & Cargar Información Perfil Egresado & PI07 & PI03 & Correcto \\ \hline
+3 & Acceso a Módulo Reportes (Vista Egresado) & PI08 & PI04 & Correcto \\ \hline
+3 & Acceso a Módulo Encuestas (Vista Egresado) & PI09 & PI04 & Correcto \\ \hline
+3 & Cargar Información Perfil Admin & PI10 & PI05 & Correcto \\ \hline
+3 & Acceso a Módulo Reportes (Vista Admin) & PI11 & PI06 & Correcto \\ \hline
+3 & Acceso a Módulo Gestión Administradores & PI12 & PI06 & Correcto \\ \hline
+3 & Acceso a Módulo Gestión Usuarios & PI13 & PI06 & Correcto \\ \hline
+3 & Acceso a Módulo Gestión Encuestas (Admin) & PI14 & PI06 & Correcto \\ \hline
+\multicolumn{5}{|c|}{\textbf{NIVEL 4: Vistas Finales, Análisis y Descargas}} \\ \hline
+4 & Visualizar Análisis Laboral, Experiencia (Egresado) & PI15 & PI08 & Correcto \\ \hline
+4 & Visualizar Mis Encuestas Completadas (Egresado) & PI16 & PI09 & Correcto \\ \hline
+4 & Visualizar Análisis Avanzado (Admin) & PI17 & PI11 & Correcto \\ \hline
+4 & Gestionar Administradores Activos/Eliminados & PI18 & PI12 & Correcto \\ \hline
+4 & Gestionar Usuarios Activos/Eliminados & PI19 & PI13 & Correcto \\ \hline
+4 & Visualizar y gestionar Resultados de Encuestas (Admin) & PI20 & PI14 & Correcto \\ \hline
+4 & Exportar Resultados de Encuesta (CSV/PDF) & PI21 & PI20 & Correcto \\ \hline
+4 & Descargar Métricas de Reportes de Egresados & PI22 & PI17 & Correcto \\ \hline
+\end{tabular}
+}
+\caption{Pruebas de integración: resultados según método Bottom Up}
+\label{tab:pruebas_integracion_bottomup}
+\end{table}
+
+\subsubsection{Descripción de Niveles}
+
+\paragraph{Nivel 1 - Autenticación y Conectividad:}
+En primer lugar, se validan los módulos base correspondientes a autenticación, que constituyen el núcleo funcional del sistema. Se realizan pruebas de login para egresados (mediante integración con LinkedIn OAuth) y administradores (email + contraseña), verificando que los tokens JWT se generen correctamente y que el sistema sea accesible desde las capas HTTP.
+
+\paragraph{Nivel 2 - Navegación, Perfiles y Menús:}
+Una vez validada la autenticación, se integran los módulos de perfil y navegación diferenciados por rol (egresado y administrador). Se valida la correcta gestión de permisos, la carga de información de usuario, y que cada rol acceda únicamente a los menús y opciones autorizadas.
+
+\paragraph{Nivel 3 - Módulos Funcionales:}
+En una tercera etapa, se integran los módulos funcionales del sistema, incluyendo la gestión de encuestas, la generación de reportes de egresados, la administración de usuarios y administradores. Se valida que cada módulo interactúe correctamente con las capas de servicios y base de datos.
+
+\paragraph{Nivel 4 - Vistas Finales y Análisis:}
+Finalmente, se incorporan las vistas y dashboards que permitirán la interacción del usuario final con el sistema. Se valida la visualización de análisis laboral, experiencia e indicadores tecnológicos, así como la exportación y descarga de reportes en diferentes formatos (CSV, PDF).
+
+\subsubsection{Estrategia de Pruebas}
+
+Este enfoque Bottom Up permitirá:
+
+\begin{itemize}
+\item Asegurar la estabilidad progresiva del sistema, iniciando desde componentes simples.
+\item Reducir la propagación de errores entre módulos, ya que se prueban dependencias antes de integrar módulos complejos.
+\item Facilitar la validación de la comunicación entre componentes (HTTP → Controlador → Servicio → Modelo).
+\item Identificar tempranamente problemas de integración en capas críticas (autenticación, autorización).
+\item Permitir la reutilización de stubs y mocks que simulan componentes aún no implementados completamente.
+\end{itemize}
+
+En total se ejecutarán \textbf{22 pruebas de integración} distribuidas en 4 niveles, cubriendo todas las funcionalidades principales del sistema de seguimiento de egresados.

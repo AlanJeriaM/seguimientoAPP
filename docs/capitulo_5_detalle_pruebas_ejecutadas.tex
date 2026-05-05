@@ -1,0 +1,705 @@
+\section{Detalle de Pruebas Ejecutadas con ng test}
+
+En este capítulo se documentan todas las pruebas unitarias e integración que se ejecutan al correr el comando \texttt{ng test} en frontend y backend, describiendo qué valida cada una, cómo funciona y cuál es el resultado esperado.
+
+\subsection{Frontend - Pruebas de Componentes Angular}
+
+Las pruebas de componentes Angular validan que cada componente funcione correctamente de forma aislada, mockando dependencias externas (servicios, APIs, etc.).
+
+\subsubsection{Estructura General de una Prueba de Componente}
+
+\begin{lstlisting}[language=TypeScript, caption=Estructura base de prueba Angular]
+describe('NombreComponent', () => {
+  let component: NombreComponent;
+  let fixture: ComponentFixture<NombreComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [NombreComponent],
+      providers: [ServicioMock]
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(NombreComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('debe crear el componente', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('debe mostrar datos cuando carga', () => {
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(component.datos).toBeDefined();
+  });
+});
+\end{lstlisting}
+
+\paragraph{Elementos de Prueba:}
+\begin{itemize}
+\item \textbf{ComponentFixture}: Wrapper que permite acceder al componente y manipular el DOM
+\item \textbf{TestBed}: Contenedor que simula un módulo Angular para las pruebas
+\item \textbf{detectChanges()}: Dispara la detección de cambios de Angular (equivalente a Angular change detection)
+\item \textbf{Mocks}: Objetos simulados que reemplazan servicios reales
+\end{itemize}
+
+\subsubsection{FC01 - Componentes de Autenticación}
+
+\paragraph{LoginComponent (Egresado - LinkedIn)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Crear componente & FC01.1 & El componente se instancia correctamente sin errores \\ \hline
+Renderizar botón LinkedIn & FC01.2 & El botón de login con LinkedIn está visible en el template \\ \hline
+Navegar a LinkedIn al clickear & FC01.3 & Al hacer click, se redirige a la URL de OAuth de LinkedIn \\ \hline
+Recibir callback de LinkedIn & FC01.4 & El componente captura el código de autorización en la URL \\ \hline
+Enviar token al backend & FC01.5 & Se envía el token de LinkedIn al servicio de autenticación \\ \hline
+Guardar token en localStorage & FC01.6 & El JWT recibido se almacena en localStorage para sesiones futuras \\ \hline
+Redirigir al dashboard & FC01.7 & Tras login exitoso, navega a /dashboard/egresado \\ \hline
+Mostrar error si falla & FC01.8 & Muestra mensaje de error si la autenticación falla \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{LoginAdminComponent (Email + Contraseña)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Crear componente & FC02.1 & El componente se inicializa correctamente \\ \hline
+Renderizar form & FC02.2 & Existen campos de email y contraseña en el template \\ \hline
+Validar email requerido & FC02.3 & El campo email es obligatorio (validator ``required'') \\ \hline
+Validar formato email & FC02.4 & Rechaza emails sin arroba o formato inválido \\ \hline
+Validar contraseña requerida & FC02.5 & El campo contraseña es obligatorio \\ \hline
+Validar longitud contraseña & FC02.6 & Contraseña debe tener mín 8 caracteres \\ \hline
+Deshabilitar botón si form inválido & FC02.7 & El botón submit está deshabilitado si falta data \\ \hline
+Enviar credentials al backend & FC02.8 & Llama a authService.loginAdmin() con email y contraseña \\ \hline
+Guardar token JWT & FC02.9 & Almacena el token en localStorage tras respuesta exitosa \\ \hline
+Redirigir a dashboard admin & FC02.10 & Navega a /dashboard/admin después del login \\ \hline
+Mostrar error en credenciales inválidas & FC02.11 & Muestra "Credenciales no válidas" si respuesta es 401 \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{RecuperarContraseñaComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Renderizar campo email & FC03.1 & Existe input para email del administrador \\ \hline
+Validar email requerido & FC03.2 & El email es obligatorio \\ \hline
+Validar formato email & FC03.3 & Solo acepta formato válido de email \\ \hline
+Enviar código al backend & FC03.4 & Llamada POST a /api/auth/recuperar con el email \\ \hline
+Mostrar confirmación & FC03.5 & Muestra "Código enviado a tu correo" tras éxito \\ \hline
+Mostrar error si email no existe & FC03.6 & Si respuesta 404, muestra "Email no registrado" \\ \hline
+Permitir ingreso de código temporal & FC03.7 & Renderiza campo para ingresar código recibido en email \\ \hline
+Validar código y nueva contraseña & FC03.8 & Valida que código y contraseña sean válidos \\ \hline
+Restablece contraseña en backend & FC03.9 & Envía código + nueva contraseña al reset endpoint \\ \hline
+Redirige a login & FC03.10 & Tras éxito, vuelve a login para reingresar \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{FC04 - Componentes de Dashboard (Egresado)}
+
+\paragraph{DashboardEgresadoComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Crear componente & FC04.1 & Se instancia el dashboard correctamente \\ \hline
+Cargar datos de usuario & FC04.2 & Al init, obtiene perfil del usuario desde UserService \\ \hline
+Mostrar nombre de usuario & FC04.3 & Renderiza nombre del egresado en la UI \\ \hline
+Mostrar foto de perfil & FC04.4 & Si existe foto, la renderiza en un img tag \\ \hline
+Cargar métricas personales & FC04.5 & Obtiene estadísticas: encuestas completadas, respuestas, etc. \\ \hline
+Renderizar tarjetas de métricas & FC04.6 & Muestra cards con números: "3 Encuestas Completadas" \\ \hline
+Navegar a módulo Reportes & FC04.7 & Botón "Ver Reportes" navega a /reportes/egresado \\ \hline
+Navegar a módulo Encuestas & FC04.8 & Botón "Mis Encuestas" navega a /encuestas/egresado \\ \hline
+Navegar a Perfil & FC04.9 & Botón "Mi Perfil" navega a /perfil/egresado \\ \hline
+Manejar error de carga & FC04.10 & Si falla la carga, muestra mensaje de error \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{PerfilEgresadoComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Cargar datos de perfil & FC05.1 & Al init, obtiene datos completos del perfil del usuario \\ \hline
+Mostrar campo nombre & FC05.2 & Renderiza nombre en input editable \\ \hline
+Mostrar campo email & FC05.3 & Renderiza email (solo lectura) \\ \hline
+Mostrar posición actual & FC05.4 & Campo posición laboral editable (Backend Developer, etc.) \\ \hline
+Mostrar empresa & FC05.5 & Campo empresa actual editable \\ \hline
+Mostrar ubicación & FC05.6 & Campo ubicación geográfica editable \\ \hline
+Mostrar años de experiencia & FC05.7 & Dropdown con opciones: 0-1, 1-3, 3-5, 5+ años \\ \hline
+Mostrar nivel educación & FC05.8 & Dropdown: Técnico, Pregrado, Postgrado \\ \hline
+Mostrar especialidad técnica & FC05.9 & Campo de texto con especialidad principal \\ \hline
+Mostrar tecnologías & FC05.10 & Tags editables con lenguajes/herramientas (Angular, Node.js, etc.) \\ \hline
+Guardar cambios & FC05.11 & Botón "Guardar" envía PATCH a /api/users/:id \\ \hline
+Mostrar confirmación de guardado & FC05.12 & Muestra toast "Perfil actualizado correctamente" \\ \hline
+Manejar errores en guardado & FC05.13 & Si falla update, muestra error específico \\ \hline
+Cancelar edición & FC05.14 & Botón "Cancelar" restaura valores anteriores \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{FC06 - Componentes de Reportes (Egresado)}
+
+\paragraph{ReportesEgresadoComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Crear componente & FC06.1 & Se instancia correctamente \\ \hline
+Cargar estadísticas generales & FC06.2 & GET /api/reportes/estadisticas → obtiene totales \\ \hline
+Mostrar total de encuestas & FC06.3 & Renderiza "Encuestas: 5" \\ \hline
+Mostrar total de preguntas & FC06.4 & Renderiza "Preguntas: 24" \\ \hline
+Mostrar total de respuestas & FC06.5 & Renderiza "Respuestas: 120" \\ \hline
+Renderizar gráfico de encuestas & FC06.6 & Chart.js muestra gráfico de barras/pie de estados \\ \hline
+Renderizar gráfico de experiencia & FC06.7 & Gráfico de años de experiencia de egresados \\ \hline
+Renderizar gráfico tecnologías & FC06.8 & Muestra top 10 tecnologías más usadas \\ \hline
+Renderizar gráfico industria & FC06.9 & Pie chart con distribución de industrias \\ \hline
+Filtrar por rango de fechas & FC06.10 & Dropdown/calendar para filtrar reportes por período \\ \hline
+Exportar a CSV & FC06.11 & Botón descarga datos en formato CSV \\ \hline
+Exportar a PDF & FC06.12 & Botón descarga reporte en PDF con gráficos \\ \hline
+Manejar sin datos & FC06.13 & Si no hay datos, muestra "Sin información disponible" \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{FC07 - Componentes de Encuestas (Egresado)}
+
+\paragraph{EncuestasEgresadoComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Cargar lista de encuestas & FC07.1 & GET /api/encuestas → obtiene encuestas del usuario \\ \hline
+Filtrar encuestas pendientes & FC07.2 & Tab "Pendientes" muestra solo encuestas sin responder \\ \hline
+Filtrar encuestas completadas & FC07.3 & Tab "Completadas" muestra encuestas ya respondidas \\ \hline
+Mostrar estado de encuesta & FC07.4 & Badge color rojo "PENDIENTE" o verde "COMPLETADA" \\ \hline
+Mostrar título de encuesta & FC07.5 & Renderiza nombre descriptivo de la encuesta \\ \hline
+Mostrar fecha límite & FC07.6 & Muestra "Vence el 15/05/2026" si aplica \\ \hline
+Mostrar fecha de respuesta & FC07.7 & Para completadas, muestra "Respondida el 10/05/2026" \\ \hline
+Iniciar encuesta & FC07.8 & Botón "Responder" navega a /encuestas/:id/responder \\ \hline
+Ver resumen de respuestas & FC07.9 & Botón "Ver Respuestas" muestra resumen de lo respondido \\ \hline
+Paginación & FC07.10 & Si hay +10 encuestas, muestra paginación \\ \hline
+Mostrar sin encuestas & FC07.11 & Si no hay, muestra "No hay encuestas disponibles" \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{ResponderEncuestaComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Cargar encuesta por ID & FC08.1 & GET /api/encuestas/:id con todas sus preguntas \\ \hline
+Mostrar título encuesta & FC08.2 & Renderiza en header \\ \hline
+Mostrar descripción & FC08.3 & Si existe, muestra contexto de la encuesta \\ \hline
+Cargar preguntas en orden & FC08.4 & Las preguntas se cargan en el orden especificado \\ \hline
+Renderizar pregunta tipo SI\_NO & FC08.5 & Radio buttons: "Sí" / "No" \\ \hline
+Renderizar pregunta OPCION\_UNICA & FC08.6 & Dropdown o radio buttons con opciones múltiples \\ \hline
+Renderizar pregunta OPCION\_MULTIPLE & FC08.7 & Checkboxes con múltiples opciones seleccionables \\ \hline
+Renderizar pregunta ESCALA & FC08.8 & Slider del 1 al 10 \\ \hline
+Renderizar pregunta ABIERTA & FC08.9 & Textarea para respuesta de texto libre \\ \hline
+Marcar pregunta como requerida & FC08.10 & Si es\_requerida = true, muestra asterisco rojo (*) \\ \hline
+Validar preguntas requeridas & FC08.11 & No permite enviar si hay requeridas sin responder \\ \hline
+Mostrar progreso & FC08.12 & Progress bar "Pregunta 3 de 10" \\ \hline
+Navegar entre preguntas & FC08.13 & Botones Siguiente/Anterior para cambiar preguntas \\ \hline
+Guardar respuesta en tiempo real & FC08.14 & Cada respuesta se guarda localmente (no requiere click) \\ \hline
+Enviar encuesta & FC08.15 & Botón "Enviar" POST /api/respuestas con todas las respuestas \\ \hline
+Mostrar confirmación & FC08.16 & Muestra "¡Encuesta completada!" tras envío exitoso \\ \hline
+Redirigir a reportes & FC08.17 & Tras éxito, navega a /encuestas/egresado o /reportes \\ \hline
+Manejar validación de backend & FC08.18 & Si backend rechaza, muestra errores específicos \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{FC09 - Componentes de Dashboard (Administrador)}
+
+\paragraph{DashboardAdminComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Crear componente & FC09.1 & Se instancia correctamente \\ \hline
+Cargar métricas globales & FC09.2 & GET /api/reportes/estadisticas-generales \\ \hline
+Mostrar KPI: Total Encuestas & FC09.3 & Card grande con número de encuestas creadas \\ \hline
+Mostrar KPI: Encuestas Activas & FC09.4 & Subfiltro: cuántas están en estado ACTIVA \\ \hline
+Mostrar KPI: Total Preguntas & FC09.5 & Suma de todas las preguntas en todas las encuestas \\ \hline
+Mostrar KPI: Total Respuestas & FC09.6 & Cantidad total de respuestas recibidas \\ \hline
+Mostrar KPI: Usuarios Activos & FC09.7 & Cuántos egresados han respondido algo \\ \hline
+Mostrar KPI: Tiempo Promedio & FC09.8 & Minutos promedio para completar encuesta \\ \hline
+Renderizar gráfico de actividad & FC09.9 & Gráfico de línea: encuestas/día durante último mes \\ \hline
+Renderizar gráfico de tasa respuesta & FC09.10 & Pie chart: invitaciones vs respuestas \\ \hline
+Navegar a Gestión Encuestas & FC09.11 & Botón navega a /encuestas/admin \\ \hline
+Navegar a Gestión Usuarios & FC09.12 & Botón navega a /usuarios/admin \\ \hline
+Navegar a Reportes Avanzados & FC09.13 & Botón navega a /reportes/admin \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{FC10 - Componentes de Gestión (Administrador)}
+
+\paragraph{GestionEncuestasComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Cargar lista de encuestas & FC10.1 & GET /api/encuestas/admin obtiene todas las encuestas \\ \hline
+Mostrar tabla de encuestas & FC10.2 & Columns: ID, Título, Estado, Fecha Creación, Acciones \\ \hline
+Filtrar por estado & FC10.3 & Dropdown para filtrar: BORRADOR, ACTIVA, FINALIZADA \\ \hline
+Buscar por título & FC10.4 & Input search filtra encuestas en tiempo real \\ \hline
+Crear nueva encuesta & FC10.5 & Botón "Nueva Encuesta" abre formulario modal \\ \hline
+Editar encuesta & FC10.6 & Botón "Editar" abre modal con campos editables \\ \hline
+Ver respuestas & FC10.7 & Botón "Ver Resultados" navega a /encuestas/:id/resultados \\ \hline
+Cambiar estado a ACTIVA & FC10.8 & Botón "Activar" hace PATCH /api/encuestas/:id \\ \hline
+Finalizar encuesta & FC10.9 & Botón "Finalizar" cierra encuesta para nuevas respuestas \\ \hline
+Eliminar encuesta & FC10.10 & Botón "Eliminar" pide confirmación y hace DELETE \\ \hline
+Exportar resultados CSV & FC10.11 & Botón descarga respuestas en CSV \\ \hline
+Exportar resultados PDF & FC10.12 & Botón descarga reporte con gráficos en PDF \\ \hline
+Paginación & FC10.13 & Si hay +20 encuestas, activa paginación \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{GestionUsuariosComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Cargar lista de usuarios & FC11.1 & GET /api/users obtiene todos los egresados \\ \hline
+Mostrar tabla de usuarios & FC11.2 & Columns: ID, Nombre, Email, Empresa, Ubicación, Estado \\ \hline
+Buscar por nombre/email & FC11.3 & Search filtra usuarios en tiempo real \\ \hline
+Filtrar por estado & FC11.4 & Checkbox "Mostrar eliminados" incluye/excluye inactivos \\ \hline
+Ver perfil de usuario & FC11.5 & Click en fila abre modal con detalles del usuario \\ \hline
+Editar información usuario & FC11.6 & Modal editable: nombre, posición, empresa, etc. \\ \hline
+Desactivar usuario & FC11.7 & Botón "Desactivar" marca como inactivo (soft delete) \\ \hline
+Reactivar usuario & FC11.8 & Botón "Reactivar" restaura acceso del usuario \\ \hline
+Eliminar usuario permanentemente & FC11.9 & Botón "Eliminar" pide confirmación para hard delete \\ \hline
+Ver historial de encuestas & FC11.10 & Botón "Ver Encuestas" muestra encuestas respondidas por user \\ \hline
+Exportar lista de usuarios & FC11.11 & Botón descarga lista en CSV/Excel \\ \hline
+Paginación & FC11.12 & Si hay +50 usuarios, activa paginación \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{GestionAdministradoresComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Cargar lista de admins & FC12.1 & GET /api/admins obtiene administradores \\ \hline
+Mostrar tabla de admins & FC12.2 & Columns: ID, Nombre, Email, Rol, Fecha Creación, Estado \\ \hline
+Crear admin & FC12.3 & Botón "Nuevo Admin" abre modal de registro \\ \hline
+Validar datos admin & FC12.4 & Email requerido, contraseña mín 8 chars \\ \hline
+Asignar rol & FC12.5 & Dropdown con roles: SUPER-ADMIN, ADMIN-USER, VIEWER \\ \hline
+Editar admin & FC12.6 & Botón "Editar" abre formulario editando \\ \hline
+Cambiar contraseña admin & FC12.7 & Opción para resetear/cambiar contraseña \\ \hline
+Desactivar admin & FC12.8 & Botón "Desactivar" revoca acceso del admin \\ \hline
+Eliminar admin & FC12.9 & Botón "Eliminar" pide confirmación \\ \hline
+Ver auditoría de admin & FC12.10 & Log de últimas acciones realizadas por este admin \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{FC13 - Componentes de Resultados/Análisis (Administrador)}
+
+\paragraph{ResultadosEncuestaComponent}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Cargar datos de encuesta & FC13.1 & GET /api/encuestas/:id/exportar \\ \hline
+Mostrar encabezado & FC13.2 & Título, descripción, estado, total respuestas \\ \hline
+Cargar preguntas con análisis & FC13.3 & Para cada pregunta, obtiene respuestas y estadísticas \\ \hline
+Analizar pregunta SI\_NO & FC13.4 & Gráfico pie: \% Sí vs \% No \\ \hline
+Analizar pregunta OPCION\_UNICA & FC13.5 & Gráfico bar horizontal: cada opción con conteo y \% \\ \hline
+Analizar pregunta OPCION\_MULTIPLE & FC13.6 & Gráfico bar: conteo por opción (puede sumar >100\%) \\ \hline
+Analizar pregunta ESCALA & FC13.7 & Histograma: distribución de valores 1-10 \\ \hline
+Analizar pregunta ABIERTA & FC13.8 & Lista de respuestas textuales sin análisis \\ \hline
+Mostrar estadísticas por pregunta & FC13.9 & Conteo total, \% completeness, tiempo promedio \\ \hline
+Filtrar respuestas por rango fechas & FC13.10 & Calendar picker para ver respuestas en período \\ \hline
+Exportar a CSV & FC13.11 & Descarga tabla con todas las respuestas en CSV \\ \hline
+Exportar a PDF & FC13.12 & Genera PDF con gráficos, análisis y respuestas textuales \\ \hline
+Mostrar comparativo & FC13.13 & Compara esta encuesta vs versiones anteriores si existen \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Backend - Pruebas Unitarias con Jest}
+
+Las pruebas unitarias del backend validan que cada función, controlador y servicio funcione correctamente de forma aislada.
+
+\subsubsection{Estructura General de Prueba Unitaria}
+
+\begin{lstlisting}[language=JavaScript, caption=Estructura base de prueba Jest]
+describe('NombreFuncion', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('debe hacer algo específico', async () => {
+    // Arrange: preparar datos
+    const input = { data: 'test' };
+    ModeloMock.metodo.mockResolvedValue(resultado);
+
+    // Act: ejecutar función
+    const resultado = await funcion(input);
+
+    // Assert: verificar resultado
+    expect(resultado).toBe(esperado);
+    expect(ModeloMock.metodo).toHaveBeenCalledWith(param);
+  });
+});
+\end{lstlisting}
+
+\subsubsection{BU01 - Pruebas de Autenticación (Backend)}
+
+\paragraph{loginAdmin()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Login exitoso & BU01.1 & POST /api/auth/login con email y contraseña válidos \\ \hline
+Buscar admin en BD & BU01.2 & Admin.findOne() llamado con email correcto \\ \hline
+Verificar contraseña & BU01.3 & admin.verificarContrasenia() es invocado \\ \hline
+Generar JWT & BU01.4 & generarJWT() produce token válido con id, nombre, rol \\ \hline
+Retornar token & BU01.5 & Response contiene \{ok: true, token: "..."\} \\ \hline
+Login fallido - email no existe & BU01.6 & Admin.findOne() retorna null \\ \hline
+Respuesta error email no existe & BU01.7 & Status 404 + "Admin no encontrado" \\ \hline
+Login fallido - contraseña incorrecta & BU01.8 & verificarContrasenia() retorna false \\ \hline
+Respuesta error contraseña & BU01.9 & Status 400 + "Credenciales no válidas" \\ \hline
+Admin inactivo & BU01.10 & Si admin.activo === false, status 403 \\ \hline
+Validar email requerido & BU01.11 & Si falta email, status 400 \\ \hline
+Validar contraseña requerida & BU01.12 & Si falta contraseña, status 400 \\ \hline
+Hasheo de contraseña & BU01.13 & Contraseña en BD es bcrypt hash, no texto plano \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{loginLinkedIn()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Recibir datos LinkedIn & BU02.1 & POST /api/auth/linkedin con linkedinData \\ \hline
+Validar datos completos & BU02.2 & linkedin\_id, nombre, email, empresa requeridos \\ \hline
+Error datos incompletos & BU02.3 & Status 400 si falta algún campo \\ \hline
+Buscar usuario existente & BU02.4 & User.findOne(\{ linkedin\_id \}) \\ \hline
+Crear usuario si no existe & BU02.5 & User.create() con datos de LinkedIn \\ \hline
+No crear duplicado & BU02.6 & Si user ya existe, solo actualizar campos \\ \hline
+Generar JWT para nuevo user & BU02.7 & generarJWT() con id, nombre, rol CLIENT-USER \\ \hline
+Retornar token & BU02.8 & \{ok: true, token: "..."\} \\ \hline
+Guardar perfil image URL & BU02.9 & Si LinkedIn proporciona foto, guardar URL \\ \hline
+Guardar empresa e industria & BU02.10 & Campos empresa\_actual e industria guardados \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{enviarCodigoRestablecimiento()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+POST /api/auth/recuperar & BU03.1 & Recibe email en body \\ \hline
+Validar email & BU03.2 & Si email vacío, retorna status 400 \\ \hline
+Buscar admin por email & BU03.3 & Admin.findOne(\{ emailUsuario \}) \\ \hline
+Admin no existe & BU03.4 & Si no encuentra, status 404 \\ \hline
+Generar código temporal & BU03.5 & Código aleatorio de 6 dígitos/caracteres \\ \hline
+Guardar código en BD & BU03.6 & admin.codigoVerificacion = codigo, admin.save() \\ \hline
+Guardar expiracion código & BU03.7 & codigo\_expiracion = now + 15 minutos \\ \hline
+Enviar email con código & BU03.8 & emailService.sendResetCode() es invocado \\ \hline
+Error al enviar email & BU03.9 & Si mailService falla, retorna status 500 \\ \hline
+Confirmación de envío & BU03.10 & \{ok: true, msj: "Código enviado al correo"\} \\ \hline
+No exponer código en respuesta & BU03.11 & Response NO contiene el código por seguridad \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{BU02 - Pruebas de Encuestas (Backend)}
+
+\paragraph{crearEncuesta()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+POST /api/encuestas & BU04.1 & Recibe titulo, estado, preguntas en body \\ \hline
+Validar titulo requerido & BU04.2 & Si titulo vacío, status 400 \\ \hline
+Validar preguntas & BU04.3 & Array preguntas debe tener al menos 1 elemento \\ \hline
+Crear encuesta en BD & BU04.4 & Encuesta.create() con titulo, estado, admin\_id \\ \hline
+Guardar fecha creacion & BU04.5 & fecha\_creacion = new Date() \\ \hline
+Crear preguntas asociadas & BU04.6 & Pregunta.create() para cada pregunta del array \\ \hline
+Guardar orden de preguntas & BU04.7 & Cada pregunta guarda índice (orden) \\ \hline
+Validar tipo pregunta & BU04.8 & Tipo debe ser: SI\_NO, OPCION\_UNICA, OPCION\_MULTIPLE, ESCALA, ABIERTA \\ \hline
+Validar opciones para preguntas múltiples & BU04.9 & Si tipo OPCION\_UNICA, debe haber opciones array \\ \hline
+Estado inicial BORRADOR & BU04.10 & Nueva encuesta siempre crea con estado BORRADOR \\ \hline
+Respuesta de éxito & BU04.11 & \{ok: true, msj: "Encuesta creada", id: encuesta.id\} con status 201 \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{listarEncuestas()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+GET /api/encuestas & BU05.1 & Obtiene todas las encuestas \\ \hline
+Filtrar por estado & BU05.2 & Query param \?estado=ACTIVA filtra resultados \\ \hline
+Paginación & BU05.3 & Query params page y limit: ?page=1\&limit=20 \\ \hline
+Calcular offset & BU05.4 & offset = (page - 1) * limit \\ \hline
+Contar total de encuestas & BU05.5 & Response incluye \{total: N, pages: M\} \\ \hline
+Incluir preguntas & BU05.6 & Cada encuesta carga suas preguntas asociadas \\ \hline
+Contar respuestas por encuesta & BU05.7 & Cada encuesta muestra total\_respuestas \\ \hline
+Ordenar por fecha & BU05.8 & Default: ORDER BY fecha\_creacion DESC \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{BU03 - Pruebas de Usuarios (Backend)}
+
+\paragraph{actualizarUsuario()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+PATCH /api/users/:id & BU06.1 & Actualiza datos del usuario \\ \hline
+Validar ID formato numérico & BU06.2 & Si id no es número, status 400 \\ \hline
+Buscar usuario por ID & BU06.3 & User.findOne(\{ id \}) \\ \hline
+Usuario no existe & BU06.4 & Si no encuentra, status 404 \\ \hline
+Actualizar nombre & BU06.5 & user.nombre = body.nombre \\ \hline
+Actualizar posición & BU06.6 & user.posicion\_actual = body.posicion\_actual \\ \hline
+Actualizar empresa & BU06.7 & user.empresa\_actual = body.empresa\_actual \\ \hline
+Actualizar ubicación & BU06.8 & user.ubicacion = body.ubicacion \\ \hline
+Actualizar años experiencia & BU06.9 & Validar que sea número entre 0 y 60 \\ \hline
+Actualizar tecnologías & BU06.10 & Si es array, guardar como JSON \\ \hline
+No permitir cambiar email & BU06.11 & Email es inmutable por seguridad \\ \hline
+No permitir cambiar linkedin\_id & BU06.12 & linkedin\_id es inmutable \\ \hline
+Guardar en BD & BU06.13 & user.save() es invocado \\ \hline
+Confirmación de actualización & BU06.14 & \{ok: true, msj: "Usuario actualizado"\} \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{BU04 - Pruebas de Respuestas/Notificaciones (Backend)}
+
+\paragraph{crearRespuestas()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+POST /api/respuestas & BU07.1 & Recibe encuesta\_id y array de respuestas \\ \hline
+Validar usuario autenticado & BU07.2 & Usa usuario\_id del middleware auth \\ \hline
+Validar encuesta existe & BU07.3 & Encuesta.findOne(\{ id: encuesta\_id \}) \\ \hline
+Encuesta no existe & BU07.4 & Status 404 si no encuentra \\ \hline
+Validar que sea ACTIVA & BU07.5 & Si estado != ACTIVA, status 400 \\ \hline
+Validar no hay respuesta previa & BU07.6 & User no puede responder 2 veces misma encuesta \\ \hline
+Crear sesión de respuesta & BU07.7 & SesionEncuesta.create(\{usuario\_id, encuesta\_id\}) \\ \hline
+Guardar cada respuesta & BU07.8 & Respuesta.create() para cada item del array \\ \hline
+Validar respuestas requeridas & BU07.9 & Si pregunta.es\_requerida, validar no vacío \\ \hline
+Guardar timestamp & BU07.10 & fecha\_respuesta = now() para cada respuesta \\ \hline
+Crear notificación para admin & BU07.11 & Notificacion.create() avisando nueva respuesta \\ \hline
+Confirmación & BU07.12 & \{ok: true, msj: "Respuestas guardadas"\} \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{obtenerNotificaciones()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+GET /api/respuestas/notificaciones & BU08.1 & Obtiene notificaciones del usuario \\ \hline
+Filtrar por usuario autenticado & BU08.2 & Usa usuario\_id del token \\ \hline
+Paginación & BU08.3 & Query params page=1, limit=20 \\ \hline
+Contar no leídas & BU08.4 & Response incluye \{no\_leidas: N\} \\ \hline
+Ordenar por fecha DESC & BU08.5 & Notificaciones más recientes primero \\ \hline
+Marcar como leída & BU08.6 & PATCH /api/notificaciones/:id con \{leida: true\} \\ \hline
+Error BD en notificaciones & BU08.7 & Si BD falla, status 500 \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{BU05 - Pruebas de Reportes (Backend)}
+
+\paragraph{obtenerEstadisticasGenerales()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+GET /api/reportes/estadisticas-generales & BU09.1 & Calcula métricas globales \\ \hline
+Contar total encuestas & BU09.2 & Encuesta.count() \\ \hline
+Contar encuestas activas & BU09.3 & Encuesta.count(\{where: \{estado: ACTIVA\}\}) \\ \hline
+Contar preguntas totales & BU09.4 & Pregunta.count() \\ \hline
+Contar respuestas totales & BU09.5 & Respuesta.count() \\ \hline
+Contar usuarios que respondieron & BU09.6 & Respuesta.count(distinct: usuario\_id) \\ \hline
+Calcular tasa respuesta & BU09.7 & (respuestas / (usuarios * encuestas\_activas)) * 100 \\ \hline
+Tiempo promedio completación & BU09.8 & AVG(fecha\_fin - fecha\_inicio) en minutos \\ \hline
+Tendencia últimos 30 días & BU09.9 & Respuesta.count() agrupado por fecha \\ \hline
+Gráfico de categorías más activas & BU09.10 & Agrupar usuarios por industria, contar \\ \hline
+Manejo de error BD & BU09.11 & Si count() falla, status 500 \\ \hline
+Respuesta con todos los datos & BU09.12 & Response: \{ok: true, data: \{total\_encuestas, ...\}\} \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{exportarDatosEncuesta()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+GET /api/encuestas/:id/exportar & BU10.1 & Obtiene datos exportables de encuesta \\ \hline
+Validar ID encuesta & BU10.2 & Si ID no válido, status 400 \\ \hline
+Buscar encuesta & BU10.3 & Encuesta.findOne(\{id\}) \\ \hline
+Encuesta no existe & BU10.4 & Status 404 si no encuentra \\ \hline
+Obtener todas las respuestas & BU10.5 & Respuesta.findAll(\{encuesta\_id\}) con usuario asociado \\ \hline
+Obtener todas las preguntas & BU10.6 & Pregunta.findAll(\{encuesta\_id\}) ordenadas \\ \hline
+Calcular estadísticas por pregunta & BU10.7 & Para cada pregunta: total respuestas, distribución \\ \hline
+Formato exportación CSV & BU10.8 & Generar CSV con headers y datos tabulares \\ \hline
+Formato exportación JSON & BU10.9 & Generar JSON estructurado \\ \hline
+Incluir metadata & BU10.10 & Título, fecha creación, total respuestas en output \\ \hline
+Response con attachment header & BU10.11 & Content-Disposition: attachment; filename \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{BU06 - Pruebas de Middlewares (Backend)}
+
+\paragraph{verificarToken()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Token presente en headers & BU11.1 & req.header('token') o Authorization bearer \\ \hline
+Token no presente & BU11.2 & Status 401 + "No hay token" \\ \hline
+Token malformado & BU11.3 & Si no es JWT válido, status 401 \\ \hline
+Token expirado & BU11.4 & jwt.verify() lanza error, status 401 \\ \hline
+Token válido & BU11.5 & Decodifica JWT y asigna req.usuario = decoded \\ \hline
+Llamar next() en caso exitoso & BU11.6 & next() es invocado para continuar al controller \\ \hline
+No llamar next() en caso error & BU11.7 & Si token inválido, no avanza al controller \\ \hline
+\end{tabular}
+\end{table}
+
+\paragraph{verificarAdmin()}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Prueba} & \textbf{ID} & \textbf{¿Qué valida?} \\ \hline
+Verificar rol es ADMIN-USER & BU12.1 & Si req.usuario.rol != ADMIN-USER, status 403 \\ \hline
+Status 403 Forbidden & BU12.2 & Mensaje "Acceso denegado, rol insuficiente" \\ \hline
+Verificar admin activo & BU12.3 & Admin.findByPk(usuario.id) y revisar activo === true \\ \hline
+Admin inactivo & BU12.4 & Si activo === false, status 403 \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Pruebas de Integración (Bottom-Up)}
+
+Las pruebas de integración validan que múltiples capas trabajen conjuntamente:
+\\
+Ruta HTTP → Middleware → Controlador → Servicio → BD (mocked)
+
+\subsubsection{PI01 - Nivel 1: Autenticación}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Caso} & \textbf{ID} & \textbf{¿Qué prueba?} \\ \hline
+Health check & PI01.1 & GET /api/health retorna 200 \\ \hline
+Login admin exitoso & PI01.2 & POST /api/auth/login → controller + BD mock \\ \hline
+Login admin rechazado & PI01.3 & Email no existe → 404 \\ \hline
+Login LinkedIn & PI01.4 & POST /api/auth/linkedin → crear/actualizar user \\ \hline
+Renovar token & PI01.5 & GET /api/auth/renew con token válido → nuevo token \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{PI02 - Nivel 2: Autorización y Roles}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Caso} & \textbf{ID} & \textbf{¿Qué prueba?} \\ \hline
+Admin puede acceder /api/users & PI02.1 & GET /api/users con token admin → 200 \\ \hline
+Cliente rechazado en /api/users & PI02.2 & GET /api/users con token cliente → 403 \\ \hline
+Sin token rechazado & PI02.3 & GET /api/users sin token → 401 \\ \hline
+Token expirado & PI02.4 & GET con token expirado → 401 \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{PI03 - Nivel 3: Módulos Funcionales}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Caso} & \textbf{ID} & \textbf{¿Qué prueba?} \\ \hline
+Crear encuesta & PI03.1 & POST /api/encuestas → crear en BD + respuesta \\ \hline
+Crear respuestas & PI03.2 & POST /api/respuestas → guardar en BD + notificación \\ \hline
+Obtener estadísticas & PI03.3 & GET /api/reportes/estadisticas → calcula métricas \\ \hline
+Listar notificaciones & PI03.4 & GET /api/respuestas/notificaciones → usuario autenticado \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{PI04 - Nivel 4: Exportación}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Caso} & \textbf{ID} & \textbf{¿Qué prueba?} \\ \hline
+Exportar encuesta & PI04.1 & GET /api/encuestas/10/exportar → JSON/CSV \\ \hline
+Exportar inexistente & PI04.2 & GET /api/encuestas/9999/exportar → 404 \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Resumen de Cobertura de Pruebas}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Componente} & \textbf{Frontend} & \textbf{Backend} & \textbf{Integración} \\ \hline
+Autenticación & 8 & 12 & 5 \\ \hline
+Encuestas & 10 & 10 & 3 \\ \hline
+Reportes & 12 & 10 & 2 \\ \hline
+Usuarios & 14 & 14 & 2 \\ \hline
+Administración & 10 & 8 & 2 \\ \hline
+Middleware & - & 6 & 4 \\ \hline
+\textbf{TOTAL} & \textbf{54} & \textbf{60} & \textbf{18} \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Total de Pruebas: 132 casos de prueba}
