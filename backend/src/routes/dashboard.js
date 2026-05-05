@@ -12,7 +12,12 @@ const {
   obtenerDistribucionExperiencia,
   obtenerExperienciaVsTecnologias,
   obtenerMapaCalorIndustriaSalarial,
-  obtenerDisponibilidadCambioTrabajo
+  obtenerDisponibilidadCambioTrabajo,
+  obtenerTecnologiasVsSalario,
+  obtenerSalarioVsEducacion,
+  obtenerTipoEmpleoVsSatisfaccion,
+  obtenerProyeccionDemandaTecnologias,
+  obtenerIndiceEmpleabilidad
 } = require('../controllers/dashboardController');
 const { verificarToken, verificarAdminOCliente } = require('../middleware/auth');
 
@@ -31,5 +36,12 @@ router.get('/distribucion-experiencia', verificarToken, verificarAdminOCliente, 
 router.get('/experiencia-vs-tecnologias', verificarToken, verificarAdminOCliente, obtenerExperienciaVsTecnologias);
 router.get('/mapa-calor-industria-salarial', verificarToken, verificarAdminOCliente, obtenerMapaCalorIndustriaSalarial);
 router.get('/disponibilidad-cambio-trabajo', verificarToken, verificarAdminOCliente, obtenerDisponibilidadCambioTrabajo);
+
+// Nuevas rutas para gráficos avanzados
+router.get('/tecnologias-vs-salario', verificarToken, verificarAdminOCliente, obtenerTecnologiasVsSalario);
+router.get('/salario-vs-educacion', verificarToken, verificarAdminOCliente, obtenerSalarioVsEducacion);
+router.get('/tipo-empleo-vs-satisfaccion', verificarToken, verificarAdminOCliente, obtenerTipoEmpleoVsSatisfaccion);
+router.get('/proyeccion-demanda-tecnologias', verificarToken, verificarAdminOCliente, obtenerProyeccionDemandaTecnologias);
+router.get('/indice-empleabilidad', verificarToken, verificarAdminOCliente, obtenerIndiceEmpleabilidad);
 
 module.exports = router;

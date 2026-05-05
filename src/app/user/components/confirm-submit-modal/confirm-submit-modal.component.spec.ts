@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { ConfirmSubmitModalComponent } from './confirm-submit-modal.component';
 
@@ -8,7 +9,8 @@ describe('ConfirmSubmitModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ConfirmSubmitModalComponent]
+      declarations: [ConfirmSubmitModalComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
 

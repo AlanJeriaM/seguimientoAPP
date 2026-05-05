@@ -921,10 +921,7 @@ const obtenerEvolucionSalarial = async (req, res) => {
 
     // Función para convertir rango salarial a valor promedio (igual que en distribucion salarial)
     const convertirRangoASalario = (rango) => {
-      console.log(`[Evolución] Convirtiendo rango: "${rango}"`);
-
       switch(rango) {
-        // Formatos del modelo de la base de datos
         case '0-500k':
         case '$0 - $500.000':
           return 250000;
@@ -943,7 +940,6 @@ const obtenerEvolucionSalarial = async (req, res) => {
         case '3M+':
         case '$3.000.001+':
           return 4000000;
-        // Formatos adicionales que podrían existir
         case '$0 - $500.001':
         case '$0 - $500.000':
           return 250000;
@@ -1542,6 +1538,325 @@ const obtenerDisponibilidadCambioTrabajo = async (req, res) => {
   }
 };
 
+// 1. Obtener tecnologías vs salario promedio
+const obtenerTecnologiasVsSalario = async (req, res) => {
+  try {
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        especialidad_tecnica: { [Op.not]: null, [Op.ne]: '' },
+        rango_salarial: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'Prefiero no decir' }
+      },
+      attributes: ['especialidad_tecnica', 'rango_salarial']
+    });
+
+    const convertirRangoASalario = (rango) => {
+      const rangos = {
+        '$0 - $500.000': 250000,
+        '$500.001 - $1.000.000': 750000,
+        '$1.000.001 - $2.000.000': 1500000,
+        '$2.000.001 - $3.000.000': 2500000,
+        '$3.000.001+': 4000000
+      };
+      return rangos[rango] || 1000000;
+    };
+
+    const tecnologiaSalarios = {};
+
+    usuarios.forEach(user => {
+      let tecnologias = user.especialidad_tecnica;
+
+      if (typeof tecnologias === 'string') {
+        try {
+          tecnologias = JSON.parse(tecnologias);
+        } catch (e) {
+          tecnologias = [tecnologias];
+        }
+      }
+
+      if (Array.isArray(tecnologias)) {
+        tecnologias.forEach(tech => {
+          if (tech && tech.trim()) {
+            const techName = tech.trim();
+            if (!tecnologiaSalarios[techName]) {
+              tecnologiaSalarios[techName] = { salarios: [], cantidad: 0 };
+            }
+            tecnologiaSalarios[techName].salarios.push(convertirRangoASalario(user.rango_salarial));
+            tecnologiaSalarios[techName].cantidad++;
+          }
+        });
+      }
+    });
+
+    const resultado = Object.entries(tecnologiaSalarios)
+      .map(([tecnologia, data]) => ({
+        tecnologia,
+        salarioPromedio: Math.round(data.salarios.reduce((sum, s) => sum + s, 0) / data.salarios.length),
+        cantidad: data.cantidad
+      }))
+      .filter(item => item.cantidad >= 2)
+      .sort((a, b) => b.salarioPromedio - a.salarioPromedio);
+
+    res.json({ ok: true, tecnologiasVsSalario: resultado });
+  } catch (error) {
+    console.error('Error en obtenerTecnologiasVsSalario:', error);
+    res.status(500).json({ ok: false, msj: 'Error al obtener tecnologías vs salario' });
+  }
+};
+
+// 2. Obtener salario vs nivel de educación
+const obtenerSalarioVsEducacion = async (req, res) => {
+  try {
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        nivel_educacion: { [Op.not]: null, [Op.ne]: '' },
+        rango_salarial: { [Op.not]: null, [Op.ne]: '', [Op.ne]: 'Prefiero no decir' }
+      },
+      attributes: ['nivel_educacion', 'rango_salarial']
+    });
+
+    const convertirRangoASalario = (rango) => {
+      const rangos = {
+        '$0 - $500.000': 250000,
+        '$500.001 - $1.000.000': 750000,
+        '$1.000.001 - $2.000.000': 1500000,
+        '$2.000.001 - $3.000.000': 2500000,
+        '$3.000.001+': 4000000
+      };
+      return rangos[rango] || 1000000;
+    };
+
+    const educacionSalarios = {};
+
+    usuarios.forEach(user => {
+      let niveles = user.nivel_educacion;
+
+      if (typeof niveles === 'string') {
+        try {
+          niveles = JSON.parse(niveles);
+        } catch (e) {
+          niveles = [niveles];
+        }
+      }
+
+      if (Array.isArray(niveles)) {
+        niveles.forEach(nivel => {
+          if (nivel && nivel.trim()) {
+            if (!educacionSalarios[nivel]) {
+              educacionSalarios[nivel] = { salarios: [], cantidad: 0 };
+            }
+            educacionSalarios[nivel].salarios.push(convertirRangoASalario(user.rango_salarial));
+            educacionSalarios[nivel].cantidad++;
+          }
+        });
+      }
+    });
+
+    const resultado = Object.entries(educacionSalarios)
+      .map(([nivelEducacion, data]) => ({
+        nivelEducacion,
+        salarioPromedio: Math.round(data.salarios.reduce((sum, s) => sum + s, 0) / data.salarios.length),
+        salarioMinimo: Math.min(...data.salarios),
+        salarioMaximo: Math.max(...data.salarios),
+        cantidad: data.cantidad
+      }))
+      .sort((a, b) => b.salarioPromedio - a.salarioPromedio);
+
+    res.json({ ok: true, salarioVsEducacion: resultado });
+  } catch (error) {
+    console.error('Error en obtenerSalarioVsEducacion:', error);
+    res.status(500).json({ ok: false, msj: 'Error al obtener salario vs educación' });
+  }
+};
+
+// 3. Obtener tipo de empleo vs satisfacción laboral
+const obtenerTipoEmpleoVsSatisfaccion = async (req, res) => {
+  try {
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        tipo_empleo_actual: { [Op.not]: null, [Op.ne]: '' },
+        satisfaccion_laboral: { [Op.not]: null, [Op.between]: [1, 5] }
+      },
+      attributes: ['tipo_empleo_actual', 'satisfaccion_laboral']
+    });
+
+    const tipoEmpleoSatisfaccion = {};
+
+    usuarios.forEach(user => {
+      const tipo = user.tipo_empleo_actual;
+      if (!tipoEmpleoSatisfaccion[tipo]) {
+        tipoEmpleoSatisfaccion[tipo] = { satisfacciones: [], cantidad: 0 };
+      }
+      tipoEmpleoSatisfaccion[tipo].satisfacciones.push(user.satisfaccion_laboral);
+      tipoEmpleoSatisfaccion[tipo].cantidad++;
+    });
+
+    const resultado = Object.entries(tipoEmpleoSatisfaccion)
+      .map(([tipoEmpleo, data]) => ({
+        tipoEmpleo,
+        satisfaccionPromedio: parseFloat((data.satisfacciones.reduce((sum, s) => sum + s, 0) / data.satisfacciones.length).toFixed(1)),
+        cantidad: data.cantidad
+      }))
+      .sort((a, b) => b.satisfaccionPromedio - a.satisfaccionPromedio);
+
+    res.json({ ok: true, tipoEmpleoVsSatisfaccion: resultado });
+  } catch (error) {
+    console.error('Error en obtenerTipoEmpleoVsSatisfaccion:', error);
+    res.status(500).json({ ok: false, msj: 'Error al obtener tipo de empleo vs satisfacción' });
+  }
+};
+
+// 4. Obtener proyección de demanda de tecnologías
+const obtenerProyeccionDemandaTecnologias = async (req, res) => {
+  try {
+    const fechaActual = new Date();
+    const historico = [];
+
+    // Obtener datos históricos de últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      const fecha = new Date(fechaActual);
+      fecha.setMonth(fecha.getMonth() - i);
+      const inicioMes = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
+      const finMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
+
+      const usuarios = await User.findAll({
+        where: {
+          activo: true,
+          especialidad_tecnica: { [Op.not]: null, [Op.ne]: '' },
+          created_at: { [Op.between]: [inicioMes, finMes] }
+        },
+        attributes: ['especialidad_tecnica']
+      });
+
+      const tecnologiasCount = {};
+      usuarios.forEach(user => {
+        let techs = user.especialidad_tecnica;
+        if (typeof techs === 'string') {
+          try { techs = JSON.parse(techs); } catch (e) { techs = [techs]; }
+        }
+        if (Array.isArray(techs)) {
+          techs.forEach(tech => {
+            if (tech && tech.trim()) {
+              const techName = tech.trim();
+              tecnologiasCount[techName] = (tecnologiasCount[techName] || 0) + 1;
+            }
+          });
+        }
+      });
+
+      historico.push({
+        mes: fecha.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+        tecnologias: tecnologiasCount
+      });
+    }
+
+    // Calcular top 5 tecnologías
+    const todasTecnologias = {};
+    historico.forEach(mes => {
+      Object.entries(mes.tecnologias).forEach(([tech, count]) => {
+        todasTecnologias[tech] = (todasTecnologias[tech] || 0) + count;
+      });
+    });
+
+    const top5Tecnologias = Object.entries(todasTecnologias)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([tech]) => tech);
+
+    // Proyección simple (promedio de crecimiento últimos 3 meses)
+    const proyeccion = [];
+    for (let i = 1; i <= 3; i++) {
+      const fecha = new Date(fechaActual);
+      fecha.setMonth(fecha.getMonth() + i);
+      proyeccion.push({
+        mes: fecha.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+        esProyeccion: true
+      });
+    }
+
+    res.json({ ok: true, proyeccion: { historico, proyeccion, top5Tecnologias } });
+  } catch (error) {
+    console.error('Error en obtenerProyeccionDemandaTecnologias:', error);
+    res.status(500).json({ ok: false, msj: 'Error al obtener proyección de tecnologías' });
+  }
+};
+
+// 5. Obtener índice de empleabilidad por perfil
+const obtenerIndiceEmpleabilidad = async (req, res) => {
+  try {
+    const usuarios = await User.findAll({
+      where: {
+        activo: true,
+        perfil_completo: true
+      },
+      attributes: ['años_experiencia', 'nivel_educacion', 'especialidad_tecnica', 'satisfaccion_laboral', 'rango_salarial']
+    });
+
+    const calcularScore = (user) => {
+      let score = 0;
+
+      // Experiencia (max 25 puntos)
+      score += Math.min((user.años_experiencia || 0) * 1.5, 25);
+
+      // Educación (max 25 puntos)
+      let niveles = user.nivel_educacion;
+      if (typeof niveles === 'string') {
+        try { niveles = JSON.parse(niveles); } catch (e) { niveles = [niveles]; }
+      }
+      if (Array.isArray(niveles)) {
+        score += Math.min(niveles.length * 8, 25);
+      }
+
+      // Tecnologías (max 25 puntos)
+      let techs = user.especialidad_tecnica;
+      if (typeof techs === 'string') {
+        try { techs = JSON.parse(techs); } catch (e) { techs = [techs]; }
+      }
+      if (Array.isArray(techs)) {
+        score += Math.min(techs.length * 5, 25);
+      }
+
+      // Satisfacción laboral (max 25 puntos)
+      if (user.satisfaccion_laboral) {
+        score += (user.satisfaccion_laboral / 5) * 25;
+      }
+
+      return Math.round(score);
+    };
+
+    const perfilesConScore = usuarios.map(user => ({
+      score: calcularScore(user)
+    }));
+
+    // Rangos de empleabilidad
+    const rangos = {
+      'Excelente (81-100)': perfilesConScore.filter(p => p.score >= 81 && p.score <= 100).length,
+      'Muy Bueno (61-80)': perfilesConScore.filter(p => p.score >= 61 && p.score < 81).length,
+      'Bueno (41-60)': perfilesConScore.filter(p => p.score >= 41 && p.score < 61).length,
+      'Regular (21-40)': perfilesConScore.filter(p => p.score >= 21 && p.score < 41).length,
+      'Bajo (0-20)': perfilesConScore.filter(p => p.score >= 0 && p.score < 21).length
+    };
+
+    const scorePromedio = perfilesConScore.length > 0
+      ? Math.round(perfilesConScore.reduce((sum, p) => sum + p.score, 0) / perfilesConScore.length)
+      : 0;
+
+    res.json({
+      ok: true,
+      indiceEmpleabilidad: {
+        distribucion: Object.entries(rangos).map(([rango, cantidad]) => ({ rango, cantidad })),
+        scorePromedio,
+        totalPerfiles: perfilesConScore.length
+      }
+    });
+  } catch (error) {
+    console.error('Error en obtenerIndiceEmpleabilidad:', error);
+    res.status(500).json({ ok: false, msj: 'Error al obtener índice de empleabilidad' });
+  }
+};
+
 module.exports = {
   obtenerEstadisticasMercado,
   obtenerMetricasAvanzadas,
@@ -1554,5 +1869,10 @@ module.exports = {
   obtenerDistribucionExperiencia,
   obtenerExperienciaVsTecnologias,
   obtenerMapaCalorIndustriaSalarial,
-  obtenerDisponibilidadCambioTrabajo
+  obtenerDisponibilidadCambioTrabajo,
+  obtenerTecnologiasVsSalario,
+  obtenerSalarioVsEducacion,
+  obtenerTipoEmpleoVsSatisfaccion,
+  obtenerProyeccionDemandaTecnologias,
+  obtenerIndiceEmpleabilidad
 };

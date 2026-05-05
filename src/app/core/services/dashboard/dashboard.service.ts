@@ -270,6 +270,48 @@ export interface DisponibilidadCambioData {
   };
 }
 
+// Nuevas interfaces
+export interface TecnologiaSalario {
+  tecnologia: string;
+  salarioPromedio: number;
+  cantidad: number;
+}
+
+export interface SalarioEducacion {
+  nivelEducacion: string;
+  salarioPromedio: number;
+  salarioMinimo: number;
+  salarioMaximo: number;
+  cantidad: number;
+}
+
+export interface TipoEmpleoSatisfaccion {
+  tipoEmpleo: string;
+  satisfaccionPromedio: number;
+  cantidad: number;
+}
+
+export interface ProyeccionTecnologias {
+  historico: Array<{
+    mes: string;
+    tecnologias: { [key: string]: number };
+  }>;
+  proyeccion: Array<{
+    mes: string;
+    esProyeccion: boolean;
+  }>;
+  top5Tecnologias: string[];
+}
+
+export interface IndiceEmpleabilidad {
+  distribucion: Array<{
+    rango: string;
+    cantidad: number;
+  }>;
+  scorePromedio: number;
+  totalPerfiles: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -536,5 +578,31 @@ export class DashboardService {
           msj: err.error?.msj || 'Error al obtener disponibilidad de cambio de trabajo'
         }))
       );
+  }
+
+  // Nuevos métodos
+  obtenerTecnologiasVsSalario(): Observable<{ ok: boolean; tecnologiasVsSalario?: TecnologiaSalario[]; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/tecnologias-vs-salario`, { headers: this.getHeaders() })
+      .pipe(catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al obtener tecnologías vs salario' })));
+  }
+
+  obtenerSalarioVsEducacion(): Observable<{ ok: boolean; salarioVsEducacion?: SalarioEducacion[]; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/salario-vs-educacion`, { headers: this.getHeaders() })
+      .pipe(catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al obtener salario vs educación' })));
+  }
+
+  obtenerTipoEmpleoVsSatisfaccion(): Observable<{ ok: boolean; tipoEmpleoVsSatisfaccion?: TipoEmpleoSatisfaccion[]; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/tipo-empleo-vs-satisfaccion`, { headers: this.getHeaders() })
+      .pipe(catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al obtener tipo empleo vs satisfacción' })));
+  }
+
+  obtenerProyeccionDemandaTecnologias(): Observable<{ ok: boolean; proyeccion?: ProyeccionTecnologias; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/proyeccion-demanda-tecnologias`, { headers: this.getHeaders() })
+      .pipe(catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al obtener proyección de tecnologías' })));
+  }
+
+  obtenerIndiceEmpleabilidad(): Observable<{ ok: boolean; indiceEmpleabilidad?: IndiceEmpleabilidad; msj?: string }> {
+    return this.http.get<any>(`${this.url}/api/dashboard/indice-empleabilidad`, { headers: this.getHeaders() })
+      .pipe(catchError(err => of({ ok: false, msj: err.error?.msj || 'Error al obtener índice de empleabilidad' })));
   }
 }

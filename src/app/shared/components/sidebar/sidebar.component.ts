@@ -198,7 +198,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
             icon: 'pi pi-fw pi-briefcase',
             items: [
               { label: 'Análisis salarial', command: () => this.navigateToChart('distribucion-salarial') },
-              { label: 'Tecnologías mas usadas', command: () => this.navigateToChart('tecnologias-demandadas') },
+              { label: 'Tecnologías mas demandadas', command: () => this.navigateToChart('tecnologias-demandadas') },
               { label: 'Satisfacción laboral',  command: () => this.navigateToChart('salarios-industria') },
             ]
           },
@@ -216,7 +216,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
             items: [
               { label: 'Mapa de calor', command: () => this.navigateToChart('mapa-calor-industria') },
               { label: 'Estado del mercado',  command: () => this.navigateToChart('disponibilidad-cambio') },
-              { label: 'Métricas avanzadas', command: () => this.navigateToChart('metricas-avanzadas') },
+              { label: 'Métricas básicas y avanzadas', command: () => this.navigateToChart('metricas-avanzadas') },
             ]
           }
         ]
@@ -258,7 +258,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
             icon: 'pi pi-fw pi-briefcase',
             items: [
               { label: 'Análisis salarial',  command: () => this.navigateToChart('distribucion-salarial') },
-              { label: 'Tecnologías mas usadas',  command: () => this.navigateToChart('tecnologias-demandadas') },
+              { label: 'Tecnologías mas demandadas',  command: () => this.navigateToChart('tecnologias-demandadas') },
               { label: 'Satisfacción laboral',  command: () => this.navigateToChart('salarios-industria') },
             ]
           },
@@ -276,7 +276,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
             items: [
               { label: 'Mapa de calor',command: () => this.navigateToChart('mapa-calor-industria') },
               { label: 'Estado del mercado', command: () => this.navigateToChart('disponibilidad-cambio') },
-              { label: 'Métricas avanzadas', command: () => this.navigateToChart('metricas-avanzadas') },
+              { label: 'Métricas básicas y avanzadas', command: () => this.navigateToChart('metricas-avanzadas') },
             ]
           }
         ]

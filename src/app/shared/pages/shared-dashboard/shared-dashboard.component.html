@@ -46,14 +46,14 @@
              (click)="navigateToProfile()"
              class="profile-image-wrapper">
           <img
-            *ngIf="perfilUsuario?.perfil_imagen_url && !imageError"
+            *ngIf="perfilUsuario.perfil_imagen_url && !imageError"
             [src]="perfilUsuario.perfil_imagen_url"
             alt="Perfil de LinkedIn"
             class="border-circle profile-image"
             (error)="handleImageError($event)"
           >
           <p-avatar
-            *ngIf="!perfilUsuario?.perfil_imagen_url || imageError"
+            *ngIf="!perfilUsuario.perfil_imagen_url || imageError"
             [label]="getUserInitials()"
             size="xlarge"
             shape="circle"
@@ -90,22 +90,26 @@
         <p class="text-sm md:text-base text-700 m-0">Información y estadísticas del mercado tecnológico</p>
       </div>
 
-
-      <div class="w-full lg:w-auto">
+      <div class="w-full lg:w-auto" *ngIf="isAdmin()" >
         <div class="market-growth-badge">
-          <div class="flex align-items-center gap-2 mb-2">
-            <i class="pi pi-user-plus text-primary text-xl"></i>
-            <span class="text-xs text-600 font-semibold text-uppercase">Nuevos Registros</span>
+          <div class="market-growth-content">
+            <div class="flex align-items-center justify-content-center gap-2 mb-3">
+              <i class="pi pi-user-plus text-primary text-2xl"></i>
+              <span class="text-xs text-600 font-semibold text-uppercase letter-spacing-1">Nuevos Registros</span>
+            </div>
+            <div class="flex align-items-baseline justify-content-center gap-2 mb-3">
+              <span class="text-4xl md:text-5xl font-bold text-primary">
+                {{ getNuevosRegistrosEsteMes() }}
+              </span>
+              <span class="text-lg font-medium text-600">este mes</span>
+            </div>
+            <div class="border-top-1 border-200 pt-2">
+              <span class="text-sm text-600">
+                <i class="pi pi-calendar mr-1"></i>
+                {{ getRegistrosMesAnterior() }} el mes anterior
+              </span>
+            </div>
           </div>
-          <div class="flex align-items-baseline gap-2">
-            <span class="text-3xl md:text-4xl font-bold text-primary">
-              {{ getNuevosRegistrosEsteMes() }}
-            </span>
-            <span class="text-xl font-medium text-600">este mes</span>
-          </div>
-          <span class="block text-xs text-600 mt-2">
-            {{ getRegistrosMesAnterior() }} el mes anterior
-          </span>
         </div>
       </div>
     </div>
@@ -115,7 +119,7 @@
   <!-- Market Stats Cards con Gráfico -->
   <div class="stats-chart-container scale-up-top mb-4 md:mb-5 lg:mb-6" id="resumen-general" >
     <!-- Estadísticas del mercado -->
-    <div class="stats-grid">
+    <div class="stats-grid" [class.admin-grid]="isAdmin()" [class.user-grid]="!isAdmin()">
       <div class="stat-card-wrapper">
         <div class="surface-card shadow-2 border-round p-3 md:p-4 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #5DB3E0 0%, #2493cf 100%) !important; color: #ffffff;">
           <div class="flex align-items-center mb-3">
@@ -130,7 +134,7 @@
         </div>
       </div>
 
-      <div class="stat-card-wrapper">
+      <div class="stat-card-wrapper" *ngIf="isAdmin()">
         <div class="surface-card shadow-2 border-round p-3 md:p-4 h-full flex flex-column justify-content-between" style="background: linear-gradient(135deg, #FFB35C 0%, #f7931e 100%) !important; color: #ffffff;">
           <div class="flex align-items-center mb-3">
             <div class="flex align-items-center justify-content-center border-circle" style="width: 3rem; height: 3rem; background-color: rgba(255, 255, 255, 0.2);">
@@ -153,7 +157,7 @@
           </div>
           <div class="flex-1">
             <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white m-0 mb-2">{{ getEmpresasUnicas() | number }}</h3>
-            <p class="text-xs md:text-sm text-white m-0" style="opacity: 0.9;">Empresas únicas</p>
+            <p class="text-xs md:text-sm text-white m-0" style="opacity: 0.9; ">Empresas únicas</p>
           </div>
         </div>
       </div>
@@ -191,7 +195,7 @@
   </div>
 
   <!-- Análisis de Tendencias del Mercado -->
-  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="tendencias-mercado">
+  <div class= "shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6 " *ngIf="isAdmin()" id="tendencias-mercado">
     <div class="mb-4">
       <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
         <i class="pi pi-chart-line text-primary"></i>
@@ -229,8 +233,8 @@
         <p-card styleClass="h-full">
           <ng-template pTemplate="header">
             <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
-              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Distribución Salarial por Industria</h3>
-              <p-tag value="Promedios del mercado" severity="success"></p-tag>
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Top Salarial por Industria</h3>
+              <p-tag value="Mejores salarios" severity="success"></p-tag>
             </div>
           </ng-template>
           <div style="height: 300px; position: relative;">
@@ -245,7 +249,7 @@
           <ng-template pTemplate="header">
             <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
               <h3 class="text-base md:text-lg font-semibold text-900 m-0">Top Empleadores</h3>
-              <p-tag value="Principales contratadores" severity="warning"></p-tag>
+              <p-tag value="Más contratadores" severity="warning"></p-tag>
             </div>
           </ng-template>
           <div style="height: 300px; position: relative;">
@@ -254,42 +258,6 @@
         </p-card>
       </div>
     </div>
-  </div>
-
-  <!-- Tecnologías Más Demandadas -->
-  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="tecnologias-demandadas">
-    <div class="mb-4">
-      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
-        <i class="pi pi-chart-pie text-primary"></i>
-        <span>Distribución General del Mercado</span>
-      </h2>
-      <p class="text-sm md:text-base text-600 m-0">Visión general de la composición del mercado laboral</p>
-    </div>
-
-    <p-card>
-      <ng-template pTemplate="header">
-        <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
-          <h3 class="text-base md:text-lg font-semibold text-900 m-0">Tecnologías Más Demandadas</h3>
-          <p-tag value="Skills más populares" severity="info"></p-tag>
-        </div>
-      </ng-template>
-      <div class="overflow-y-auto" style="max-height: 400px;">
-        <div *ngFor="let tech of tecnologiasDemandadas; let i = index" class="py-3 border-bottom-1 surface-border">
-          <div class="flex align-items-center justify-content-between mb-2">
-            <h4 class="text-sm md:text-base font-semibold m-0" style="color: #000000;">{{ tech.nombre }}</h4>
-            <span class="text-sm md:text-base font-bold mr-3" style="color: #000000;">{{ getSeleccionesText(tech.demanda) }}</span>
-          </div>
-          <div class="mr-3">
-            <p-progressBar
-              [value]="getTechDemandPercentage(tech.demanda)"
-              [showValue]="false"
-              [style]="{'--tech-color': getTechnologyColor(i), 'height': '0.75rem'}"
-              styleClass="tech-progress-bar">
-            </p-progressBar>
-          </div>
-        </div>
-      </div>
-    </p-card>
   </div>
 
   <!-- Información Detallada de Empresas -->
@@ -307,10 +275,7 @@
       <div class="col-12 lg:col-8">
         <p-card styleClass="h-full">
           <ng-template pTemplate="header">
-            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
-              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Principales Empleadores del Mercado</h3>
-              <p-tag value="Top empresas" severity="info"></p-tag>
-            </div>
+            <h3>Principales Empleadores del Mercado</h3>
           </ng-template>
           <div class="overflow-y-auto" style="max-height: 500px;">
             <div *ngFor="let empresa of empresasContratantes" class="py-3 border-bottom-1 surface-border">
@@ -356,6 +321,42 @@
       </div>
     </div>
   </div>
+
+    <!-- Tecnologías Más Demandadas -->
+    <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="tecnologias-demandadas">
+      <div class="mb-4">
+        <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+          <i class="pi pi-chart-pie text-primary"></i>
+          <span>Distribución General del Mercado</span>
+        </h2>
+        <p class="text-sm md:text-base text-600 m-0">Visión general de la composición del mercado laboral</p>
+      </div>
+
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+            <h3 class="text-base md:text-lg font-semibold text-900 m-0">Tecnologías Más Demandadas</h3>
+            <p-tag value="Skills más populares" severity="info"></p-tag>
+          </div>
+        </ng-template>
+        <div class="overflow-y-auto" style="max-height: 400px;">
+          <div *ngFor="let tech of tecnologiasDemandadas; let i = index" class="py-3 border-bottom-1 surface-border">
+            <div class="flex align-items-center justify-content-between mb-2">
+              <h4 class="text-sm md:text-base font-semibold m-0" style="color: #000000;">{{ tech.nombre }}</h4>
+              <span class="text-sm md:text-base font-bold mr-3" style="color: #000000;">{{ getSeleccionesText(tech.demanda) }}</span>
+            </div>
+            <div class="mr-3">
+              <p-progressBar
+                [value]="getTechDemandPercentage(tech.demanda)"
+                [showValue]="false"
+                [style]="{'--tech-color': getTechnologyColor(i), 'height': '0.75rem'}"
+                styleClass="tech-progress-bar">
+              </p-progressBar>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
 
   <!-- Análisis de Satisfacción Laboral -->
   <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="satisfaccion-laboral" *ngIf="satisfaccionLaboral && satisfaccionLaboral.empresas.length > 0">
@@ -726,7 +727,7 @@
     <div class="mb-4">
       <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
         <i class="pi pi-chart-line text-primary"></i>
-        <span>Análisis Avanzado del Mercado Laboral</span>
+        <span>Análisis de métricas básicas del Mercado Laboral</span>
       </h2>
       <p class="text-sm md:text-base text-600 m-0">Métricas detalladas y análisis profundo del mercado</p>
     </div>
@@ -820,7 +821,7 @@
           <ng-template pTemplate="header">
             <div class="flex align-items-center gap-2 p-3">
               <i class="pi pi-chart-bar text-primary text-xl"></i>
-              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Resumen de Métricas Avanzadas</h3>
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Resumen de Métricas básicas de los egresados</h3>
             </div>
           </ng-template>
           <div class="grid p-3">
@@ -852,6 +853,188 @@
               </div>
             </div>
           </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- NUEVOS GRÁFICOS: Análisis de Correlaciones Avanzadas -->
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="analisis-correlaciones" *ngIf="(tecnologiasVsSalario && tecnologiasVsSalario.length > 0) || (salarioVsEducacion && salarioVsEducacion.length > 0) || (tipoEmpleoVsSatisfaccion && tipoEmpleoVsSatisfaccion.length > 0)">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-chart-scatter text-primary"></i>
+        <span>Análisis de Correlaciones Avanzadas</span>
+      </h2>
+      <p class="text-sm md:text-base text-600 m-0">Relaciones entre tecnologías, educación, salario y satisfacción laboral</p>
+    </div>
+
+    <div class="grid">
+      <!-- 1. Tecnologías vs Salario Promedio -->
+      <div class="col-12 lg:col-6" *ngIf="tecnologiasVsSalario && tecnologiasVsSalario.length > 0">
+        <p-card styleClass="h-full">
+          <ng-template pTemplate="header">
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Tecnologías con Mejores Salarios</h3>
+              <p-tag value="Skills mejor pagadas" severity="success"></p-tag>
+            </div>
+          </ng-template>
+          <div style="height: 350px; position: relative;">
+            <canvas id="tecnologiasVsSalarioChart"></canvas>
+          </div>
+          <ng-template pTemplate="footer">
+            <div class="surface-100 border-round p-3">
+              <p class="text-sm text-600 m-0">
+                <i class="pi pi-lightbulb mr-2"></i>
+                <strong>Insight:</strong> Tecnologías ordenadas por salario promedio. Útil para orientar tu aprendizaje hacia skills mejor valoradas.
+              </p>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+
+      <!-- 2. Salario vs Nivel de Educación -->
+      <div class="col-12 lg:col-6" *ngIf="salarioVsEducacion && salarioVsEducacion.length > 0">
+        <p-card styleClass="h-full">
+          <ng-template pTemplate="header">
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Impacto de la Educación en el Salario</h3>
+              <p-tag value="ROI Educativo" severity="info"></p-tag>
+            </div>
+          </ng-template>
+          <div style="height: 350px; position: relative;">
+            <canvas id="salarioVsEducacionChart"></canvas>
+          </div>
+          <ng-template pTemplate="footer">
+            <div class="surface-100 border-round p-3">
+              <p class="text-sm text-600 m-0">
+                <i class="pi pi-graduation-cap mr-2"></i>
+                <strong>Análisis:</strong> Correlación entre nivel educativo y rango salarial. Ayuda a evaluar el retorno de inversión en formación.
+              </p>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+
+      <!-- 3. Tipo de Empleo vs Satisfacción Laboral -->
+      <div class="col-12" *ngIf="tipoEmpleoVsSatisfaccion && tipoEmpleoVsSatisfaccion.length > 0">
+        <p-card>
+          <ng-template pTemplate="header">
+            <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Satisfacción Laboral por Tipo de Empleo</h3>
+              <p-tag value="Bienestar Profesional" severity="warning"></p-tag>
+            </div>
+          </ng-template>
+          <div style="height: 300px; position: relative;">
+            <canvas id="tipoEmpleoVsSatisfaccionChart"></canvas>
+          </div>
+          <ng-template pTemplate="footer">
+            <div class="surface-100 border-round p-3">
+              <p class="text-sm text-600 m-0">
+                <i class="pi pi-heart mr-2"></i>
+                <strong>Insight:</strong> Comparación de satisfacción entre freelance, tiempo completo, part-time, etc. Ayuda a decidir qué modalidad buscar.
+              </p>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- NUEVOS GRÁFICOS: Proyecciones y Análisis Predictivo -->
+  <div class="surface-card shadow-2 border-round p-3 md:p-4 lg:p-5 mb-4 md:mb-5 lg:mb-6" id="proyecciones-predictivas" *ngIf="(proyeccionTecnologias && proyeccionTecnologias.top5Tecnologias.length > 0) || (indiceEmpleabilidad && indiceEmpleabilidad.totalPerfiles > 0)">
+    <div class="mb-4">
+      <h2 class="text-xl md:text-2xl font-bold text-900 m-0 mb-2 flex align-items-center gap-2">
+        <i class="pi pi-chart-line text-primary"></i>
+        <span>Proyecciones y Análisis Predictivo</span>
+      </h2>
+      <p class="text-sm md:text-base text-600 m-0">Tendencias futuras y métricas de empleabilidad del mercado</p>
+    </div>
+
+    <div class="grid">
+      <!-- 4. Proyección de Demanda de Tecnologías -->
+      <div class="col-12 lg:col-8" *ngIf="proyeccionTecnologias && proyeccionTecnologias.top5Tecnologias.length > 0">
+        <p-card styleClass="h-full">
+          <ng-template pTemplate="header">
+            <div class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-2 p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Proyección de Demanda de Tecnologías</h3>
+              <div class="flex flex-wrap gap-2">
+                <p-tag value="Histórico: 6 meses" severity="info"></p-tag>
+                <p-tag value="Proyección: 3 meses" severity="warning"></p-tag>
+              </div>
+            </div>
+          </ng-template>
+          <div style="height: 400px; position: relative;">
+            <canvas id="proyeccionTecnologiasChart"></canvas>
+          </div>
+          <ng-template pTemplate="footer">
+            <div class="surface-100 border-round p-3 mb-3">
+              <p class="text-sm text-600 m-0">
+                <i class="pi pi-eye mr-2"></i>
+                <strong>Análisis Predictivo:</strong> Tendencia histórica (línea sólida) + proyección simple (línea punteada) para las top 5 tecnologías.
+              </p>
+            </div>
+
+            <!-- Top 5 Tecnologías Proyectadas -->
+            <div>
+              <h4 class="text-base md:text-lg font-semibold text-900 mb-3">Top 5 Tecnologías Proyectadas</h4>
+              <div class="grid">
+                <div class="col-12 md:col-6 lg:col-4" *ngFor="let tech of proyeccionTecnologias.top5Tecnologias; let i = index">
+                  <div class="surface-100 border-round p-3 flex align-items-center gap-3">
+                    <div class="flex align-items-center justify-content-center border-circle"
+                         [style]="{'width': '2.5rem', 'height': '2.5rem', 'background-color': getTechnologyColor(i), 'color': '#ffffff'}">
+                      <span class="font-bold">{{i + 1}}</span>
+                    </div>
+                    <div class="flex-1">
+                      <p class="font-semibold text-900 m-0 text-sm md:text-base white-space-nowrap overflow-hidden text-overflow-ellipsis"
+                         [title]="tech">{{tech}}</p>
+                      <small class="text-600">En crecimiento</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+
+      <!-- 5. Índice de Empleabilidad -->
+      <div class="col-12 lg:col-4" *ngIf="indiceEmpleabilidad && indiceEmpleabilidad.totalPerfiles > 0">
+        <p-card styleClass="h-full">
+          <ng-template pTemplate="header">
+            <div class="p-3">
+              <h3 class="text-base md:text-lg font-semibold text-900 m-0">Índice de Empleabilidad</h3>
+              <p class="text-sm text-600 m-0 mt-2">Score: 0-100 puntos</p>
+            </div>
+          </ng-template>
+          <div style="height: 250px; position: relative;">
+            <canvas id="indiceEmpleabilidadChart"></canvas>
+          </div>
+          <ng-template pTemplate="footer">
+            <div class="mb-3">
+              <div class="surface-100 border-round p-3 text-center">
+                <h4 class="text-sm text-600 m-0 mb-2">Score Promedio del Mercado</h4>
+                <p class="text-4xl font-bold text-primary m-0">{{indiceEmpleabilidad.scorePromedio}}</p>
+                <small class="text-600">de 100 puntos</small>
+              </div>
+            </div>
+
+            <div class="surface-100 border-round p-3">
+              <h4 class="text-sm font-semibold text-900 mb-2">Criterios de Evaluación</h4>
+              <ul class="text-xs text-600 m-0 pl-3">
+                <li class="mb-1">Experiencia (max 25 pts)</li>
+                <li class="mb-1">Educación (max 25 pts)</li>
+                <li class="mb-1">Tecnologías (max 25 pts)</li>
+                <li>Satisfacción laboral (max 25 pts)</li>
+              </ul>
+            </div>
+
+            <div class="mt-3 surface-100 border-round p-3">
+              <p class="text-sm text-600 m-0">
+                <i class="pi pi-info-circle mr-2"></i>
+                <strong>Total perfiles analizados:</strong> {{indiceEmpleabilidad.totalPerfiles}}
+              </p>
+            </div>
+          </ng-template>
         </p-card>
       </div>
     </div>

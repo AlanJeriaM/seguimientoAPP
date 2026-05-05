@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
@@ -16,9 +18,11 @@ describe('ResetPasswordComponent', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
+        HttpClientTestingModule,
         ToastModule
       ],
-      providers: [MessageService]
+      providers: [MessageService],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
   });

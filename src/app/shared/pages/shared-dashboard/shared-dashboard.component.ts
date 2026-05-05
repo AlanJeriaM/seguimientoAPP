@@ -1,14 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { Subject, takeUntil } from 'rxjs';
-import {DashboardService,EstadisticasMercado,TecnologiaDemandada,DistribucionSalarial,EmpresaContratante,TendenciasMercado,PerfilUsuario,MetricasAvanzadas,SatisfaccionLaboral,EvolucionSalarial,DistribucionExperienciaData,ExperienciaVsTecnologiasData,MapaCalorData,DisponibilidadCambioData} from '../../../core/services/dashboard/dashboard.service';
+import {DashboardService,EstadisticasMercado,TecnologiaDemandada,DistribucionSalarial,EmpresaContratante,TendenciasMercado,PerfilUsuario,MetricasAvanzadas,SatisfaccionLaboral,EvolucionSalarial,DistribucionExperienciaData,ExperienciaVsTecnologiasData,MapaCalorData,DisponibilidadCambioData,TecnologiaSalario,SalarioEducacion,TipoEmpleoSatisfaccion,ProyeccionTecnologias,IndiceEmpleabilidad} from '../../../core/services/dashboard/dashboard.service';
 import { Router } from '@angular/router';
 Chart.register(...registerables);
 
 
 
 @Component({
-  selector: 'app-linkedin-dashboard',
+  selector: 'app-shared-dashboard',
   templateUrl: './shared-dashboard.component.html',
   styleUrls: ['./shared-dashboard.component.scss']
 })
@@ -33,6 +33,12 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
   mapaCalorIndustriaSalarial: MapaCalorData | null = null;
   disponibilidadCambioTrabajo: DisponibilidadCambioData | null = null;
 
+  // Nuevas propiedades
+  tecnologiasVsSalario: TecnologiaSalario[] = [];
+  salarioVsEducacion: SalarioEducacion[] = [];
+  tipoEmpleoVsSatisfaccion: TipoEmpleoSatisfaccion[] = [];
+  proyeccionTecnologias: ProyeccionTecnologias | null = null;
+  indiceEmpleabilidad: IndiceEmpleabilidad | null = null;
 
   loading = true;
   error: string | null = null;
@@ -100,6 +106,8 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadDashboardData();
+    // Cargar nuevos gráficos
+    this.loadNuevosGraficos();
   }
 
   ngOnDestroy() {
@@ -401,8 +409,17 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
       return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
     };
 
-    // Ordenar datos por salario promedio para mejor visualización
-    const sortedData = [...this.distribucionSalarial].sort((a, b) => b.salarioPromedio - a.salarioPromedio);
+    // TOP 7: Ordenar por salario promedio y tomar máximo 7 industrias
+    const sortedData = [...this.distribucionSalarial]
+      .sort((a, b) => b.salarioPromedio - a.salarioPromedio)
+      .slice(0, 7); // Máximo 7 industrias (top 7)
+
+    console.log(`Top industrias con mejores salarios: ${sortedData.length}`);
+
+    if (sortedData.length === 0) {
+      console.warn('No hay industrias para mostrar');
+      return;
+    }
 
     this.charts['distribucionSalarial'] = new Chart(ctx, {
       type: 'bar',
@@ -419,8 +436,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               'rgba(241, 196, 15, 0.8)',  // Amarillo
               'rgba(231, 76, 60, 0.8)',   // Rojo
               'rgba(230, 126, 34, 0.8)',  // Naranja
-              'rgba(52, 73, 94, 0.8)',    // Gris oscuro
-              'rgba(26, 188, 156, 0.8)'   // Turquesa
+              'rgba(52, 73, 94, 0.8)'     // Gris oscuro
             ],
             borderColor: [
               'rgba(52, 152, 219, 1)',
@@ -429,8 +445,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               'rgba(241, 196, 15, 1)',
               'rgba(231, 76, 60, 1)',
               'rgba(230, 126, 34, 1)',
-              'rgba(52, 73, 94, 1)',
-              'rgba(26, 188, 156, 1)'
+              'rgba(52, 73, 94, 1)'
             ],
             borderWidth: 2,
             borderRadius: 8,
@@ -487,7 +502,6 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             },
             title: {
               display: true,
-              text: 'Industrias',
               font: {
                 size: 12,
                 weight: 'bold',
@@ -511,6 +525,17 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
               }
             }
           },
+          title: {
+            display: true,
+            text: 'Top Industrias con Mejores Salarios',
+            font: {
+              size: 16,
+              weight: 'bold',
+              family: 'Inter, sans-serif'
+            },
+            color: '#111827',
+            padding: 20
+          },
           tooltip: {
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             titleColor: '#ffffff',
@@ -528,7 +553,8 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
                 const industryData = sortedData[dataIndex];
                 return [
                   `Salario Promedio: ${formatCurrency(industryData.salarioPromedio)}`,
-                  `Profesionales: ${industryData.cantidad}`
+                  `Profesionales: ${industryData.cantidad}`,
+                  `Rango: ${formatCurrency(industryData.salarioMinimo)} - ${formatCurrency(industryData.salarioMaximo)}`
                 ];
               }
             }
@@ -538,15 +564,16 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-
   private renderEmpresasContratantesChart() {
     const ctx = document.getElementById('empresasContratantesChart') as HTMLCanvasElement;
     if (!ctx || !this.empresasContratantes.length) return;
 
     this.destroyChart('empresasContratantes');
 
-    // Tomar las top 8 empresas
-    const topEmpresas = this.empresasContratantes.slice(0, 8);
+    // TOP 7: Tomar las top 7 empresas con más empleados
+    const topEmpresas = this.empresasContratantes.slice(0, 7);
+
+    console.log(`Top empleadores: ${topEmpresas.length}`);
 
     this.charts['empresasContratantes'] = new Chart(ctx, {
       type: 'bar',
@@ -562,8 +589,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             '#00a0b0',
             '#7b68ee',
             '#ff69b4',
-            '#32cd32',
-            '#ffa500'
+            '#32cd32'
           ],
           borderRadius: 8,
           borderSkipped: false
@@ -579,7 +605,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           },
           title: {
             display: true,
-            text: 'Principales Empleadores del Mercado',
+            text: 'Top Empleadores del Mercado',
             font: {
               size: 16,
               weight: 'bold'
@@ -722,23 +748,48 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
 
     const stats = this.estadisticasMercado;
 
+    // Configurar labels y data según el rol del usuario
+    let labels: string[];
+    let data: number[];
+    let backgroundColor: string[];
+
+    if (this.isAdmin()) {
+      // ADMIN: Muestra todas las métricas incluyendo "Nuevos Este Mes"
+      labels = ['Profesionales Activos', 'Empresas Únicas', 'Industrias Únicas', 'Nuevos Este Mes'];
+      data = [
+        stats.totalProfesionales,
+        stats.empresasUnicas,
+        stats.industriasUnicas,
+        stats.nuevosProfesionalesEsteMes
+      ];
+      backgroundColor = [
+        '#0077b5',
+        '#00a0b0',
+        '#ff6b35',
+        '#f7931e'
+      ];
+    } else {
+      // USUARIO: Solo muestra métricas generales SIN "Nuevos Este Mes"
+      labels = ['Profesionales Activos', 'Empresas Únicas', 'Industrias Únicas'];
+      data = [
+        stats.totalProfesionales,
+        stats.empresasUnicas,
+        stats.industriasUnicas
+      ];
+      backgroundColor = [
+        '#0077b5',
+        '#00a0b0',
+        '#ff6b35'
+      ];
+    }
+
     this.charts['estadisticasGenerales'] = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Profesionales Activos', 'Empresas Únicas', 'Industrias Únicas', 'Nuevos Este Mes'],
+        labels: labels,
         datasets: [{
-          data: [
-            stats.totalProfesionales, // Profesionales Activos
-            stats.empresasUnicas, // Empresas Únicas
-            stats.industriasUnicas, // Industrias Únicas
-            stats.nuevosProfesionalesEsteMes // Nuevos Este Mes
-          ],
-          backgroundColor: [
-            '#0077b5',
-            '#00a0b0',
-            '#ff6b35',
-            '#f7931e'
-          ],
+          data: data,
+          backgroundColor: backgroundColor,
           borderWidth: 0
         }]
       },
@@ -1851,7 +1902,7 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
             padding: 20
           },
           tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: 'rgba(0, 0, 0, 8)',
             titleColor: '#ffffff',
             bodyColor: '#ffffff',
             borderColor: '#3B82F6',
@@ -2234,6 +2285,493 @@ export class SharedDashboardComponent implements OnInit, OnDestroy {
           title: {
             display: true,
             text: 'Tipos de Empleo Actual'
+          }
+        }
+      }
+    });
+  }
+
+  private renderTipoEmpleoVsSatisfaccionChart() {
+    const canvas = document.getElementById('tipoEmpleoVsSatisfaccionChart') as HTMLCanvasElement;
+    if (!canvas || !this.tipoEmpleoVsSatisfaccion.length) return;
+
+    if (this.charts['tipoEmpleoVsSatisfaccion']) {
+      this.charts['tipoEmpleoVsSatisfaccion'].destroy();
+    }
+
+    // Paleta de colores para cada tipo de empleo
+    const coloresTipoEmpleo = [
+      '#10B981', // Verde - Tiempo completo
+      '#3B82F6', // Azul - Part-time
+      '#F59E0B', // Ámbar - Freelance
+      '#EF4444', // Rojo - Desempleado
+      '#8B5CF6', // Púrpura - Estudiante
+      '#6B7280'  // Gris - Otro
+    ];
+
+    this.charts['tipoEmpleoVsSatisfaccion'] = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: this.tipoEmpleoVsSatisfaccion.map(t => t.tipoEmpleo),
+        datasets: [{
+          label: 'Satisfacción Promedio',
+          data: this.tipoEmpleoVsSatisfaccion.map(t => t.satisfaccionPromedio),
+          backgroundColor: this.tipoEmpleoVsSatisfaccion.map((_, index) =>
+            coloresTipoEmpleo[index % coloresTipoEmpleo.length]
+          ),
+          borderColor: this.tipoEmpleoVsSatisfaccion.map((_, index) =>
+            coloresTipoEmpleo[index % coloresTipoEmpleo.length]
+          ),
+          borderWidth: 2,
+          borderRadius: 6,
+          hoverBackgroundColor: this.tipoEmpleoVsSatisfaccion.map((_, index) => {
+            // Versiones más intensas para hover
+            const hoverColors = [
+              '#059669', // Verde más intenso
+              '#2563EB', // Azul más intenso
+              '#D97706', // Ámbar más intenso
+              '#DC2626', // Rojo más intenso
+              '#7C3AED', // Púrpura más intenso
+              '#4B5563'  // Gris más intenso
+            ];
+            return hoverColors[index % hoverColors.length];
+          }),
+          hoverBorderWidth: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false // Ocultar leyenda ya que cada barra tiene su propio color
+          },
+          title: {
+            display: true,
+            text: 'Satisfacción Laboral por Tipo de Empleo',
+            font: { size: 16, weight: 'bold' }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#3B82F6',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              label: (context) => {
+                const item = this.tipoEmpleoVsSatisfaccion[context.dataIndex];
+                const fullStars = '★'.repeat(Math.floor(item.satisfaccionPromedio));
+                const emptyStars = '☆'.repeat(5 - Math.floor(item.satisfaccionPromedio));
+                return [
+                  `Satisfacción: ${fullStars}${emptyStars} (${item.satisfaccionPromedio}/5)`,
+                  `Profesionales: ${item.cantidad}`
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            max: 5,
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => `${value} ★`,
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            title: {
+              display: true,
+              text: 'Nivel de Satisfacción',
+              font: {
+                size: 12,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              maxRotation: 45,
+              minRotation: 0
+            },
+            title: {
+              display: true,
+              text: 'Tipo de Empleo',
+              font: {
+                size: 12,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
+  loadNuevosGraficos() {
+    // 1. Tecnologías vs Salario
+    this.dashboardService.obtenerTecnologiasVsSalario()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.tecnologiasVsSalario) {
+            this.tecnologiasVsSalario = response.tecnologiasVsSalario;
+            setTimeout(() => this.renderTecnologiasVsSalarioChart(), 200);
+          }
+        },
+        error: (error) => console.error('Error cargando tecnologías vs salario:', error)
+      });
+
+    // 2. Salario vs Educación
+    this.dashboardService.obtenerSalarioVsEducacion()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.salarioVsEducacion) {
+            this.salarioVsEducacion = response.salarioVsEducacion;
+            setTimeout(() => this.renderSalarioVsEducacionChart(), 200);
+          }
+        },
+        error: (error) => console.error('Error cargando salario vs educación:', error)
+      });
+
+    // 3. Tipo Empleo vs Satisfacción
+    this.dashboardService.obtenerTipoEmpleoVsSatisfaccion()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.tipoEmpleoVsSatisfaccion) {
+            this.tipoEmpleoVsSatisfaccion = response.tipoEmpleoVsSatisfaccion;
+            setTimeout(() => this.renderTipoEmpleoVsSatisfaccionChart(), 200);
+          }
+        },
+        error: (error) => console.error('Error cargando tipo empleo vs satisfacción:', error)
+      });
+
+    // 4. Proyección Tecnologías
+    this.dashboardService.obtenerProyeccionDemandaTecnologias()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.proyeccion) {
+            this.proyeccionTecnologias = response.proyeccion;
+            setTimeout(() => this.renderProyeccionTecnologiasChart(), 200);
+          }
+        },
+        error: (error) => console.error('Error cargando proyección tecnologías:', error)
+      });
+
+    // 5. Índice Empleabilidad
+    this.dashboardService.obtenerIndiceEmpleabilidad()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.ok && response.indiceEmpleabilidad) {
+            this.indiceEmpleabilidad = response.indiceEmpleabilidad;
+            setTimeout(() => this.renderIndiceEmpleabilidadChart(), 200);
+          }
+        },
+        error: (error) => console.error('Error cargando índice empleabilidad:', error)
+      });
+  }
+
+  // Métodos para renderizar los nuevos gráficos
+  private renderTecnologiasVsSalarioChart() {
+    const canvas = document.getElementById('tecnologiasVsSalarioChart') as HTMLCanvasElement;
+    if (!canvas || !this.tecnologiasVsSalario.length) return;
+
+    if (this.charts['tecnologiasVsSalario']) {
+      this.charts['tecnologiasVsSalario'].destroy();
+    }
+
+    const formatCurrency = (value: number): string => {
+      return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
+    };
+
+    this.charts['tecnologiasVsSalario'] = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: this.tecnologiasVsSalario.map(t => t.tecnologia),
+        datasets: [{
+          label: 'Salario Promedio',
+          data: this.tecnologiasVsSalario.map(t => t.salarioPromedio),
+          backgroundColor: '#10B981',
+          borderColor: '#059669',
+          borderWidth: 2,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Tecnologías con Mejores Salarios',
+            font: { size: 16, weight: 'bold' }
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const item = this.tecnologiasVsSalario[context.dataIndex];
+                return [
+                  `Salario: ${formatCurrency(item.salarioPromedio)}`,
+                  `Profesionales: ${item.cantidad}`
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { callback: (value) => formatCurrency(Number(value)) }
+          }
+        }
+      }
+    });
+  }
+
+  private renderSalarioVsEducacionChart() {
+    const canvas = document.getElementById('salarioVsEducacionChart') as HTMLCanvasElement;
+    if (!canvas || !this.salarioVsEducacion.length) return;
+
+    if (this.charts['salarioVsEducacion']) {
+      this.charts['salarioVsEducacion'].destroy();
+    }
+
+    const formatCurrency = (value: number): string => {
+      return `$${value.toLocaleString('es-CL').replace(/,/g, '.')}`;
+    };
+
+    this.charts['salarioVsEducacion'] = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: this.salarioVsEducacion.map(e => e.nivelEducacion),
+        datasets: [
+          {
+            label: 'Salario Promedio',
+            data: this.salarioVsEducacion.map(e => e.salarioPromedio),
+            backgroundColor: '#3B82F6',
+            borderColor: '#2563EB',
+            borderWidth: 2,
+            borderRadius: 6
+          },
+          {
+            label: 'Salario Máximo',
+            data: this.salarioVsEducacion.map(e => e.salarioMaximo),
+            backgroundColor: '#10B981',
+            borderColor: '#059669',
+            borderWidth: 2,
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Impacto de la Educación en el Salario',
+            font: { size: 16, weight: 'bold' }
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const item = this.salarioVsEducacion[context.dataIndex];
+                return [
+                  `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
+                  `Profesionales: ${item.cantidad}`
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            ticks: { callback: (value) => formatCurrency(Number(value)) }
+          }
+        }
+      }
+    });
+  }
+
+  private renderProyeccionTecnologiasChart() {
+    const canvas = document.getElementById('proyeccionTecnologiasChart') as HTMLCanvasElement;
+    if (!canvas || !this.proyeccionTecnologias) return;
+
+    if (this.charts['proyeccionTecnologias']) {
+      this.charts['proyeccionTecnologias'].destroy();
+    }
+
+    const { historico, proyeccion, top5Tecnologias } = this.proyeccionTecnologias;
+    const labels = [...historico.map(h => h.mes), ...proyeccion.map(p => p.mes)];
+
+    const datasets = top5Tecnologias.map((tech, index) => {
+      const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+      const data = historico.map(h => h.tecnologias[tech] || 0);
+
+      // Proyección simple (promedio de últimos 3 meses)
+      const ultimos3 = data.slice(-3);
+      const promedio = ultimos3.reduce((sum, val) => sum + val, 0) / 3;
+      proyeccion.forEach(() => data.push(promedio));
+
+      return {
+        label: tech,
+        data: data,
+        borderColor: colors[index],
+        backgroundColor: colors[index] + '20',
+        borderWidth: 2,
+        tension: 0.4,
+        segment: {
+          borderDash: (ctx: any) => ctx.p1DataIndex >= historico.length ? [5, 5] : undefined
+        }
+      };
+    });
+
+    this.charts['proyeccionTecnologias'] = new Chart(canvas, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Proyección de Demanda de Tecnologías',
+            font: { size: 16, weight: 'bold' }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#3B82F6',
+            borderWidth: 1,
+            cornerRadius: 8,
+            callbacks: {
+              title: function(tooltipItems) {
+                const index = tooltipItems[0].dataIndex;
+                const isProyeccion = index >= historico.length;
+                return `${tooltipItems[0].label}${isProyeccion ? ' (Proyección)' : ''}`;
+              },
+              label: function(context) {
+                return `${context.dataset.label}: ${context.parsed.y} selecciones`;
+              },
+              afterLabel: function(context) {
+                const index = context.dataIndex;
+                if (index >= historico.length) {
+                  return 'Dato proyectado';
+                }
+                return '';
+              }
+            }
+          },
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 15,
+              font: {
+                size: 12,
+                family: 'Inter, sans-serif'
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              maxRotation: 45
+            }
+          },
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              },
+              stepSize: 1
+            },
+            title: {
+              display: true,
+              text: 'Número de Selecciones',
+              font: {
+                size: 12,
+                weight: 'bold',
+                family: 'Inter, sans-serif'
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
+  private renderIndiceEmpleabilidadChart() {
+    const canvas = document.getElementById('indiceEmpleabilidadChart') as HTMLCanvasElement;
+    if (!canvas || !this.indiceEmpleabilidad) return;
+
+    if (this.charts['indiceEmpleabilidad']) {
+      this.charts['indiceEmpleabilidad'].destroy();
+    }
+
+    const { distribucion } = this.indiceEmpleabilidad;
+
+    this.charts['indiceEmpleabilidad'] = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: distribucion.map(d => d.rango),
+        datasets: [{
+          data: distribucion.map(d => d.cantidad),
+          backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#6B7280'],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Índice de Empleabilidad del Mercado',
+            font: { size: 16, weight: 'bold' }
           }
         }
       }
