@@ -9,6 +9,7 @@ const routes: Routes = [
    path: '', component: MainComponent,
    children: [
     {path: 'login', component: LoginComponent},
+    {path: 'linkedin/callback', component: LoginComponent}, // nueva ruta explícita
     {path: 'reset-password', component: ResetPasswordComponent},
     { path: '**', redirectTo: 'login' }
    ]

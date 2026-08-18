@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
   // Variables para el modal dinámico unificado
   displayModal: boolean = false;
   isLoggingIn: boolean = false;
-  
+
   // Variables para el modal dinámico
   modalIcon: string = 'pi pi-spin pi-spinner';
   modalTitle: string = 'Procesando';
@@ -120,8 +120,8 @@ export class LoginComponent implements OnInit {
   loginWithLinkedIn() {
     if (environment.useRealLinkedIn) {
       this.loginWithLinkedInReal();
-    } else {
-      this.loginWithLinkedInSimulado();
+    // } else {
+    //   this.loginWithLinkedInSimulado();
     }
   }
 
@@ -158,50 +158,50 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  private loginWithLinkedInSimulado() {
-    console.log('Usando login simulado de LinkedIn...');
+  // private loginWithLinkedInSimulado() {
+  //   console.log('Usando login simulado de LinkedIn...');
 
-    const linkedinDataSimulado = {
-      linkedin_id: `linkedin_dev_${Date.now()}`,
-      nombre: `Usuario Desarrollo ${Math.floor(Math.random() * 1000)}`,
-      correo: `dev.usuario${Math.floor(Math.random() * 1000)}@linkedin.com`,
-      perfil_imagen_url: 'https://via.placeholder.com/150x150?text=DEV',
-      posicion_actual: 'Desarrollador de Software',
-      empresa_actual: 'Tech Company Dev',
-      ubicacion: 'Santiago, Chile',
-      resumen: 'Perfil de desarrollo para pruebas del sistema.',
-      industria: 'Tecnología de la información'
-    };
+  //   const linkedinDataSimulado = {
+  //     linkedin_id: `linkedin_dev_${Date.now()}`,
+  //     nombre: `Usuario Desarrollo ${Math.floor(Math.random() * 1000)}`,
+  //     correo: `dev.usuario${Math.floor(Math.random() * 1000)}@linkedin.com`,
+  //     perfil_imagen_url: 'https://via.placeholder.com/150x150?text=DEV',
+  //     posicion_actual: 'Desarrollador de Software',
+  //     empresa_actual: 'Tech Company Dev',
+  //     ubicacion: 'Santiago, Chile',
+  //     resumen: 'Perfil de desarrollo para pruebas del sistema.',
+  //     industria: 'Tecnología de la información'
+  //   };
 
-    this.isLoggingIn = true;
-    this.changeModalState('loading', 'pi pi-spin pi-spinner', 'Procesando', 'Conectando con LinkedIn...');
-    this.displayModal = true;
+  //   this.isLoggingIn = true;
+  //   this.changeModalState('loading', 'pi pi-spin pi-spinner', 'Procesando', 'Conectando con LinkedIn...');
+  //   this.displayModal = true;
 
-    setTimeout(() => {
-      this.authService.loginLinkedIn(linkedinDataSimulado).subscribe({
-        next: (ok) => {
-          if (ok === true) {
-            // Cambiar a estado de éxito
-            this.changeModalState('success', 'pi pi-check', '¡Éxito!', 'Accediendo al portal...', true);
+  //   setTimeout(() => {
+  //     this.authService.loginLinkedIn(linkedinDataSimulado).subscribe({
+  //       next: (ok) => {
+  //         if (ok === true) {
+  //           // Cambiar a estado de éxito
+  //           this.changeModalState('success', 'pi pi-check', '¡Éxito!', 'Accediendo al portal...', true);
 
-            setTimeout(() => {
-              this.router.navigate(['/user']);
-              // El modal se cerrará automáticamente al cambiar de ruta
-            }, 800);
-          } else {
-            // Cambiar a estado de error
-            this.changeModalState('error', 'pi pi-times', 'Error de LinkedIn', ok || 'Error al conectar con LinkedIn');
-            this.isLoggingIn = false;
-          }
-        },
-        error: (error) => {
-          console.error('Error en login simulado:', error);
-          this.changeModalState('error', 'pi pi-times', 'Error de desarrollo', 'Error en el login simulado');
-          this.isLoggingIn = false;
-        }
-      });
-    }, 1000);
-  }
+  //           setTimeout(() => {
+  //             this.router.navigate(['/user']);
+  //             // El modal se cerrará automáticamente al cambiar de ruta
+  //           }, 800);
+  //         } else {
+  //           // Cambiar a estado de error
+  //           this.changeModalState('error', 'pi pi-times', 'Error de LinkedIn', ok || 'Error al conectar con LinkedIn');
+  //           this.isLoggingIn = false;
+  //         }
+  //       },
+  //       error: (error) => {
+  //         console.error('Error en login simulado:', error);
+  //         this.changeModalState('error', 'pi pi-times', 'Error de desarrollo', 'Error en el login simulado');
+  //         this.isLoggingIn = false;
+  //       }
+  //     });
+  //   }, 1000);
+  // }
 
   private processLinkedInCallback(code: string, state: string) {
     console.log('Procesando callback de LinkedIn...');

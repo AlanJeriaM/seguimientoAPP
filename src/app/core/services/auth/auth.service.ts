@@ -65,23 +65,23 @@ export class AuthService {
   }
 
   // Login con LinkedIn (simulado para desarrollo)
-  loginLinkedIn(linkedinData: any): Observable<any> {
-    return this.http.post<any>(`${this.url}/api/auth/linkedin`, { linkedinData })
-      .pipe(
-        tap(resp => {
-          if (resp.ok) {
-            sessionStorage.setItem('token', resp.token);
-            this._usuario = {
-              nombreUsuario: resp.nombreUsuario!,
-              id: resp.id!,
-              rol: resp.rol!,
-            }
-          }
-        }),
-        map(valido => valido.ok),
-        catchError(err => of(err.error.msj)),
-      )
-  }
+  // loginLinkedIn(linkedinData: any): Observable<any> {
+  //   return this.http.post<any>(`${this.url}/api/auth/linkedin`, { linkedinData })
+  //     .pipe(
+  //       tap(resp => {
+  //         if (resp.ok) {
+  //           sessionStorage.setItem('token', resp.token);
+  //           this._usuario = {
+  //             nombreUsuario: resp.nombreUsuario!,
+  //             id: resp.id!,
+  //             rol: resp.rol!,
+  //           }
+  //         }
+  //       }),
+  //       map(valido => valido.ok),
+  //       catchError(err => of(err.error.msj)),
+  //     )
+  // }
 
   // Validar token
   validarToken() {
