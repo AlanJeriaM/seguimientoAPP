@@ -117,7 +117,7 @@
 </div>
 
   <!-- Market Stats Cards con Gráfico -->
-  <div class="stats-chart-container scale-up-top mb-4 md:mb-5 lg:mb-6" id="resumen-general" >
+  <div class="stats-chart-container scale-up-top mb-4 md:mb-5 lg:mb-6" id="resumen-general">
     <!-- Estadísticas del mercado -->
     <div class="stats-grid" [class.admin-grid]="isAdmin()" [class.user-grid]="!isAdmin()">
       <div class="stat-card-wrapper">
@@ -179,11 +179,11 @@
 
 
     <!-- Gráfico Composición del Mercado -->
-    <div class="chart-container">
+    <div class="chart-container" style="margin-top: 1.5rem;">
       <p-card styleClass="h-full">
         <ng-template pTemplate="header">
           <div class="flex align-items-center justify-content-between flex-wrap gap-2 p-3">
-            <h3 class="text-base md:text-lg font-semibold text-900 m-0">Composición del Mercado</h3>
+            <h3 class="text-base md:text-lg font-semibold text-900 m-2">Composición del Mercado</h3>
             <p-tag value="Métricas clave" severity="info"></p-tag>
           </div>
         </ng-template>

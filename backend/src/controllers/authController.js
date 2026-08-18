@@ -265,100 +265,100 @@ const linkedinCallback = async (req, res) => {
 };
 
 // Login directo con LinkedIn (para datos simulados en desarrollo)
-const loginLinkedIn = async (req, res) => {
-  try {
-    const { linkedinData } = req.body;
+// const loginLinkedIn = async (req, res) => {
+//   try {
+//     const { linkedinData } = req.body;
 
-    if (!linkedinData) {
-      return res.status(400).json({
-        ok: false,
-        msj: 'Datos de LinkedIn requeridos'
-      });
-    }
+//     if (!linkedinData) {
+//       return res.status(400).json({
+//         ok: false,
+//         msj: 'Datos de LinkedIn requeridos'
+//       });
+//     }
 
-    const {
-      linkedin_id,
-      nombre,
-      correo,
-      perfil_imagen_url,
-      posicion_actual,
-      empresa_actual,
-      ubicacion,
-      resumen,
-      industria
-    } = linkedinData;
+//     const {
+//       linkedin_id,
+//       nombre,
+//       correo,
+//       perfil_imagen_url,
+//       posicion_actual,
+//       empresa_actual,
+//       ubicacion,
+//       resumen,
+//       industria
+//     } = linkedinData;
 
-    if (!linkedin_id || !nombre || !correo) {
-      return res.status(400).json({
-        ok: false,
-        msj: 'Datos de LinkedIn incompletos'
-      });
-    }
+//     if (!linkedin_id || !nombre || !correo) {
+//       return res.status(400).json({
+//         ok: false,
+//         msj: 'Datos de LinkedIn incompletos'
+//       });
+//     }
 
-    // Buscar o crear usuario
-    let user = await User.findOne({
-      where: { linkedin_id }
-    });
+//     // Buscar o crear usuario
+//     let user = await User.findOne({
+//       where: { linkedin_id }
+//     });
 
-    if (!user) {
-      user = await User.create({
-        linkedin_id,
-        nombre,
-        correo,
-        linkedin_data: linkedinData,
-        perfil_imagen_url,
-        posicion_actual,
-        empresa_actual: normalizeText(empresa_actual),
-        ubicacion,
-        resumen,
-        industria: normalizeText(industria),
-        ultimo_acceso: new Date(),
-        activo: true,
-        nombre_editado_manual: false // Nuevo campo, por defecto false
-      });
-      console.log('Usuario simulado creado con ID:', user.id);
-    } else {
-      // Solo actualizar campos que NO fueron editados manualmente
-      const datosParaActualizar = {
-        correo,
-        linkedin_data: linkedinData,
-        perfil_imagen_url,
-        posicion_actual,
-        empresa_actual: normalizeText(empresa_actual),
-        ubicacion,
-        resumen,
-        industria: normalizeText(industria),
-        ultimo_acceso: new Date()
-      };
+//     if (!user) {
+//       user = await User.create({
+//         linkedin_id,
+//         nombre,
+//         correo,
+//         linkedin_data: linkedinData,
+//         perfil_imagen_url,
+//         posicion_actual,
+//         empresa_actual: normalizeText(empresa_actual),
+//         ubicacion,
+//         resumen,
+//         industria: normalizeText(industria),
+//         ultimo_acceso: new Date(),
+//         activo: true,
+//         nombre_editado_manual: false // Nuevo campo, por defecto false
+//       });
+//       console.log('Usuario simulado creado con ID:', user.id);
+//     } else {
+//       // Solo actualizar campos que NO fueron editados manualmente
+//       const datosParaActualizar = {
+//         correo,
+//         linkedin_data: linkedinData,
+//         perfil_imagen_url,
+//         posicion_actual,
+//         empresa_actual: normalizeText(empresa_actual),
+//         ubicacion,
+//         resumen,
+//         industria: normalizeText(industria),
+//         ultimo_acceso: new Date()
+//       };
 
-      // Solo actualizar el nombre si NO fue editado manualmente
-      if (!user.nombre_editado_manual) {
-        datosParaActualizar.nombre = nombre;
-      }
+//       // Solo actualizar el nombre si NO fue editado manualmente
+//       if (!user.nombre_editado_manual) {
+//         datosParaActualizar.nombre = nombre;
+//       }
 
-      await user.update(datosParaActualizar);
-      console.log('Usuario simulado actualizado');
-    }
+//       await user.update(datosParaActualizar);
+//       console.log('Usuario simulado actualizado');
+//     }
 
-    const token = await generarJWT(user.id, user.nombre, user.rol);
+//     const token = await generarJWT(user.id, user.nombre, user.rol);
 
-    res.json({
-      ok: true,
-      token,
-      id: user.id,
-      nombreUsuario: user.nombre,
-      rol: user.rol,
-      msj: 'Login con LinkedIn exitoso'
-    });
+//     res.json({
+//       ok: true,
+//       token,
+//       id: user.id,
+//       nombreUsuario: user.nombre,
+//       rol: user.rol,
+//       msj: 'Login con LinkedIn exitoso'
+//     });
 
-  } catch (error) {
-    console.error('Error en loginLinkedIn:', error);
-    res.status(500).json({
-      ok: false,
-      msj: 'Error del servidor'
-    });
-  }
-};
+//   } catch (error) {
+//     console.error('Error en loginLinkedIn:', error);
+//     res.status(500).json({
+//       ok: false,
+//       msj: 'Error del servidor'
+//     });
+//   }
+// };
 
 // Enviar código de restablecimiento de contraseña
 const enviarCodigoRestablecimiento = async (req, res) => {
@@ -610,7 +610,6 @@ module.exports = {
   renovarToken,
   getLinkedInAuthUrl,
   linkedinCallback,
-  loginLinkedIn,
   enviarCodigoRestablecimiento,
   verificarCodigoRestablecimiento,
   restablecerContrasenia

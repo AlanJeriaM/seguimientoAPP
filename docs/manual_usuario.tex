@@ -1,0 +1,291 @@
+% Apéndice: Manual de usuario — Sistema de Seguimiento de Egresados
+% Incluir en el documento principal con: \input{docs/manual_usuario.tex}
+% Requiere en el preámbulo: \usepackage{float} \usepackage{graphicx} \usepackage{hyperref}
+
+\chapter{Manual de usuarios}
+\label{ap:manual-usuario}
+
+\begin{center}
+\textbf{MANUAL DE USO DEL SISTEMA DE SEGUIMIENTO DE EGRESADOS}\\[0.5em]
+\textit{Trabajo de Título --- SeguimientoApp}
+\end{center}
+
+\section{Introducción}
+\label{sec:manual-intro}
+
+El objetivo de realizar este manual es poder ayudar a los diferentes usuarios que quieran utilizar este sistema, guiándolos en los pasos que debe realizar ya sea para ingresar al sistema como en el uso del mismo.
+
+Este proyecto fue desarrollado con el fin de dar seguimiento a la trayectoria profesional de los egresados de la institución, consolidar información laboral y tecnológica, y apoyar la toma de decisiones académicas e institucionales mediante reportes y encuestas. El sistema contempla dos perfiles principales: \textbf{egresado} y \textbf{administrador}.
+
+A continuación se detalla, en la primera sección, el ingreso al sistema; en las secciones siguientes, el funcionamiento de cada módulo según el rol del usuario.
+
+\subsection{Ingreso al sistema}
+\label{subsec:manual-ingreso}
+
+\subsubsection{Requisitos y acceso general}
+
+Para utilizar el sistema, el usuario debe abrir un navegador web y dirigirse a la URL de despliegue de la aplicación (por ejemplo, la ruta \texttt{/auth} del frontend). En la pantalla de inicio se podrá alternar entre el \textbf{Portal Egresados} y el \textbf{Panel Administrativo} mediante el botón de cambio de rol, como se muestra en la Figura~\ref{fig:login}.
+
+\begin{figure}[H]
+\centering
+% \includegraphics[width=0.85\textwidth]{figuras/manual/login.png}
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: pantalla de login]\vspace{2cm}}}
+\caption{Pantalla de inicio de sesión con selector de rol.}
+\label{fig:login}
+\end{figure}
+
+\subsubsection{Ingreso del usuario egresado}
+
+El acceso del egresado al sistema se realiza mediante autenticación con LinkedIn y contempla, para un usuario nuevo, un flujo de cuatro etapas que se describen a continuación: ingreso a la aplicación, autorización en LinkedIn, completitud del perfil profesional y acceso al dashboard principal.
+
+\paragraph{Paso 1: Ingreso a la página del sistema.}
+
+El primer paso consiste en abrir un navegador web y dirigirse a la URL de despliegue de la aplicación (por ejemplo, \texttt{http://localhost:4200} en ambiente de desarrollo, o la dirección institucional definida en producción). Al cargar el sitio, el sistema redirige automáticamente a la ruta de autenticación \texttt{/auth}, donde se presenta la pantalla denominada \emph{Portal Egresados}, como se muestra en la Figura~\ref{fig:login-egresado-paso1}.
+
+En esta pantalla, el usuario debe verificar que \textbf{no} esté activa la vista de \emph{Panel Administrativo}. Si el formulario muestra campos de correo y contraseña, debe presionar el botón superior \emph{Egresados} para volver al modo correspondiente al perfil de egresado. Los elementos visibles en esta etapa son los siguientes:
+
+\begin{enumerate}
+\item \textbf{Encabezado del portal:} título \emph{Portal Egresados} y mensaje de bienvenida.
+\item \textbf{Ícono de LinkedIn} junto al texto \emph{Conecta con tu perfil profesional}, que indica el método de acceso habilitado para este rol.
+\item \textbf{Botón Ingresar con LinkedIn:} acción principal que inicia el proceso de autenticación externa.
+\item \textbf{Botón de cambio de rol} (parte superior): permite alternar entre egresado y administrador; debe permanecer en modo egresado.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: Portal Egresados --- Paso 1]\vspace{2cm}}}
+\caption{Paso 1 --- Página de ingreso del egresado en la URL del sistema.}
+\label{fig:login-egresado-paso1}
+\end{figure}
+
+\paragraph{Paso 2: Redirección y autenticación en LinkedIn.}
+
+Al presionar el botón \emph{Ingresar con LinkedIn}, el sistema solicita al servidor la URL de autorización de LinkedIn y muestra un cuadro de diálogo con el mensaje \emph{Conectando con LinkedIn} o \emph{Redirigiendo a LinkedIn}, indicando que la operación está en curso. Posteriormente, el navegador abandona temporalmente la aplicación y carga el sitio oficial de LinkedIn (\texttt{linkedin.com}), donde el usuario deberá:
+
+\begin{enumerate}
+\item Iniciar sesión con su cuenta de LinkedIn, si aún no lo ha hecho en esa sesión del navegador.
+\item Revisar los permisos que la aplicación solicita (acceso al perfil básico y datos profesionales).
+\item Presionar el botón \emph{Permitir} o \emph{Aceptar} para autorizar la vinculación de su cuenta con el sistema.
+\end{enumerate}
+
+Una vez autorizado el acceso, LinkedIn redirige nuevamente a la aplicación con un código de autenticación. El sistema procesa dicho código en segundo plano, registra al usuario si es su primer ingreso o actualiza sus datos si ya existía previamente, y muestra un mensaje de éxito (\emph{Accediendo al portal...}). Finalmente, el egresado es conducido al área privada del sistema bajo la ruta \texttt{/user}, como se aprecia en la Figura~\ref{fig:login-egresado-paso2}.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: autorización LinkedIn --- Paso 2]\vspace{2cm}}}
+\caption{Paso 2 --- Pantalla de autorización en LinkedIn y retorno al sistema.}
+\label{fig:login-egresado-paso2}
+\end{figure}
+
+Si el usuario cancela la autorización o ocurre un error en la autenticación, el sistema permanece en la pantalla de login y despliega un mensaje de error descriptivo, permitiendo reintentar el proceso.
+
+\paragraph{Paso 3: Completar el perfil profesional (usuario nuevo).}
+
+Cuando el egresado ingresa por primera vez, el sistema importa desde LinkedIn información básica como nombre, fotografía, correo, empresa, cargo, ubicación y resumen profesional. Sin embargo, para generar métricas precisas del mercado laboral, la aplicación exige completar un conjunto de \textbf{campos obligatorios} antes de habilitar el dashboard y el módulo de encuestas.
+
+Si el perfil no está completo, al intentar acceder a \texttt{/user/dashboard} o a las encuestas, el sistema redirige automáticamente a la ruta \texttt{/user/mi-perfil} y muestra un aviso destacado con el mensaje \emph{Complete su perfil profesional}, junto a una barra de progreso de completitud (ver Figura~\ref{fig:login-egresado-paso3}). Los campos que el usuario debe completar son:
+
+\begin{enumerate}
+\item Años de experiencia laboral.
+\item Nivel de educación.
+\item Especialidad técnica.
+\item Tipo de empleo actual.
+\item Disponibilidad para cambio de trabajo.
+\item Área de interés.
+\end{enumerate}
+
+Además, el formulario incluye secciones de \emph{Información personal} (nombre, ubicación), \emph{Información profesional} (posición, empresa, industria, resumen) y \emph{Datos para métricas} (tecnologías, rango salarial, satisfacción laboral, entre otros campos opcionales). El usuario debe completar los campos marcados con asterisco rojo ($*$), presionar el botón \emph{Guardar cambios} y verificar que el indicador de progreso alcance el \textbf{100\%}, momento en el cual aparece el mensaje \emph{¡Perfil completado exitosamente!}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: completar perfil --- Paso 3]\vspace{2cm}}}
+\caption{Paso 3 --- Completitud del perfil profesional para usuario nuevo.}
+\label{fig:login-egresado-paso3}
+\end{figure}
+
+Hasta que el perfil no se encuentre completo, el menú lateral seguirá visible, pero las rutas protegidas del dashboard y encuestas permanecerán bloqueadas por el sistema de validación de perfil.
+
+\paragraph{Paso 4: Acceso al Dashboard principal.}
+
+Una vez completado el perfil, el egresado puede acceder al \emph{Dashboard principal} seleccionando en el menú lateral la opción \emph{Reporte egresados} $\rightarrow$ \emph{Dashboard principal}, o navegando directamente a \texttt{/user/dashboard}. En esta pantalla el usuario visualiza por primera vez el conjunto de indicadores agregados del mercado laboral tecnológico, alimentados con los datos consolidados de la comunidad de egresados (ver Figura~\ref{fig:login-egresado-paso4}).
+
+Los elementos principales del dashboard son:
+
+\begin{enumerate}
+\item \textbf{Encabezado personalizado:} muestra la fotografía importada de LinkedIn, el nombre del egresado, su cargo actual, ubicación, empresa e industria. Al hacer clic en el nombre o la imagen, el usuario puede volver a \emph{Mi perfil}.
+\item \textbf{Tarjetas de resumen del mercado:} indicadores como profesionales activos, satisfacción laboral promedio, tecnologías más utilizadas y empleabilidad del sector.
+\item \textbf{Gráficos interactivos:} distribución salarial, tecnologías demandadas, análisis de experiencia, mapa de calor por industria y métricas avanzadas, accesibles también desde los submenús del panel lateral.
+\item \textbf{Botón de menú (\texttt{☰}):} permite desplegar el panel de navegación para acceder a encuestas u otras secciones del reporte.
+\item \textbf{Botón volver arriba:} aparece al desplazarse hacia abajo en páginas extensas de gráficos.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: Dashboard principal --- Paso 4]\vspace{2cm}}}
+\caption{Paso 4 --- Dashboard principal del egresado tras completar el perfil.}
+\label{fig:login-egresado-paso4}
+\end{figure}
+
+A partir de este punto, el egresado dispone de acceso completo a las funcionalidades de su rol: consulta de reportes, respuesta de encuestas y actualización permanente de su perfil profesional (detalladas en la Sección~\ref{sec:manual-egresado}).
+
+\subsubsection{Ingreso del usuario administrador}
+
+El administrador debe activar la vista \emph{Panel Administrativo}, ingresar correo electrónico y contraseña, y presionar \emph{Iniciar Sesión}. La recuperación de contraseña está disponible mediante el enlace \emph{¿Olvidaste tu contraseña?}, que despliega un asistente en tres pasos: solicitud de código, verificación e ingreso de nueva contraseña.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: login administrador]\vspace{2cm}}}
+\caption{Formulario de acceso administrativo.}
+\label{fig:login-admin}
+\end{figure}
+
+\subsubsection{Navegación general}
+
+Una vez autenticado, la interfaz se compone de una barra superior, un botón de menú (\texttt{☰}) que despliega el panel lateral, y el área de contenido. En el menú lateral, la tarjeta de perfil permite acceder a \emph{Mi perfil}. Las opciones del menú dependen del rol del usuario.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: layout principal]\vspace{2cm}}}
+\caption{Vista general del sistema con menú lateral.}
+\label{fig:layout}
+\end{figure}
+
+\section{Módulos del sistema --- Usuario administrador}
+\label{sec:manual-admin}
+
+\subsection{Dashboard y reporte de egresados}
+\label{subsec:dashboard-admin}
+
+Para ingresar al dashboard, el administrador debe seleccionar en el menú lateral la opción \emph{Reporte egresados} $\rightarrow$ \emph{Dashboard principal} (ruta \texttt{/admin/dashboard}).
+
+La página presenta métricas agregadas del mercado laboral tecnológico. Los elementos principales son:
+
+\begin{enumerate}
+\item Encabezado con indicadores generales del mercado laboral.
+\item Tarjeta de \emph{Nuevos registros} con la cantidad de egresados incorporados recientemente.
+\item Conjunto de gráficos interactivos alimentados por los datos de los perfiles.
+\end{enumerate}
+
+Desde el submenú \emph{Reporte egresados} es posible acceder directamente a secciones como análisis salarial, tecnologías más demandadas, satisfacción laboral, mapa de calor y métricas avanzadas; el sistema desplaza la vista hasta el gráfico seleccionado.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: dashboard administrador]\vspace{2cm}}}
+\caption{Dashboard principal del administrador.}
+\label{fig:dashboard-admin}
+\end{figure}
+
+\subsection{Gestión de usuarios egresados}
+
+\subsubsection{Usuarios activos}
+
+Ruta: \texttt{/admin/view-users}. La tabla lista los egresados registrados. Los elementos de la interfaz son:
+
+\begin{enumerate}
+\item \textbf{Buscador:} permite filtrar por nombre, correo o empresa.
+\item \textbf{Botón limpiar filtros:} restablece la búsqueda.
+\item \textbf{Botón actualizar:} recarga los datos desde el servidor.
+\item \textbf{Tabla paginada:} muestra el detalle de cada egresado y acciones de edición o desactivación.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: usuarios activos]\vspace{2cm}}}
+\caption{Listado de usuarios egresados activos.}
+\label{fig:usuarios-activos}
+\end{figure}
+
+\subsubsection{Usuarios eliminados}
+
+Ruta: \texttt{/admin/view-deleted-users}. Muestra egresados desactivados y permite su reactivación.
+
+\subsection{Gestión de administradores}
+
+Rutas: \texttt{/admin/view-admin} (activos) y \texttt{/admin/view-deleted-admin} (eliminados). Permite administrar cuentas con privilegios administrativos de forma análoga a la gestión de egresados.
+
+\subsection{Gestión de encuestas}
+
+\subsubsection{Crear o editar encuesta}
+
+Ruta: \texttt{/admin/create-encuesta}. El formulario se organiza en: (1) datos principales (título, estado, descripción, fechas); (2) definición de preguntas y tipos de respuesta; (3) guardado. Para editar una encuesta existente se utiliza \texttt{/admin/editar-encuesta/:id}.
+
+\subsubsection{Listado y resultados}
+
+\begin{itemize}
+\item \textbf{Mis encuestas} (\texttt{/admin/view-encuesta}): listado y mantenimiento de encuestas.
+\item \textbf{Resultados} (\texttt{/admin/view-encuestas-resultados}): análisis de respuestas, gráficos y exportación de datos.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: resultados encuesta]\vspace{2cm}}}
+\caption{Vista de resultados de encuestas.}
+\label{fig:resultados-encuesta}
+\end{figure}
+
+\subsection{Mi perfil del administrador}
+
+Ruta: \texttt{/admin/mi-perfil}. Permite actualizar datos personales y credenciales del administrador.
+
+\section{Módulos del sistema --- Usuario egresado}
+\label{sec:manual-egresado}
+
+\subsection{Completar perfil profesional}
+\label{subsec:perfil-egresado}
+
+Tras el primer ingreso, el sistema puede restringir el acceso al dashboard y a encuestas hasta completar el perfil (ruta \texttt{/user/mi-perfil}). Los campos obligatorios son: años de experiencia, nivel de educación, especialidad técnica, tipo de empleo actual, disponibilidad de cambio y área de interés.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: perfil incompleto]\vspace{2cm}}}
+\caption{Solicitud de completar perfil profesional.}
+\label{fig:perfil-incompleto}
+\end{figure}
+
+\subsection{Dashboard del egresado}
+
+Ruta: \texttt{/user/dashboard}. Ofrece las mismas visualizaciones agregadas que el panel administrativo, sin la tarjeta de nuevos registros. El egresado puede navegar por las subsecciones del menú \emph{Reporte egresados}.
+
+\subsection{Encuestas}
+
+\subsubsection{Mis encuestas}
+
+Ruta: \texttt{/user/view-encuestas}. Lista encuestas disponibles con buscador y filtro por estado. El botón \emph{Responder} conduce a \texttt{/user/responder-encuesta/:id}.
+
+\subsubsection{Encuestas completadas}
+
+Ruta: \texttt{/user/encuesta-completada}. Historial de encuestas ya enviadas.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}[Insertar captura: responder encuesta]\vspace{2cm}}}
+\caption{Formulario de respuesta de encuesta.}
+\label{fig:responder-encuesta}
+\end{figure}
+
+\subsection{Mi perfil del egresado}
+
+Ruta: \texttt{/user/mi-perfil}. Permite editar y guardar la información profesional que alimenta los reportes del sistema.
+
+\section{Resumen de rutas}
+
+La Tabla~\ref{tab:rutas-manual} resume las rutas principales por rol.
+
+\begin{table}[H]
+\centering
+\caption{Rutas principales del sistema SeguimientoApp.}
+\label{tab:rutas-manual}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Funcionalidad} & \textbf{Administrador} & \textbf{Egresado} \\
+\hline
+Inicio de sesión & \texttt{/auth} & \texttt{/auth} (LinkedIn) \\
+Dashboard & \texttt{/admin/dashboard} & \texttt{/user/dashboard} \\
+Mi perfil & \texttt{/admin/mi-perfil} & \texttt{/user/mi-perfil} \\
+Usuarios & \texttt{/admin/view-users} & --- \\
+Encuestas & \texttt{/admin/view-encuesta} & \texttt{/user/view-encuestas} \\
+Resultados & \texttt{/admin/view-encuestas-resultados} & --- \\
+Responder encuesta & --- & \texttt{/user/responder-encuesta/:id} \\
+\hline
+\end{tabular}
+\end{table}

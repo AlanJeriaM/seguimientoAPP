@@ -5,7 +5,6 @@ const {
   renovarToken,
   getLinkedInAuthUrl,
   linkedinCallback,
-  loginLinkedIn,
   enviarCodigoRestablecimiento,
   verificarCodigoRestablecimiento,
   restablecerContrasenia
@@ -14,7 +13,7 @@ const { verificarToken } = require('../middleware/auth');
 
 // Rutas públicas
 router.post('/login', loginAdmin);
-router.post('/linkedin', loginLinkedIn); // Para desarrollo/simulación
+// router.post('/linkedin', loginLinkedIn); // Para desarrollo/simulación
 router.get('/linkedin/auth-url', getLinkedInAuthUrl); // Nueva ruta
 router.get('/linkedin/callback', linkedinCallback); // Nueva ruta
 
